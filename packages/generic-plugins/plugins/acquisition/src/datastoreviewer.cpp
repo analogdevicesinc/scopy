@@ -195,7 +195,7 @@ void DataStoreViewer::refresh()
 		const QString rowKey = m_tree->topLevelItem(i)->text(ColKey);
 		bool found = false;
 		for(const scopy::acq::DataKey &k : keys) {
-			if(k.key == rowKey) {
+			if(k.toString() == rowKey) {
 				found = true;
 				break;
 			}
@@ -211,14 +211,14 @@ void DataStoreViewer::refresh()
 
 		QTreeWidgetItem *item = nullptr;
 		for(int i = 0; i < m_tree->topLevelItemCount(); ++i) {
-			if(m_tree->topLevelItem(i)->text(ColKey) == k.key) {
+			if(m_tree->topLevelItem(i)->text(ColKey) == k.toString()) {
 				item = m_tree->topLevelItem(i);
 				break;
 			}
 		}
 		if(!item) {
 			item = new QTreeWidgetItem(m_tree);
-			item->setText(ColKey, k.key);
+			item->setText(ColKey, k.toString());
 		}
 
 		item->setText(ColType, type ? scopy::acq::sampleTypeName(*type) : QStringLiteral("-"));
@@ -291,9 +291,9 @@ void DataStoreViewer::fillInfo()
 	// is neither a subset nor a superset of those. So this only ever reports on keys
 	// that have been written at least once.
 	const std::optional<scopy::acq::StreamInfo> info =
-		(key.key.isEmpty() || m_engine.isNull()) ? std::nullopt : m_engine->streamInfo(key);
+		(key.toString().isEmpty() || m_engine.isNull()) ? std::nullopt : m_engine->streamInfo(key);
 
-	if(!key.key.isEmpty() && !info) {
+	if(!key.toString().isEmpty() && !info) {
 		// Not an error, and common: an X ramp or a processor's scratch key is exactly
 		// the stream its producer has nothing to say about.
 		rows.append({QStringLiteral("Stream info"), QStringLiteral("(not declared)")});
@@ -302,7 +302,7 @@ void DataStoreViewer::fillInfo()
 		rows.append({QStringLiteral("Label"), orElse(info->label, "(derived from key)")});
 		rows.append({QStringLiteral("Unit"), orElse(info->unit, "(dimensionless)")});
 		rows.append({QStringLiteral("Sample rate"), formatRate(m_fmt, info->sampleRate, "sps")});
-		rows.append({QStringLiteral("X key"), orElse(info->xKey.key, "(sample index)")});
+		rows.append({QStringLiteral("X key"), orElse(info->xKey.toString(), "(sample index)")});
 		rows.append({QStringLiteral("Kind"), QString::fromLatin1(scopy::acq::reprKindName(info->kind))});
 		rows.append(
 			{QStringLiteral("Color index"),
@@ -311,7 +311,7 @@ void DataStoreViewer::fillInfo()
 
 	// The protocol half of the description, for the streams that have one. Held by the
 	// store rather than the block, so it is a separate lookup with its own absent case.
-	if(!key.key.isEmpty() && m_store) {
+	if(!key.toString().isEmpty() && m_store) {
 		const std::optional<scopy::acq::SampleType> type = m_store->snapshot(key).type();
 		if(type == scopy::acq::SampleType::Annotation) {
 			if(const std::optional<scopy::acq::AnnotationStreamInfo> ann = m_store->annotationInfo(key)) {
@@ -354,14 +354,14 @@ void DataStoreViewer::fillSamples()
 	}
 
 	const scopy::acq::DataKey key = selectedKey();
-	if(key.key.isEmpty()) {
+	if(key.toString().isEmpty()) {
 		m_samples->clear();
 		m_samplesTitle->setText("Select a key.");
 		m_copyBtn->setEnabled(false);
 		fillInfo();
 		return;
 	}
-	m_samplesTitle->setText(key.key);
+	m_samplesTitle->setText(key.toString());
 	fillInfo();
 
 	// Copy goes to the store, not to these rows, so it only needs a selected key with
@@ -413,7 +413,7 @@ void DataStoreViewer::copySamples()
 	}
 
 	const scopy::acq::DataKey key = selectedKey();
-	if(key.key.isEmpty()) {
+	if(key.toString().isEmpty()) {
 		return;
 	}
 

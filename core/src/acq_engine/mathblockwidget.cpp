@@ -96,7 +96,7 @@ MathBlockWidget::MathBlockWidget(MathProcessor *proc, QWidget *parent)
 			delete item;
 		}
 		inputsLay->addWidget(new QLabel("S = sample index", inputsContainer));
-		const QList<DataKey> &keys = proc->watchedKeys();
+		const QList<DataKey> keys = proc->watchedKeys();
 		if(keys.isEmpty()) {
 			inputsLay->addWidget(new QLabel("(no inputs)", inputsContainer));
 			return;

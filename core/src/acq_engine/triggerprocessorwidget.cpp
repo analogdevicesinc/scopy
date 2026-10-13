@@ -152,6 +152,9 @@ TriggerProcessorWidget::TriggerProcessorWidget(TriggerProcessor *proc, QWidget *
 	connect(addBtn, &QPushButton::clicked, this, [this]() {
 		TriggerCondition c;
 		c.label = QString("cond %1").arg(m_proc->conditions().size() + 1);
+		// The key the new row's combo will show, so what is displayed is what is used.
+		if(!m_availableKeys.isEmpty())
+			c.key = DataKey(m_availableKeys.first());
 		m_proc->addCondition(c);
 	});
 
@@ -206,10 +209,10 @@ void TriggerProcessorWidget::rebuildRows()
 		// round-trips without silently mutating.
 		for(const QString &k : m_availableKeys)
 			keyCombo->addItem(k);
-		if(!c.key.key.isEmpty()) {
-			if(keyCombo->findText(c.key.key) < 0)
-				keyCombo->insertItem(0, c.key.key);
-			keyCombo->setCurrentIndex(keyCombo->findText(c.key.key));
+		if(!c.key.toString().isEmpty()) {
+			if(keyCombo->findText(c.key.toString()) < 0)
+				keyCombo->insertItem(0, c.key.toString());
+			keyCombo->setCurrentIndex(keyCombo->findText(c.key.toString()));
 		}
 		m_keyCombos.append(keyCombo);
 		form->addRow("Key:", keyCombo);

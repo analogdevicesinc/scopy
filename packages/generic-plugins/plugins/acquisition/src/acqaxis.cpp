@@ -151,7 +151,7 @@ bool AcqAxis::isHorizontal() const { return m_axis.isNull() ? false : m_axis->is
 
 QString AcqAxis::unitForKey(const scopy::acq::DataKey &k) const
 {
-	if(k.key.isEmpty()) {
+	if(k.toString().isEmpty()) {
 		// No producer named an X. The channel resolves that to the ramp before an axis
 		// ever sees it, so this is only reachable for an axis constructed with a
 		// default-built Source.

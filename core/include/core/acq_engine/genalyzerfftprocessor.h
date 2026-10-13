@@ -108,8 +108,8 @@ public:
 	// Moves the averaging depth claims with the keys, so a key this block no
 	// longer watches stops pinning history.
 	void setInputs(const QList<DataKey> &keys);
-	QList<DataKey> inputs() const { return m_watchedKeys; }
-	bool hasInputs() const { return !m_watchedKeys.isEmpty(); }
+	QList<DataKey> inputs() const { return watchedKeys(); }
+	bool hasInputs() const { return !watchedKeys().isEmpty(); }
 
 	// Routed through setInputs(), so the base-class entry point gets the mode
 	// switch, the re-claim and the signal rather than just assigning the list.

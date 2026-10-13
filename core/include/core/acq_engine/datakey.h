@@ -28,25 +28,30 @@
 namespace scopy {
 namespace acq {
 
-// Identifies one data stream in the DataStore as "<sourceId>_<channelId>_<stage>".
+// Identifies one DataStore stream as "<sourceId>_<channelId>_<stage>".
 //
-// The string is the identity: DataKey round-trips through GUI combo boxes and
-// settings as plain text, so equality and hashing are string-based and the
-// components are parsed back out on demand.
-//
-// The source is the first segment, the stage the last, and the channel is
-// everything in between ("adxl355_accel_x_raw" -> source "adxl355", channel
-// "accel_x", stage "raw"). Channel IDs may therefore contain underscores, while
-// source IDs and stage names may not — a source named "m2k_logic" would parse as
-// source "m2k" with "logic_" pulled into every one of its channel IDs.
-struct DataKey
+// The joined string is the identity (equality, hashing, combo boxes, settings); the
+// three parts are split out once, at construction. Source ids and stage names may
+// not contain '_' — the channel id may, since parsing takes the first segment as
+// the source and the last as the stage ("adxl355_accel_x_raw" -> "adxl355",
+// "accel_x", "raw").
+class DataKey
 {
-	QString key;
-
+public:
 	DataKey() = default;
 	explicit DataKey(const QString &k)
-		: key(k)
-	{}
+		: m_key(k)
+	{
+		const QStringList p = k.split('_');
+		if(p.size() >= 3) {
+			m_source = p.first();
+			m_stage = p.last();
+			m_channel = QStringList(p.mid(1, p.size() - 2)).join('_');
+		} else if(!p.isEmpty()) {
+			m_source = p.first();
+			m_stage = p.size() == 2 ? p.last() : QString();
+		}
+	}
 
 	static DataKey raw(const QString &sourceId, const QString &channelId)
 	{
@@ -55,41 +60,36 @@ struct DataKey
 
 	static DataKey withStage(const QString &sourceId, const QString &channelId, const QString &stage)
 	{
-		return DataKey(sourceId + "_" + channelId + "_" + stage);
+		Q_ASSERT_X(!sourceId.contains('_') && !stage.contains('_'), "DataKey",
+			   "source ids and stage names may not contain '_'");
+		DataKey k;
+		k.m_key = sourceId + '_' + channelId + '_' + stage;
+		k.m_source = sourceId;
+		k.m_channel = channelId;
+		k.m_stage = stage;
+		return k;
 	}
 
-	QString sourceId() const { return segment(0); }
-	QString channelId() const { return middle(); }
-	QString stage() const { return segment(-1); }
+	const QString &sourceId() const { return m_source; }
+	const QString &channelId() const { return m_channel; }
+	const QString &stage() const { return m_stage; }
+	bool isRaw() const { return m_stage == QLatin1String("raw"); }
+	bool isEmpty() const { return m_key.isEmpty(); }
 
-	bool isRaw() const { return key.endsWith(QStringLiteral("_raw")); }
+	const QString &toString() const { return m_key; }
 
-	bool operator<(const DataKey &o) const noexcept { return key < o.key; }
-	bool operator==(const DataKey &o) const noexcept { return key == o.key; }
-	bool operator!=(const DataKey &o) const noexcept { return key != o.key; }
-
-	QString toString() const { return key; }
+	bool operator<(const DataKey &o) const noexcept { return m_key < o.m_key; }
+	bool operator==(const DataKey &o) const noexcept { return m_key == o.m_key; }
+	bool operator!=(const DataKey &o) const noexcept { return m_key != o.m_key; }
 
 private:
-	// i-th segment, negative counting back from the end (-1 is the last).
-	QString segment(int i) const
-	{
-		const QStringList p = key.split('_');
-		const int idx = i < 0 ? p.size() + i : i;
-		return (idx >= 0 && idx < p.size()) ? p.at(idx) : QString();
-	}
-
-	// Everything between the first and last segments, rejoined.
-	QString middle() const
-	{
-		const QStringList p = key.split('_');
-		if(p.size() <= 2)
-			return {};
-		return QStringList(p.mid(1, p.size() - 2)).join('_');
-	}
+	QString m_key;
+	QString m_source;
+	QString m_channel;
+	QString m_stage;
 };
 
-inline size_t qHash(const DataKey &k, size_t seed = 0) noexcept { return qHash(k.key, seed); }
+inline size_t qHash(const DataKey &k, size_t seed = 0) noexcept { return qHash(k.toString(), seed); }
 
 } // namespace acq
 } // namespace scopy

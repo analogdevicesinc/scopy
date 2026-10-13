@@ -48,10 +48,11 @@ void MathProcessor::process(DataStore *store)
 	// invalidates element addresses on push_back, so the pointers stay valid.
 	std::deque<QVector<float>> held;
 	QVector<const QVector<float> *> inputs;
-	inputs.reserve(m_watchedKeys.size());
+	const QList<DataKey> keys = watchedKeys();
+	inputs.reserve(keys.size());
 
 	int n = 0;
-	for(const DataKey &k : m_watchedKeys) {
+	for(const DataKey &k : keys) {
 		auto src = store->latestAs<QVector<float>>(k);
 		if(!src) {
 			inputs.append(nullptr); // absent or non-float reads as 0

@@ -142,7 +142,7 @@ std::optional<StreamInfo> ExternalDecoderProcessor::streamInfo(const DataKey &ke
 {
 	// Empty slots are skipped rather than matched: an unconfigured stage has no key,
 	// and an empty query key must not collide with it.
-	if(key.key.isEmpty())
+	if(key.toString().isEmpty())
 		return std::nullopt;
 
 	const int i = m_outKeys.indexOf(key);
@@ -170,7 +170,7 @@ std::optional<StreamInfo> ExternalDecoderProcessor::streamInfo(const DataKey &ke
 void ExternalDecoderProcessor::publishStreamInfo(DataStore *store)
 {
 	for(int i = 0; i < m_outKeys.size(); ++i) {
-		if(m_outKeys[i].key.isEmpty())
+		if(m_outKeys[i].toString().isEmpty())
 			continue;
 		if(static_cast<std::size_t>(i) >= m_cfg.stack.size())
 			continue;
@@ -190,7 +190,7 @@ void ExternalDecoderProcessor::publishStreamInfo(DataStore *store)
 void ExternalDecoderProcessor::publish(DataStore *store, std::vector<QVector<Annotation>> &perStage)
 {
 	for(int i = 0; i < m_outKeys.size(); ++i) {
-		if(m_outKeys[i].key.isEmpty())
+		if(m_outKeys[i].toString().isEmpty())
 			continue;
 		store->write(m_outKeys[i], std::move(perStage[static_cast<std::size_t>(i)]));
 		Q_EMIT cycleProduced(m_outKeys[i]);
@@ -216,7 +216,7 @@ void ExternalDecoderProcessor::process(DataStore *store)
 
 void ExternalDecoderProcessor::decodeAnnotationInput(DataStore *store, std::vector<QVector<Annotation>> &perStage)
 {
-	if(m_annInKey.key.isEmpty()) {
+	if(m_annInKey.toString().isEmpty()) {
 		// Same per-cycle misconfiguration shape as "no rawKeys set" below.
 		reportOnce(AcquisitionError::Severity::Warning,
 			   QStringLiteral("rootInput=Annotations but no annInKey set"));
@@ -228,8 +228,9 @@ void ExternalDecoderProcessor::decodeAnnotationInput(DataStore *store, std::vect
 		if(store->contains(m_annInKey))
 			// A wrong stream type does not fix itself between cycles either. The key
 			// is in the message, so retargeting to a different bad key still reports.
-			reportOnce(AcquisitionError::Severity::Warning,
-				   QStringLiteral("annInKey %1 is not an annotation stream").arg(m_annInKey.key));
+			reportOnce(
+				AcquisitionError::Severity::Warning,
+				QStringLiteral("annInKey %1 is not an annotation stream").arg(m_annInKey.toString()));
 		return;
 	}
 	if(annIn->isEmpty())
@@ -251,7 +252,7 @@ void ExternalDecoderProcessor::decodeAnnotationInput(DataStore *store, std::vect
 		report(AcquisitionError::Severity::Info,
 		       QStringLiteral("annInKey %1 has no stream descriptor; "
 				      "falling back to annIn.* config")
-			       .arg(m_annInKey.key));
+			       .arg(m_annInKey.toString()));
 	}
 
 	std::vector<scopy::decoder::AnnotationC> outC;
@@ -294,7 +295,7 @@ void ExternalDecoderProcessor::decodeLogicInput(DataStore *store, std::vector<QV
 			if(store->contains(key) && store->typeOf(key) != SampleType::UInt8)
 				// Steady state for as long as that key stays mapped.
 				reportOnce(AcquisitionError::Severity::Warning,
-					   QStringLiteral("key %1 is not a bit stream").arg(key.key));
+					   QStringLiteral("key %1 is not a bit stream").arg(key.toString()));
 			continue;
 		}
 		minLen = std::min(minLen, vec.size());

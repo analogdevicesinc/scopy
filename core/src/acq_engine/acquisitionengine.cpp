@@ -25,6 +25,7 @@
 #include <exception>
 #include <numeric>
 #include <QElapsedTimer>
+#include <QMetaObject>
 #include <QMutexLocker>
 #include <QStringList>
 
@@ -33,27 +34,27 @@ namespace acq {
 
 using Severity = AcquisitionError::Severity;
 
+namespace {
+constexpr std::size_t kDefaultIndexRampLength = 1024;
+} // namespace
+
 AcquisitionEngine::AcquisitionEngine(DataStore *store, QObject *parent)
 	: QObject(parent)
 	, m_store(store)
-	, m_defaultIndexRampLength(1024)
 {
 	qRegisterMetaType<scopy::acq::DataKey>("scopy::acq::DataKey");
 
-	// Written in the ctor: a channel can be created and read before the first
-	// cycle, and an X source with no samples draws nothing at all. The matching
-	// descriptor needs no publishing — streamInfo() answers for this key itself.
+	// A channel can read its X source before the first cycle.
 	if(m_store)
-		publishIndexRamp(m_defaultIndexRampLength);
+		publishIndexRamp(kDefaultIndexRampLength);
 }
 
 AcquisitionEngine::~AcquisitionEngine() { stop(); }
 
 // --- Block registration ------------------------------------------------------
 //
-// Requests are queued and applied by the worker between cycles (syncBlocks), so
-// a mid-run add/remove can never race the worker's iteration. While stopped,
-// syncBlocks() runs inline so the lists are immediately observable.
+// Requests are queued and applied between cycles by syncBlocks(); while stopped
+// it runs inline so the lists are immediately observable.
 
 void AcquisitionEngine::addSource(SourceBlock *src)
 {
@@ -71,7 +72,8 @@ void AcquisitionEngine::removeSource(SourceBlock *src)
 	{
 		QMutexLocker lk(&m_blockMutex);
 		m_pendingAddSources.removeAll(src);
-		m_pendingRemoveSources.append(src);
+		if(!m_pendingRemoveSources.contains(src))
+			m_pendingRemoveSources.append(src);
 	}
 	if(!m_threadAlive)
 		syncBlocks();
@@ -93,26 +95,20 @@ void AcquisitionEngine::removeProcessor(ProcessorBlock *proc)
 	{
 		QMutexLocker lk(&m_blockMutex);
 		m_pendingAddProcessors.removeAll(proc);
-		m_pendingRemoveProcessors.append(proc);
+		if(!m_pendingRemoveProcessors.contains(proc))
+			m_pendingRemoveProcessors.append(proc);
 	}
 	if(!m_threadAlive)
 		syncBlocks();
 }
 
-void AcquisitionEngine::setRunLast(ProcessorBlock *proc)
-{
-	QMutexLocker lk(&m_blockMutex);
-	m_runLast.insert(proc);
-}
-
 void AcquisitionEngine::syncBlocks()
 {
+	QList<SourceBlock *> removedSources;
+	QList<ProcessorBlock *> removedProcessors;
 	bool changed;
 	{
 		QMutexLocker lk(&m_blockMutex);
-
-		// Called once per cycle from loop(), so most calls have nothing
-		// pending — only report a change when something was actually applied.
 		changed = !m_pendingAddSources.isEmpty() || !m_pendingRemoveSources.isEmpty() ||
 			!m_pendingAddProcessors.isEmpty() || !m_pendingRemoveProcessors.isEmpty();
 
@@ -128,24 +124,27 @@ void AcquisitionEngine::syncBlocks()
 			if(!m_processors.contains(p))
 				m_processors.append(p);
 
+		removedSources.swap(m_pendingRemoveSources);
+		removedProcessors.swap(m_pendingRemoveProcessors);
 		m_pendingAddSources.clear();
-		m_pendingRemoveSources.clear();
 		m_pendingAddProcessors.clear();
-		m_pendingRemoveProcessors.clear();
 	}
 
-	// Emitted with m_blockMutex released: a directly-connected consumer that
-	// reached back into sources()/processors() would deadlock on it.
+	// Out of every list now, so nothing on the worker can reach them again. A started
+	// source is stopped here, on the thread that started it. deleteLater() posts to
+	// the block's own (GUI) thread, which is where its widgets and connections live.
+	for(SourceBlock *s : removedSources) {
+		stopSource(s);
+		s->deleteLater();
+	}
+	for(ProcessorBlock *p : removedProcessors)
+		p->deleteLater();
+
 	if(changed)
 		Q_EMIT blocksChanged();
 }
 
 // --- Stream descriptors ------------------------------------------------------
-//
-// Both take a snapshot of the block lists under m_blockMutex and then call into
-// the blocks with it released: a block takes its own lock in there (SourceBlock
-// its channel mutex, GenalyzerFFTProcessor the genalyzer one), and holding two at
-// once is how deadlocks are built.
 
 QList<Block *> AcquisitionEngine::blockSnapshot() const
 {
@@ -161,10 +160,6 @@ QList<Block *> AcquisitionEngine::blockSnapshot() const
 
 std::optional<StreamInfo> AcquisitionEngine::streamInfo(const DataKey &key) const
 {
-	// The ramp is the engine's own stream, not any block's, so it is answered here.
-	// First, not last: no block produces this key, so asking them all would be a
-	// walk that cannot succeed. Hidden, like every stream that exists to be read as
-	// an X axis and is not a trace.
 	if(key == indexRampKey()) {
 		StreamInfo info;
 		info.label = QStringLiteral("sample index");
@@ -173,31 +168,23 @@ std::optional<StreamInfo> AcquisitionEngine::streamInfo(const DataKey &key) cons
 		return info;
 	}
 
-	// First answer wins, which is not a real contest: keys are namespaced by
-	// producer name, so at most one block recognises any given one.
-	const QList<Block *> blocks = blockSnapshot();
-	for(Block *b : blocks) {
-		if(const std::optional<StreamInfo> info = b->streamInfo(key))
+	// Keys are namespaced by producer, so at most one block answers.
+	for(Block *b : blockSnapshot()) {
+		if(std::optional<StreamInfo> info = b->streamInfo(key))
 			return info;
 	}
-
 	return std::nullopt;
 }
 
 QList<DataKey> AcquisitionEngine::declaredKeys() const
 {
-	// outputKeys(), not a second per-block enumeration: a block's outputs *are* the
-	// keys it can describe, and the descriptor lookup above answers nullopt for
-	// anything else. One list, so there is nothing to drift.
 	QSet<DataKey> all;
-	const QList<Block *> blocks = blockSnapshot();
-	for(Block *b : blocks) {
+	for(Block *b : blockSnapshot()) {
 		const QList<DataKey> out = b->outputKeys();
 		for(const DataKey &k : out)
 			all.insert(k);
 	}
 	all.insert(indexRampKey());
-
 	return all.values();
 }
 
@@ -218,15 +205,17 @@ QList<ProcessorBlock *> AcquisitionEngine::processors() const
 bool AcquisitionEngine::isRunning() const { return m_running; }
 void AcquisitionEngine::setBufferSize(std::size_t size) { m_bufferSize = size; }
 std::size_t AcquisitionEngine::bufferSize() const { return m_bufferSize; }
+void AcquisitionEngine::setMaxFPS(unsigned int fps) { m_maxFPS.store(fps); }
+unsigned int AcquisitionEngine::maxFPS() const { return m_maxFPS.load(); }
+void AcquisitionEngine::setMode(Mode m) { m_mode.store(m); }
+AcquisitionEngine::Mode AcquisitionEngine::mode() const { return m_mode.load(); }
+void AcquisitionEngine::setMinReportSeverity(Severity sev) { m_minSeverity.store(sev); }
+Severity AcquisitionEngine::minReportSeverity() const { return m_minSeverity.load(); }
 
 // --- The sample-index ramp ---------------------------------------------------
 
 DataKey AcquisitionEngine::indexRampKey()
 {
-	// The source and the stage may not contain an underscore: DataKey takes the
-	// first segment as the source and the last as the stage, so an "engine_acq"
-	// source would reparse as source "engine" with "acq_" prefixed onto the
-	// channel. Only the channel is free to carry one.
 	return DataKey::withStage(QStringLiteral("engine"), QStringLiteral("sample"), QStringLiteral("index"));
 }
 
@@ -252,26 +241,14 @@ void AcquisitionEngine::publishIndexRamp(std::size_t n)
 			m_indexRamp.resize(static_cast<int>(n));
 			std::iota(m_indexRamp.begin(), m_indexRamp.end(), 0.0f);
 		}
-		// Copied under the lock, written outside it: DataStore::write takes its
-		// own mutex, and holding two at once is how deadlocks are built. The copy
-		// is a refcount bump — the resize above is what detaches.
-		ramp = m_indexRamp;
+		ramp = m_indexRamp; // shared copy; written outside the lock
 	}
 
-	// Unconditional, even when the length did not change: this is also the path
-	// that re-establishes the chunk after DataStore::clear() dropped it.
+	// Unconditional: also re-establishes the chunk after DataStore::clear().
 	m_store->write(indexRampKey(), ramp);
 }
 
-// --- Configuration, continued ------------------------------------------------
-
-void AcquisitionEngine::setMaxFPS(unsigned int fps) { m_maxFPS.store(fps); }
-unsigned int AcquisitionEngine::maxFPS() const { return m_maxFPS.load(); }
-void AcquisitionEngine::setMode(Mode m) { m_mode.store(m); }
-AcquisitionEngine::Mode AcquisitionEngine::mode() const { return m_mode.load(); }
-
-void AcquisitionEngine::setMinReportSeverity(Severity sev) { m_minSeverity.store(sev); }
-Severity AcquisitionEngine::minReportSeverity() const { return m_minSeverity.load(); }
+// --- Reporting ---------------------------------------------------------------
 
 void AcquisitionEngine::reportInfo(const QString &id, const QString &msg)
 {
@@ -316,40 +293,17 @@ void AcquisitionEngine::startLoop(int acqCount)
 
 	// A previous self-terminated run may have left a finished thread behind.
 	joinThread();
-
 	syncBlocks();
-
-	// Unconditional: a previous run's clear()/reset() drops the ramp's chunk, so it
-	// is re-established here rather than only when its length changes.
 	publishIndexRamp(indexRampLength());
 
 	m_acqCount = acqCount;
 	m_faultStop = false;
+	m_cyclePending = false;
 
-	for(SourceBlock *src : m_sources) {
-		if(!src->isEnabled())
-			continue;
-		src->setBufferSize(m_bufferSize);
-		if(!guarded(src->id(), QStringLiteral("onStart()"), [src] { src->onStart(); }))
-			m_faultStop = true;
-	}
-
-	// Release whatever the partially-started sources already claimed.
-	if(m_faultStop) {
-		for(SourceBlock *src : m_sources)
-			if(src->isEnabled())
-				guarded(src->id(), QStringLiteral("onStop()"), [src] { src->onStop(); });
-		Q_EMIT forceStopped();
-		return;
-	}
-
-	for(ProcessorBlock *proc : m_processors)
-		proc->reset();
-
+	// Set before the thread exists, so a re-entrant run() sees a live run. Sources are
+	// started on the worker, never here: onStart() may block on a device.
 	m_running = true;
 	m_threadAlive = true;
-	// Owned, not self-deleting: startLoop() and stop() both need to wait() on
-	// it after a self-terminated run, so it must outlive loop() returning.
 	m_thread = QThread::create([this] { loop(); });
 	m_thread->start();
 }
@@ -357,11 +311,16 @@ void AcquisitionEngine::startLoop(int acqCount)
 void AcquisitionEngine::stop()
 {
 	m_running = false;
+	if(m_threadAlive) {
+		for(Block *b : blockSnapshot())
+			b->requestStop();
+	}
 	joinThread();
+	// Applies anything removed during the run's teardown tail, which the loop no
+	// longer looked at.
+	syncBlocks();
 }
 
-// Waits for the worker to finish and destroys the QThread. Safe to call when no
-// thread exists or when the worker already self-terminated.
 void AcquisitionEngine::joinThread()
 {
 	if(!m_thread)
@@ -371,25 +330,79 @@ void AcquisitionEngine::joinThread()
 	m_thread = nullptr;
 }
 
+void AcquisitionEngine::stopSource(SourceBlock *src)
+{
+	if(!m_startedSources.remove(src))
+		return;
+	guarded(src->id(), QStringLiteral("onStop()"), [src] { src->onStop(); });
+}
+
+void AcquisitionEngine::stopAllSources()
+{
+	const QList<SourceBlock *> started = m_startedSources.values();
+	for(SourceBlock *src : started)
+		stopSource(src);
+}
+
+bool AcquisitionEngine::syncSourceStates()
+{
+	for(SourceBlock *src : std::as_const(m_sources)) {
+		const bool started = m_startedSources.contains(src);
+		if(src->isEnabled() && !started) {
+			src->setBufferSize(m_bufferSize);
+			if(!guarded(src->id(), QStringLiteral("onStart()"), [src] { src->onStart(); }))
+				return false;
+			m_startedSources.insert(src);
+		} else if(!src->isEnabled() && started) {
+			stopSource(src);
+		}
+	}
+	return true;
+}
+
+void AcquisitionEngine::postCycleComplete()
+{
+	// At most one in flight: a GUI slower than the worker sees the newest cycle
+	// instead of draining a queue of stale ones.
+	if(m_cyclePending.exchange(true))
+		return;
+	QMetaObject::invokeMethod(
+		this,
+		[this] {
+			m_cyclePending = false;
+			Q_EMIT cycleComplete();
+		},
+		Qt::QueuedConnection);
+}
+
 void AcquisitionEngine::loop()
 {
-	Q_EMIT started();
+	m_lastWarning.clear();
+	m_startedSources.clear();
 
-	{
-		QStringList srcNames, procNames;
-		for(SourceBlock *s : m_sources)
-			srcNames << s->id();
-		for(ProcessorBlock *p : m_processors)
-			procNames << p->name();
-		reportInfo(QStringLiteral("engine"),
-			   QStringLiteral("started | sources: [%1] | processors: [%2] | buffer: %3")
-				   .arg(srcNames.join(", "),
-					procNames.isEmpty() ? QStringLiteral("none") : procNames.join(", "))
-				   .arg(m_bufferSize));
+	for(ProcessorBlock *proc : std::as_const(m_processors))
+		proc->reset();
+
+	if(!syncSourceStates()) {
+		m_faultStop = true;
+		m_running = false;
+	} else {
+		Q_EMIT started();
+		if(Severity::Info >= m_minSeverity.load()) {
+			QStringList srcNames, procNames;
+			for(SourceBlock *s : std::as_const(m_sources))
+				srcNames << s->id();
+			for(ProcessorBlock *p : std::as_const(m_processors))
+				procNames << p->name();
+			reportInfo(QStringLiteral("engine"),
+				   QStringLiteral("started | sources: [%1] | processors: [%2] | buffer: %3")
+					   .arg(srcNames.join(", "),
+						procNames.isEmpty() ? QStringLiteral("none") : procNames.join(", "))
+					   .arg(m_bufferSize.load()));
+		}
 	}
 
-	m_lastWarning.clear();
-
+	const int acqCount = m_acqCount;
 	int cyclesDone = 0;
 	QElapsedTimer cycleTimer, heartbeatTimer;
 	heartbeatTimer.start();
@@ -397,11 +410,15 @@ void AcquisitionEngine::loop()
 	while(m_running) {
 		cycleTimer.start();
 		syncBlocks();
+		if(!syncSourceStates()) {
+			m_faultStop = true;
+			break;
+		}
 		m_store->beginCycle();
 
 		bool aborted = false;
-		for(SourceBlock *src : m_sources) {
-			if(!src->isEnabled())
+		for(SourceBlock *src : std::as_const(m_sources)) {
+			if(!m_startedSources.contains(src))
 				continue;
 
 			const quint64 before = m_store->writeCount();
@@ -425,14 +442,11 @@ void AcquisitionEngine::loop()
 		if(!runProcessors())
 			break;
 
+		const unsigned int fps = m_maxFPS.load();
 		if(m_mode.load() == Mode::Triggered) {
-			Q_EMIT cycleComplete();
+			postCycleComplete();
 			if(!m_running)
 				break;
-			// Throttle so every cycle gets a chance to be displayed. Read
-			// once: a concurrent setMaxFPS() must not change the divisor
-			// between the guard and the division.
-			const unsigned int fps = m_maxFPS.load();
 			if(fps > 0) {
 				const qint64 minMs = 1000LL / fps;
 				const qint64 spent = cycleTimer.elapsed();
@@ -440,31 +454,25 @@ void AcquisitionEngine::loop()
 					QThread::msleep(static_cast<unsigned long>(minMs - spent));
 			}
 		} else {
-			// Free-run; only the notification is rate-limited.
-			const unsigned int fps = m_maxFPS.load();
 			const qint64 hbMs = fps > 0 ? 1000LL / fps : 16;
 			if(heartbeatTimer.elapsed() >= hbMs) {
-				Q_EMIT cycleComplete();
+				postCycleComplete();
 				heartbeatTimer.restart();
 			}
 		}
 
-		if(m_acqCount > 0 && ++cyclesDone >= m_acqCount)
+		if(acqCount > 0 && ++cyclesDone >= acqCount)
 			break;
 	}
 
 	m_running = false;
 
-	// Continuous mode gates cycleComplete on the heartbeat, so emit a final
-	// one to publish whatever the last cycle produced.
-	if(m_mode.load() == Mode::Continuous)
-		Q_EMIT cycleComplete();
+	// Publish whatever the last cycle produced: continuous mode gates notifications
+	// on the heartbeat.
+	if(!m_faultStop)
+		postCycleComplete();
 
-	// Sole owner of onStop(): stop() only clears the flag and waits, so device
-	// teardown always happens exactly once, on this thread.
-	for(SourceBlock *src : m_sources)
-		if(src->isEnabled())
-			guarded(src->id(), QStringLiteral("onStop()"), [src] { src->onStop(); });
+	stopAllSources();
 
 	reportInfo(QStringLiteral("engine"), QStringLiteral("stopped"));
 	if(m_faultStop)
@@ -481,33 +489,28 @@ bool AcquisitionEngine::runProcessors()
 	if(m_processors.isEmpty())
 		return true;
 
+	// One snapshot per processor per cycle: the GUI may change them mid-cycle.
+	QHash<ProcessorBlock *, QList<DataKey>> keysOf;
+	keysOf.reserve(m_processors.size());
+	for(ProcessorBlock *proc : std::as_const(m_processors))
+		keysOf.insert(proc, proc->watchedKeys());
+
 	QSet<ProcessorBlock *> executed;
 	QSet<DataKey> dirty = m_store->cycleKeys();
-	QSet<ProcessorBlock *> runLast;
-	{
-		QMutexLocker lk(&m_blockMutex);
-		runLast = m_runLast;
-	}
 
-	// A processor that runs writes new keys, which may make another processor
-	// runnable — so re-scan until a pass changes nothing. Deferred processors
-	// are held back to a final pass so they observe everything the others wrote.
+	// Re-scan until a pass changes nothing; run-last processors get a final pass of
+	// their own so they observe everything the others wrote.
 	for(bool deferred : {false, true}) {
 		bool progress = true;
 		while(progress) {
 			progress = false;
-			for(ProcessorBlock *proc : m_processors) {
-				if(executed.contains(proc) || !proc->isEnabled())
-					continue;
-				if(runLast.contains(proc) != deferred)
+			for(ProcessorBlock *proc : std::as_const(m_processors)) {
+				if(executed.contains(proc) || !proc->isEnabled() || proc->runsLast() != deferred)
 					continue;
 
-				bool ready = true;
-				for(const DataKey &k : proc->watchedKeys())
-					if(!dirty.contains(k)) {
-						ready = false;
-						break;
-					}
+				const QList<DataKey> &keys = keysOf[proc];
+				const bool ready = std::all_of(keys.cbegin(), keys.cend(),
+							       [&](const DataKey &k) { return dirty.contains(k); });
 				if(!ready)
 					continue;
 
@@ -524,10 +527,8 @@ bool AcquisitionEngine::runProcessors()
 		}
 	}
 
-	// A processor can legitimately idle for many cycles (e.g. a stacked decoder
-	// whose upstream has produced nothing yet), so dedupe rather than warn at
-	// cycle rate.
-	for(ProcessorBlock *proc : m_processors) {
+	// A processor can legitimately idle for many cycles, so warn once, not per cycle.
+	for(ProcessorBlock *proc : std::as_const(m_processors)) {
 		if(!proc->isEnabled())
 			continue;
 		if(executed.contains(proc)) {
@@ -535,9 +536,9 @@ bool AcquisitionEngine::runProcessors()
 			continue;
 		}
 		QStringList missing;
-		for(const DataKey &k : proc->watchedKeys())
+		for(const DataKey &k : keysOf[proc])
 			if(!dirty.contains(k))
-				missing << k.key;
+				missing << k.toString();
 		reportWarningOnce(proc->name(), QStringLiteral("skipped — missing input keys: ") + missing.join(", "));
 	}
 	return true;
