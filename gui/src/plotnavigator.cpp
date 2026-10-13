@@ -241,7 +241,9 @@ void PlotNavigator::addNavigators(QwtAxisId axisId)
 		connect(plotAxis, &PlotAxis::axisScaleUpdated, this, [=]() {
 			if(m_autoBase) {
 				setBaseRect(axisId);
-				if(m_resetOnNewBase)
+				// reset() reaches every navigator and each one replots, so skip it when
+				// there is no zoom to undo — the axes already sit on their base.
+				if(m_resetOnNewBase && isZoomed())
 					Q_EMIT reset();
 			}
 		});
@@ -392,7 +394,9 @@ void PlotNavigator::addAxis(PlotAxis *axis)
 		connect(axis, &PlotAxis::axisScaleUpdated, this, [this, axisId]() {
 			if(m_autoBase) {
 				setBaseRect(axisId);
-				if(m_resetOnNewBase)
+				// reset() reaches every navigator and each one replots, so skip it when
+				// there is no zoom to undo — the axes already sit on their base.
+				if(m_resetOnNewBase && isZoomed())
 					Q_EMIT reset();
 			}
 		});

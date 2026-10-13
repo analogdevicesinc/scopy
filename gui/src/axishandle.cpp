@@ -73,7 +73,7 @@ bool AxisHandle::isBounded() const { return m_bounded; }
 void AxisHandle::setAxis(QwtAxisId axis)
 {
 	m_axisId = axis;
-	repaint();
+	update();
 }
 
 void AxisHandle::setHandlePos(HandlePos pos)
@@ -125,14 +125,14 @@ void AxisHandle::setColor(const QColor &color)
 {
 	m_color = color;
 	m_pen.setColor(color);
-	repaint();
+	update();
 }
 
 void AxisHandle::setPos(int pos)
 {
 	setPosSilent(pos);
 	Q_EMIT pixelPosChanged(pos);
-	repaint();
+	update();
 }
 
 QRect AxisHandle::getBigRect()
@@ -306,7 +306,7 @@ bool AxisHandle::onEnter(QPointF pos)
 {
 	if(getBigRect().contains(pos.toPoint())) {
 		m_isHovering = true;
-		repaint();
+		update();
 		setCursor(Qt::OpenHandCursor);
 		return true;
 	}
@@ -316,7 +316,7 @@ bool AxisHandle::onEnter(QPointF pos)
 void AxisHandle::onLeave()
 {
 	m_isHovering = false;
-	repaint();
+	update();
 	setCursor(Qt::ArrowCursor);
 }
 
