@@ -191,7 +191,7 @@ void TriggerMarker::repaintPlot()
 	// Both widgets: see the header.
 	m_plot->replot();
 	if(!m_handle.isNull() && m_handle->handle()) {
-		m_handle->handle()->repaint();
+		m_handle->handle()->update();
 	}
 }
 
