@@ -22,6 +22,7 @@
 #include "emuwidget.h"
 
 #include "common/scopyconfig.h"
+#include "scopy-core_config.h"
 #include "pluginbase/preferences.h"
 
 #include <QDir>
@@ -40,6 +41,11 @@
 #define PORT_DEFAULT 30431
 #define PORT_MIN 30431
 #define PORT_MAX 30439
+
+#define EMU_STARTUP_CHECK_MS 500
+
+#define IIO_EMU "iio-emu"
+#define IIOD_EMU "iiod-emu"
 
 Q_LOGGING_CATEGORY(CAT_EMU_ADD_PAGE, "EmuAddPage")
 using namespace scopy;
@@ -90,15 +96,15 @@ EmuWidget::EmuWidget(QWidget *parent)
 	connect(xmlEdit, &QLineEdit::returnPressed, this, [this]() { m_enDemoBtn->setFocus(); });
 	connect(m_xmlFileBrowser->btn(), &QPushButton::pressed, this, [this]() { m_enDemoBtn->setFocus(); });
 
-	QLabel *rxTxLabel = new QLabel("Rx/Tx", emuWidget);
+	m_rxTxLabel = new QLabel("Rx/Tx", emuWidget);
 	m_rxTxFileBrowser = new FileBrowserWidget(FileBrowserWidget::OPEN_FILE, emuWidget);
 	m_rxTxFileBrowser->setFilter("All (*);;XML Files (*.xml);;Text Files (*.txt);;BIN Files (*.bin)");
 	QLineEdit *rxTxEdit = m_rxTxFileBrowser->lineEdit();
 	rxTxEdit->setPlaceholderText("iio:device0@/absolutePathTo/data.bin");
 
-	emuWidgetLay->addWidget(rxTxLabel, 2, 0);
+	emuWidgetLay->addWidget(m_rxTxLabel, 2, 0);
 	emuWidgetLay->addWidget(m_rxTxFileBrowser, 2, 1);
-	connect(this, &EmuWidget::demoEnabled, rxTxLabel, &QWidget::setDisabled);
+	connect(this, &EmuWidget::demoEnabled, m_rxTxLabel, &QWidget::setDisabled);
 	connect(this, &EmuWidget::demoEnabled, m_rxTxFileBrowser, &QWidget::setDisabled);
 	connect(rxTxEdit, &QLineEdit::returnPressed, this, [this]() { m_enDemoBtn->setFocus(); });
 	connect(m_rxTxFileBrowser->btn(), &QPushButton::pressed, this, [this]() { m_enDemoBtn->setFocus(); });
@@ -117,7 +123,7 @@ EmuWidget::EmuWidget(QWidget *parent)
 
 	m_uriMsgLabel = new QLabel(emuWidget);
 	m_uriMsgLabel->setVisible(false);
-	emuWidgetLay->addWidget(m_uriMsgLabel, 4, 1);
+	emuWidgetLay->addWidget(m_uriMsgLabel, 5, 1);
 
 	configSection->add(emuWidget);
 	container->layout()->addWidget(configSection);
@@ -132,6 +138,17 @@ EmuWidget::EmuWidget(QWidget *parent)
 	connect(m_enDemoBtn, &QPushButton::clicked, this, &EmuWidget::onEnableDemoClicked);
 
 	m_emuProcess = new QProcess(this);
+	connect(m_emuProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this,
+		[this](int exitCode, QProcess::ExitStatus) {
+			if(!m_enableDemo) {
+				return;
+			}
+			QString err = QString(m_emuProcess->readAllStandardError()).trimmed();
+			qWarning(CAT_EMU_ADD_PAGE) << "Emulator exited with code" << exitCode << err;
+			setStatusMessage("Emulator stopped: " + (err.isEmpty() ? QString::number(exitCode) : err));
+			stopEnableBtn("Enable");
+			setEnableDemo(false);
+		});
 	init();
 }
 
@@ -148,11 +165,14 @@ void EmuWidget::init()
 	Preferences::init("iio_emu_dir_path", "");
 	m_emuPath = findEmuPath();
 	if(m_emuPath.isEmpty()) {
-		setStatusMessage("Can't find iio-emu in the system!");
+		setStatusMessage(QString("Can't find %1 in the system!").arg(m_isIiodEmu ? IIOD_EMU : IIO_EMU));
 	} else {
 		setStatusMessage("");
 	}
 	this->setEnabled(!m_emuPath.isEmpty());
+	// iiod-emu has no Rx/Tx argument
+	m_rxTxLabel->setVisible(!m_isIiodEmu);
+	m_rxTxFileBrowser->setVisible(!m_isIiodEmu);
 }
 
 void EmuWidget::enGenericOptWidget(QString crtOpt)
@@ -185,9 +205,28 @@ void EmuWidget::onEnableDemoClicked()
 {
 	m_enDemoBtn->startAnimation();
 	if(!m_enableDemo) {
-		QStringList arg = createArgList();
+		setStatusMessage("");
+		if(m_isIiodEmu && m_emuType == "adalm2000") {
+			setStatusMessage("adalm2000 is not supported by iiod-emu!");
+			stopEnableBtn("Enable");
+			return;
+		}
+		QStringList arg = m_isIiodEmu ? createIiodEmuArgList() : createArgList();
+		if(arg.isEmpty()) {
+			stopEnableBtn("Enable");
+			return;
+		}
 		bool started = startIioEmuProcess(m_emuPath, arg);
 		if(!started) {
+			stopEnableBtn("Enable");
+			return;
+		}
+		// The emulator exits right away on startup errors (e.g. port already in use).
+		if(m_emuProcess->waitForFinished(EMU_STARTUP_CHECK_MS)) {
+			QString err = QString(m_emuProcess->readAllStandardError()).trimmed();
+			qWarning(CAT_EMU_ADD_PAGE) << "Emulator failed to start" << m_emuProcess->exitCode() << err;
+			setStatusMessage("Emulator stopped: " +
+					 (err.isEmpty() ? QString::number(m_emuProcess->exitCode()) : err));
 			stopEnableBtn("Enable");
 			return;
 		}
@@ -238,38 +277,77 @@ QStringList EmuWidget::createArgList()
 
 QString EmuWidget::findEmuPath()
 {
+	QString emuPath;
+#if SCOPY_LIBIIO_VERSION == 1
+	// iiod-emu speaks only the binary iiod protocol, so it is usable only by libiio v1 clients.
+	emuPath = findEmuPath(IIOD_EMU);
+	if(!emuPath.isEmpty()) {
+		m_isIiodEmu = true;
+		return emuPath;
+	}
+#endif
+	m_isIiodEmu = false;
+	return findEmuPath(IIO_EMU);
+}
+
+QString EmuWidget::findEmuPath(const QString &emuName)
+{
 	// The path from the preferences has the highest priority. The path must be added manually.
-	QString emuPath = buildEmuPath(Preferences::get("iio_emu_dir_path").toString());
+	QString emuPath = buildEmuPath(Preferences::get("iio_emu_dir_path").toString(), emuName);
 	if(!emuPath.isEmpty() && QFile::exists(emuPath)) {
-		qInfo(CAT_EMU_ADD_PAGE) << "iio-emu path from preferences:" << emuPath;
+		qInfo(CAT_EMU_ADD_PAGE) << emuName << "path from preferences:" << emuPath;
 		return emuPath;
 	}
-	// Search iio-emu next to scopy executable.
-	emuPath = buildEmuPath(scopy::config::executableFolderPath());
+	// Search the emulator next to scopy executable.
+	emuPath = buildEmuPath(scopy::config::executableFolderPath(), emuName);
 	if(!emuPath.isEmpty() && QFile::exists(emuPath)) {
-		qInfo(CAT_EMU_ADD_PAGE) << "iio-emu path:" << emuPath;
+		qInfo(CAT_EMU_ADD_PAGE) << emuName << "path:" << emuPath;
 		return emuPath;
 	}
-	// Search iio-emu in system.
-	emuPath = "iio-emu";
+	// Search the emulator in system.
+	emuPath = emuName;
 	if(startIioEmuProcess(emuPath)) {
-		qInfo(CAT_EMU_ADD_PAGE) << "iio-emu from system!";
+		qInfo(CAT_EMU_ADD_PAGE) << emuName << "from system!";
+		m_emuProcess->waitForFinished(1000);
 		return emuPath;
 	}
 
 	return "";
 }
 
-QString EmuWidget::buildEmuPath(QString dirPath)
+QString EmuWidget::buildEmuPath(QString dirPath, QString emuName)
 {
 	QString emuPath = "";
 	if(!dirPath.isEmpty()) {
-		emuPath = dirPath + QDir::separator() + "iio-emu";
+		emuPath = dirPath + QDir::separator() + emuName;
 #ifdef WIN32
 		emuPath += ".exe";
 #endif
 	}
 	return emuPath;
+}
+
+QStringList EmuWidget::createIiodEmuArgList()
+{
+	// iiod-emu [-p <port>] emu:<device.xml>
+	// Rx/Tx data is read from <xml_dir>/<device_name>_buf<idx>.bin.
+	QStringList arguments;
+	QString xmlPath = m_xmlFileBrowser->lineEdit()->text();
+	if(xmlPath.isEmpty() || !QFile::exists(xmlPath)) {
+		setStatusMessage("Invalid XML file!");
+		return {};
+	}
+
+	QFileInfo f(xmlPath);
+	m_workingDir = f.absoluteDir().path();
+
+	QString port = m_portEdit->text();
+	if(!port.isEmpty()) {
+		arguments << "-p" << port;
+	}
+	arguments.append("emu:" + f.absoluteFilePath());
+
+	return arguments;
 }
 
 void EmuWidget::stopEnableBtn(QString btnText)
@@ -299,7 +377,7 @@ void EmuWidget::killEmuProcess()
 {
 	m_emuProcess->kill();
 	stopEnableBtn("Enable");
-	setEnableDemo(!m_enableDemo);
+	setEnableDemo(false);
 }
 
 void EmuWidget::configureOption(QString option)
