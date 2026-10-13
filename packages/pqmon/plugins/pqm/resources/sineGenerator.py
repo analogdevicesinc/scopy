@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #
 # Copyright (c) 2024 Analog Devices Inc.
 #
@@ -18,9 +19,16 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
+import argparse
 import numpy as np
 import time
 import os
+
+parser = argparse.ArgumentParser(description="Generate PQM sample data.")
+parser.add_argument(
+    "output_file", nargs="?", default="data.bin", help="output file (default: data.bin)"
+)
+args = parser.parse_args()
 
 start_time = 0
 end_time = 100  # number of buffers
@@ -65,7 +73,7 @@ bufferValues = np.ravel(
     ],
     "F",
 )
-output_file = open("data.bin", "ab")
+output_file = open(args.output_file, "ab")
 safety_guard = 0
 while True:
     file_size = os.path.getsize(output_file.name)
