@@ -307,9 +307,14 @@ void PlotAxis::setDivs(double divs)
 
 void PlotAxis::setInterval(double min, double max)
 {
+	// One scale update and one replot for both ends, not one per end.
+	const double oldMin = m_min, oldMax = m_max;
+	m_deferScaleUpdate = true;
 	setMin(min);
 	setMax(max);
-	//	updateAxisScale();
+	m_deferScaleUpdate = false;
+	if(!qFuzzyCompare(oldMin, m_min) || !qFuzzyCompare(oldMax, m_max))
+		updateAxisScale();
 }
 
 void PlotAxis::setVisible(bool val)
@@ -335,6 +340,8 @@ void PlotAxis::setVisible(bool val)
 
 void PlotAxis::updateAxisScale()
 {
+	if(m_deferScaleUpdate)
+		return;
 	m_plot->setAxisScale(m_axisId, m_min, m_max, (m_max - m_min) / m_divs); // set Divs, limits
 	m_plot->replot();
 	Q_EMIT axisScaleUpdated();
