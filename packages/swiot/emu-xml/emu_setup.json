@@ -7,6 +7,13 @@
 	{
 		"device": "swiot_runtime",
 		"xml_path": "swiot_runtime1.xml",
+		"uri": "ip:127.0.0.1",
+		"rx_tx_device":"iio:device1",
+		"rx_tx_bin_path": "ad74413r_buf0.bin"
+	},
+	{
+		"device": "swiot_runtime_v1",
+		"xml_path": "swiot_runtime1_v1.xml",
 		"uri": "ip:127.0.0.1"
 	}
 ]
