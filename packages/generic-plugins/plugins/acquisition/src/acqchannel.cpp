@@ -303,13 +303,6 @@ void AcqChannel::refreshAxisSourceChoices()
 	}
 }
 
-void AcqChannel::onStarted()
-{
-	// Nothing to do beyond the hook. The autoscalers are started by
-	// AcqAxis::setAutoscale, not by run state, so a reader who toggles AUTOSCALE while
-	// stopped still gets a scaled axis on the data already in the store.
-}
-
 void AcqChannel::onStopped()
 {
 	// One final pass, so the axes end up scaled to the last frame rather than to

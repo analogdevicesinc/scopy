@@ -185,10 +185,8 @@ public:
 	// draw a window the reported fire index does not describe. Borrowed for the call only.
 	void pull(int plotSize, const QMap<QString, scopy::acq::SampleVariant> *snap = nullptr);
 
-	// Drop every cached buffer and blank the visual. Called from onStarted(), after
-	// AcqInstrument::run() has already done store->clear(): the chunks are gone but
-	// the visual still holds the previous run's samples until the first new cycle
-	// lands.
+	// Drop every cached buffer and blank the visual. Called at the start of a run: the
+	// store's chunks are already cleared, but the visual still holds the last run's.
 	virtual void reset() = 0;
 
 	// (Re)register the depth claims on this channel's keys — the Y key, and the X key
@@ -202,10 +200,8 @@ public:
 	// when the acquisition buffer is resized.
 	void reclaimDepth(int plotSize);
 
-	// Run state, for the axes. Replot and data are the manager's business; these exist
-	// so a stop leaves the axes scaled to the last frame rather than to the frame the
+	// So a stop leaves the axes scaled to the last frame rather than to the frame the
 	// autoscaler happened to be on when its timer stopped.
-	void onStarted();
 	void onStopped();
 
 	// ---- presence ------------------------------------------------------------
