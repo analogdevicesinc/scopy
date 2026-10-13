@@ -89,8 +89,6 @@ public:
 	// plot, never deleted by the caller. Null if this plot has no widget.
 	scopy::PlotAxis *axisForSource(int position, const QString &sourceId);
 
-	int axisCount() const { return m_sourceAxes.size(); }
-
 	// The one axis hosting fixed-height items (digital tracks, annotation bands) on
 	// this plot. Created on first use, interval [0,1], invisible: items place
 	// themselves in canvas pixels off their own handle, so the axis exists only to host
@@ -104,13 +102,6 @@ public:
 	// Walks down in 26 px steps (24 px band + 2 px gap) — the pitch DigitalCurveItem
 	// and AnnotationCurve both render at.
 	double nextDigitalSlot();
-
-	// Samples across the visible width. There is no ramp here any more: the sample-index
-	// X source is a real store stream written once by the engine
-	// (AcquisitionEngine::indexRampKey()), so a per-plot QVector<float> would be a
-	// duplicate of it that every narrow plot had to keep in step.
-	int plotSize() const { return m_plotSize; }
-	void setPlotSize(int n);
 
 	// --- per-plot view options ---
 
@@ -152,7 +143,6 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void nameChanged(QString name);
-	void plotSizeChanged(int n);
 	// So a settings page built before the toggle changed elsewhere can follow it.
 	void showLabelsChanged(bool on);
 	void showLegendChanged(bool on);
@@ -171,10 +161,6 @@ private:
 	// Headroom above the first band, as a fraction of the axis span.
 	const double m_kTopMargin;
 
-	// The width a plot starts at, before the instrument's plot-window control says
-	// otherwise.
-	const int m_kDefaultPlotSize;
-
 	QList<AcqChannel *> m_channels; // not owned — the manager owns them
 
 	// Only grows; see the class comment for why nothing is deleted.
@@ -184,8 +170,6 @@ private:
 	scopy::PlotAxis *m_digitalAxis{nullptr};
 	double m_nextSlot{0.0};
 	bool m_slotInit{false};
-
-	int m_plotSize{0};
 
 	// View options. Labels start on, matching what PlotWidget's own subclasses do in
 	// their constructors; the other two start off — a plot that opens with a legend over

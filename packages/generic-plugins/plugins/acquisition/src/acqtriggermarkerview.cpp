@@ -80,7 +80,7 @@ PlotAxis *AcqTriggerMarkerView::findXAxisFor(AcqPlot *plot, const scopy::acq::Da
 	return fallback;
 }
 
-void AcqTriggerMarkerView::retarget(const QList<AcqPlot *> &plots, int defaultWidth)
+void AcqTriggerMarkerView::retarget(const QList<AcqPlot *> &plots, int width)
 {
 	if(m_marker.isNull()) {
 		return;
@@ -121,19 +121,17 @@ void AcqTriggerMarkerView::retarget(const QList<AcqPlot *> &plots, int defaultWi
 	m_axis = axis;
 	// The window before the attach, so the marker's first sync places the bar against the
 	// right one.
-	updateWindow(defaultWidth);
+	updateWindow(width);
 	m_marker->attach(w, axis);
 }
 
-void AcqTriggerMarkerView::updateWindow(int defaultWidth)
+void AcqTriggerMarkerView::updateWindow(int width)
 {
 	if(m_marker.isNull()) {
 		return;
 	}
 
-	// The *marker plot's* plotSize: plots can be different widths. The default is only the
-	// answer before the first resolve.
-	const int n = m_plot.isNull() ? defaultWidth : m_plot->plotSize();
+	const int n = width;
 	const int last = std::max(0, n - 1);
 
 	// The axis units that window spans: slot numbers, or slots over the channel's rate for a
