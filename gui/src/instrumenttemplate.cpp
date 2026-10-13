@@ -161,8 +161,7 @@ void InstrumentTemplate::setupRegions()
 	}
 	// The right menu is one surface: one page at a time, so one fill. The rail is not —
 	// each of its groups carries its own, with the panel showing through between them —
-	// so it stays transparent over ToolTemplate's background_subtle. See
-	// docs/acq-engine/08-instrument-layout.md.
+	// so it stays transparent over ToolTemplate's background_subtle.
 	Style::setBackgroundColor(m_rightPanel, json::theme::background_primary);
 	Style::setBackgroundColor(m_leftPanel, QString("transparent"));
 
@@ -349,8 +348,6 @@ void InstrumentTemplate::setupBottomRail()
 
 ToolTemplate *InstrumentTemplate::tool() const { return m_tool; }
 
-QSplitter *InstrumentTemplate::splitter() const { return m_splitter; }
-
 void InstrumentTemplate::setCenterWidget(QWidget *w)
 {
 	if(m_center) {
@@ -367,34 +364,13 @@ void InstrumentTemplate::setCenterWidget(QWidget *w)
 	m_centerRow->insertWidget(1, w, 1);
 }
 
-QWidget *InstrumentTemplate::centerWidget() const { return m_center; }
-
 void InstrumentTemplate::addToSlot(PlotSlot s, QWidget *w) { m_slots.value(s)->addWidget(w); }
-
-void InstrumentTemplate::removeFromSlot(PlotSlot s, QWidget *w)
-{
-	m_slots.value(s)->removeWidget(w);
-	w->setParent(nullptr);
-}
-
-QBoxLayout *InstrumentTemplate::slot(PlotSlot s) const { return m_slots.value(s); }
-
-void InstrumentTemplate::addToTopRail(QWidget *w, ToolTemplateAlignment a)
-{
-	m_tool->addWidgetToTopContainerHelper(w, a);
-}
-
-void InstrumentTemplate::addToBottomRail(QWidget *w, ToolTemplateAlignment a)
-{
-	m_tool->addWidgetToBottomContainerHelper(w, a);
-}
 
 RunBtn *InstrumentTemplate::runBtn() const { return m_runBtn; }
 SingleShotBtn *InstrumentTemplate::singleBtn() const { return m_singleBtn; }
 InfoBtn *InstrumentTemplate::infoBtn() const { return m_infoBtn; }
 PrintIconBtn *InstrumentTemplate::printBtn() const { return m_printBtn; }
 QPushButton *InstrumentTemplate::exportBtn() const { return m_exportBtn; }
-QWidget *InstrumentTemplate::engineSection() const { return m_engineSection; }
 
 void InstrumentTemplate::addEngineControl(QWidget *w)
 {
@@ -431,17 +407,6 @@ void InstrumentTemplate::setFps(qint64 timestampMs)
 	m_fps->setText(QString::number(1000. / avg, 'g', 3) + " FPS");
 }
 
-QLabel *InstrumentTemplate::fpsLabel() const { return m_fps; }
-
-QLineEdit *InstrumentTemplate::targetFpsEdit() const { return m_targetFps; }
-
-int InstrumentTemplate::targetFps() const
-{
-	bool ok = false;
-	const int v = m_targetFps->text().toInt(&ok);
-	return ok && v > 0 ? v : 0;
-}
-
 void InstrumentTemplate::setTargetFps(int fps)
 {
 	// Blocked: this reflects what the owner already applied, so re-emitting would
@@ -449,8 +414,6 @@ void InstrumentTemplate::setTargetFps(int fps)
 	QSignalBlocker b(m_targetFps);
 	m_targetFps->setText(fps > 0 ? QString::number(fps) : QString());
 }
-
-VerticalChannelManager *InstrumentTemplate::channelRail() const { return m_vcm; }
 
 MenuSectionCollapseWidget *InstrumentTemplate::addChannelGroup(const QString &title)
 {
@@ -646,33 +609,6 @@ void InstrumentTemplate::removeChannelRow(CompositeWidget *group, MenuControlBut
 	row->deleteLater();
 }
 
-MenuControlButton *InstrumentTemplate::addRailHeaderRow(const QString &name, const QString &menuId)
-{
-	MenuControlButton *btn = new MenuControlButton(m_vcm);
-	btn->setName(name);
-	btn->setOpenMenuChecksThis(true);
-	btn->setDoubleClickToOpenMenu(false);
-	btn->checkBox()->setVisible(false);
-	btn->button()->setVisible(false);
-	btn->setIconEnabled(true);
-
-	m_channelGroup->addButton(btn);
-	// addTop() puts it outside the scroll area, so it stays put while rows scroll.
-	m_vcm->addTop(btn);
-
-	if(!menuId.isEmpty()) {
-		connect(btn, &QAbstractButton::clicked, this, [this, menuId](bool b) {
-			if(b) {
-				showMenuPage(menuId);
-			}
-		});
-	}
-
-	return btn;
-}
-
-QButtonGroup *InstrumentTemplate::channelGroup() const { return m_channelGroup; }
-
 void InstrumentTemplate::addMenuPage(const QString &id, QWidget *w) { m_tool->rightStack()->add(id, w); }
 
 void InstrumentTemplate::removeMenuPage(const QString &id, bool deletePage)
@@ -683,8 +619,6 @@ void InstrumentTemplate::removeMenuPage(const QString &id, bool deletePage)
 		m_tool->rightStack()->remove(id);
 	}
 }
-
-bool InstrumentTemplate::hasMenuPage(const QString &id) const { return m_tool->rightStack()->contains(id); }
 
 void InstrumentTemplate::showMenuPage(const QString &id)
 {
@@ -701,7 +635,6 @@ void InstrumentTemplate::showMenuPage(const QString &id)
 		sizes[2] = menuWidth();
 		m_splitter->setSizes(sizes);
 	}
-	Q_EMIT menuPageSelected(id);
 }
 
 QLabel *InstrumentTemplate::createOwnerPill(SettingOwner owner, QWidget *parent)

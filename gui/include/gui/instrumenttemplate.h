@@ -46,7 +46,7 @@ class PrintIconBtn;
 
 /**
  * Which object owns the setting a menu section writes. Rendered as a small pill in the
- * section header — see docs/acq-engine/09-settings-scope.md.
+ * section header.
  */
 enum SettingOwner
 {
@@ -58,7 +58,7 @@ enum SettingOwner
 /**
  * The four layouts wrapping the center widget. Anything that *annotates* plots —
  * measurements, stats, cursor readouts, marker lists — goes into one of these rather than
- * getting its own hardcoded region. See docs/acq-engine/08-instrument-layout.md.
+ * getting its own hardcoded region.
  */
 enum PlotSlot
 {
@@ -89,8 +89,8 @@ private:
 };
 
 /**
- * A reusable instrument shell. Fixes *where things live* per
- * docs/acq-engine/08-instrument-layout.md, and nothing about what they look like:
+ * A reusable instrument shell. Fixes *where things live*, and nothing about what they
+ * look like:
  *
  *   +--------------------------------------------------------------------+
  *   | top rail  info print export | engine ctrls | fps/target | Run Single |  transparent
@@ -120,25 +120,15 @@ public:
 
 	ToolTemplate *tool() const;
 
-	// The [channel rail | center | right menu] splitter. Exposed so an owner can read or
-	// restore the widths it was dragged to; the shell needs nothing from it.
-	QSplitter *splitter() const;
-
 	// The truly central widget — a PlotManager and nothing else. Everything that
 	// annotates it goes into a slot.
 	void setCenterWidget(QWidget *w);
-	QWidget *centerWidget() const;
 
 	// The four slot layouts around the center. Empty slots collapse to zero, so an
 	// instrument that uses none looks like a plain plot stack.
 	//
 	//   m_it->addToSlot(PS_BOTTOM, measurementsPanel);   // that's the whole API
 	void addToSlot(PlotSlot slot, QWidget *w);
-	void removeFromSlot(PlotSlot slot, QWidget *w);
-	QBoxLayout *slot(PlotSlot slot) const;
-
-	void addToTopRail(QWidget *w, ToolTemplateAlignment a = TTA_LEFT);
-	void addToBottomRail(QWidget *w, ToolTemplateAlignment a = TTA_LEFT);
 
 	// ---- top rail ------------------------------------------------------------
 	// Built up front, in doc order: info · print · export | <engine controls> |
@@ -159,27 +149,13 @@ public:
 	// default to Expanding, and in a rail that means one control swallows the row.
 	void addEngineControl(QWidget *w);
 
-	// The filled section holding the engine controls and the fps readout.
-	QWidget *engineSection() const;
-
 	// Plot-agnostic fps readout: same 10-sample rolling average as FPSInfo, but driven
 	// by the owner instead of by a PlotWidget. Call once per frame.
 	void setFps(qint64 timestampMs);
-	QLabel *fpsLabel() const;
 
-	// The editable target under the readout. The shell only collects the number and
-	// emits targetFpsChanged — what a frame rate means is the owner's business, so
-	// nothing here touches an engine.
-	//
-	// 0 is "no ceiling", which is both what an empty field means and what
-	// AcquisitionEngine::setMaxFPS(0) means, so the two agree without translation.
-	int targetFps() const;
 	void setTargetFps(int fps);
-	QLineEdit *targetFpsEdit() const;
 
 	// ---- channel rail --------------------------------------------------------
-
-	VerticalChannelManager *channelRail() const;
 
 	// A named, collapsible group of rows — Sources · Processors · Decoders · Plots.
 	// Repeat calls with the same title return the existing group.
@@ -232,47 +208,35 @@ public:
 	void removeChannelRow(CompositeWidget *group, MenuControlButton *row, const QString &menuId,
 			      bool deletePage = false);
 
-	// A row pinned above the scroll area, outside every group. Used for the
-	// device/general-settings entry.
-	MenuControlButton *addRailHeaderRow(const QString &name, const QString &menuId);
-
-	QButtonGroup *channelGroup() const;
-
 	// ---- right menu ----------------------------------------------------------
 
-	// Hosts a page. Built once, never rebuilt; showMenuPage() only switches.
+	// Hosts a page, shown when the rail row registered under `id` is picked.
 	void addMenuPage(const QString &id, QWidget *w);
-	// Unstacks the page. Defaults to leaving it alive — several existing callers keep
-	// their own pointer and re-add it later — so pass `deletePage` to be rid of it
-	// rather than leaving an orphaned hidden top-level behind.
-	void removeMenuPage(const QString &id, bool deletePage = false);
-	bool hasMenuPage(const QString &id) const;
-	void showMenuPage(const QString &id);
 
 	// A collapsible section carrying an owner pill in its header. This is the unit
 	// a menu page is assembled from.
 	MenuSectionCollapseWidget *createMenuSection(const QString &title, SettingOwner owner,
 						     QWidget *parent = nullptr);
 
-	// The pill on its own, for callers assembling a header by hand.
-	static QLabel *createOwnerPill(SettingOwner owner, QWidget *parent = nullptr);
-
 	// ---- bottom rail ---------------------------------------------------------
 
-	// The Debug toggle and its popup. The popup is created on first use.
+	// The Debug toggle, and a tab in the popup it raises.
 	QPushButton *debugBtn() const;
-	DebugPopup *debugPopup();
 	void addDebugTab(QWidget *w, const QString &title);
 
 Q_SIGNALS:
-	// Emitted when a rail row is selected, with the menu id it registered.
-	void menuPageSelected(QString id);
-
 	// The reader edited the target fps field. 0 means they cleared it — no ceiling.
 	// Only on editingFinished, so a rate is never applied half-typed.
 	void targetFpsChanged(int fps);
 
 private:
+	// Unstacks the page; `deletePage` frees it too.
+	void removeMenuPage(const QString &id, bool deletePage = false);
+	void showMenuPage(const QString &id);
+	static QLabel *createOwnerPill(SettingOwner owner, QWidget *parent = nullptr);
+	// Created on first use.
+	DebugPopup *debugPopup();
+
 	void setupRegions();
 	void setupSlots();
 	void setupTopRail();
