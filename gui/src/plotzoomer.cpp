@@ -95,9 +95,9 @@ void PlotZoomer::setBaseRect() { m_baseRect = getCurrentRect(); }
 
 void PlotZoomer::cancelZoom()
 {
+	// Deleting the child already schedules a repaint of the area it covered.
 	delete m_rubberBand;
 	m_rubberBand = nullptr;
-	plot()->repaint();
 }
 
 void PlotZoomer::setEnabled(bool en)
@@ -187,7 +187,6 @@ void PlotZoomer::rescale(const QRectF &rect)
 	}
 
 	plot()->replot();
-	plot()->repaint();
 	m_isZoomed = true;
 	Q_EMIT zoomed(rect);
 }
@@ -284,7 +283,6 @@ void PlotZoomer::zoomToBase()
 	}
 
 	plot()->replot();
-	plot()->repaint();
 	m_isZoomed = false;
 }
 
