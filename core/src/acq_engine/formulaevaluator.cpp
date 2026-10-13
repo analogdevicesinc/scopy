@@ -92,13 +92,34 @@ QString FormulaEvaluator::formula() const
 void FormulaEvaluator::rebuildEngine(const QString &formula, int inputCount)
 {
 	m_batchFn = QJSValue(); // release ref before destroying old engine
-	m_workerEngine.reset(new QJSEngine());
+	{
+		std::lock_guard<std::mutex> lock(m_engineMutex);
+		m_workerEngine.reset(new QJSEngine());
+	}
 	m_workerEngine->evaluate(m_setupScript);
 	m_batchFn = m_workerEngine->evaluate(wrapFormula(formula, inputCount));
 	if(m_batchFn.isError()) {
 		m_batchFn = QJSValue();
 		m_syntaxValid.store(false, std::memory_order_relaxed);
 	}
+}
+
+void FormulaEvaluator::interrupt()
+{
+	std::lock_guard<std::mutex> lock(m_engineMutex);
+	if(m_workerEngine)
+		m_workerEngine->setInterrupted(true);
+}
+
+void FormulaEvaluator::resetEngine()
+{
+	m_batchFn = QJSValue();
+	{
+		std::lock_guard<std::mutex> lock(m_engineMutex);
+		m_workerEngine.reset();
+	}
+	std::lock_guard<std::mutex> lock(m_mutex);
+	m_dirty = true;
 }
 
 bool FormulaEvaluator::evaluateBatch(int n, const QVector<const QVector<float> *> &inputs, QVector<float> &out,
@@ -144,6 +165,13 @@ bool FormulaEvaluator::evaluateBatch(int n, const QVector<const QVector<float> *
 
 	const QJSValue result = m_batchFn.call({QJSValue(n), jsXs});
 
+	if(result.isError() && m_workerEngine->isInterrupted()) {
+		// Stopped mid-batch, not a bad formula: keep it valid for the next run.
+		if(errorOut)
+			*errorOut = QStringLiteral("interrupted");
+		out.fill(0.0f);
+		return false;
+	}
 	if(result.isError()) {
 		if(errorOut)
 			*errorOut = QStringLiteral("evaluation exception: %1").arg(result.toString());

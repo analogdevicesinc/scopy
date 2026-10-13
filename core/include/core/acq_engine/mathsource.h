@@ -41,6 +41,8 @@ public:
 	~MathSource() override = default;
 
 	void acquire(DataStore *store) override;
+	void onStart() override;
+	void requestStop() override;
 
 	QWidget *createSettingsWidget(QWidget *parent = nullptr) override;
 

@@ -49,7 +49,7 @@ void AcqTriggerMarkerView::setAxisKey(const scopy::acq::DataKey &key) { m_axisKe
 
 PlotAxis *AcqTriggerMarkerView::findXAxisFor(AcqPlot *plot, const scopy::acq::DataKey &key)
 {
-	if(!plot || key.key.isEmpty()) {
+	if(!plot || key.toString().isEmpty()) {
 		return nullptr;
 	}
 
