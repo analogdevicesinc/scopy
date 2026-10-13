@@ -106,6 +106,8 @@ private:
 
 	int m_id;
 	double m_divs;
+	// Set while setInterval() changes both ends, so the scale is applied once.
+	bool m_deferScaleUpdate{false};
 	double m_min;
 	double m_max;
 
