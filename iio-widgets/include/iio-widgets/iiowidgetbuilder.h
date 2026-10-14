@@ -26,10 +26,13 @@
 #include <QMap>
 #include <QLabel>
 #include <QTimer>
-#include <iio.h>
 #include "iiowidget.h"
 #include "iiowidgetgroup.h"
 #include "scopy-iio-widgets_export.h"
+
+struct iio_context;
+struct iio_device;
+struct iio_channel;
 
 namespace scopy {
 namespace component {

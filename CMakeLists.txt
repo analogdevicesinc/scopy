@@ -123,30 +123,38 @@ if(WIN32)
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/properties.rc.cmakein ${SCOPY_WIN32_RESOURCES} @ONLY)
 endif()
 
-find_path(
-	IIO_INCLUDE_DIRS
-	NAMES iio.h
-	HINTS ${CMAKE_INSTALL_PREFIX}/include
-	      /include
-	      /usr/include
-	      /usr/local/include
-	      /opt/local/include
-	      REQUIRED
-)
+# libiio API Scopy is built against (see device-controller/CMakeLists.txt). Declared here because the v0 lookup below
+# depends on it. Only v0 builds need the flat <iio.h> and the v0 library; v1 builds use libiio solely through the
+# device-controller backend, which finds libiio v1 itself.
+set(SCOPY_LIBIIO_VERSION "1" CACHE STRING "libiio API used by the device-controller backend (0 or 1)")
+set_property(CACHE SCOPY_LIBIIO_VERSION PROPERTY STRINGS 0 1)
 
-find_library(
-	IIO_LIBRARIES
-	NAMES iio libiio
-	HINTS ${CMAKE_INSTALL_PREFIX}/lib
-	      /usr/lib
-	      /usr/lib64
-	      /usr/local/lib
-	      /usr/local/lib64
-	      /opt/local/lib
-	      /opt/local/lib64
-	      REQUIRED
-)
-message(STATUS "IIO LIBRARIES: " ${IIO_LIBRARIES})
+if(SCOPY_LIBIIO_VERSION STREQUAL "0")
+	find_path(
+		IIO_INCLUDE_DIRS
+		NAMES iio.h
+		HINTS ${CMAKE_INSTALL_PREFIX}/include
+		      /include
+		      /usr/include
+		      /usr/local/include
+		      /opt/local/include
+		      REQUIRED
+	)
+
+	find_library(
+		IIO_LIBRARIES
+		NAMES iio libiio
+		HINTS ${CMAKE_INSTALL_PREFIX}/lib
+		      /usr/lib
+		      /usr/lib64
+		      /usr/local/lib
+		      /usr/local/lib64
+		      /opt/local/lib
+		      /opt/local/lib64
+		      REQUIRED
+	)
+	message(STATUS "IIO LIBRARIES: " ${IIO_LIBRARIES})
+endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set(SCOPY_DLL_BUILD_PATH ${CMAKE_BINARY_DIR}/Scopy.app/Contents/Frameworks)

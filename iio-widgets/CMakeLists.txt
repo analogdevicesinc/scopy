@@ -75,10 +75,12 @@ set(SCOPY_QT_COMPONENTS Core Widgets)
 
 # Legacy data strategies that talk to libiio v0 directly (iio_context/iio_device/iio_channel recipes:
 # ChannelAttr/DeviceAttr/ContextAttr/Trigger). Built only with SCOPY_LIBIIO_VERSION=0; with libiio v1 only the
-# device-controller strategy (ComponentAttrDataStrategy) is built and iio-widgets does not link libiio.
+# device-controller strategy (ComponentAttrDataStrategy) is built and iio-widgets neither links libiio nor needs its
+# header (the public headers only forward-declare the iio_* recipe types).
 set(IIOWIDGETS_IIO_LIBRARIES "")
 if(SCOPY_LIBIIO_VERSION STREQUAL "0")
 	find_library(IIO_LIBRARIES NAMES iio libiio REQUIRED)
+	find_path(IIO_INCLUDE_DIRS iio.h REQUIRED)
 	set(IIOWIDGETS_IIO_LIBRARIES ${IIO_LIBRARIES})
 else()
 	foreach(_s channelattrdatastrategy deviceattrdatastrategy contextattrdatastrategy triggerdatastrategy)
@@ -86,8 +88,6 @@ else()
 		list(REMOVE_ITEM HEADER_LIST ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/datastrategy/${_s}.h)
 	endforeach()
 endif()
-# The public headers still mention iio_* types in the raw recipe fields.
-find_path(IIO_INCLUDE_DIRS iio.h REQUIRED)
 
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 

@@ -21,8 +21,9 @@
 # iio-backend-v1 — libiio v1.x API backend. STATIC, linked into `component` (built when SCOPY_LIBIIO_VERSION=1); its
 # extern "C" createIIOBackend() is resolved at link time.
 #
-# libiio v1 is located on its own: the root IIO_LIBRARIES / IIO_INCLUDE_DIRS point at the v0 API (the LIBIIO_COMPAT
-# shim) used by the rest of Scopy. Pass -DIIO_V1_INCLUDE_DIR / -DIIO_V1_LIBRARY to override the auto-detection below.
+# libiio v1 is located on its own (the root IIO_LIBRARIES / IIO_INCLUDE_DIRS are only set for v0 builds); this backend
+# is the only part of Scopy that uses libiio in a v1 build. Pass -DIIO_V1_INCLUDE_DIR / -DIIO_V1_LIBRARY to override the
+# auto-detection below.
 #
 # The v1 header lives at <prefix>/include/iio/iio.h (unambiguously v1 — v0 has a flat <prefix>/include/iio.h). Find it
 # first, then look for the library NEXT TO it (same prefix) with NO_DEFAULT_PATH, so a v0 libiio.so elsewhere on the
