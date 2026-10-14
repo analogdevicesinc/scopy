@@ -122,8 +122,9 @@ findlib()
     # compat layer), and the version-stripped search below would pick whichever sorts first.
     for path in "${SEARCH_PATHS[@]}"
     do
-        if [ -e "$path/$LIB" ]; then
-            LIB_PATH=$(realpath "$path/$LIB")
+        LIB_PATH=$(find "$path" -name "$LIB" \( -type f -o -type l \) 2>/dev/null | sort | head -1)
+        if [ "$LIB_PATH" != "" ]; then
+            LIB_PATH=$(realpath "$LIB_PATH")
             break
         fi
     done

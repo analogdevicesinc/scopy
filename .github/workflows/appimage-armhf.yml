@@ -18,6 +18,14 @@ env:
 jobs:
   make_armhf_qt6:
     runs-on: ubuntu-latest
+    name: armhf Qt6 AppImage (libiio v${{ matrix.libiio }})
+    strategy:
+      fail-fast: false
+      matrix:
+        # libiio v1 is the default build; v0 uses the libiio v0 prefix shipped in the same image.
+        libiio: ['1', '0']
+    env:
+      APPIMAGE_NAME: Scopy-armhf${{ matrix.libiio == '0' && '-libiio-v0' || '' }}
     steps:
 
         - name: check storage space
@@ -50,6 +58,7 @@ jobs:
           shell: bash
           run: |
                 docker run \
+                        -e SCOPY_LIBIIO_VERSION=${{ matrix.libiio }} \
                         --mount type=bind,source="$GITHUB_WORKSPACE",target=/home/runner/scopy \
                         docker.cloudsmith.io/adi/scopy-dockers/scopy2-armhf-cross-qt6:${{ inputs.docker_tag }} \
                         /bin/bash -c    'sudo chown -R runner:runner /home/runner/scopy && \
@@ -62,8 +71,9 @@ jobs:
 
         - uses: actions/upload-artifact@v7
           with:
-            name: scopy-armhf-qt6-appimage-${{ env.commit_sha }}
-            path: ${{ github.workspace }}/Scopy-armhf.AppImage
+            # Must match move_appimage in ci/arm/arm_cross_build_process.sh
+            name: scopy-armhf-qt6-appimage${{ matrix.libiio == '0' && '-libiio-v0' || '' }}-${{ env.commit_sha }}
+            path: ${{ github.workspace }}/${{ env.APPIMAGE_NAME }}.AppImage
 
         - name: check storage space
           run: df -h
