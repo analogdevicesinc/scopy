@@ -32,7 +32,7 @@
 #include <popupwidget.h>
 #include <QApplication>
 
-#ifdef __linux__
+#if defined(__linux__) && !defined(__ANDROID__)
 #include <unistd.h>
 #endif
 
@@ -111,7 +111,7 @@ void ScopyHomeAddPage::onVerifyFinished()
 		}
 		Q_EMIT verifyFinished(result);
 	}
-#ifdef __linux__
+#if defined(__linux__) && !defined(__ANDROID__)
 	if(m_deviceImpl && m_deviceImpl->param().contains("local:") && getuid() != 0) {
 		createSudoDialog();
 	}
@@ -287,7 +287,7 @@ QWidget *ScopyHomeAddPage::createAddPage(QWidget *parent)
 	return addPage;
 }
 
-#ifdef __linux__
+#if defined(__linux__) && !defined(__ANDROID__)
 void ScopyHomeAddPage::createSudoDialog()
 {
 	PopupWidget *popupWidget = new PopupWidget(QApplication::activeWindow());
