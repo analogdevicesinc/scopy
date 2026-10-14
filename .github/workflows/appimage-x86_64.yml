@@ -22,17 +22,15 @@ permissions:
 jobs:
   make_x86-64_appimage_qt6:
     runs-on: ubuntu-latest
-    name: Ubuntu ${{ matrix.ubuntu_version }} Qt6 AppImage
+    name: Ubuntu ${{ matrix.ubuntu_version }} Qt6 AppImage (libiio v${{ matrix.libiio }})
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - ubuntu_version: "22"
-            docker_image: scopy2-ubuntu22-qt6
-          - ubuntu_version: "24"
-            docker_image: scopy2-ubuntu24-qt6
-          - ubuntu_version: "26"
-            docker_image: scopy2-ubuntu26-qt6
+        ubuntu_version: ["22", "24", "26"]
+        # libiio v1 is the default build; v0 uses the libiio v0 prefix shipped in the same image.
+        libiio: ['1', '0']
+    env:
+      DOCKER_IMAGE: docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu${{ matrix.ubuntu_version }}-qt6:${{ inputs.docker_tag }}
 
     steps:
         - name: check storage space
@@ -60,7 +58,7 @@ jobs:
           run: docker login docker.cloudsmith.io -u token -p "$CLOUDSMITH_API_KEY"
 
         - name: Pull Docker image
-          run: docker pull docker.cloudsmith.io/adi/scopy-dockers/${{ matrix.docker_image }}:${{ inputs.docker_tag }}
+          run: docker pull $DOCKER_IMAGE
 
         - name: Create Scopy Qt6 AppImage
           run: |
@@ -70,16 +68,19 @@ jobs:
               -e GITHUB_WORKSPACE=$GITHUB_WORKSPACE \
               -e BUILD_HOST=$BUILD_HOST \
               -e USERNAME=$USERNAME \
+              -e SCOPY_LIBIIO_VERSION=${{ matrix.libiio }} \
               -v $GITHUB_WORKSPACE:$GITHUB_WORKSPACE \
               -w $GITHUB_WORKSPACE \
-              docker.cloudsmith.io/adi/scopy-dockers/${{ matrix.docker_image }}:${{ inputs.docker_tag }} \
+              $DOCKER_IMAGE \
               bash -c "git config --global --add safe.directory $GITHUB_WORKSPACE && $GITHUB_WORKSPACE/ci/x86_64/x86-64_appimage_process.sh run_workflow"
 
         - name: Set AppImage env vars
           run: |
+            # Must match APP_IMAGE_FOLDER in ci/x86_64/x86-64_appimage_process.sh
             UBUNTU_VERSION_SHORT="${{ matrix.ubuntu_version }}04"
-            echo "app_image_folder=scopy-qt6-x86_64-appimage-ubuntu${UBUNTU_VERSION_SHORT}" >> "$GITHUB_ENV"
-            echo "app_image_name=scopy-qt6-x86_64-appimage-ubuntu${UBUNTU_VERSION_SHORT}.AppImage" >> "$GITHUB_ENV"
+            LIBIIO_SUFFIX=$([ "${{ matrix.libiio }}" == "0" ] && echo "-libiio-v0" || true)
+            echo "app_image_folder=scopy-qt6-x86_64-appimage-ubuntu${UBUNTU_VERSION_SHORT}${LIBIIO_SUFFIX}" >> "$GITHUB_ENV"
+            echo "app_image_name=scopy-qt6-x86_64-appimage-ubuntu${UBUNTU_VERSION_SHORT}${LIBIIO_SUFFIX}.AppImage" >> "$GITHUB_ENV"
 
         - name: Set short git commit SHA
           shell: bash

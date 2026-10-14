@@ -36,7 +36,8 @@ fi
 export APPIMAGE=1
 
 LIBSERIALPORT_BRANCH=master
-LIBIIO_VERSION=v0.26
+LIBIIO_VERSION=v1.0.0
+LIBIIO_V0_VERSION=v0.26
 LIBAD9361_BRANCH=main
 LIBM2K_BRANCH=main
 SPDLOG_BRANCH=v1.x
@@ -94,8 +95,12 @@ JOBS=-j14 # Parallel build jobs
 APP_DIR_NAME=scopy.AppDir
 APP_DIR=$SRC_SCRIPT/$APP_DIR_NAME
 
+# libiio API Scopy is built against: 1 (default) or 0. Same image serves both, see LIBIIO_V0_PREFIX.
+SCOPY_LIBIIO_VERSION=${SCOPY_LIBIIO_VERSION:-1}
+[ "$SCOPY_LIBIIO_VERSION" == "0" ] && LIBIIO_SUFFIX=-libiio-v0 || LIBIIO_SUFFIX=""
+
 UBUNTU_VERSION_SHORT=$(echo "$VERSION_ID" | tr -d '.')
-APP_IMAGE_FOLDER=scopy-qt6-x86_64-appimage-ubuntu${UBUNTU_VERSION_SHORT}
+APP_IMAGE_FOLDER=scopy-qt6-x86_64-appimage-ubuntu${UBUNTU_VERSION_SHORT}${LIBIIO_SUFFIX}
 
 APP_IMAGE_NAME=${APP_IMAGE_FOLDER}.AppImage
 APP_IMAGE=$SRC_SCRIPT/$APP_IMAGE_NAME
@@ -136,6 +141,22 @@ if [ "$USE_STAGING" == "ON" ]
 		)
 fi
 
+# libiio v0 and the dependencies built on it live in their own prefix (same layout as
+# ci/ubuntu/ubuntu_build_process.sh, which builds the CI images). The v0 prefix is searched first so its
+# libiio (iio.h, libiio.so.0) is picked over libiio v1; the RPATH keeps the installed v0 libraries off the
+# libiio v1 compat libiio.so.0 in the default prefix.
+if [ "$USE_STAGING" == "ON" ]; then
+	LIBIIO_V0_PREFIX=$STAGING_AREA_DEPS/libiio-v0
+else
+	LIBIIO_V0_PREFIX=/opt/libiio-v0
+fi
+V0_CMAKE_OPTS="\
+	-DCMAKE_INSTALL_PREFIX=$LIBIIO_V0_PREFIX \
+	-DCMAKE_PREFIX_PATH=$LIBIIO_V0_PREFIX;$QT;$STAGING_AREA_DEPS \
+	-DCMAKE_LIBRARY_PATH=$LIBIIO_V0_PREFIX/lib \
+	-DCMAKE_INSTALL_RPATH=$LIBIIO_V0_PREFIX/lib \
+	"
+
 # Complete CMake command
 CMAKE="$CMAKE_BIN ${CMAKE_OPTS[*]}"
 echo -- USING CMAKE COMMAND:
@@ -149,6 +170,7 @@ clone() {
 	pushd $STAGING_AREA
 	[ -d 'libserialport' ] || git clone --recursive https://github.com/sigrokproject/libserialport -b $LIBSERIALPORT_BRANCH libserialport
 	[ -d 'libiio' ]		|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
+	[ -d 'libiio-v0' ]	|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_V0_VERSION libiio-v0
 	[ -d 'libad9361' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
 	[ -d 'libm2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
 	[ -d 'spdlog' ]		|| git clone --recursive https://github.com/gabime/spdlog.git -b $SPDLOG_BRANCH spdlog
@@ -221,6 +243,14 @@ build_with_cmake() {
 	>> $BUILD_STATUS_FILE
 }
 
+# Same as build_with_cmake, but builds against and installs into LIBIIO_V0_PREFIX.
+build_with_cmake_v0() {
+	CURRENT_BUILD_CMAKE_OPTS="$CURRENT_BUILD_CMAKE_OPTS $V0_CMAKE_OPTS"
+	CPATH=$LIBIIO_V0_PREFIX/include${CPATH:+:$CPATH} \
+	PKG_CONFIG_PATH=$LIBIIO_V0_PREFIX/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH} \
+		build_with_cmake $1
+}
+
 install_packages() {
 	sudo DEBIAN_FRONTEND=noninteractive apt-get -y install
 
@@ -263,6 +293,26 @@ build_libiio() {
 	pushd $STAGING_AREA/libiio
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DWITH_TESTS:BOOL=OFF \
+		-DWITH_MAN:BOOL=OFF \
+		-DHAVE_DNS_SD:BOOL=ON \
+		-DCSHARP_BINDINGS:BOOL=OFF \
+		-DPYTHON_BINDINGS:BOOL=OFF \
+		-DWITH_SERIAL_BACKEND:BOOL=ON \
+		-DENABLE_IPV6:BOOL=OFF \
+		-DINSTALL_UDEV_RULE:BOOL=OFF \
+		-DWITH_IIOD_EMU:BOOL=ON \
+		-DWITH_EMU_BACKEND:BOOL=ON \
+		-DLIBIIO_COMPAT:BOOL=ON \
+		"
+	build_with_cmake $1
+	popd
+}
+
+build_libiio_v0() {
+	echo "### Building libiio - version $LIBIIO_V0_VERSION (prefix $LIBIIO_V0_PREFIX)"
+	pushd $STAGING_AREA/libiio-v0
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DWITH_TESTS:BOOL=OFF \
 		-DWITH_DOC:BOOL=OFF \
 		-DHAVE_DNS_SD:BOOL=ON\
 		-DWITH_MATLAB_BINDINGS:BOOL=OFF \
@@ -272,14 +322,14 @@ build_libiio() {
 		-DENABLE_IPV6:BOOL=OFF \
 		-DINSTALL_UDEV_RULE:BOOL=OFF
 		"
-	build_with_cmake $1
+	build_with_cmake_v0 $1
 	popd
 }
 
 build_libad9361() {
 	echo "### Building libad9361 - branch $LIBAD9361_BRANCH"
 	pushd $STAGING_AREA/libad9361
-	build_with_cmake $1
+	build_with_cmake_v0 $1
 	popd
 }
 
@@ -301,7 +351,7 @@ build_libm2k() {
 		-DENABLE_TOOLS=OFF \
 		-DINSTALL_UDEV_RULES=OFF \
 		"
-	build_with_cmake $1
+	build_with_cmake_v0 $1
 	popd
 }
 
@@ -327,14 +377,14 @@ build_gnuradio() {
 		-DENABLE_GR_IIO=ON \
 		-DENABLE_POSTINSTALL=OFF
 		"
-	build_with_cmake $1
+	build_with_cmake_v0 $1
 	popd
 }
 
 build_grscopy() {
 	echo "### Building gr-scopy - branch $GRSCOPY_BRANCH"
 	pushd $STAGING_AREA/gr-scopy
-	build_with_cmake $1
+	build_with_cmake_v0 $1
 	popd
 }
 
@@ -345,7 +395,7 @@ build_grm2k() {
 		-DENABLE_PYTHON=OFF \
 		-DDIGITAL=OFF
 		"
-	build_with_cmake $1
+	build_with_cmake_v0 $1
 	popd
 }
 
@@ -420,17 +470,18 @@ build_libtinyiiod() {
 	echo "### Building libtinyiiod - branch $LIBTINYIIOD_BRANCH"
 	pushd $STAGING_AREA/libtinyiiod
 	CURRENT_BUILD_CMAKE_OPTS="-DBUILD_EXAMPLES=OFF"
-	build_with_cmake $1
+	build_with_cmake_v0 $1
 	popd
 }
 
+# libiio v0 emulator (libtinyiiod based). libiio v1 builds ship iiod-emu, built with libiio itself.
 build_iio-emu() {
 	echo "### Building iio-emu - branch $IIOEMU_BRANCH"
 	mkdir -p $STAGING_AREA
 	pushd $STAGING_AREA
 	[ -d 'iio-emu' ] || git clone --recursive https://github.com/analogdevicesinc/iio-emu -b $IIOEMU_BRANCH iio-emu
 	pushd $STAGING_AREA/iio-emu
-	build_with_cmake OFF
+	build_with_cmake_v0 OFF
 	popd
 	popd
 }
@@ -490,7 +541,7 @@ build_qcoro() {
 }
 
 build_scopy() {
-	echo "### Building scopy"
+	echo "### Building scopy - libiio v$SCOPY_LIBIIO_VERSION"
 	pushd $SRC_DIR
 	[ -f /home/runner/build-status ] && cp /home/runner/build-status $SRC_DIR/build-status
 	[ $CI_SCRIPT ] && git config --global --add safe.directory $SRC_DIR
@@ -506,7 +557,15 @@ build_scopy() {
 		-DENABLE_PLUGIN_ADC=OFF
 		-DWITH_SIGROK=OFF
 		-DWITH_PYTHON=OFF
+		-DSCOPY_LIBIIO_VERSION=$SCOPY_LIBIIO_VERSION
 		"
+	if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
+		CURRENT_BUILD_CMAKE_OPTS="$CURRENT_BUILD_CMAKE_OPTS \
+			-DIIO_INCLUDE_DIRS=$LIBIIO_V0_PREFIX/include \
+			-DIIO_LIBRARIES=$LIBIIO_V0_PREFIX/lib/libiio.so \
+			-DCMAKE_PREFIX_PATH=$LIBIIO_V0_PREFIX;$QT;$STAGING_AREA_DEPS \
+			"
+	fi
 	build_with_cmake OFF
 	popd
 }
@@ -533,6 +592,8 @@ create_appdir(){
 	# This flag makes them extract and run instead
 	export PATH=$QT:$PATH
 	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$STAGING_AREA_DEPS/lib:$QT/lib:$APP_DIR/usr/lib
+	# libiio v0: resolve libiio.so.0 (and libad9361) from the v0 prefix, not the libiio v1 compat library.
+	[ "$SCOPY_LIBIIO_VERSION" == "0" ] && LD_LIBRARY_PATH=$LIBIIO_V0_PREFIX/lib:$LD_LIBRARY_PATH
 	sudo ldconfig
 	export APPIMAGE_EXTRACT_AND_RUN=1
 
@@ -547,8 +608,15 @@ create_appdir(){
 
 	$COPY_DEPS "$LIBS" $APP_DIR/usr/lib
 
-	cp $EMU_BUILD_FOLDER/iio-emu $APP_DIR/usr/bin
-	cp ${STAGING_AREA_DEPS}/lib/tinyiiod.so* $APP_DIR/usr/lib
+	# Emulator: iiod-emu (from libiio v1) or iio-emu + libtinyiiod (libiio v0)
+	if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
+		cp $EMU_BUILD_FOLDER/iio-emu $APP_DIR/usr/bin
+		cp $LIBIIO_V0_PREFIX/lib/tinyiiod.so* $APP_DIR/usr/lib
+		$COPY_DEPS $APP_DIR/usr/bin/iio-emu $APP_DIR/usr/lib
+	else
+		cp $STAGING_AREA_DEPS/bin/iiod-emu $APP_DIR/usr/bin
+		$COPY_DEPS $APP_DIR/usr/bin/iiod-emu $APP_DIR/usr/lib
+	fi
 
 	# Copy Python runtime. With WITH_PYTHON=OFF, PYTHON_VERSION is never written to the cache
 	# (core/CMakeLists.txt sets it inside the if(WITH_PYTHON) block), so the grep comes back empty.
@@ -633,27 +701,29 @@ build_deps(){
 	download_tools
 	build_libserialport ON
 	build_libiio ON
-	build_libad9361 ON
 	build_spdlog ON
-	build_libm2k ON
 	build_volk ON
-	build_gnuradio ON
-	build_grscopy ON
-	build_grm2k ON
 	build_qwt ON
 	build_libsigrokdecode ON
-	build_libtinyiiod ON
 	build_kddock ON
 	build_ecm ON
 	build_karchive ON
 	build_genalyzer ON
 	build_qcoro ON
+	# libiio v0 and its consumers, installed into LIBIIO_V0_PREFIX
+	build_libiio_v0 ON
+	build_libad9361 ON
+	build_libm2k ON
+	build_gnuradio ON
+	build_grscopy ON
+	build_grm2k ON
+	build_libtinyiiod ON
 }
 
 # Complete build from source to AppImage
 run_workflow(){
 	[ "$CI_SCRIPT" == "ON" ] && move_tools || download_tools
-	build_iio-emu       # Build emulator
+	[ "$SCOPY_LIBIIO_VERSION" == "0" ] && build_iio-emu	# libiio v0 emulator (v1 ships iiod-emu)
 	build_scopy         # Build application
 	create_appdir       # Assemble files
 	create_appimage     # Package AppImage
@@ -669,7 +739,7 @@ get_tools(){
 # Build AppImage assuming dependencies exist
 generate_appimage(){
 	download_tools
-	build_iio-emu
+	[ "$SCOPY_LIBIIO_VERSION" == "0" ] && build_iio-emu
 	build_scopy
 	create_appdir
 	create_appimage
