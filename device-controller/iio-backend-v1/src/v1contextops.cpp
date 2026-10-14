@@ -108,7 +108,8 @@ bool V1ContextOps::ping(ContextHandle h) const
 	}
 	const iio_device *trig = iio_device_get_trigger(dev);
 	int err = iio_err(trig);
-	return err == 0 || err == -ENOENT;
+	// -ENOSYS: the server answered but has no trigger support (e.g. iiod-emu).
+	return err == 0 || err == -ENOENT || err == -ENOSYS;
 }
 
 } // namespace scopy::iio
