@@ -16,7 +16,8 @@ SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 [ "$CI_SCRIPT" == "ON" ] && USE_STAGING=OFF
 
 LIBSERIALPORT_BRANCH=master
-LIBIIO_VERSION=v0.26
+LIBIIO_VERSION=v1.0.0
+LIBIIO_V0_VERSION=v0.26
 LIBAD9361_BRANCH=main
 LIBAD9166_BRANCH=libad9166-iio-v0
 LIBM2K_BRANCH=main
@@ -94,6 +95,24 @@ if [ "$USE_STAGING" == "ON" ]
 		)
 fi
 
+# libiio v0 and the dependencies built on it live in their own prefix, so one image serves both
+# Scopy builds: SCOPY_LIBIIO_VERSION=1 (default, libiio v1 from the default prefix) and
+# SCOPY_LIBIIO_VERSION=0 (libiio v0 from LIBIIO_V0_PREFIX).
+SCOPY_LIBIIO_VERSION=${SCOPY_LIBIIO_VERSION:-1}
+if [ "$USE_STAGING" == "ON" ]; then
+	LIBIIO_V0_PREFIX=$STAGING_AREA_DEPS/libiio-v0
+else
+	LIBIIO_V0_PREFIX=/opt/libiio-v0
+fi
+# The v0 prefix is searched first so its libiio (iio.h, libiio.so.0) is picked over libiio v1. The RPATH keeps the
+# installed v0 libraries off the libiio v1 compat libiio.so.0 in the default prefix.
+V0_CMAKE_OPTS="\
+	-DCMAKE_INSTALL_PREFIX=$LIBIIO_V0_PREFIX \
+	-DCMAKE_PREFIX_PATH=$LIBIIO_V0_PREFIX;$QT;$STAGING_AREA_DEPS \
+	-DCMAKE_LIBRARY_PATH=$LIBIIO_V0_PREFIX/lib \
+	-DCMAKE_INSTALL_RPATH=$LIBIIO_V0_PREFIX/lib \
+	"
+
 CMAKE="$CMAKE_BIN ${CMAKE_OPTS[*]}"
 echo -- USING CMAKE COMMAND:
 echo $CMAKE
@@ -120,6 +139,7 @@ clone() {
 	pushd $STAGING_AREA
 	[ -d 'libserialport' ] || git clone --recursive https://github.com/sigrokproject/libserialport -b $LIBSERIALPORT_BRANCH libserialport
 	[ -d 'libiio' ]		|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
+	[ -d 'libiio-v0' ]	|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_V0_VERSION libiio-v0
 	[ -d 'libad9361' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
 	[ -d 'libad9166' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9166-iio.git -b $LIBAD9166_BRANCH libad9166
 	[ -d 'libm2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
@@ -148,6 +168,14 @@ build_with_cmake() {
 		if [ "$USE_STAGING" == "ON" ]; then make install; else sudo make install; fi
 	fi
 	CURRENT_BUILD_CMAKE_OPTS=""
+}
+
+# Same as build_with_cmake, but builds against and installs into LIBIIO_V0_PREFIX.
+build_with_cmake_v0() {
+	CURRENT_BUILD_CMAKE_OPTS="$CURRENT_BUILD_CMAKE_OPTS $V0_CMAKE_OPTS"
+	CPATH=$LIBIIO_V0_PREFIX/include${CPATH:+:$CPATH} \
+	PKG_CONFIG_PATH=$LIBIIO_V0_PREFIX/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH} \
+		build_with_cmake $1
 }
 
 install_packages() {
@@ -199,6 +227,26 @@ build_libiio() {
 	pushd $STAGING_AREA/libiio
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DWITH_TESTS:BOOL=OFF \
+		-DWITH_MAN:BOOL=OFF \
+		-DHAVE_DNS_SD:BOOL=OFF \
+		-DCSHARP_BINDINGS:BOOL=OFF \
+		-DPYTHON_BINDINGS:BOOL=OFF \
+		-DWITH_SERIAL_BACKEND:BOOL=ON \
+		-DENABLE_IPV6:BOOL=OFF \
+		-DINSTALL_UDEV_RULE:BOOL=OFF \
+		-DWITH_IIOD_EMU:BOOL=ON \
+		-DWITH_EMU_BACKEND:BOOL=ON \
+		-DLIBIIO_COMPAT:BOOL=ON \
+		"
+	build_with_cmake $1
+	popd
+}
+
+build_libiio_v0() {
+	echo "### Building libiio - version $LIBIIO_V0_VERSION (prefix $LIBIIO_V0_PREFIX)"
+	pushd $STAGING_AREA/libiio-v0
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DWITH_TESTS:BOOL=OFF \
 		-DWITH_DOC:BOOL=OFF \
 		-DHAVE_DNS_SD:BOOL=OFF\
 		-DWITH_MATLAB_BINDINGS:BOOL=OFF \
@@ -208,21 +256,21 @@ build_libiio() {
 		-DENABLE_IPV6:BOOL=OFF \
 		-DINSTALL_UDEV_RULE:BOOL=OFF
 		"
-	build_with_cmake $1
+	build_with_cmake_v0 $1
 	popd
 }
 
 build_libad9361() {
 	echo "### Building libad9361 - branch $LIBAD9361_BRANCH"
 	pushd $STAGING_AREA/libad9361
-	build_with_cmake $1
+	build_with_cmake_v0 $1
 	popd
 }
 
 build_libad9166() {
 	echo "### Building libad9166 - branch $LIBAD9166_BRANCH"
 	pushd $STAGING_AREA/libad9166
-	build_with_cmake $1
+	build_with_cmake_v0 $1
 	popd
 }
 
@@ -236,7 +284,7 @@ build_libm2k() {
 		-DENABLE_TOOLS=OFF \
 		-DINSTALL_UDEV_RULES=OFF \
 		"
-	build_with_cmake $1
+	build_with_cmake_v0 $1
 	popd
 }
 
@@ -277,7 +325,7 @@ build_libtinyiiod() {
 	echo "### Building libtinyiiod - branch $LIBTINYIIOD_BRANCH"
 	pushd $STAGING_AREA/libtinyiiod
 	CURRENT_BUILD_CMAKE_OPTS="-DBUILD_EXAMPLES=OFF"
-	build_with_cmake $1
+	build_with_cmake_v0 $1
 	popd
 }
 
@@ -321,7 +369,7 @@ build_genalyzer() {
 build_iio-emu() {
 	echo "### Building iio-emu - branch $IIOEMU_BRANCH"
 	pushd $STAGING_AREA/iio-emu
-	build_with_cmake $1
+	build_with_cmake_v0 $1
 	popd
 }
 
@@ -342,7 +390,7 @@ build_qcoro() {
 }
 
 build_scopy() {
-	echo "### Building scopy"
+	echo "### Building scopy - libiio v$SCOPY_LIBIIO_VERSION"
 	git config --global --add safe.directory $SRC_DIR
 	ls -la $SRC_DIR
 	pushd $SRC_DIR
@@ -354,7 +402,15 @@ build_scopy() {
 		-DENABLE_PLUGIN_ADC=OFF
 		-DWITH_SIGROK=OFF
 		-DWITH_PYTHON=OFF
+		-DSCOPY_LIBIIO_VERSION=$SCOPY_LIBIIO_VERSION
 		"
+	if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
+		CURRENT_BUILD_CMAKE_OPTS="$CURRENT_BUILD_CMAKE_OPTS \
+			-DIIO_INCLUDE_DIRS=$LIBIIO_V0_PREFIX/include \
+			-DIIO_LIBRARIES=$LIBIIO_V0_PREFIX/lib/libiio.so \
+			-DCMAKE_PREFIX_PATH=$LIBIIO_V0_PREFIX;$QT;$STAGING_AREA_DEPS \
+			"
+	fi
 	build_with_cmake OFF
 	popd
 }
@@ -367,17 +423,19 @@ build_deps(){
 	clone
 	build_libserialport ON
 	build_libiio ON
-	build_libad9361 ON
-	build_libad9166 ON
-	build_libm2k ON
 	build_qwt ON
-	build_libtinyiiod ON
 	build_kddock ON
 	build_ecm ON
 	build_karchive ON
 	build_genalyzer ON
-	build_iio-emu ON
 	build_qcoro ON
+	# libiio v0 and its consumers, installed into LIBIIO_V0_PREFIX
+	build_libiio_v0 ON
+	build_libad9361 ON
+	build_libad9166 ON
+	build_libm2k ON
+	build_libtinyiiod ON
+	build_iio-emu ON
 }
 
 configure_system(){
