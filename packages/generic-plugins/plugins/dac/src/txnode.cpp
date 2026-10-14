@@ -29,7 +29,7 @@
 #include <component/backends/iio/iiochannel.h>
 #include <component/backends/iio/iiosamplecodec.h>
 
-#include <iio.h>
+#include <iioutil/channeltypes.h>
 
 using namespace scopy;
 using namespace scopy::dac;
@@ -85,7 +85,7 @@ QCoro::Task<bool> TxNode::readDds() const
 {
 	if(m_channel) {
 		auto *iioChn = qobject_cast<component::iio::IIOChannel *>(m_channel);
-		if(iioChn && iioChn->chanType() == IIO_ALTVOLTAGE) {
+		if(iioChn && iioChn->chanType() == iio::CHAN_ALTVOLTAGE) {
 			auto *raw = m_channel->findChild<component::Attribute *>("raw");
 			if(!raw || !raw->readCapability()) {
 				co_return false;
@@ -110,7 +110,7 @@ QCoro::Task<bool> TxNode::enableDds(bool enable)
 	qDebug(CAT_DAC_DATA) << QString("Try enable:%1 DDS TXNode %2").arg(enable).arg(m_txUuid);
 	if(m_channel) {
 		auto *iioChn = qobject_cast<component::iio::IIOChannel *>(m_channel);
-		if(iioChn && iioChn->chanType() == IIO_ALTVOLTAGE) {
+		if(iioChn && iioChn->chanType() == iio::CHAN_ALTVOLTAGE) {
 			auto *raw = m_channel->findChild<component::Attribute *>("raw");
 			if(!raw || !raw->writeCapability()) {
 				co_return false;

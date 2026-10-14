@@ -84,12 +84,13 @@ QList<DmmDataMonitorModel *> DMM::getDmmMonitors(component::Context *ctx)
 				double scale = readAttrOnce(scaleAttr, 1);
 
 				component::iio::IIOChannel *iioChnl = dynamic_cast<component::iio::IIOChannel *>(chn);
-				int type = iioChnl ? iioChnl->chanType() : iio_chan_type::IIO_CHAN_TYPE_UNKNOWN;
-				if(type != iio_chan_type::IIO_CHAN_TYPE_UNKNOWN) {
-					IIOUnit dmmInfo = m_iioDevices.value(static_cast<iio_chan_type>(type));
+				int type = iioChnl ? iioChnl->chanType() : iio::CHAN_TYPE_UNKNOWN;
+				if(type != iio::CHAN_TYPE_UNKNOWN) {
+					IIOUnit dmmInfo = m_iioDevices.value(static_cast<iio::ChannelType>(type));
 
 					if(isHwmon(dev, chn)) {
-						dmmInfo = m_hwmonDevices.value(static_cast<hwmon_chan_type>(type));
+						dmmInfo =
+							m_hwmonDevices.value(static_cast<iio::HwmonChannelType>(type));
 					}
 					unitOfMeasurement = new UnitOfMeasurement(dmmInfo.name, dmmInfo.symbol);
 					scale = scale * dmmInfo.scale;
@@ -153,8 +154,8 @@ void DMM::generateDictionaries()
 	m_iioDevices = IIOUnitsManager::iioChannelTypes();
 }
 
-QMap<iio_chan_type, IIOUnit> DMM::iioDevices() const { return m_iioDevices; }
+QMap<iio::ChannelType, IIOUnit> DMM::iioDevices() const { return m_iioDevices; }
 
-QMap<hwmon_chan_type, IIOUnit> DMM::hwmonDevices() const { return m_hwmonDevices; }
+QMap<iio::HwmonChannelType, IIOUnit> DMM::hwmonDevices() const { return m_hwmonDevices; }
 
 #include "moc_dmm.cpp"

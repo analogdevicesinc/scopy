@@ -50,12 +50,12 @@ public:
 	component::Attribute *channelAttribute(component::Channel *chn, const QString &attr);
 	void generateDictionaries();
 
-	QMap<iio_chan_type, IIOUnit> iioDevices() const;
-	QMap<hwmon_chan_type, IIOUnit> hwmonDevices() const;
+	QMap<iio::ChannelType, IIOUnit> iioDevices() const;
+	QMap<iio::HwmonChannelType, IIOUnit> hwmonDevices() const;
 
 private:
-	QMap<iio_chan_type, IIOUnit> m_iioDevices;
-	QMap<hwmon_chan_type, IIOUnit> m_hwmonDevices;
+	QMap<iio::ChannelType, IIOUnit> m_iioDevices;
+	QMap<iio::HwmonChannelType, IIOUnit> m_hwmonDevices;
 };
 } // namespace datamonitor
 } // namespace scopy

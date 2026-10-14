@@ -21,9 +21,12 @@
 #ifndef SCOPY_IIOWIDGETDATA_H
 #define SCOPY_IIOWIDGETDATA_H
 
-#include <iio.h>
 #include <QString>
 #include "scopy-iio-widgets_export.h"
+
+struct iio_context;
+struct iio_device;
+struct iio_channel;
 
 namespace scopy::component {
 class Attribute;

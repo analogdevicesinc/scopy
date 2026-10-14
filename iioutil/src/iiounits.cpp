@@ -30,23 +30,26 @@ IIOUnitsManager::IIOUnitsManager(QObject *parent)
 	: QObject(parent)
 {
 
-	m_iioChannelTypes = QMap<iio_chan_type, IIOUnit>({
-		{IIO_VOLTAGE, {"Voltage", "V", 0.001}},
-		{IIO_TEMP, {"Degree Celsius", "°C", 0.001}},
-		{IIO_CURRENT, {"Ampere", "A", 0.001}},
-		{IIO_PRESSURE, {"Pascal", "Pa", 1000}},
-		{IIO_ACCEL, {"Metre per second squared", "m/s2", 1}},
-		{IIO_ANGL_VEL, {"Radian per second", "rad/s", 1}},
-		{IIO_MAGN, {"Gauss", "Gs", 1}},
-		{IIO_POWER, {"Watt", "W", 0.000001}}
+	m_iioChannelTypes = QMap<iio::ChannelType, IIOUnit>({
+		{iio::CHAN_VOLTAGE, {"Voltage", "V", 0.001}},
+		{iio::CHAN_TEMP, {"Degree Celsius", "°C", 0.001}},
+		{iio::CHAN_CURRENT, {"Ampere", "A", 0.001}},
+		{iio::CHAN_PRESSURE, {"Pascal", "Pa", 1000}},
+		{iio::CHAN_ACCEL, {"Metre per second squared", "m/s2", 1}},
+		{iio::CHAN_ANGL_VEL, {"Radian per second", "rad/s", 1}},
+		{iio::CHAN_MAGN, {"Gauss", "Gs", 1}},
+		{iio::CHAN_POWER, {"Watt", "W", 0.000001}}
 		/// and others
 	});
 
 	m_hwmonChannelTypes = {
-		{HWMON_VOLTAGE, {"Voltage", "V", 0.001}}, {HWMON_TEMP, {"Degree Celsius", "°C", 0.001}},
-		{HWMON_CURRENT, {"Ampere", "A", 0.001}},  {HWMON_POWER, {"Watt", "W", 0.000001}},
-		{HWMON_ENERGY, {"Joule", "J", 0.000001}}, {HWMON_FAN, {"Revolution/Min", "RPM", 1}},
-		{HWMON_HUMIDITY, {"percent", "%", 0.001}}
+		{iio::HWMON_CHAN_VOLTAGE, {"Voltage", "V", 0.001}},
+		{iio::HWMON_CHAN_TEMP, {"Degree Celsius", "°C", 0.001}},
+		{iio::HWMON_CHAN_CURRENT, {"Ampere", "A", 0.001}},
+		{iio::HWMON_CHAN_POWER, {"Watt", "W", 0.000001}},
+		{iio::HWMON_CHAN_ENERGY, {"Joule", "J", 0.000001}},
+		{iio::HWMON_CHAN_FAN, {"Revolution/Min", "RPM", 1}},
+		{iio::HWMON_CHAN_HUMIDITY, {"percent", "%", 0.001}}
 		/// and others
 	};
 }
@@ -59,20 +62,20 @@ IIOUnitsManager *IIOUnitsManager::GetInstance()
 	return pinstance_;
 }
 
-QMap<iio_chan_type, IIOUnit> IIOUnitsManager::iioChannelTypes()
+QMap<iio::ChannelType, IIOUnit> IIOUnitsManager::iioChannelTypes()
 {
 	return IIOUnitsManager::GetInstance()->_iioChannelTypes();
 }
 
-QMap<hwmon_chan_type, IIOUnit> IIOUnitsManager::hwmonChannelTypes()
+QMap<iio::HwmonChannelType, IIOUnit> IIOUnitsManager::hwmonChannelTypes()
 {
 	return IIOUnitsManager::GetInstance()->_hwmonChannelTypes();
 }
 
 IIOUnitsManager::~IIOUnitsManager() {}
 
-QMap<iio_chan_type, IIOUnit> IIOUnitsManager::_iioChannelTypes() { return m_iioChannelTypes; }
+QMap<iio::ChannelType, IIOUnit> IIOUnitsManager::_iioChannelTypes() { return m_iioChannelTypes; }
 
-QMap<hwmon_chan_type, IIOUnit> IIOUnitsManager::_hwmonChannelTypes() { return m_hwmonChannelTypes; }
+QMap<iio::HwmonChannelType, IIOUnit> IIOUnitsManager::_hwmonChannelTypes() { return m_hwmonChannelTypes; }
 
 #include "moc_iiounits.cpp"

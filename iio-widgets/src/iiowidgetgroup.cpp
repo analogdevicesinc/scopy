@@ -21,7 +21,9 @@
 
 #include "iiowidgetgroup.h"
 #include <QLoggingCategory>
+#if SCOPY_LIBIIO_VERSION == 0
 #include <iio.h>
+#endif
 #include <component/attribute.h>
 #include <component/channel.h>
 #include <component/device.h>

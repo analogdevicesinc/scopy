@@ -27,7 +27,7 @@
 
 #include <float.h>
 #include <qmath.h>
-#include <iio.h>
+#include <iioutil/channeltypes.h>
 
 using namespace scopy;
 using namespace scopy::dac;
@@ -50,7 +50,7 @@ double DacUtils::dbFullScaleConvert(double scale, bool inverse)
 bool DacUtils::checkDdsChannel(component::Channel *chn)
 {
 	auto *iioChn = qobject_cast<component::iio::IIOChannel *>(chn);
-	if(!iioChn || iioChn->chanType() != IIO_ALTVOLTAGE) {
+	if(!iioChn || iioChn->chanType() != iio::CHAN_ALTVOLTAGE) {
 		return false;
 	}
 	if(!chn->findChild<component::Attribute *>("frequency")) {
