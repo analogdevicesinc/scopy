@@ -16,7 +16,8 @@ ARCHITECTURE=armhf
 TOOLCHAIN_HOST=arm-linux-gnueabihf
 
 LIBSERIALPORT_BRANCH=master
-LIBIIO_VERSION=v0.26
+LIBIIO_VERSION=v1.0.0
+LIBIIO_V0_VERSION=v0.26
 LIBAD9361_BRANCH=main
 LIBAD9166_BRANCH=libad9166-iio-v0
 LIBM2K_BRANCH=main
@@ -80,6 +81,32 @@ CMAKE_OPTS=(\
 	-DCMAKE_VERBOSE_MAKEFILE=ON \
 	-DCMAKE_INSTALL_PREFIX=$SYSROOT \
 )
+
+# libiio v0 and the dependencies built on it live in their own prefix inside the sysroot, so one image serves both
+# Scopy builds: SCOPY_LIBIIO_VERSION=1 (default, libiio v1 in $SYSROOT) and SCOPY_LIBIIO_VERSION=0 (libiio v0 from
+# LIBIIO_V0_PREFIX). The toolchain file sets CMAKE_PREFIX_PATH itself (a -D value is shadowed), so the v0 prefix is
+# made visible through CMAKE_LIBRARY_PATH / CMAKE_INCLUDE_PATH, which find_library/find_path search before the
+# sysroot system paths - i.e. before libiio v1 and its compat libiio.so.0 in $SYSROOT/lib.
+SCOPY_LIBIIO_VERSION=${SCOPY_LIBIIO_VERSION:-1}
+[ "$SCOPY_LIBIIO_VERSION" == "0" ] && LIBIIO_SUFFIX=-libiio-v0 || LIBIIO_SUFFIX=""
+LIBIIO_V0_PREFIX=$SYSROOT/opt/libiio-v0
+V0_SEARCH_OPTS="\
+	-DCMAKE_LIBRARY_PATH=$LIBIIO_V0_PREFIX/lib \
+	-DCMAKE_INCLUDE_PATH=$LIBIIO_V0_PREFIX/include \
+	"
+# The sysroot already holds a libiio.so in $SYSROOT/usr/lib that find_library() picks before CMAKE_LIBRARY_PATH under
+# the toolchain's root-path rules, so the v0 consumers get the libiio v0 location explicitly, through the cache
+# variables they read (libad9361/libad9166: LIBIIO_*, libm2k: IIO_*); a preset cache entry skips the search.
+V0_IIO_OPTS="\
+	-DLIBIIO_LIBRARIES=$LIBIIO_V0_PREFIX/lib/libiio.so \
+	-DLIBIIO_INCLUDEDIR=$LIBIIO_V0_PREFIX/include \
+	-DIIO_LIBRARIES=$LIBIIO_V0_PREFIX/lib/libiio.so \
+	-DIIO_INCLUDE_DIRS=$LIBIIO_V0_PREFIX/include \
+	"
+V0_CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=$LIBIIO_V0_PREFIX $V0_SEARCH_OPTS $V0_IIO_OPTS"
+# Read by cmake_toolchain_armhf.cmake. With --as-needed the linker resolves a library's own NEEDED libiio.so.0
+# from the sysroot default dirs, not from the v0 prefix; point it at the v0 prefix.
+V0_LDFLAGS="-Wl,-rpath-link,$LIBIIO_V0_PREFIX/lib"
 
 CMAKE="$CMAKE_BIN ${CMAKE_OPTS[*]}"
 
@@ -158,6 +185,7 @@ clone() {
 	pushd $STAGING_AREA
 	[ -d 'libserialport' ] || git clone --recursive https://github.com/sigrokproject/libserialport -b $LIBSERIALPORT_BRANCH libserialport
 	[ -d 'libiio' ]		|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
+	[ -d 'libiio-v0' ]	|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_V0_VERSION libiio-v0
 	[ -d 'libad9361' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
 	[ -d 'libad9166' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9166-iio.git -b $LIBAD9166_BRANCH libad9166
 	[ -d 'libm2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
@@ -188,6 +216,14 @@ build_with_cmake() {
 	CURRENT_BUILD_CMAKE_OPTS=""
 }
 
+# Same as build_with_cmake, but builds against and installs into LIBIIO_V0_PREFIX. CPATH puts the v0 iio.h on
+# the compiler's default include path, as $SYSROOT/include did before: some dependencies (e.g. the libad9361 tests)
+# include <iio.h> without adding the libiio include directory themselves.
+build_with_cmake_v0() {
+	CURRENT_BUILD_CMAKE_OPTS="$CURRENT_BUILD_CMAKE_OPTS $V0_CMAKE_OPTS"
+	CPATH=$LIBIIO_V0_PREFIX/include${CPATH:+:$CPATH} SCOPY_CROSS_LDFLAGS=$V0_LDFLAGS build_with_cmake $1
+}
+
 build_libserialport() {
 	echo "### Building libserialport - branch $LIBSERIALPORT_BRANCH"
 	set_config_opts
@@ -205,6 +241,26 @@ build_libiio() {
 	pushd $STAGING_AREA/libiio
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DWITH_TESTS:BOOL=OFF \
+		-DWITH_MAN:BOOL=OFF \
+		-DHAVE_DNS_SD:BOOL=OFF \
+		-DCSHARP_BINDINGS:BOOL=OFF \
+		-DPYTHON_BINDINGS:BOOL=OFF \
+		-DWITH_SERIAL_BACKEND:BOOL=ON \
+		-DENABLE_IPV6:BOOL=OFF \
+		-DINSTALL_UDEV_RULE:BOOL=OFF \
+		-DWITH_IIOD_EMU:BOOL=ON \
+		-DWITH_EMU_BACKEND:BOOL=ON \
+		-DLIBIIO_COMPAT:BOOL=ON \
+		"
+	build_with_cmake $1
+	popd
+}
+
+build_libiio_v0() {
+	echo "### Building libiio - version $LIBIIO_V0_VERSION (prefix $LIBIIO_V0_PREFIX)"
+	pushd $STAGING_AREA/libiio-v0
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DWITH_TESTS:BOOL=OFF \
 		-DWITH_DOC:BOOL=OFF \
 		-DHAVE_DNS_SD:BOOL=OFF \
 		-DWITH_MATLAB_BINDINGS:BOOL=OFF \
@@ -212,8 +268,10 @@ build_libiio() {
 		-DPYTHON_BINDINGS:BOOL=OFF \
 		-DWITH_SERIAL_BACKEND:BOOL=ON \
 		-DENABLE_IPV6:BOOL=OFF \
-		-DINSTALL_UDEV_RULE:BOOL=OFF
+		-DINSTALL_UDEV_RULE:BOOL=OFF \
+		-DCMAKE_INSTALL_PREFIX=$LIBIIO_V0_PREFIX \
 		"
+	# Plain build_with_cmake: libiio itself must not get the V0_IIO_OPTS that point consumers at it.
 	build_with_cmake $1
 	popd
 }
@@ -221,14 +279,14 @@ build_libiio() {
 build_libad9361() {
 	echo "### Building libad9361 - branch $LIBAD9361_BRANCH"
 	pushd $STAGING_AREA/libad9361
-	build_with_cmake $1
+	build_with_cmake_v0 $1
 	popd
 }
 
 build_libad9166() {
 	echo "### Building libad9166 - branch $LIBAD9166_BRANCH"
 	pushd $STAGING_AREA/libad9166
-	build_with_cmake $1
+	build_with_cmake_v0 $1
 	popd
 }
 
@@ -242,7 +300,7 @@ build_libm2k() {
 		-DENABLE_TOOLS=OFF \
 		-DINSTALL_UDEV_RULES=OFF \
 		"
-	build_with_cmake $1
+	build_with_cmake_v0 $1
 	popd
 }
 
@@ -337,7 +395,7 @@ build_qcoro() {
 }
 
 build_scopy() {
-	echo "### Building scopy (cross-compile armhf)"
+	echo "### Building scopy (cross-compile armhf) - libiio v$SCOPY_LIBIIO_VERSION"
 	git config --global --add safe.directory $SRC_DIR
 	pushd $SRC_DIR
 	CURRENT_BUILD_CMAKE_OPTS="\
@@ -347,7 +405,17 @@ build_scopy() {
 		-DWITH_SIGROK=OFF \
 		-DWITH_PYTHON=OFF \
 		-DCMAKE_INSTALL_PREFIX=$APP_DIR/usr \
+		-DSCOPY_LIBIIO_VERSION=$SCOPY_LIBIIO_VERSION \
 		"
+	if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
+		CURRENT_BUILD_CMAKE_OPTS="$CURRENT_BUILD_CMAKE_OPTS $V0_SEARCH_OPTS \
+			-DIIO_INCLUDE_DIRS=$LIBIIO_V0_PREFIX/include \
+			-DIIO_LIBRARIES=$LIBIIO_V0_PREFIX/lib/libiio.so \
+			-DAD9361_INCLUDE_DIRS=$LIBIIO_V0_PREFIX/include \
+			-DAD9361_LIBRARIES=$LIBIIO_V0_PREFIX/lib/libad9361.so \
+			"
+		export SCOPY_CROSS_LDFLAGS=$V0_LDFLAGS
+	fi
 	build_with_cmake OFF
 	popd
 }
@@ -356,9 +424,6 @@ build_deps() {
 	clone
 	build_libserialport ON
 	build_libiio ON
-	build_libad9361 ON
-	build_libad9166 ON
-	build_libm2k ON
 	build_qwt ON
 	build_libtinyiiod ON
 	build_kddock ON
@@ -367,6 +432,12 @@ build_deps() {
 	build_genalyzer ON
 	build_iio-emu ON
 	build_qcoro ON
+	# libiio v0 and its consumers, installed into LIBIIO_V0_PREFIX. libtinyiiod and iio-emu (above) do not use
+	# libiio, so they stay in the sysroot prefix.
+	build_libiio_v0 ON
+	build_libad9361 ON
+	build_libad9166 ON
+	build_libm2k ON
 }
 
 create_appdir() {
@@ -391,24 +462,32 @@ create_appdir() {
 	cp $SRC_DIR/gui/res/scopy.png $APP_DIR/usr/share/icons/hicolor/512x512
 	cp $APP_DESKTOP $APP_DIR/usr/share/applications
 
+	# Emulator: iiod-emu (built with libiio v1) or iio-emu (libiio v0, libtinyiiod based).
 	# $EMU_BUILD_FOLDER is $STAGING_AREA/iio-emu/build, i.e. under /home/runner/scripts, which
 	# Dockerfile.armhf-cross deletes when it cleans the image - so at CI time this source is
-	# guaranteed absent and the old single-source `if` silently shipped no emulator at all.
-	# The cross-compiled binary survives at $SYSROOT/bin/iio-emu: build_iio-emu installs with
-	# CMAKE_INSTALL_PREFIX=$SYSROOT, which is outside the deleted tree. Scopy then finds it next
-	# to its own executable (EmuWidget::findEmuPath -> applicationDirPath, core/src/emuwidget.cpp).
-	# Deliberately NOT arm64's `command -v iio-emu` / /usr/local/bin/iio-emu fallbacks: this is a
-	# cross build on an x86_64 host, so both of those resolve to x86_64 binaries that would look
-	# like a fix and not be executable on the target.
-	if [ -f $EMU_BUILD_FOLDER/iio-emu ]; then
-		cp $EMU_BUILD_FOLDER/iio-emu $APP_DIR/usr/bin
-	elif [ -f $SYSROOT/bin/iio-emu ]; then
-		cp $SYSROOT/bin/iio-emu $APP_DIR/usr/bin
+	# guaranteed absent. The cross-compiled binaries survive in $SYSROOT/bin: both are installed with
+	# CMAKE_INSTALL_PREFIX=$SYSROOT, which is outside the deleted tree. Scopy then finds the emulator
+	# next to its own executable (EmuWidget::findEmuPath -> applicationDirPath, core/src/emuwidget.cpp).
+	# Deliberately NOT arm64's `command -v` / /usr/local/bin fallbacks: this is a cross build on an
+	# x86_64 host, so those resolve to x86_64 binaries that would not be executable on the target.
+	if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
+		EMU_BIN=iio-emu
+		EMU_CANDIDATES="$EMU_BUILD_FOLDER/iio-emu $SYSROOT/bin/iio-emu"
 	else
-		echo "ERROR: no armhf iio-emu in $EMU_BUILD_FOLDER or $SYSROOT/bin."
-		echo "       Nothing outside this container can produce an armhf iio-emu, and the AppImage"
+		EMU_BIN=iiod-emu
+		EMU_CANDIDATES="$SYSROOT/bin/iiod-emu"
+	fi
+	for emu in $EMU_CANDIDATES; do
+		if [ -f $emu ]; then
+			cp $emu $APP_DIR/usr/bin
+			break
+		fi
+	done
+	if [ ! -f $APP_DIR/usr/bin/$EMU_BIN ]; then
+		echo "ERROR: no armhf $EMU_BIN in: $EMU_CANDIDATES"
+		echo "       Nothing outside this container can produce an armhf emulator, and the AppImage"
 		echo "       is the only vehicle that carries it to the device, so refusing to package"
-		echo "       without it. Check that build_deps ran build_iio-emu."
+		echo "       without it. Check that build_deps built it."
 		exit 1
 	fi
 
@@ -416,10 +495,12 @@ create_appdir() {
 	sudo rm -rfv ${SYSROOT}/usr/lib/arm-linux-gnueabihf/libQt6* 2>/dev/null || true
 
 	LIB_DIRS=${SYSROOT}:${BUILD_FOLDER}:${QT}/lib
+	# libiio v0: resolve libiio.so.0 (and libad9361) from the v0 prefix, not the libiio v1 compat library.
+	[ "$SCOPY_LIBIIO_VERSION" == "0" ] && LIB_DIRS=$LIBIIO_V0_PREFIX/lib:$LIB_DIRS
 	$COPY_DEPS --lib-dir ${LIB_DIRS} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/scopy
-	# iio-emu is guaranteed present by the check in create_appdir above, so a "not found" from
+	# The emulator is guaranteed present by the check above, so a "not found" from
 	# copy-deps here is a genuine resolution fault rather than a tolerable absence - do not guard it.
-	$COPY_DEPS --lib-dir ${LIB_DIRS} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/iio-emu
+	$COPY_DEPS --lib-dir ${LIB_DIRS} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/$EMU_BIN
 	find $APP_DIR/usr -type f -name 'libscopy*.so' | xargs $COPY_DEPS --lib-dir ${LIB_DIRS} --output-dir $APP_DIR/usr/lib
 
 	# Qt loads the platform plugins with dlopen, so nothing scanned above reaches them: libqxcb
@@ -502,7 +583,7 @@ create_appimage() {
 }
 
 move_appimage() {
-	mv $APP_IMAGE $SRC_DIR/Scopy-armhf.AppImage
+	mv $APP_IMAGE $SRC_DIR/Scopy-armhf${LIBIIO_SUFFIX}.AppImage
 }
 
 generate_appimage() {
