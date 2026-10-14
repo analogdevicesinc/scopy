@@ -23,7 +23,12 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Ubuntu 24 Qt6
+    name: Ubuntu 24 Qt6 (libiio v${{ matrix.libiio }})
+    strategy:
+      fail-fast: false
+      matrix:
+        # libiio v1 is the default build; v0 uses the libiio v0 prefix shipped in the same image.
+        libiio: ['1', '0']
 
     steps:
         - name: check storage space
@@ -54,6 +59,7 @@ jobs:
               -e GITHUB_WORKSPACE=$GITHUB_WORKSPACE \
               -e BUILD_HOST=$BUILD_HOST \
               -e USERNAME=$USERNAME \
+              -e SCOPY_LIBIIO_VERSION=${{ matrix.libiio }} \
               -v $GITHUB_WORKSPACE:$GITHUB_WORKSPACE \
               -w $GITHUB_WORKSPACE \
               docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:${{ inputs.docker_tag }} \
@@ -68,22 +74,24 @@ jobs:
               -v $GITHUB_WORKSPACE:$GITHUB_WORKSPACE \
               -w $GITHUB_WORKSPACE \
               docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:${{ inputs.docker_tag }} \
-              bash -c "ldconfig && cd $GITHUB_WORKSPACE/build && QT_QPA_PLATFORM=offscreen ctest -V --output-on-failure --output-junit $GITHUB_WORKSPACE/test-result-ubuntu-qt6.xml"
+              bash -c "ldconfig && cd $GITHUB_WORKSPACE/build && QT_QPA_PLATFORM=offscreen ctest -V --output-on-failure --output-junit $GITHUB_WORKSPACE/test-result-ubuntu-qt6-libiio-v${{ matrix.libiio }}.xml"
 
         - name: Report
           uses: mikepenz/action-junit-report@v6
           if: always()
           with:
              job_name: Verify Results
-             check_name: 'Scopy Qt6 Test'
+             check_name: 'Scopy Qt6 Test (libiio v${{ matrix.libiio }})'
              check_title_template: '{{TEST_NAME}}'
-             report_paths: '${{github.workspace}}/test-result-ubuntu-qt6.xml'
+             report_paths: '${{github.workspace}}/test-result-ubuntu-qt6-libiio-v${{ matrix.libiio }}.xml'
              detailed_summary: 'true'
              fail_on_failure: 'true'
              require_tests: 'true'
              include_passed: 'true'
 
+        # Documentation screenshots come from the default (libiio v1) build only.
         - name: Generate screenshots
+          if: matrix.libiio == '1'
           run: |
             docker run --rm \
               --user root \
@@ -99,6 +107,7 @@ jobs:
                 --output-root $GITHUB_WORKSPACE/screenshots_output"
 
         - name: Upload screenshots artifact
+          if: matrix.libiio == '1'
           uses: actions/upload-artifact@v7
           with:
             name: documentation-screenshots
