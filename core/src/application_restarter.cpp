@@ -25,8 +25,9 @@
 #include <QDir>
 #include <QProcess>
 
-#ifdef __ANDROID__
-#include <QtAndroidExtras/QtAndroid>
+#ifdef Q_OS_ANDROID
+#include <QJniObject>
+#include <QCoreApplication>
 #endif
 
 using namespace scopy;
@@ -50,9 +51,13 @@ QStringList ApplicationRestarter::getArguments() const { return m_arguments; }
 int ApplicationRestarter::restart(int exitCode)
 {
 	if(m_restart) {
-#ifdef __ANDROID__
-		QAndroidJniObject activity = QtAndroid::androidActivity();
-		activity.callMethod<void>("restart");
+#ifdef Q_OS_ANDROID
+		// Qt6: QtAndroidExtras is gone. The Android context is the QtActivity, which the
+		// bundled ScopyActivity extends; call its restart() method through JNI.
+		QJniObject activity = QNativeInterface::QAndroidApplication::context();
+		if(activity.isValid()) {
+			activity.callMethod<void>("restart");
+		}
 #else
 		QProcess::startDetached(m_executable, m_arguments, m_currentPath);
 #endif

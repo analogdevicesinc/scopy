@@ -37,6 +37,9 @@ QString scopy::config::defaultTranslationFolderPath()
 	return QCoreApplication::applicationDirPath() + "/../Resources/translations";
 #elif defined(__appimage__)
 	return QCoreApplication::applicationDirPath() + "/../lib/scopy/translations";
+#elif defined(__ANDROID__)
+	// data files are copied from the APK assets to the app writable dir at startup
+	return qgetenv("APPDATA") + "/translations";
 #endif
 	return SCOPY_TRANSLATION_INSTALL_PATH;
 }
@@ -49,6 +52,9 @@ QString scopy::config::defaultStyleFolderPath()
 	return QCoreApplication::applicationDirPath() + "/../Resources/style";
 #elif defined(__appimage__)
 	return QCoreApplication::applicationDirPath() + "/../lib/scopy/style";
+#elif defined(__ANDROID__)
+	// data files are copied from the APK assets to the app writable dir at startup
+	return qgetenv("APPDATA") + "/style";
 #endif
 	return SCOPY_STYLE_INSTALL_PATH;
 }
@@ -103,6 +109,8 @@ QString scopy::config::pkgFolderPath()
 	QString defaultPath =
 		QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + QDir::separator() + "packages";
 #ifdef WIN32
+	defaultPath = defaultPkgFolderPath();
+#elif defined(__ANDROID__)
 	defaultPath = defaultPkgFolderPath();
 #endif
 	return defaultPath;
@@ -161,6 +169,9 @@ QString scopy::config::defaultPkgFolderPath()
 #elif defined(__appimage__)
 	// usr/lib/packages
 	return QCoreApplication::applicationDirPath() + "/../lib/scopy/packages";
+#elif defined(__ANDROID__)
+	// org.adi.scopy writable dir /packages (plugin .so's are loaded from nativeLibraryDir by base name)
+	return qgetenv("APPDATA") + "/packages";
 #endif
 
 	return SCOPY_PACKAGE_INSTALL_PATH;
