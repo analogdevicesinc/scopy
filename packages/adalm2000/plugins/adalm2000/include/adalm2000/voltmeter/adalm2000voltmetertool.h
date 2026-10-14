@@ -26,6 +26,7 @@
 
 #include <QLabel>
 #include <QString>
+#include <QVector>
 #include <QWidget>
 
 #include <qcoro/qcorotask.h>
@@ -38,12 +39,21 @@
 #include <style.h>
 
 class QTimer;
+class QVBoxLayout;
 
 namespace scopy {
 class MenuCombo;
 class MenuOnOffSwitch;
+class PlotChannel;
+class PlotWidget;
 class ValueBarWidget;
 class ValueMonitorWidget;
+
+namespace gui {
+class MenuPlotAxisRangeControl;
+class MenuSpinbox;
+class PlotAutoscaler;
+} // namespace gui
 
 namespace component {
 class Attribute;
@@ -68,6 +78,15 @@ private:
 	component::Attribute *findRangeAttribute(int channel) const;
 	QWidget *createChannelSection(int channel, QWidget *parent);
 	void applyScalePreset(int channel, int index);
+	void createChannelPlot(int channel, QWidget *parent);
+	QWidget *createPlotSettings(int channel, QWidget *parent);
+	void setPlotHistory(int channel, double seconds);
+	void clearPlotHistory(int channel);
+	void pushPlotSample(int channel, double value);
+	void repointPlotCurve(int channel);
+	void applyPlotYRange(int channel, double min, double max);
+	void setPlotAutoscaleEnabled(int channel, bool on);
+	void setPlotVisible(int channel, bool on);
 
 	void onReadings(int channel, double dcVolts, double acVolts);
 	void onRangeChangeRequested(int channel, bool lowRange);
@@ -96,6 +115,20 @@ private:
 	MenuCombo *m_gainCombo[2] = {nullptr, nullptr};
 	QLabel *m_activeRangeLabel[2] = {nullptr, nullptr};
 	MenuOnOffSwitch *m_peakHoldSwitch = nullptr;
+
+	QVBoxLayout *m_centralLayout = nullptr;
+	PlotWidget *m_plot[2] = {nullptr, nullptr};
+	PlotChannel *m_plotCh[2] = {nullptr, nullptr};
+	gui::PlotAutoscaler *m_plotAutoscaler[2] = {nullptr, nullptr};
+	gui::MenuPlotAxisRangeControl *m_plotYRange[2] = {nullptr, nullptr};
+	gui::MenuSpinbox *m_historySpin[2] = {nullptr, nullptr};
+	MenuOnOffSwitch *m_plotVisibleSwitch[2] = {nullptr, nullptr};
+	MenuOnOffSwitch *m_autoscaleSwitch[2] = {nullptr, nullptr};
+
+	QVector<double> m_histX[2];
+	QVector<double> m_histY[2];
+	int m_histCap[2] = {0, 0};
+	double m_pendingYMin[2] = {0.0, 0.0};
 
 	bool m_acMode[2] = {false, false};
 

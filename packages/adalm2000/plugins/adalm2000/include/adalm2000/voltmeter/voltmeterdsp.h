@@ -29,8 +29,9 @@
 
 namespace scopy::adalm2000::dsp {
 
-// At sample_rate = 1e5.
+inline constexpr double SAMPLE_RATE_HZ = 1e5;
 inline constexpr std::size_t DECIMATION = 10000; // keep_one_in_n -> 10 updates/s
+inline constexpr double UPDATE_RATE_HZ = SAMPLE_RATE_HZ / DECIMATION;
 inline constexpr std::size_t BLOCKER_LEN = 4000; // dc_blocker_ff, long form
 inline constexpr std::size_t MA_LEN = 4000;	 // moving_average_ff, gain 1/4000
 inline constexpr double RMS_ALPHA = 1e-4;	 // rms_ff single-pole IIR

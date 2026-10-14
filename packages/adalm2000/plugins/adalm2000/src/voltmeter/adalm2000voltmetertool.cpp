@@ -35,9 +35,16 @@
 #include <QSpacerItem>
 #include <QVBoxLayout>
 
+#include <gui/plotautoscaler.h>
+#include <gui/plotaxis.h>
+#include <gui/plotchannel.h>
+#include <gui/plotnavigator.hpp>
+#include <gui/plotwidget.h>
 #include <gui/widgets/menucombo.h>
 #include <gui/widgets/menuonoffswitch.h>
+#include <gui/widgets/menuplotaxisrangecontrol.h>
 #include <gui/widgets/menusectionwidget.h>
+#include <gui/widgets/menuspinbox.h>
 #include <gui/widgets/menuwidget.h>
 #include <gui/widgets/valuebarwidget.h>
 #include <gui/widgets/valuemonitorwidget.h>
@@ -52,6 +59,8 @@
 #include <component/navigation.h>
 
 Q_LOGGING_CATEGORY(CAT_ADALM2000VOLTMETER, "Adalm2000VoltmeterTool")
+
+constexpr int PLOT_MIN_HEIGHT_PX = 120;
 
 using namespace scopy;
 using namespace scopy::adalm2000;
@@ -100,11 +109,21 @@ QWidget *Adalm2000VoltmeterTool::createChannelSection(int channel, QWidget *pare
 		QStringLiteral("Channel %1").arg(channel + 1), MenuCollapseSection::MHCW_ARROW,
 		MenuCollapseSection::MHW_BASEWIDGET, parent);
 
+	QWidget *sectionWidget = new QWidget(section);
+	QHBoxLayout *sectionLayout = new QHBoxLayout(sectionWidget);
+	sectionLayout->setContentsMargins(0, 0, 0, 0);
+	sectionWidget->setLayout(sectionLayout);
+
+	section->contentLayout()->addWidget(sectionWidget);
+
 	const QColor color = railColor(channel);
+
+	QVBoxLayout *valuesLayout = new QVBoxLayout();
+	valuesLayout->setContentsMargins(0, 0, 0, 0);
 
 	m_monitor[channel] = new ValueMonitorWidget(QStringLiteral("Channel %1").arg(channel + 1), "VDC", QString(), 3,
 						    color, true, section);
-	section->contentLayout()->addWidget(m_monitor[channel]);
+	valuesLayout->addWidget(m_monitor[channel]);
 
 	m_scale[channel] = new ValueBarWidget(section);
 	m_scale[channel]->setOrientation(Qt::Horizontal);
@@ -112,7 +131,14 @@ QWidget *Adalm2000VoltmeterTool::createChannelSection(int channel, QWidget *pare
 	m_autoScaler[channel].setPresets(vm::presets());
 	m_autoScaler[channel].setFloorAtZero(m_acMode[channel]);
 	applyScalePreset(channel, m_autoScaler[channel].index());
-	section->contentLayout()->addWidget(m_scale[channel]);
+	valuesLayout->addWidget(m_scale[channel]);
+
+	createChannelPlot(channel, section);
+	sectionLayout->addWidget(m_plot[channel]);
+	sectionLayout->addLayout(valuesLayout);
+
+	section->menuSection()->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	section->collapseSection()->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
 	return section;
 }
@@ -125,6 +151,177 @@ void Adalm2000VoltmeterTool::applyScalePreset(int channel, int index)
 	const ScalePreset preset = m_autoScaler[channel].current();
 	m_scale[channel]->setRange(preset.lower, preset.upper);
 	m_scale[channel]->setTickCounts(preset.maxMajor, preset.maxMinor);
+}
+
+void Adalm2000VoltmeterTool::createChannelPlot(int channel, QWidget *parent)
+{
+	const QColor color = railColor(channel);
+
+	m_plot[channel] = new PlotWidget(parent);
+	m_plot[channel]->navigator()->setEnabled(false);
+	m_plot[channel]->setShowXAxisLabels(true);
+	m_plot[channel]->setShowYAxisLabels(true);
+	m_plot[channel]->setMinimumHeight(PLOT_MIN_HEIGHT_PX);
+	m_plot[channel]->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+	m_plot[channel]->xAxis()->setUnits("s");
+	m_plot[channel]->xAxis()->setInterval(-vm::PLOT_HISTORY_DEFAULT_S, 0);
+	m_plot[channel]->yAxis()->setUnits("V");
+	m_plot[channel]->yAxis()->scaleDraw()->setFloatPrecision(2);
+	m_plot[channel]->yAxis()->setInterval(-vm::PLOT_MIN_SPAN_V, vm::PLOT_MIN_SPAN_V);
+	m_plot[channel]->yAxis()->setDivs(5);
+	m_plot[channel]->yAxis()->scaleEngine()->setMajorTicksCount(5);
+
+	m_plotCh[channel] = new PlotChannel(QStringLiteral("Channel %1").arg(channel + 1), QPen(color, 1),
+					    m_plot[channel]->xAxis(), m_plot[channel]->yAxis(), m_plot[channel]);
+	m_plot[channel]->addPlotChannel(m_plotCh[channel]);
+	m_plotCh[channel]->setEnabled(true);
+	m_plot[channel]->setUnitsVisible(true);
+
+	m_plotAutoscaler[channel] = new gui::PlotAutoscaler(this);
+	m_plotAutoscaler[channel]->addChannels(m_plotCh[channel]);
+	connect(m_plotAutoscaler[channel], &gui::PlotAutoscaler::newMin, this,
+		[this, channel](double v) { m_pendingYMin[channel] = v; });
+	connect(m_plotAutoscaler[channel], &gui::PlotAutoscaler::newMax, this,
+		[this, channel](double v) { applyPlotYRange(channel, m_pendingYMin[channel], v); });
+
+	setPlotHistory(channel, vm::PLOT_HISTORY_DEFAULT_S);
+}
+
+QWidget *Adalm2000VoltmeterTool::createPlotSettings(int channel, QWidget *parent)
+{
+	MenuCollapseSection *plotSection = new MenuCollapseSection("Plot", MenuCollapseSection::MHCW_ARROW,
+								   MenuCollapseSection::MHW_BASEWIDGET, parent);
+	plotSection->contentLayout()->setSpacing(10);
+
+	m_plotVisibleSwitch[channel] = new MenuOnOffSwitch("Show plot", plotSection);
+	m_plotVisibleSwitch[channel]->onOffswitch()->setChecked(true);
+	connect(m_plotVisibleSwitch[channel]->onOffswitch(), &QAbstractButton::toggled, this,
+		[this, channel](bool on) { setPlotVisible(channel, on); });
+
+	m_historySpin[channel] =
+		new gui::MenuSpinbox("History", vm::PLOT_HISTORY_DEFAULT_S, "s", vm::PLOT_HISTORY_MIN_S,
+				     vm::PLOT_HISTORY_MAX_S, true, false, true, plotSection);
+	m_historySpin[channel]->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
+	m_historySpin[channel]->setScalingEnabled(false);
+	connect(m_historySpin[channel], &gui::MenuSpinbox::valueChanged, this,
+		[this, channel](double v) { setPlotHistory(channel, v); });
+
+	m_plotYRange[channel] = new gui::MenuPlotAxisRangeControl(m_plot[channel]->yAxis(), plotSection);
+	m_plotYRange[channel]->minSpinbox()->setUnit("V");
+	m_plotYRange[channel]->maxSpinbox()->setUnit("V");
+	m_plotYRange[channel]->setMin(-vm::PLOT_MIN_SPAN_V);
+	m_plotYRange[channel]->setMax(vm::PLOT_MIN_SPAN_V);
+
+	m_autoscaleSwitch[channel] = new MenuOnOffSwitch("Autoscale", plotSection);
+	connect(m_autoscaleSwitch[channel]->onOffswitch(), &QAbstractButton::toggled, this,
+		[this, channel](bool on) { setPlotAutoscaleEnabled(channel, on); });
+
+	plotSection->contentLayout()->addWidget(m_plotVisibleSwitch[channel]);
+	plotSection->contentLayout()->addWidget(m_historySpin[channel]);
+	plotSection->contentLayout()->addWidget(m_autoscaleSwitch[channel]);
+	plotSection->contentLayout()->addWidget(m_plotYRange[channel]);
+
+	m_autoscaleSwitch[channel]->onOffswitch()->setChecked(true);
+	plotSection->header()->setChecked(false);
+
+	return plotSection;
+}
+
+void Adalm2000VoltmeterTool::repointPlotCurve(int channel)
+{
+	if(!m_plotCh[channel] || !m_plotCh[channel]->curve()) {
+		return;
+	}
+	const QVector<double> &x = m_histX[channel];
+	const QVector<double> &y = m_histY[channel];
+	m_plotCh[channel]->curve()->setRawSamples(x.constData() + (x.size() - y.size()), y.constData(),
+						  static_cast<int>(y.size()));
+}
+
+void Adalm2000VoltmeterTool::setPlotHistory(int channel, double seconds)
+{
+	if(channel < 0 || channel > 1 || !m_plot[channel]) {
+		return;
+	}
+
+	const int cap = vm::historyCapacity(seconds);
+
+	m_histY[channel].clear();
+	m_histY[channel].reserve(cap);
+	m_histX[channel].clear();
+	m_histX[channel].reserve(cap);
+	for(int i = cap - 1; i >= 0; --i) {
+		m_histX[channel].append(-i / dsp::UPDATE_RATE_HZ);
+	}
+	m_histCap[channel] = cap;
+
+	repointPlotCurve(channel);
+
+	m_plot[channel]->xAxis()->setInterval(m_histX[channel].first(), 0);
+	m_plot[channel]->replot();
+}
+
+void Adalm2000VoltmeterTool::clearPlotHistory(int channel)
+{
+	if(channel < 0 || channel > 1 || !m_plot[channel]) {
+		return;
+	}
+	m_histY[channel].clear();
+	repointPlotCurve(channel);
+	m_plot[channel]->replot();
+}
+
+void Adalm2000VoltmeterTool::pushPlotSample(int channel, double value)
+{
+	if(channel < 0 || channel > 1 || !m_plot[channel]) {
+		return;
+	}
+
+	QVector<double> &y = m_histY[channel];
+	y.append(value);
+	while(y.size() > m_histCap[channel]) {
+		y.removeFirst();
+	}
+
+	repointPlotCurve(channel);
+	if(m_plot[channel]->isVisible()) {
+		m_plot[channel]->replot();
+	}
+}
+
+void Adalm2000VoltmeterTool::applyPlotYRange(int channel, double min, double max)
+{
+	if(channel < 0 || channel > 1 || !m_plot[channel]) {
+		return;
+	}
+	vm::clampAutoRange(min, max, m_acMode[channel]);
+	m_plot[channel]->yAxis()->setInterval(min, max);
+}
+
+void Adalm2000VoltmeterTool::setPlotAutoscaleEnabled(int channel, bool on)
+{
+	if(channel < 0 || channel > 1 || !m_plotAutoscaler[channel] || !m_plotYRange[channel]) {
+		return;
+	}
+	m_plotYRange[channel]->setEnabled(!on);
+	if(on && m_runBtn->isChecked()) {
+		m_plotAutoscaler[channel]->start();
+	} else {
+		m_plotAutoscaler[channel]->stop();
+	}
+}
+
+void Adalm2000VoltmeterTool::setPlotVisible(int channel, bool on)
+{
+	if(channel < 0 || channel > 1 || !m_plot[channel] || !m_centralLayout) {
+		return;
+	}
+	m_plot[channel]->setVisible(on);
+	m_centralLayout->setStretch(channel, on ? 1 : 0);
+	if(on) {
+		m_plot[channel]->replot();
+	}
 }
 
 void Adalm2000VoltmeterTool::setupUi()
@@ -154,12 +351,12 @@ void Adalm2000VoltmeterTool::setupUi()
 	m_tool->addWidgetToTopContainerHelper(m_gearBtn, TTA_RIGHT);
 
 	QWidget *central = new QWidget(this);
-	QVBoxLayout *centralLayout = new QVBoxLayout(central);
-	centralLayout->setContentsMargins(0, 0, 0, 0);
+	m_centralLayout = new QVBoxLayout(central);
+	m_centralLayout->setContentsMargins(0, 0, 0, 0);
 	for(int c = 0; c < 2; ++c) {
-		centralLayout->addWidget(createChannelSection(c, central));
+		m_centralLayout->addWidget(createChannelSection(c, central), 1);
 	}
-	centralLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
+	m_centralLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
 	m_tool->addWidgetToCentralContainerHelper(central);
 
 	gui::MenuWidget *settingsMenu =
@@ -200,6 +397,8 @@ void Adalm2000VoltmeterTool::setupUi()
 		} else {
 			m_activeRangeLabel[c]->setText("Range attribute unavailable");
 		}
+
+		chSection->contentLayout()->addWidget(createPlotSettings(c, chSection));
 
 		settingsMenu->add(chSection, QStringLiteral("channel%1").arg(c));
 	}
@@ -260,12 +459,17 @@ void Adalm2000VoltmeterTool::setupUi()
 	connect(m_runBtn, &QPushButton::toggled, this, [this](bool on) {
 		if(!on) {
 			m_scaleTimer->stop();
+			for(int c = 0; c < 2; ++c) {
+				m_plotAutoscaler[c]->stop();
+			}
 			m_reader->requestStop();
 			m_controller->release();
 			return;
 		}
 		for(int c = 0; c < 2; ++c) {
 			m_autoScaler[c].resetWindow();
+			clearPlotHistory(c);
+			setPlotAutoscaleEnabled(c, m_autoscaleSwitch[c]->onOffswitch()->isChecked());
 		}
 		m_scaleTimer->start();
 		startRunning(); // unawaited on purpose -- never waitFor() in a UI slot
@@ -295,6 +499,7 @@ void Adalm2000VoltmeterTool::onReadings(int channel, double dcVolts, double acVo
 
 	applyScalePreset(channel, m_autoScaler[channel].push(shown));
 	m_scale[channel]->setValue(shown);
+	pushPlotSample(channel, shown);
 
 	if(!m_peakSeen[channel]) {
 		m_peakSeen[channel] = true;
@@ -322,6 +527,8 @@ void Adalm2000VoltmeterTool::onModeChanged(int channel, int index)
 	m_peakSeen[channel] = false;
 	m_monitor[channel]->setMin(0.0);
 	m_monitor[channel]->setMax(0.0);
+
+	clearPlotHistory(channel);
 }
 
 void Adalm2000VoltmeterTool::onGainSelected(int channel, int index)
