@@ -116,7 +116,18 @@ fi
 findlib()
 {
     LIB=$1
+    LIB_PATH=""
+    # Exact NEEDED name first (resolved to the real file). This matters when one directory holds several
+    # SONAMEs of the same library: /usr/local/lib has both libiio.so.1 (libiio v1) and libiio.so.0 (its
+    # compat layer), and the version-stripped search below would pick whichever sorts first.
     for path in "${SEARCH_PATHS[@]}"
+    do
+        if [ -e "$path/$LIB" ]; then
+            LIB_PATH=$(realpath "$path/$LIB")
+            break
+        fi
+    done
+    [ "$LIB_PATH" == "" ] && for path in "${SEARCH_PATHS[@]}"
     do
         # Strip version suffix and search for any version
         # libfoo.so.1.2.3 -> search for libfoo.so*
