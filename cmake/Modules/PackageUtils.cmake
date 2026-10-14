@@ -46,6 +46,15 @@ function(add_subdirectories_with_options base_dir output_dir prefix)
 
 				if(EXISTS "${base_dir}/${child}/CMakeLists.txt")
 					add_subdirectory(${base_dir}/${child})
+					# Record every target each package/plugin defines. The Android build needs to
+					# copy the built packages/ tree into the APK assets, so it has to be able to
+					# order that copy after these targets; nothing else depends on plugins at build
+					# time because they are loaded at runtime.
+					get_property(
+						child_targets DIRECTORY ${base_dir}/${child}
+						PROPERTY BUILDSYSTEM_TARGETS
+					)
+					set_property(GLOBAL APPEND PROPERTY SCOPY_PACKAGE_TARGETS ${child_targets})
 				else()
 					message(NOTICE "No CMakeLists.txt in subdirectory: ${base_dir}/${child}")
 				endif()
