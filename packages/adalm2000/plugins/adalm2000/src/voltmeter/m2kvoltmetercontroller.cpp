@@ -22,6 +22,7 @@
 
 #include "m2kcallcommand.h"
 #include "m2kcontext.h"
+#include "voltmeterdsp.h"
 
 #include "component/capabilityexecutor.h"
 
@@ -63,7 +64,7 @@ QCoro::Task<bool> M2kVoltmeterController::claimAndConfigure()
 	auto *cmd = new M2kCallCommand<void>(m2k, [m2k]() {
 		M2kAnalogIn *ain = m2k->getAnalogIn();
 		ain->setKernelBuffersCount(4);
-		ain->setSampleRate(1e5);
+		ain->setSampleRate(dsp::SAMPLE_RATE_HZ);
 		ain->setOversamplingRatio(1);
 		libm2k::M2kHardwareTrigger *trigger = ain->getTrigger();
 		for(unsigned int c = 0; c < 2; ++c) {
