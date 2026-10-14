@@ -40,6 +40,12 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L${CMAKE_SYSROOT}/lib")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L${CMAKE_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L${CMAKE_SYSROOT}/usr/lib")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L${CMAKE_SYSROOT}/usr/local/lib")
+# Extra linker flags from arm_cross_build_process.sh (the -D form is shadowed by the set() calls above), e.g.
+# -rpath-link to the libiio v0 prefix so libiio.so.0 needed by libad9361/libm2k is not resolved to the libiio v1 compat
+# library in the sysroot.
+if(DEFINED ENV{SCOPY_CROSS_LDFLAGS})
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} $ENV{SCOPY_CROSS_LDFLAGS}")
+endif()
 set(CMAKE_SHARED_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS})
 
 # Search paths
