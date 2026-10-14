@@ -7,5 +7,10 @@
 	"device": "pluto",
 	"xml_path": "pluto.xml",
 	"uri": "ip:127.0.0.1"
+    },
+    {
+	"device": "pluto_v1",
+	"xml_path": "pluto_v1.xml",
+	"uri": "ip:127.0.0.1"
     }
 ]
