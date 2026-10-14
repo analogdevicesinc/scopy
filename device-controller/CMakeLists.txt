@@ -28,12 +28,10 @@ set(CMAKE_AUTOMOC ON)
 find_package(Qt6 REQUIRED COMPONENTS Core Concurrent Test)
 find_package(QCoro6 REQUIRED COMPONENTS Core Coro)
 
-# libiio backend — chosen at BUILD time. Exactly one backend (iio-backend-v0 or iio-backend-v1) is built as a static
-# library and linked into `component`, which calls its createIIOBackend() directly. There is no runtime loader and no
-# dlopen; the version cannot change after the build. SCOPY_LIBIIO_VERSION=0 -> libiio v0.x API (<iio.h>), IIO_LIBRARIES
-# / IIO_INCLUDE_DIRS (from the root CMakeLists) SCOPY_LIBIIO_VERSION=1 -> libiio v1.x API (<iio/iio.h>), IIO_V1_LIBRARY
-# / IIO_V1_INCLUDE_DIR (found by the v1 backend)
-set(SCOPY_LIBIIO_VERSION "0" CACHE STRING "libiio API used by the device-controller backend (0 or 1)")
+# libiio backend - chosen at BUILD time. Exactly one backend (iio-backend-v0 or iio-backend-v1) is built as a static
+# library and linked into `component`, which calls its createIIOBackend() directly. Default libiio = 1 (also declared in
+# the root CMakeLists.txt).
+set(SCOPY_LIBIIO_VERSION "1" CACHE STRING "libiio API used by the device-controller backend (0 or 1)")
 set_property(CACHE SCOPY_LIBIIO_VERSION PROPERTY STRINGS 0 1)
 if(NOT SCOPY_LIBIIO_VERSION MATCHES "^[01]$")
 	message(FATAL_ERROR "SCOPY_LIBIIO_VERSION must be 0 or 1, got '${SCOPY_LIBIIO_VERSION}'")

@@ -27,7 +27,7 @@
 #include <QObject>
 
 #include "scopy-iioutil_export.h"
-#include <iio.h>
+#include <iioutil/channeltypes.h>
 
 namespace scopy {
 
@@ -51,17 +51,17 @@ public:
 	void operator=(const IIOUnitsManager &) = delete;
 	static IIOUnitsManager *GetInstance();
 
-	static QMap<iio_chan_type, IIOUnit> iioChannelTypes();
-	static QMap<hwmon_chan_type, IIOUnit> hwmonChannelTypes();
+	static QMap<iio::ChannelType, IIOUnit> iioChannelTypes();
+	static QMap<iio::HwmonChannelType, IIOUnit> hwmonChannelTypes();
 
 private:
-	QMap<iio_chan_type, IIOUnit> _iioChannelTypes();
-	QMap<hwmon_chan_type, IIOUnit> _hwmonChannelTypes();
+	QMap<iio::ChannelType, IIOUnit> _iioChannelTypes();
+	QMap<iio::HwmonChannelType, IIOUnit> _hwmonChannelTypes();
 
 private:
 	static IIOUnitsManager *pinstance_;
-	QMap<iio_chan_type, IIOUnit> m_iioChannelTypes;
-	QMap<hwmon_chan_type, IIOUnit> m_hwmonChannelTypes;
+	QMap<iio::ChannelType, IIOUnit> m_iioChannelTypes;
+	QMap<iio::HwmonChannelType, IIOUnit> m_hwmonChannelTypes;
 };
 
 }; // namespace scopy

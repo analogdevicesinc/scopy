@@ -37,7 +37,7 @@
 #include <algorithm>
 
 #include <QDebug>
-#include <iio.h>
+#include <iioutil/channeltypes.h>
 
 using namespace scopy;
 using namespace scopy::dac;
@@ -596,7 +596,7 @@ bool DacDataModel::initDdsDac()
 			continue;
 		}
 		auto *iioChn = qobject_cast<component::iio::IIOChannel *>(chn);
-		if(!iioChn || iioChn->chanType() != IIO_ALTVOLTAGE) {
+		if(!iioChn || iioChn->chanType() != iio::CHAN_ALTVOLTAGE) {
 			continue;
 		}
 		// Only DDS tone channels carry a "frequency" attribute
