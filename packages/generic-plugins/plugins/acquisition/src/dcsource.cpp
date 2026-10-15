@@ -72,6 +72,10 @@ int64_t signExtend(int64_t raw, const scopy::iio::DataFormat &fmt)
 	return (raw << shift) >> shift;
 }
 
+// A 1-bit element is a logic line (e.g. the M2K's le:u1/16>>n): written as a bit stream,
+// the type decoders read, and described as digital.
+bool isBitStream(const scopy::iio::DataFormat &fmt) { return fmt.bits == 1; }
+
 } // namespace
 
 DcSource::DcSource(component::Context *ctx, const QString &id, QObject *parent)
@@ -261,6 +265,17 @@ void DcSource::decodeAndWrite(const Dev &dev, scopy::acq::DataStore *store)
 		const component::ChannelFormat &cf = f.channels.at(c);
 		const char *p = static_cast<const char *>(f.data) + cf.offset;
 
+		if(isBitStream(ch.codec->dataFormat())) {
+			QVector<quint8> bits(static_cast<int>(f.sampleCount));
+			for(size_t s = 0; s < f.sampleCount; ++s, p += cf.stride) {
+				int64_t raw = 0;
+				ch.codec->convert(&raw, p);
+				bits[static_cast<int>(s)] = raw & 1;
+			}
+			store->write(scopy::acq::DataKey::raw(id(), ch.channelId), std::move(bits));
+			continue;
+		}
+
 		QVector<float> samples(static_cast<int>(f.sampleCount));
 		for(size_t s = 0; s < f.sampleCount; ++s, p += cf.stride) {
 			// Through the codec rather than a cast: it applies byte order, shift and
@@ -306,6 +321,15 @@ std::optional<scopy::acq::StreamInfo> DcSource::streamInfo(const scopy::acq::Dat
 	std::optional<scopy::acq::StreamInfo> info = SourceBlock::streamInfo(key);
 	if(!info) {
 		return std::nullopt;
+	}
+
+	// m_devices is fixed by discover() in the constructor, so this read needs no lock.
+	for(const Dev &dev : m_devices) {
+		for(const Chan &ch : dev.channels) {
+			if(ch.channelId == key.channelId() && isBitStream(ch.codec->dataFormat())) {
+				info->kind = scopy::acq::ReprKind::Digital;
+			}
+		}
 	}
 
 	QMutexLocker lk(&m_rateMutex);
