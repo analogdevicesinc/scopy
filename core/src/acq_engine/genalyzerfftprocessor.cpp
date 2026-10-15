@@ -767,11 +767,11 @@ void GenalyzerFFTProcessor::process(DataStore *store)
 	// requested as nfft*navg and nfft is then rewritten from it.
 	int nfft = 0;
 	{
-		auto v = store->latestAs<QVector<float>>(keys[0]);
+		auto v = store->latestFloat(keys[0]);
 		if(!v) {
 			if(store->contains(keys[0]))
 				reportOnce(AcquisitionError::Severity::Warning,
-					   QStringLiteral("input 0 is not float; skipping"));
+					   QStringLiteral("input 0 is not numeric; skipping"));
 			return;
 		}
 		nfft = v->size();
@@ -787,16 +787,16 @@ void GenalyzerFFTProcessor::process(DataStore *store)
 	for(int i = 0; i < nWatched; ++i) {
 		QVector<float> s;
 		if(navgMax > 1) {
-			s = store->windowAs<QVector<float>>(keys[i], nfft * navgMax);
+			s = store->windowFloat(keys[i], nfft * navgMax);
 		} else {
-			auto v = store->latestAs<QVector<float>>(keys[i]);
+			auto v = store->latestFloat(keys[i]);
 			if(v)
 				s = std::move(*v);
 		}
 		if(s.isEmpty()) {
 			if(store->contains(keys[i]))
 				reportOnce(AcquisitionError::Severity::Warning,
-					   QStringLiteral("input %1 is not float; skipping").arg(i));
+					   QStringLiteral("input %1 is not numeric; skipping").arg(i));
 			return;
 		}
 		// Whole frames only, and no more than the two channels agree on.

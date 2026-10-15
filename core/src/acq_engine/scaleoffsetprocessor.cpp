@@ -56,7 +56,7 @@ QList<DataKey> ScaleOffsetProcessor::outputKeys() const
 void ScaleOffsetProcessor::process(DataStore *store)
 {
 	for(ChannelConfig *cfg : m_channels) {
-		const auto src = store->latestAs<QVector<float>>(cfg->inputKey);
+		const auto src = store->latestFloat(cfg->inputKey);
 		if(!src)
 			continue;
 
