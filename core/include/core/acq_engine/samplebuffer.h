@@ -183,6 +183,7 @@ public:
 	void setCapacity(std::size_t n);
 	std::size_t capacity() const { return m_capacity; }
 
+	// Newest first. A chunk of another type than the history drops the history first.
 	void push(SampleVariant vec);
 
 	// Drop every chunk but keep capacity and declared type.

@@ -255,7 +255,12 @@ void SampleBuffer::setCapacity(std::size_t n)
 
 void SampleBuffer::push(SampleVariant vec)
 {
-	m_type = sampleTypeOf(vec);
+	const SampleType t = sampleTypeOf(vec);
+	// window() and every snapshot reader assume one type across the history, so chunks of
+	// another type cannot be joined to this one: a stream that changes type starts over.
+	if(m_type && *m_type != t)
+		m_history.clear();
+	m_type = t;
 	m_history.push_front(std::move(vec));
 	while(m_history.size() > m_capacity)
 		m_history.pop_back();

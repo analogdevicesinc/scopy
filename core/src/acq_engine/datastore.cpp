@@ -245,7 +245,9 @@ void DataStore::remove(const DataKey &key)
 		QMutexLocker lk(&m_mutex);
 		changed = m_data.remove(key) > 0;
 		m_annInfo.remove(key);
-		m_claims.remove(key);
+		// Claims stay: they belong to their claimants, who release them, and a key that
+		// is rewritten (a reloaded file, a re-captured snapshot) must get its depth back
+		// on the first push, as a claim made before the key existed does.
 		m_cycleKeys.remove(key);
 	}
 	if(changed)
