@@ -17,6 +17,10 @@ SCOPY_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && cd ../.
 # Flatpak manifest file (generated from template)
 SCOPY_JSON=$SCOPY_DIR/ci/flatpak/org.adi.Scopy.json
 
+# libiio API Scopy is built against: 1 (default) or 0. Read by the Makefile (manifest and cache selection).
+export SCOPY_LIBIIO_VERSION=${SCOPY_LIBIIO_VERSION:-1}
+[ "$SCOPY_LIBIIO_VERSION" == "0" ] && STATE_DIR=.flatpak-builder-libiio-v0 || STATE_DIR=.flatpak-builder
+
 pushd $SCOPY_DIR/ci/flatpak
 
 git submodule update --init
@@ -40,11 +44,11 @@ if [ "$CI_SCRIPT" == "ON" ];
 		# runs there - but a second local run in the same tree aborts here under -e. Reusing the
 		# existing cache is also the point of the cache: the rerun resumes at the first module
 		# whose definition changed. To force a refresh from the image, delete
-		# $SOURCE_DIR/ci/flatpak/.flatpak-builder first.
-		if [ -d $SOURCE_DIR/ci/flatpak/.flatpak-builder ]; then
+		# $SOURCE_DIR/ci/flatpak/$STATE_DIR first.
+		if [ -d $SOURCE_DIR/ci/flatpak/$STATE_DIR ]; then
 			echo "-- Reusing existing flatpak-builder cache in the workspace"
 		else
-			cp -r /home/runner/flatpak_tools/.flatpak-builder $SOURCE_DIR/ci/flatpak
+			cp -r /home/runner/flatpak_tools/$STATE_DIR $SOURCE_DIR/ci/flatpak
 		fi
 		# "make preprocess" above removes build/ every run, so this copy is already idempotent.
 		cp -r /home/runner/flatpak_tools/build $SOURCE_DIR/ci/flatpak
@@ -80,7 +84,7 @@ cp tmp.json $SCOPY_JSON
 # ci/arm/docker/tarballs (1.85 GB) and the Kuiper .img (4.8 GB) are armhf image-build inputs; a
 # local flatpak build was copying both on every run, since dir sources are never cached.
 # Not skipping .git: ScopyAbout.cmake runs git rev-parse/config/log at configure time.
-cat $SCOPY_JSON | jq --tab '.modules['$cnt'].sources[0].skip = ["ci/arm/staging", "ci/arm/docker/tarballs", "ci/arm/image_ADI-Kuiper-Linux-armhf.img", "ci/flatpak/.flatpak-builder", "ci/flatpak/build", "ci/flatpak/repo", ".worktrees", "build"]' > tmp.json
+cat $SCOPY_JSON | jq --tab '.modules['$cnt'].sources[0].skip = ["ci/arm/staging", "ci/arm/docker/tarballs", "ci/arm/image_ADI-Kuiper-Linux-armhf.img", "ci/flatpak/.flatpak-builder", "ci/flatpak/.flatpak-builder-libiio-v0", "ci/flatpak/build", "ci/flatpak/repo", ".worktrees", "build"]' > tmp.json
 cp tmp.json $SCOPY_JSON
 rm tmp.json
 

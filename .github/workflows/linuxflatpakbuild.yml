@@ -22,7 +22,12 @@ permissions:
 jobs:
   make_flatpak_qt6:
     runs-on: ubuntu-latest
-    name: Ubuntu Qt6 Flatpak
+    name: Ubuntu Qt6 Flatpak (libiio v${{ matrix.libiio }})
+    strategy:
+      fail-fast: false
+      matrix:
+        # libiio v1 is the default build; v0 uses its own manifest variant and cache from the same image.
+        libiio: ['1', '0']
     steps:
         - name: check storage space
           run: df -h
@@ -58,6 +63,7 @@ jobs:
             $GITHUB_WORKSPACE/ci/general/gen_ci_envs.sh > $GITHUB_WORKSPACE/ci/general/gh-actions.envs
             docker run --privileged \
                 -e CI_SCRIPT='ON' \
+                -e SCOPY_LIBIIO_VERSION=${{ matrix.libiio }} \
                 --mount type=bind,source="$GITHUB_WORKSPACE",target=$GITHUB_WORKSPACE \
                 --env-file $GITHUB_WORKSPACE/ci/general/gh-actions.envs \
                 docker.cloudsmith.io/adi/scopy-dockers/scopy2-flatpak-qt6:${{ inputs.docker_tag }} \
@@ -71,7 +77,7 @@ jobs:
 
         - uses: actions/upload-artifact@v7
           with:
-            name: scopy-x86_64-flatpak-${{ env.commit_sha }}
+            name: scopy-x86_64-flatpak${{ matrix.libiio == '0' && '-libiio-v0' || '' }}-${{ env.commit_sha }}
             path: ${{ github.workspace }}/Scopy.flatpak
 
         - name: check storage space
