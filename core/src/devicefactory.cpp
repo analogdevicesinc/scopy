@@ -22,6 +22,7 @@
 #include "devicefactory.h"
 
 #include "iiodeviceimpl.h"
+#include "m2kdeviceimpl.h"
 #include "swiotdeviceimpl.h"
 
 #include <component/context.h>
@@ -38,6 +39,11 @@ DeviceImpl *DeviceFactory::build(QString param, QString category, QObject *paren
 			component::Controller::connectCtx(param, component::BackendKind::Libiiov0, maxThreads);
 		if(ctx && ctx->findChild<component::Device *>("swiot", Qt::FindDirectChildrenOnly)) {
 			return new SWIOTDeviceImpl(param, maxThreads, parent);
+		}
+		if(ctx && ctx->findChild<component::Device *>("m2k-adc", Qt::FindDirectChildrenOnly) &&
+		   ctx->findChild<component::Device *>("m2k-dac-a", Qt::FindDirectChildrenOnly) &&
+		   ctx->findChild<component::Device *>("m2k-dac-b", Qt::FindDirectChildrenOnly)) {
+			return new M2kDeviceImpl(param, maxThreads, parent);
 		}
 		return new IIODeviceImpl(param, maxThreads, parent);
 	} else {
