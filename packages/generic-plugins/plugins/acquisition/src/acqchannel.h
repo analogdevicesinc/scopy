@@ -233,6 +233,11 @@ public:
 	// statement wins over the view's default.
 	void setFallbackSampleRate(double sr);
 
+	// Re-reads the producer's rate. The descriptor is copied at construction, but a
+	// producer's rate can change between runs (a decoder's configured rate, a source's
+	// latched device rate), so the manager calls this as each run starts.
+	void refreshSampleRate();
+
 	// Samples per second, or 1.0 if nothing knows. The divisor of the "time (s)" X mode,
 	// which reads in samples when it is 1.0 — wrong-but-readable rather than a zero
 	// divisor.
@@ -361,6 +366,9 @@ protected:
 	scopy::acq::DataStore *store() const;
 
 private:
+	// m_sampleRate = sr, with onSampleRateChanged() only on a real change.
+	void applySampleRate(double sr);
+
 	// Build and destroy this channel's axis pair. Called by attach()/detach() around the
 	// subclass's attachTo()/detachFrom(), so a kind can build its visual against the axes
 	// and still be unhooked before the wrappers go.
@@ -401,6 +409,10 @@ private:
 	bool m_enabledBeforeVanish{true};
 
 	double m_sampleRate{1.0};
+	// The producer declared m_sampleRate, so the view's fallback must not replace it.
+	bool m_rateDeclared{false};
+	// The manager's last fallback, restored when the producer's rate goes back to unknown.
+	double m_fallbackSampleRate{1.0};
 };
 
 } // namespace adc

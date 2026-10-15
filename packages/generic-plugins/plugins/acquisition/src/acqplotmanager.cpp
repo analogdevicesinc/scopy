@@ -72,6 +72,15 @@ AcqPlotManager::AcqPlotManager(scopy::acq::DataStore *store, scopy::acq::Acquisi
 	// The rail is built now, though: it holds the "Add plot" row, which is the only
 	// way to make the first plot.
 	m_rail = new AcqPlotRail(shell, store, engine, this);
+
+	// Producer rates only change while stopped, so a run start is when they settle.
+	if(engine) {
+		connect(engine, &scopy::acq::AcquisitionEngine::started, this, [this]() {
+			for(AcqChannel *ch : std::as_const(m_channels)) {
+				ch->refreshSampleRate();
+			}
+		});
+	}
 	connect(m_rail, &AcqPlotRail::addPlotRequested, this, [this](const QString &name, AcqPlotKind kind) {
 		addPlot(name.isEmpty() ? tr("Plot %1").arg(m_plotUuidCounter) : name, kind);
 	});
