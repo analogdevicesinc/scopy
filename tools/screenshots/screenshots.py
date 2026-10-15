@@ -109,6 +109,39 @@ def start_emulator(entry, emu_dir):
     return proc
 
 
+def start_emulator_v1(entry, emu_dir):
+    """Start iiod-emu (libiio v1) as a background process. Returns the Popen object."""
+    # iiod-emu [-p <port>] emu:<device.xml>
+    # Rx/Tx data is read from <xml_dir>/<device_name>_buf<idx>.bin.
+    if not entry.get("xml_path"):
+        print(f"[doc] ERROR: iiod-emu needs an xml_path ('{entry.get('emu-type')}' is not supported)")
+        return None
+
+    xml_path = os.path.join(emu_dir, entry["xml_path"])
+    cmd = ["iiod-emu", "-p", str(EMU_PORT), f"emu:{xml_path}"]
+
+    print(f"[doc] Starting iiod-emu: {' '.join(cmd)} (cwd: {emu_dir})")
+    try:
+        proc = subprocess.Popen(
+            cmd,
+            cwd=emu_dir,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+        )
+    except FileNotFoundError:
+        print("[doc] ERROR: 'iiod-emu' not found on PATH")
+        sys.exit(1)
+
+    time.sleep(0.5)
+    if proc.poll() is not None:
+        stderr = proc.stderr.read().decode(errors="replace").strip()
+        print(f"[doc] ERROR: iiod-emu exited immediately. stderr: {stderr}")
+        return None
+
+    print(f"[doc] iiod-emu started (PID {proc.pid})")
+    return proc
+
+
 def stop_emulator(proc):
     """Stop an emulator process."""
     if proc is None:
@@ -118,7 +151,7 @@ def stop_emulator(proc):
         proc.wait(timeout=5)
     except subprocess.TimeoutExpired:
         proc.kill()
-    print("[doc] iio-emu stopped")
+    print("[doc] Emulator stopped")
 
 
 def make_wrapper(uri, out_dir, js_script_path, skip_plugins=None, use_plugin_dirs=False):
@@ -296,14 +329,14 @@ def run_single(args):
         print(f"[doc] ERROR: JS script not found at {js_script}")
         sys.exit(1)
 
-    emu_proc = start_emulator(entry, emu_dir)
+    emu_proc = start_emulator_v1(entry, emu_dir)
     if emu_proc is None:
         sys.exit(1)
     try:
         print(f"[doc] Waiting for port {EMU_PORT} (timeout {EMU_TIMEOUT}s)...")
         if not wait_for_port("127.0.0.1", EMU_PORT, EMU_TIMEOUT):
             print(
-                f"[doc] ERROR: iio-emu did not open port {EMU_PORT} within {EMU_TIMEOUT}s"
+                f"[doc] ERROR: emulator did not open port {EMU_PORT} within {EMU_TIMEOUT}s"
             )
             sys.exit(1)
         print(f"[doc] Port {EMU_PORT} ready")
@@ -348,13 +381,17 @@ def run_all(args):
             print(f"[doc] Skipping {package}/{device}: no xml_path or emu-type")
             continue
 
+        if not entry.get("xml_path"):
+            print(f"[doc] Skipping {package}/{device}: not supported by iiod-emu")
+            continue
+
         uri = entry["uri"]
         out_dir = os.path.join(output_root, package, device)
         os.makedirs(out_dir, exist_ok=True)
 
         skip_plugins = [] if package == "generic-plugins" else generic_names
 
-        emu_proc = start_emulator(entry, emu_dir)
+        emu_proc = start_emulator_v1(entry, emu_dir)
         if emu_proc is None:
             failures.append(f"{package}/{device}: emulator failed to start")
             continue
