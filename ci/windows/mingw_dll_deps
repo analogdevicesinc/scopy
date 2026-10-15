@@ -5,12 +5,7 @@ DLL_DEPS=(
     libwinpthread-*.dll
     libgomp-1.dll
     # scopy deps built from source
-    libad9361.dll
-    libad9166.dll
-    libm2k.dll
-    libiio.dll
     libserialport-0.dll
-    tinyiiod.dll
     qwt_scopy.dll
     libgenalyzer.dll
     libKF6Archive.dll
@@ -41,4 +36,18 @@ DLL_DEPS=(
     libngtcp2-*.dll
     libngtcp2_*.dll
     libunistring-*.dll
+)
+
+# libiio v1 (STAGING_DIR/bin)
+LIBIIO_V1_DLL_DEPS=(
+    libiio1.dll
+)
+
+# libiio v0 and the libraries built on it (LIBIIO_V0_PREFIX/bin)
+LIBIIO_V0_DLL_DEPS=(
+    libiio.dll
+    libad9361.dll
+    libad9166.dll
+    libm2k.dll
+    tinyiiod.dll
 )

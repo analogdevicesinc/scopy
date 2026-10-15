@@ -116,6 +116,7 @@ clone() {
 	pushd $STAGING_AREA
 	[ -d 'libserialport' ] || git clone --recursive https://github.com/sigrokproject/libserialport -b $LIBSERIALPORT_BRANCH libserialport
 	[ -d 'libiio' ]		|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
+	[ -d 'libiio-v0' ]	|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_V0_VERSION libiio-v0
 	[ -d 'libad9361' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
 	[ -d 'libad9166' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9166-iio.git -b $LIBAD9166_BRANCH libad9166
 	[ -d 'libm2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
@@ -186,6 +187,16 @@ build_with_cmake() {
 	CURRENT_BUILD=""
 }
 
+# Same as build_with_cmake, but builds against and installs into LIBIIO_V0_PREFIX. CPATH puts the v0 iio.h on
+# the compiler's default include path: some dependencies (e.g. the libad9361 tests) include <iio.h> without adding
+# the libiio include directory themselves.
+build_with_cmake_v0() {
+	CURRENT_BUILD_CMAKE_OPTS="$CURRENT_BUILD_CMAKE_OPTS $V0_CMAKE_OPTS"
+	CPATH=$LIBIIO_V0_PREFIX/include${CPATH:+:$CPATH} \
+	PKG_CONFIG_PATH=$LIBIIO_V0_PREFIX/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH} \
+		build_with_cmake $1
+}
+
 build_libserialport(){
 	CURRENT_BUILD=libserialport
 	pushd $STAGING_AREA/$CURRENT_BUILD
@@ -209,7 +220,29 @@ build_libserialport(){
 }
 
 build_libiio() {
+	echo "### Building libiio - version $LIBIIO_VERSION"
 	CURRENT_BUILD=libiio
+	# LIBIIO_COMPAT=OFF: on Windows the compat layer is libiio.dll, the same name as libiio v0 (Linux keeps them
+	# apart by SONAME). The libiio v1 build of Scopy links libiio1.dll only, so the compat layer is not needed.
+	CURRENT_BUILD_CMAKE_OPTS="\
+		${RC_COMPILER_OPT}\
+		-DWITH_USB_BACKEND:BOOL=ON\
+		-DWITH_SERIAL_BACKEND:BOOL=ON\
+		-DCSHARP_BINDINGS:BOOL=OFF\
+		-DPYTHON_BINDINGS:BOOL=OFF\
+		-DHAVE_DNS_SD:BOOL=ON\
+		-DENABLE_IPV6:BOOL=OFF\
+		-DWITH_MAN:BOOL=OFF\
+		-DWITH_IIOD_EMU:BOOL=ON\
+		-DWITH_EMU_BACKEND:BOOL=ON\
+		-DLIBIIO_COMPAT:BOOL=OFF\
+	"
+	build_with_cmake $1
+}
+
+build_libiio_v0() {
+	echo "### Building libiio - version $LIBIIO_V0_VERSION (prefix $LIBIIO_V0_PREFIX)"
+	CURRENT_BUILD=libiio-v0
 	CURRENT_BUILD_CMAKE_OPTS="\
 		${RC_COMPILER_OPT}\
 		-DWITH_USB_BACKEND:BOOL=ON\
@@ -220,19 +253,19 @@ build_libiio() {
 		-DENABLE_IPV6:BOOL=OFF\
 		-DWITH_EXAMPLES:BOOL=ON\
 	"
-	build_with_cmake $1
+	build_with_cmake_v0 $1
 }
 
 build_libad9361() {
 	echo "### Building libad9361 - branch $LIBAD9361_BRANCH"
 	CURRENT_BUILD=libad9361
-	build_with_cmake $1
+	build_with_cmake_v0 $1
 }
 
 build_libad9166() {
 	echo "### Building libad9166 - branch $LIBAD9166_BRANCH"
 	CURRENT_BUILD=libad9166
-	build_with_cmake $1
+	build_with_cmake_v0 $1
 }
 
 build_libm2k() {
@@ -245,7 +278,7 @@ build_libm2k() {
 		-DENABLE_TOOLS=OFF\
 		-DINSTALL_UDEV_RULES=OFF\
 		"
-	build_with_cmake $1
+	build_with_cmake_v0 $1
 }
 
 build_libsndfile() {
@@ -332,7 +365,7 @@ build_libtinyiiod() {
 	local PREV_JOBS=$JOBS
 	JOBS="-j2"
 
-	build_with_cmake $1
+	build_with_cmake_v0 $1
 
 	# Restore original jobs variable for the rest of the script
 	JOBS=$PREV_JOBS
@@ -435,17 +468,19 @@ build_deps() {
 
 	build_libserialport ON
 	build_libiio ON
-	build_libad9361 ON
-	build_libad9166 ON
-	build_libm2k ON
 	build_libsndfile ON
 	build_qwt ON
-	build_libtinyiiod ON
 	build_kddock ON
 	build_ecm ON
 	build_karchive ON
 	build_genalyzer ON
 	build_qcoro ON
+	# libiio v0 and its consumers, installed into LIBIIO_V0_PREFIX
+	build_libiio_v0 ON
+	build_libad9361 ON
+	build_libad9166 ON
+	build_libm2k ON
+	build_libtinyiiod ON
 }
 
 # Run named steps if any were given, otherwise do the full dependency build. The docker image
