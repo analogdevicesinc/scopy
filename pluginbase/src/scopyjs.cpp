@@ -328,6 +328,10 @@ void ScopyJS::onMcpConnection()
 			result = "ERROR:" + val.toString();
 		} else if(val.isUndefined()) {
 			result = "OK:undefined";
+		} else if((val.isArray() || val.isObject()) && !val.isQObject() && !val.isCallable()) {
+			// toString() of a map is "[object Object]"; the MCP client needs the content.
+			QJSValue json = m_engine.globalObject().property("JSON").property("stringify").call({val});
+			result = "OK:" + (json.isString() ? json.toString() : val.toString());
 		} else {
 			result = "OK:" + val.toString();
 		}

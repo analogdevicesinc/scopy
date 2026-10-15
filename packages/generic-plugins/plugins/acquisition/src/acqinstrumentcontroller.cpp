@@ -125,7 +125,7 @@ void AcqInstrumentController::init(scopy::component::Context *ctx)
 
 	connect(m_ui->shell()->singleBtn(), &QAbstractButton::toggled, this, [this](bool checked) {
 		if(checked) {
-			onSingleClicked();
+			single();
 		}
 	});
 
@@ -249,6 +249,8 @@ void AcqInstrumentController::setupPlots()
 	it->addEngineControl(plotSpin);
 	connect(plotSpin, &gui::MenuSpinbox::valueChanged, m_plots,
 		[this](double v) { m_plots->setPlotSize(static_cast<int>(v)); });
+	connect(m_plots, &AcqPlotManager::plotSizeChanged, plotSpin,
+		[plotSpin](int n) { plotSpin->setValueSilent(n); });
 
 	// The sample-index ramp must be at least as long as the plot window.
 	connect(m_plots, &AcqPlotManager::plotSizeChanged, engine,
@@ -449,7 +451,7 @@ void AcqInstrumentController::setupAnalysisPanel()
 		Qt::QueuedConnection);
 }
 
-void AcqInstrumentController::onSingleClicked()
+void AcqInstrumentController::single()
 {
 	if(!m_trigProc || !m_trigProc->isEnabled()) {
 		m_ui->single();
@@ -474,5 +476,9 @@ void AcqInstrumentController::stop()
 }
 
 AcqInstrument *AcqInstrumentController::ui() const { return m_ui; }
+
+AcqPlotManager *AcqInstrumentController::plots() const { return m_plots; }
+
+scopy::decoder::DecoderPanel *AcqInstrumentController::decoders() const { return m_decoderPanel; }
 
 #include "moc_acqinstrumentcontroller.cpp"

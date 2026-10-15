@@ -62,6 +62,8 @@ public:
 	QString about() override;
 	QString version() override;
 
+	QList<adc::AcqInstrumentController *> controllers() const { return m_ctrls; }
+
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
