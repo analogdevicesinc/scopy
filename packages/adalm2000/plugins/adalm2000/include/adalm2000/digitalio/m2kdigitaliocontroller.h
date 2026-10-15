@@ -67,6 +67,9 @@ public:
 	// Independent of Run: inputs are polled whether or not the drivers are enabled.
 	void startPolling();
 	void stopPolling();
+	bool isPolling() const { return m_polling; }
+
+	QCoro::Task<bool> refreshInputs();
 
 	// Blocks: it runs at teardown, and the pins must not be left driven.
 	void shutdown();

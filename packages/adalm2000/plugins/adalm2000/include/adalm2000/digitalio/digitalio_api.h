@@ -29,6 +29,7 @@
 
 namespace scopy::adalm2000 {
 class Adalm2000DigitalIoTool;
+class M2kDigitalIoController;
 
 /**
  * @brief The JS global `dio`: scriptable access to the Digital I/O pins.
@@ -65,7 +66,36 @@ public:
 	bool running() const;
 	void run(bool en);
 
+	Q_INVOKABLE bool setGroupMode(int group, bool grouped);
+	Q_INVOKABLE bool isGroupMode(int group) const;
+
+	Q_INVOKABLE bool setGroupDirection(int group, bool output);
+	Q_INVOKABLE bool isGroupOutput(int group) const;
+	Q_INVOKABLE bool setGroupValue(int group, int value);
+	Q_INVOKABLE int groupOutput(int group) const;
+	Q_INVOKABLE int groupInput(int group) const;
+
+	Q_INVOKABLE bool setPinDirection(int pin, bool output);
+	Q_INVOKABLE bool setPinOutput(int pin, bool high);
+	Q_INVOKABLE int pinOutput(int pin) const;
+	Q_INVOKABLE int pinInput(int pin) const;
+
+	Q_INVOKABLE bool setDirectionWord(int word);
+	Q_INVOKABLE bool setOutputWord(int word);
+	Q_INVOKABLE int directionWord() const;
+	Q_INVOKABLE int outputWord() const;
+
+	Q_INVOKABLE int readInputWord();
+	Q_INVOKABLE int inputWord() const;
+	Q_INVOKABLE int shortedWord() const;
+
+	Q_INVOKABLE bool setRunning(bool on);
+	Q_INVOKABLE bool setPolling(bool on);
+	Q_INVOKABLE bool isUsable() const;
+
 private:
+	M2kDigitalIoController *controller() const;
+
 	Adalm2000DigitalIoTool *m_tool;
 };
 
