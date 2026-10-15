@@ -6,9 +6,10 @@ export WORKFOLDER=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null &&
 BUILD_STATUS_FILE=$WORKFOLDER/build-status
 
 LIBSERIALPORT_BRANCH=master
-LIBIIO_VERSION=v0.26
+LIBIIO_VERSION=v1.0.0
+LIBIIO_V0_VERSION=v0.26
 LIBAD9361_BRANCH=main
-# libad9166-iio: the main branch targets libiio v1; we are on v0.26, so this pin is required.
+# libad9166-iio: the main branch targets libiio v1; it is built against libiio v0.26, so this pin is required.
 LIBAD9166_BRANCH=libad9166-iio-v0
 LIBM2K_BRANCH=main
 LIBSNDFILE_BRANCH=1.2.2
@@ -75,6 +76,28 @@ export CMAKE_OPTS=( \
 )
 
 export CMAKE="${STAGING_AREA}/cmake/bin/cmake ${CMAKE_OPTS[@]} "
+
+# libiio API Scopy is built against: 1 (default) or 0. Same image serves both, see LIBIIO_V0_PREFIX.
+SCOPY_LIBIIO_VERSION=${SCOPY_LIBIIO_VERSION:-1}
+
+# libiio v0 and the dependencies built on it live in their own prefix (same layout as the Linux builds). On
+# Windows this is required, not just tidy: libiio v0 and the libiio v1 compat layer are both libiio.dll, so they
+# cannot share a bin folder (libiio v1 itself is libiio1.dll). The *_CMAKE paths are Windows-form for the native
+# cmake.exe; the posix LIBIIO_V0_PREFIX is for the shell and environment variables.
+if [ "$USE_STAGING" == "ON" ]; then
+	LIBIIO_V0_PREFIX=$STAGING_AREA_DEPS/libiio-v0
+else
+	LIBIIO_V0_PREFIX=/opt/libiio-v0
+fi
+LIBIIO_V0_PREFIX_CMAKE=$(cygpath -m $LIBIIO_V0_PREFIX)
+STAGING_DIR_CMAKE=$(cygpath -m $STAGING_DIR)
+# The v0 prefix is searched first so its libiio (iio.h, libiio.dll.a) is picked over libiio v1.
+V0_CMAKE_OPTS="\
+	-DCMAKE_INSTALL_PREFIX=$LIBIIO_V0_PREFIX_CMAKE \
+	-DCMAKE_STAGING_PREFIX=$LIBIIO_V0_PREFIX_CMAKE \
+	-DCMAKE_PREFIX_PATH=$LIBIIO_V0_PREFIX_CMAKE;$STAGING_DIR_CMAKE;$STAGING_DIR_CMAKE/lib/cmake;$QT \
+	-DCMAKE_LIBRARY_PATH=$LIBIIO_V0_PREFIX_CMAKE/lib \
+	"
 
 
 AUTOCONF_OPTS="--prefix=$STAGING_DIR \

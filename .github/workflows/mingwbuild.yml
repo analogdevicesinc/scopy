@@ -13,6 +13,14 @@ on:
 jobs:
   make_windows_installer:
     runs-on: windows-2022
+    name: Windows Qt6 Installer (libiio v${{ matrix.libiio }})
+    strategy:
+      fail-fast: false
+      matrix:
+        # libiio v1 is the default build; v0 uses the libiio v0 prefix shipped in the same image.
+        libiio: ['1', '0']
+    env:
+      LIBIIO_SUFFIX: ${{ matrix.libiio == '0' && '-libiio-v0' || '' }}
     steps:
     - uses: actions/checkout@v6
       with:
@@ -63,6 +71,7 @@ jobs:
                 -e GITHUB_RUN_NUMBER=%GITHUB_RUN_NUMBER% ^
                 -e RUNNER_ARCH=%RUNNER_ARCH% ^
                 -e CI_SCRIPT=ON ^
+                -e SCOPY_LIBIIO_VERSION=${{ matrix.libiio }} ^
                 docker.cloudsmith.io/adi/scopy-dockers/scopy-windows-qt6:${{ inputs.docker_tag }} C:\msys64\usr\bin\bash.exe -c '/home/docker/scopy/ci/windows/build_and_create_installer.sh run_workflow'
 
     - name: Set short git commit SHA
@@ -71,18 +80,18 @@ jobs:
 
     - uses: actions/upload-artifact@v7
       with:
-        name: scopy-windows-qt6-portable-${{ env.commit_sha }}
+        name: scopy-windows-qt6-portable${{ env.LIBIIO_SUFFIX }}-${{ env.commit_sha }}
         path: ${{ github.workspace }}\artifacts\scopy-x86_64.zip
         compression-level: 0
 
     - uses: actions/upload-artifact@v7
       with:
-        name: debug-windows-qt6-x86_64-${{ env.commit_sha }}
+        name: debug-windows-qt6-x86_64${{ env.LIBIIO_SUFFIX }}-${{ env.commit_sha }}
         path: ${{ github.workspace }}\artifacts\debug-x86_64.zip
         compression-level: 0
 
     - uses: actions/upload-artifact@v7
       with:
-        name: scopy-windows-qt6-setup-${{ env.commit_sha }}
+        name: scopy-windows-qt6-setup${{ env.LIBIIO_SUFFIX }}-${{ env.commit_sha }}
         path: ${{ github.workspace }}\artifacts\scopy-64-setup.zip
         compression-level: 0

@@ -67,7 +67,7 @@ download_tools() {
 
 
 build_scopy(){
-	echo "### Building Scopy"
+	echo "### Building Scopy - libiio v$SCOPY_LIBIIO_VERSION"
 	download_cmake
 	[ -f $HOME/build-status ] && cp $HOME/build-status $SRC_FOLDER/build-status
 	mkdir -p $BUILD_FOLDER
@@ -76,6 +76,14 @@ build_scopy(){
 	# ADC must be explicitly OFF: the gr-util skip in the top-level CMakeLists tests
 	# `DEFINED ENABLE_PLUGIN_ADC AND NOT ENABLE_PLUGIN_ADC`, so the value must come from the command
 	# line. Miss it and gr-util still configures, and its find_package(Gnuradio 3.10 REQUIRED) fails.
+	LIBIIO_CMAKE_OPTS="-DSCOPY_LIBIIO_VERSION=$SCOPY_LIBIIO_VERSION"
+	if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
+		LIBIIO_CMAKE_OPTS="$LIBIIO_CMAKE_OPTS \
+			-DIIO_INCLUDE_DIRS=$LIBIIO_V0_PREFIX_CMAKE/include \
+			-DIIO_LIBRARIES=$LIBIIO_V0_PREFIX_CMAKE/lib/libiio.dll.a \
+			-DCMAKE_PREFIX_PATH=$LIBIIO_V0_PREFIX_CMAKE;$STAGING_DIR_CMAKE;$STAGING_DIR_CMAKE/lib/cmake;$QT \
+			"
+	fi
 	$CMAKE $RC_COMPILER_OPT \
 				-DENABLE_TESTING=OFF -DCMAKE_INSTALL_PREFIX=$INSTALL_FOLDER \
 				-DENABLE_ALL_PACKAGES=ON \
@@ -83,11 +91,13 @@ build_scopy(){
 				-DENABLE_PACKAGE_M2K=OFF \
 				-DWITH_SIGROK=OFF \
 				-DWITH_PYTHON=OFF \
+				$LIBIIO_CMAKE_OPTS \
 				$SRC_FOLDER
 	$MAKE_BIN $JOBS
 	ls -la $BUILD_FOLDER
 }
 
+# libiio v0 emulator (libtinyiiod based). libiio v1 builds ship iiod-emu, built with libiio itself.
 build_iio-emu(){
 	echo "### Building IIO-EMU"
 	download_cmake
@@ -97,7 +107,9 @@ build_iio-emu(){
 
 	mkdir -p $EMU_BUILD_FOLDER
 	cd $EMU_BUILD_FOLDER
-	$CMAKE -DBUILD_TOOLS=ON ../
+	CPATH=$LIBIIO_V0_PREFIX/include${CPATH:+:$CPATH} \
+	PKG_CONFIG_PATH=$LIBIIO_V0_PREFIX/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH} \
+		$CMAKE $V0_CMAKE_OPTS -DBUILD_TOOLS=ON ../
 	$MAKE_BIN $JOBS
 
 	pushd $WORKDIR/iio-emu
@@ -139,8 +151,11 @@ deploy_app(){
 	cp -v $INSTALL_FOLDER/bin/Scopy.exe $DEST_FOLDER/
 	cp -v $INSTALL_FOLDER/bin/Scopy-console.exe $DEST_FOLDER/
 	cp -v $INSTALL_FOLDER/bin/qt.conf $DEST_FOLDER/
-	cp -v $EMU_BUILD_FOLDER/iio-emu.exe $DEST_FOLDER/
-	cp -v $EMU_BUILD_FOLDER/tools/iio-emu_gen_xml.exe $DEST_FOLDER/
+	# Emulator: iiod-emu (from libiio v1, copied with the libiio v1 DLLs below) or iio-emu (libiio v0)
+	if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
+		cp -v $EMU_BUILD_FOLDER/iio-emu.exe $DEST_FOLDER/
+		cp -v $EMU_BUILD_FOLDER/tools/iio-emu_gen_xml.exe $DEST_FOLDER/
+	fi
 
 	$QT/bin/windeployqt6.exe \
 		--dir $DEST_FOLDER \
@@ -173,9 +188,20 @@ deploy_app(){
 	cp -vr  $QT/plugins/renderers $DEST_FOLDER/
 	cp -vr  $QT/plugins/sceneparsers $DEST_FOLDER/
 
-	pushd $STAGING_DIR/bin
 	source $SRC_FOLDER/ci/windows/mingw_dll_deps
+	pushd $STAGING_DIR/bin
 	cp -vn "${DLL_DEPS[@]}" $DEST_FOLDER/
+	popd
+
+	# libiio, the libraries built on it and the iio_* utilities: libiio v1 from STAGING_DIR, libiio v0 from
+	# LIBIIO_V0_PREFIX. Copied before anything else could bring a libiio of the other version.
+	if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
+		pushd $LIBIIO_V0_PREFIX/bin
+		cp -vn "${LIBIIO_V0_DLL_DEPS[@]}" $DEST_FOLDER/
+	else
+		pushd $STAGING_DIR/bin
+		cp -vn "${LIBIIO_V1_DLL_DEPS[@]}" iiod-emu.exe $DEST_FOLDER/
+	fi
 	cp -nv iio_*.exe $DEST_FOLDER/
 	popd
 
@@ -238,7 +264,9 @@ move_tools(){
 run_workflow(){
 	[ "$CI_SCRIPT" == "ON" ] && move_tools || download_tools
 	build_scopy
-	build_iio-emu
+	if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
+		build_iio-emu
+	fi
 	deploy_app
 	extract_debug_symbols
 	create_installer
