@@ -191,77 +191,6 @@
 		},
 
 		{
-			"name": "libiio",
-			"builddir": true,
-			"buildsystem": "cmake",
-			"config-opts": [
-				"-DCMAKE_PREFIX_PATH:PATH=/app",
-				"-DCMAKE_INSTALL_PREFIX:PATH=/app",
-				"-DCMAKE_INSTALL_LIBDIR:STRING=lib",
-				"-DINSTALL_UDEV_RULE:BOOL=OFF",
-				"-DWITH_TESTS:BOOL=OFF",
-				"-DWITH_DOC:BOOL=OFF",
-				"-DHAVE_DNS_SD:BOOL=ON",
-				"-DWITH_IIOD:BOOL=OFF",
-				"-DWITH_LOCAL_BACKEND:BOOL=OFF",
-				"-DENABLE_IPV6:BOOL=OFF",
-				"-DWITH_SERIAL_BACKEND:BOOL=ON"
-			],
-			"sources": [
-				{
-					"type": "git",
-					"url": "https://github.com/analogdevicesinc/libiio",
-					"tag": "v0.26"
-				}
-			]
-		},
-		{
-			"name": "libad9361",
-			"builddir": true,
-			"buildsystem": "cmake",
-			"config-opts": [ "-DCMAKE_INSTALL_PREFIX:PATH=/app", "-DCMAKE_INSTALL_LIBDIR:STRING=lib" ],
-			"sources": [
-				{
-					"type": "git",
-					"url": "https://github.com/analogdevicesinc/libad9361-iio",
-					"branch" : "main"
-				}
-			]
-		},
-		{
-			"name": "libad9166",
-			"builddir": true,
-			"buildsystem": "cmake",
-			"config-opts": [ "-DCMAKE_INSTALL_PREFIX:PATH=/app", "-DCMAKE_INSTALL_LIBDIR:STRING=lib" ],
-			"sources": [
-				{
-					"type": "git",
-					"url": "https://github.com/analogdevicesinc/libad9166-iio",
-					"branch" : "libad9166-iio-v0"
-				}
-			]
-		},
-		{
-			"name": "libm2k",
-			"builddir": true,
-			"buildsystem": "cmake",
-			"config-opts": [
-				"-DCMAKE_INSTALL_PREFIX:PATH=/app",
-				"-DENABLE_PYTHON=OFF",
-				"-DENABLE_CSHARP=OFF",
-				"-DENABLE_TOOLS=OFF",
-				"-DBUILD_EXAMPLES=OFF",
-				"-DINSTALL_UDEV_RULES=OFF"
-			],
-			"sources": [
-				{
-					"type": "git",
-					"url": "https://github.com/analogdevicesinc/libm2k",
-					"branch": "main"
-				}
-			]
-		},
-		{
 			"name": "qwt",
 			"cleanup": [ "/features", "/plugins", "/share" ],
 			"sources": [
@@ -291,24 +220,6 @@
 					"type": "archive",
 					"url": "https://nih.at/libzip/libzip-1.1.3.tar.xz",
 					"sha256": "729a295a59a9fd6e5b9fe9fd291d36ae391a9d2be0b0824510a214cfaa05ceee"
-				}
-			]
-		},
-		{
-			"name": "libtinyiiod",
-			"builddir": true,
-			"buildsystem": "cmake",
-			"config-opts": [
-				"-DCMAKE_INSTALL_PREFIX:PATH=/app",
-				"-DCMAKE_INSTALL_LIBDIR:STRING=lib",
-				"-DBUILD_SHARED_LIBS=OFF",
-				"-DBUILD_EXAMPLES=OFF"
-			],
-			"sources": [
-				{
-					"type": "git",
-					"url": "https://github.com/analogdevicesinc/libtinyiiod",
-					"branch" : "master"
 				}
 			]
 		},
@@ -408,6 +319,99 @@
 				}
 			]
 		},
+		// libiio and the modules built on it come last, so the libiio v0 and libiio v1 manifests share the
+		// flatpak-builder cache of every module above. Selected with SCOPY_LIBIIO_VERSION in the Makefile.
+#ifdef LIBIIO_V0
+		// libiio v0 and its consumers; iio-emu is the libtinyiiod based emulator
+		{
+			"name": "libiio-v0",
+			"builddir": true,
+			"buildsystem": "cmake",
+			"config-opts": [
+				"-DCMAKE_PREFIX_PATH:PATH=/app",
+				"-DCMAKE_INSTALL_PREFIX:PATH=/app",
+				"-DCMAKE_INSTALL_LIBDIR:STRING=lib",
+				"-DINSTALL_UDEV_RULE:BOOL=OFF",
+				"-DWITH_TESTS:BOOL=OFF",
+				"-DWITH_DOC:BOOL=OFF",
+				"-DHAVE_DNS_SD:BOOL=ON",
+				"-DWITH_IIOD:BOOL=OFF",
+				"-DWITH_LOCAL_BACKEND:BOOL=OFF",
+				"-DENABLE_IPV6:BOOL=OFF",
+				"-DWITH_SERIAL_BACKEND:BOOL=ON"
+			],
+			"sources": [
+				{
+					"type": "git",
+					"url": "https://github.com/analogdevicesinc/libiio",
+					"tag": "v0.26"
+				}
+			]
+		},
+		{
+			"name": "libad9361",
+			"builddir": true,
+			"buildsystem": "cmake",
+			"config-opts": [ "-DCMAKE_INSTALL_PREFIX:PATH=/app", "-DCMAKE_INSTALL_LIBDIR:STRING=lib" ],
+			"sources": [
+				{
+					"type": "git",
+					"url": "https://github.com/analogdevicesinc/libad9361-iio",
+					"branch" : "main"
+				}
+			]
+		},
+		{
+			"name": "libad9166",
+			"builddir": true,
+			"buildsystem": "cmake",
+			"config-opts": [ "-DCMAKE_INSTALL_PREFIX:PATH=/app", "-DCMAKE_INSTALL_LIBDIR:STRING=lib" ],
+			"sources": [
+				{
+					"type": "git",
+					"url": "https://github.com/analogdevicesinc/libad9166-iio",
+					"branch" : "libad9166-iio-v0"
+				}
+			]
+		},
+		{
+			"name": "libm2k",
+			"builddir": true,
+			"buildsystem": "cmake",
+			"config-opts": [
+				"-DCMAKE_INSTALL_PREFIX:PATH=/app",
+				"-DENABLE_PYTHON=OFF",
+				"-DENABLE_CSHARP=OFF",
+				"-DENABLE_TOOLS=OFF",
+				"-DBUILD_EXAMPLES=OFF",
+				"-DINSTALL_UDEV_RULES=OFF"
+			],
+			"sources": [
+				{
+					"type": "git",
+					"url": "https://github.com/analogdevicesinc/libm2k",
+					"branch": "main"
+				}
+			]
+		},
+		{
+			"name": "libtinyiiod",
+			"builddir": true,
+			"buildsystem": "cmake",
+			"config-opts": [
+				"-DCMAKE_INSTALL_PREFIX:PATH=/app",
+				"-DCMAKE_INSTALL_LIBDIR:STRING=lib",
+				"-DBUILD_SHARED_LIBS=OFF",
+				"-DBUILD_EXAMPLES=OFF"
+			],
+			"sources": [
+				{
+					"type": "git",
+					"url": "https://github.com/analogdevicesinc/libtinyiiod",
+					"branch" : "master"
+				}
+			]
+		},
 		{
 			"name": "iio-emu",
 			"builddir": true,
@@ -421,11 +425,48 @@
 				}
 			]
 		},
+#else
+		// libiio v1; ships iiod-emu, the libiio v1 emulator
+		{
+			"name": "libiio",
+			"builddir": true,
+			"buildsystem": "cmake",
+			"config-opts": [
+				"-DCMAKE_PREFIX_PATH:PATH=/app",
+				"-DCMAKE_INSTALL_PREFIX:PATH=/app",
+				"-DCMAKE_INSTALL_LIBDIR:STRING=lib",
+				"-DINSTALL_UDEV_RULE:BOOL=OFF",
+				"-DWITH_TESTS:BOOL=OFF",
+				"-DWITH_MAN:BOOL=OFF",
+				"-DHAVE_DNS_SD:BOOL=ON",
+				"-DWITH_IIOD:BOOL=OFF",
+				"-DWITH_LOCAL_BACKEND:BOOL=OFF",
+				"-DENABLE_IPV6:BOOL=OFF",
+				"-DWITH_SERIAL_BACKEND:BOOL=ON",
+				"-DWITH_IIOD_EMU:BOOL=ON",
+				"-DWITH_EMU_BACKEND:BOOL=ON",
+				"-DLIBIIO_COMPAT:BOOL=ON"
+			],
+			"sources": [
+				{
+					"type": "git",
+					"url": "https://github.com/analogdevicesinc/libiio",
+					"tag": "v1.0.0"
+				}
+			]
+		},
+#endif
 	{
 		"name": "scopy",
 		"builddir": true,
 		"buildsystem": "cmake",
-		"config-opts": [ "-DCMAKE_INSTALL_PREFIX:PATH=/app", "-DCMAKE_INSTALL_LIBDIR:STRING=lib", "-DCMAKE_PREFIX_PATH=/app/lib/pkgconfig;/app/lib/cmake", "-DCMAKE_BUILD_TYPE=Release", "-DENABLE_TESTING=OFF", "-DENABLE_ALL_PACKAGES=ON", "-DENABLE_PACKAGE_M2K=OFF", "-DENABLE_PLUGIN_ADC=OFF", "-DWITH_SIGROK=OFF", "-DWITH_PYTHON=OFF"],
+		"config-opts": [ "-DCMAKE_INSTALL_PREFIX:PATH=/app", "-DCMAKE_INSTALL_LIBDIR:STRING=lib", "-DCMAKE_PREFIX_PATH=/app/lib/pkgconfig;/app/lib/cmake", "-DCMAKE_BUILD_TYPE=Release", "-DENABLE_TESTING=OFF", "-DENABLE_ALL_PACKAGES=ON", "-DENABLE_PACKAGE_M2K=OFF", "-DENABLE_PLUGIN_ADC=OFF", "-DWITH_SIGROK=OFF", "-DWITH_PYTHON=OFF",
+#ifdef LIBIIO_V0
+			"-DSCOPY_LIBIIO_VERSION=0"
+#else
+			"-DSCOPY_LIBIIO_VERSION=1"
+#endif
+		],
 		"sources": [
 			{
 				"type": "git",

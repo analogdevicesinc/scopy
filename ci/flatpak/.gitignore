@@ -1,5 +1,6 @@
 Scopy.flatpak
 .flatpak-builder
+.flatpak-builder-libiio-v0
 build
 repo
 org.adi.Scopy.json
