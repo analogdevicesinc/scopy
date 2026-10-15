@@ -51,6 +51,13 @@ bool writeSync(component::Attribute *attr, const QString &value)
 		qWarning(CAT_DIGITALIO_API) << "write of" << value << "failed:" << r.error().message;
 		return false;
 	}
+
+	// The read-after-write that Attribute::addWriteCapability fires is async, so
+	// cachedValue() would still hold the old value when this returns. A script
+	// expects the next statement to see the write, so settle it here.
+	if(attr->readCapability()) {
+		QCoro::waitFor(attr->readCapability()->readAsync());
+	}
 	return true;
 }
 
@@ -62,6 +69,8 @@ DigitalIO_API::DigitalIO_API(Adalm2000DigitalIoTool *tool)
 {}
 
 DigitalIO_API::~DigitalIO_API() {}
+
+M2kDigitalIoController *DigitalIO_API::controller() const { return m_tool ? m_tool->m_controller : nullptr; }
 
 QList<bool> DigitalIO_API::grouped() const
 {
@@ -159,6 +168,227 @@ void DigitalIO_API::run(bool en)
 	if(m_tool) {
 		m_tool->setRunningBlocking(en);
 	}
+}
+
+bool DigitalIO_API::setGroupMode(int group, bool grouped)
+{
+	DioGroupWidget *w = m_tool ? m_tool->groupWidget(group) : nullptr;
+	if(!w) {
+		qWarning(CAT_DIGITALIO_API) << "no group widget for group" << group;
+		return false;
+	}
+	w->setGrouped(grouped);
+	return true;
+}
+
+bool DigitalIO_API::isGroupMode(int group) const
+{
+	DioGroupWidget *w = m_tool ? m_tool->groupWidget(group) : nullptr;
+	return w && w->isGrouped();
+}
+
+bool DigitalIO_API::setGroupDirection(int group, bool output)
+{
+	M2kDigitalIoController *c = controller();
+	if(!c) {
+		return false;
+	}
+	return writeSync(c->groupDirection(group),
+			 output ? QLatin1String(dio::DIRECTION_OPTIONS[0]) : QLatin1String(dio::DIRECTION_OPTIONS[1]));
+}
+
+bool DigitalIO_API::isGroupOutput(int group) const
+{
+	M2kDigitalIoController *c = controller();
+	component::Attribute *attr = c ? c->groupDirection(group) : nullptr;
+	return attr && attr->cachedValue() == QLatin1String(dio::DIRECTION_OPTIONS[0]);
+}
+
+bool DigitalIO_API::setGroupValue(int group, int value)
+{
+	M2kDigitalIoController *c = controller();
+	if(!c) {
+		return false;
+	}
+	if(value < 0 || value > dio::GROUP_VALUE_MAX) {
+		qWarning(CAT_DIGITALIO_API) << "group value" << value << "is outside 0.." << dio::GROUP_VALUE_MAX;
+		return false;
+	}
+	return writeSync(c->groupValue(group), QString::number(value));
+}
+
+int DigitalIO_API::groupOutput(int group) const
+{
+	M2kDigitalIoController *c = controller();
+	component::Attribute *attr = c ? c->groupValue(group) : nullptr;
+	return attr ? attr->cachedValue().toInt() : -1;
+}
+
+int DigitalIO_API::groupInput(int group) const
+{
+	M2kDigitalIoController *c = controller();
+	if(!c || !dio::validGroup(group)) {
+		return -1;
+	}
+	return static_cast<int>(dio::groupValue(c->gpi(), group));
+}
+
+bool DigitalIO_API::setPinDirection(int pin, bool output)
+{
+	M2kDigitalIoController *c = controller();
+	if(!c) {
+		return false;
+	}
+	return writeSync(c->pinDirection(pin),
+			 output ? QLatin1String(dio::DIRECTION_OPTIONS[0]) : QLatin1String(dio::DIRECTION_OPTIONS[1]));
+}
+
+bool DigitalIO_API::setPinOutput(int pin, bool high)
+{
+	M2kDigitalIoController *c = controller();
+	if(!c) {
+		return false;
+	}
+	return writeSync(c->pinValue(pin),
+			 high ? QLatin1String(dio::VALUE_OPTIONS[0]) : QLatin1String(dio::VALUE_OPTIONS[1]));
+}
+
+int DigitalIO_API::pinOutput(int pin) const
+{
+	M2kDigitalIoController *c = controller();
+	component::Attribute *attr = c ? c->pinValue(pin) : nullptr;
+	return attr ? (attr->cachedValue().toInt() != 0 ? 1 : 0) : -1;
+}
+
+int DigitalIO_API::pinInput(int pin) const
+{
+	M2kDigitalIoController *c = controller();
+	if(!c || !dio::validPin(pin)) {
+		return -1;
+	}
+	return dio::bit(c->gpi(), pin) ? 1 : 0;
+}
+
+bool DigitalIO_API::setDirectionWord(int word)
+{
+	M2kDigitalIoController *c = controller();
+	if(!c) {
+		return false;
+	}
+	if(word < 0 || word > 0xFFFF) {
+		qWarning(CAT_DIGITALIO_API) << "direction word" << word << "is outside 0..0xFFFF";
+		return false;
+	}
+	bool ok = true;
+	for(int pin = 0; pin < dio::PIN_COUNT; ++pin) {
+		const bool out = dio::bit(static_cast<quint16>(word), pin);
+		ok = writeSync(c->pinDirection(pin),
+			       out ? QLatin1String(dio::DIRECTION_OPTIONS[0])
+				   : QLatin1String(dio::DIRECTION_OPTIONS[1])) &&
+			ok;
+	}
+	return ok;
+}
+
+bool DigitalIO_API::setOutputWord(int word)
+{
+	M2kDigitalIoController *c = controller();
+	if(!c) {
+		return false;
+	}
+	if(word < 0 || word > 0xFFFF) {
+		qWarning(CAT_DIGITALIO_API) << "output word" << word << "is outside 0..0xFFFF";
+		return false;
+	}
+	bool ok = true;
+	for(int pin = 0; pin < dio::PIN_COUNT; ++pin) {
+		const bool high = dio::bit(static_cast<quint16>(word), pin);
+		ok = writeSync(c->pinValue(pin),
+			       high ? QLatin1String(dio::VALUE_OPTIONS[0]) : QLatin1String(dio::VALUE_OPTIONS[1])) &&
+			ok;
+	}
+	return ok;
+}
+
+int DigitalIO_API::directionWord() const
+{
+	M2kDigitalIoController *c = controller();
+	if(!c) {
+		return -1;
+	}
+	quint16 word = 0;
+	for(int pin = 0; pin < dio::PIN_COUNT; ++pin) {
+		component::Attribute *attr = c->pinDirection(pin);
+		word = dio::withBit(word, pin, attr && attr->cachedValue() == QLatin1String(dio::DIRECTION_OPTIONS[0]));
+	}
+	return word;
+}
+
+int DigitalIO_API::outputWord() const
+{
+	M2kDigitalIoController *c = controller();
+	if(!c) {
+		return -1;
+	}
+	quint16 word = 0;
+	for(int pin = 0; pin < dio::PIN_COUNT; ++pin) {
+		component::Attribute *attr = c->pinValue(pin);
+		word = dio::withBit(word, pin, attr && attr->cachedValue().toInt() != 0);
+	}
+	return word;
+}
+
+int DigitalIO_API::readInputWord()
+{
+	M2kDigitalIoController *c = controller();
+	if(!c) {
+		return -1;
+	}
+	if(!QCoro::waitFor(c->refreshInputs())) {
+		return -1;
+	}
+	return static_cast<int>(c->gpi());
+}
+
+int DigitalIO_API::inputWord() const
+{
+	M2kDigitalIoController *c = controller();
+	return c ? static_cast<int>(c->gpi()) : -1;
+}
+
+int DigitalIO_API::shortedWord() const
+{
+	M2kDigitalIoController *c = controller();
+	return c ? static_cast<int>(c->shorted()) : -1;
+}
+
+bool DigitalIO_API::setRunning(bool on)
+{
+	if(!m_tool) {
+		return false;
+	}
+	m_tool->setRunningBlocking(on);
+	return m_tool->isRunning() == on;
+}
+
+bool DigitalIO_API::setPolling(bool on)
+{
+	M2kDigitalIoController *c = controller();
+	if(!c) {
+		return false;
+	}
+	if(on) {
+		c->startPolling();
+	} else {
+		c->stopPolling();
+	}
+	return c->isPolling() == on;
+}
+
+bool DigitalIO_API::isUsable() const
+{
+	M2kDigitalIoController *c = controller();
+	return c && c->isUsable();
 }
 
 #include "moc_digitalio_api.cpp"

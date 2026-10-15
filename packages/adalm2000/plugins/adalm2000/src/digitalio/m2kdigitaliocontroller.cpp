@@ -232,6 +232,12 @@ QCoro::Task<bool> M2kDigitalIoController::setOutputEnabled(bool on)
 		co_return false;
 	}
 
+	// Settle the cache before returning: outputEnabled() reads cachedValue(), and
+	// the read-after-write the Attribute fires on writeSucceeded is async.
+	if(m_outputEnabledAttr->readCapability()) {
+		co_await m_outputEnabledAttr->readCapability()->readAsync();
+	}
+
 	Q_EMIT outputEnabledChanged(on);
 	co_return true;
 }
@@ -253,26 +259,20 @@ void M2kDigitalIoController::stopPolling()
 	}
 }
 
-QCoro::Task<void> M2kDigitalIoController::pollOnce()
+QCoro::Task<bool> M2kDigitalIoController::refreshInputs()
 {
-	if(!m_polling || !m_gpiAttr || !m_gpiAttr->readCapability()) {
-		co_return;
+	if(!m_gpiAttr || !m_gpiAttr->readCapability()) {
+		co_return false;
 	}
 
 	auto resp = co_await m_gpiAttr->readCapability()->readAsync();
-	// Stopped while the read was in flight: drop the result rather than rearm.
-	if(!m_polling) {
-		co_return;
-	}
-
 	if(!resp) {
 		if(!m_readFailed) { // only on the ok -> failed transition
 			m_readFailed = true;
 			qWarning(CAT_M2KDIO_CONTROLLER) << "gpi read failed:" << resp.error().message;
 			Q_EMIT failed(QStringLiteral("Digital I/O: pin read-back failed"));
 		}
-		m_timer->start(dio::POLL_INTERVAL_MS);
-		co_return;
+		co_return false;
 	}
 	m_readFailed = false;
 
@@ -286,7 +286,18 @@ QCoro::Task<void> M2kDigitalIoController::pollOnce()
 	m_shorted = shorted;
 
 	Q_EMIT pinStatesUpdated(m_gpi, m_shorted);
+	co_return true;
+}
 
+QCoro::Task<void> M2kDigitalIoController::pollOnce()
+{
+	if(!m_polling) {
+		co_return;
+	}
+
+	co_await refreshInputs();
+
+	// Stopped while the read was in flight: do not rearm.
 	if(m_polling) {
 		m_timer->start(dio::POLL_INTERVAL_MS);
 	}
