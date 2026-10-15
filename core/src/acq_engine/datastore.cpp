@@ -81,6 +81,14 @@ std::optional<SampleVariant> DataStore::latest(const DataKey &key) const
 	return it->sample(0);
 }
 
+std::optional<QVector<float>> DataStore::latestFloat(const DataKey &key) const
+{
+	std::optional<SampleVariant> v = latest(key);
+	if(!v || std::holds_alternative<QVector<Annotation>>(*v))
+		return std::nullopt;
+	return toFloat(*v);
+}
+
 SampleVariant DataStore::window(const DataKey &key, int plotSize) const
 {
 	QMutexLocker lk(&m_mutex);
