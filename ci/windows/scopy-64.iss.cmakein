@@ -301,6 +301,7 @@ Type: files; Name: "{userappdata}\ADI\Preferences.ini"; Tasks: deletepreferences
 Type: filesandordirs; Name: "{app}\decoders"; Check: not WizardIsComponentSelected('packages')
 Type: filesandordirs; Name: "{app}\packages"; Check: not WizardIsComponentSelected('packages')
 Type: files; Name: "{app}\iio-emu.exe"; Check: not WizardIsComponentSelected('emu')
+Type: files; Name: "{app}\iiod-emu.exe"; Check: not WizardIsComponentSelected('emu')
 Type: files; Name: "{app}\xml_gen.exe"; Check: not WizardIsComponentSelected('emu')
 Type: files; Name: "{app}\iio_*.exe"; Check: not WizardIsComponentSelected('main')
 
