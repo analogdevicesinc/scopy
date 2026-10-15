@@ -474,6 +474,60 @@ void DecoderEditor::refreshKeys(const QList<scopy::acq::DataKey> &keys)
 	}
 }
 
+bool DecoderEditor::setChannel(const QString &role, const QString &key)
+{
+	if(m_stages.isEmpty() || !m_mgr || m_mgr->isEngineRunning())
+		return false;
+	const Stage &st = m_stages[0];
+	for(int i = 0; i < st.info.channels.size() && i < st.channelCombos.size(); ++i) {
+		if(st.info.channels[i].id != role)
+			continue;
+		// Empty unassigns: the combo's first entry carries no key.
+		const int idx = st.channelCombos[i]->findData(key);
+		if(idx < 0)
+			return false;
+		st.channelCombos[i]->setCurrentIndex(idx);
+		return true;
+	}
+	return false;
+}
+
+bool DecoderEditor::setOption(const QString &id, const QString &value)
+{
+	if(m_stages.isEmpty() || !m_mgr || m_mgr->isEngineRunning())
+		return false;
+	QWidget *w = m_stages[0].optionWidgets.value(id, nullptr);
+	bool ok = true;
+	if(auto *c = qobject_cast<QComboBox *>(w)) {
+		const int idx = c->findText(value);
+		if(idx < 0)
+			return false;
+		c->setCurrentIndex(idx);
+	} else if(auto *s = qobject_cast<QSpinBox *>(w)) {
+		const int v = value.toInt(&ok);
+		if(ok)
+			s->setValue(v);
+	} else if(auto *d = qobject_cast<QDoubleSpinBox *>(w)) {
+		const double v = value.toDouble(&ok);
+		if(ok)
+			d->setValue(v);
+	} else if(auto *l = qobject_cast<QLineEdit *>(w)) {
+		l->setText(value);
+	} else {
+		return false;
+	}
+	return ok;
+}
+
+bool DecoderEditor::setSampleRate(double hz)
+{
+	if(!m_sampleRateSpin || !m_mgr || m_mgr->isEngineRunning() || hz < m_sampleRateSpin->minimum() ||
+	   hz > m_sampleRateSpin->maximum())
+		return false;
+	m_sampleRateSpin->setValue(hz);
+	return true;
+}
+
 void DecoderEditor::refreshAnnotationSources()
 {
 	if(!m_annSourceCombo || !m_mgr)
@@ -805,16 +859,29 @@ void DecoderPanel::onAddClicked()
 		return;
 	}
 	openPicker(QStringLiteral("Add protocol decoder"),
-		   /*filter*/ nullptr, [this](const QString &id) {
-			   const QString uid = m_mgr->addDecoder(id);
-			   if(uid.isEmpty()) {
-				   if(m_logger)
-					   m_logger->critical(kPanelId,
-							      QStringLiteral("DecoderManager::addDecoder failed"));
-				   return;
-			   }
-			   appendEditorFor(uid, id);
-		   });
+		   /*filter*/ nullptr, [this](const QString &id) { addDecoder(id); });
+}
+
+QString DecoderPanel::addDecoder(const QString &decoderId)
+{
+	if(!m_mgr || !m_catalog || !m_catalog->decoders().contains(decoderId))
+		return {};
+	const QString uid = m_mgr->addDecoder(decoderId);
+	if(uid.isEmpty()) {
+		if(m_logger)
+			m_logger->critical(kPanelId, QStringLiteral("DecoderManager::addDecoder failed"));
+		return {};
+	}
+	appendEditorFor(uid, decoderId);
+	return uid;
+}
+
+DecoderEditor *DecoderPanel::editor(const QString &uid) const
+{
+	for(DecoderEditor *e : m_editors)
+		if(e->uid() == uid)
+			return e;
+	return nullptr;
 }
 
 void DecoderPanel::onStackPickerRequested(DecoderEditor *editor, const QStringList &acceptedInputIds)
@@ -877,7 +944,9 @@ void DecoderPanel::appendEditorFor(const QString &uid, const QString &decoderId)
 	connect(ed, &DecoderEditor::stackPickerRequested, this, &DecoderPanel::onStackPickerRequested);
 }
 
-void DecoderPanel::onEditorRemoveRequested(const QString &uid)
+void DecoderPanel::onEditorRemoveRequested(const QString &uid) { removeDecoder(uid); }
+
+void DecoderPanel::removeDecoder(const QString &uid)
 {
 	for(int i = 0; i < m_editors.size(); ++i) {
 		if(m_editors[i]->uid() != uid)

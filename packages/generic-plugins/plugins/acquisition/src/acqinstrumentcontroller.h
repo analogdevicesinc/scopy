@@ -79,6 +79,11 @@ public:
 	void stop();
 
 	AcqInstrument *ui() const;
+	AcqPlotManager *plots() const;
+	scopy::decoder::DecoderPanel *decoders() const;
+
+	// Single is one cycle, or with the trigger on, one fire: run until it stops itself.
+	void single();
 
 private:
 	void setupBlocks(scopy::component::Context *ctx);
@@ -87,9 +92,6 @@ private:
 	void setupTrigger();
 	void setupDecoders();
 	void setupAnalysisPanel();
-
-	// Single is one cycle, or with the trigger on, one fire: run until it stops itself.
-	void onSingleClicked();
 
 	// A plain rail row opening `body` as its right-menu page. The block overload also
 	// binds the row's checkbox to the block's enable state.

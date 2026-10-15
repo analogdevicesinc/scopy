@@ -64,6 +64,10 @@ public:
 	// The "Pipeline" tab, for an owner whose blocks the engine does not list (decoders).
 	scopy::acq::PipelineInspector *pipeline() const { return m_pipeline; }
 
+	// Set through the controls, which apply them to the engine, so the two stay in step.
+	void setMode(int mode);
+	void setBufferSize(int n);
+
 public Q_SLOTS:
 	// Safe in any state; ignored while running. The buttons follow the engine's own
 	// started/stopped signals, so a refused or self-terminated run cannot desync them.
