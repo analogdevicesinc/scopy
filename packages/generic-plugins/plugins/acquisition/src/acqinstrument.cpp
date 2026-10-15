@@ -158,6 +158,10 @@ void AcqInstrument::single() { start(1); }
 
 void AcqInstrument::stop() { m_engine->stop(); }
 
+void AcqInstrument::setMode(int mode) { m_modeCombo->combo()->setCurrentIndex(mode); }
+
+void AcqInstrument::setBufferSize(int n) { m_bufferSpin->setValue(n); }
+
 void AcqInstrument::setRunning(bool running)
 {
 	// Blocked so reflecting the state does not re-enter run()/stop().
