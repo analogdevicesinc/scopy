@@ -43,6 +43,7 @@ CLASS_TO_JSOBJ = {
     "RegMap_API": "regmap",
     "IIOExplorerInstrument_API": "iioExplorer",
     "DataLogger_API": "datalogger",
+    "Acquisition_API": "acq",
     # PQM / SWIOT
     "PQM_API": "pqm",
     "SWIOT_API": "swiot",
@@ -78,7 +79,7 @@ PLUGIN_OBJECTS: dict[str, list[str]] = {
     "cn0540": ["cn0540"],
     "daq2": ["daq2"],
     "fmcomms11": ["fmcomms11"],
-    "generic-plugins": ["regmap", "iioExplorer", "datalogger"],
+    "generic-plugins": ["regmap", "iioExplorer", "datalogger", "acq"],
     "pqmon": ["pqm"],
     "swiot": ["swiot"],
     "m2k": ["osc", "spectrum", "network", "siggen", "logic", "pattern", "dio", "dmm", "power", "calib"],
@@ -176,6 +177,22 @@ def _parse_property(m: re.Match) -> dict:
     return prop
 
 
+def _doc_above(text: str, pos: int) -> str:
+    """The /// doc comment lines directly above `pos`, joined. Plain // comments are not docs:
+    in most headers they are section titles, which would mislabel the method below them."""
+    head = text[:pos]
+    lines = head.splitlines()
+    if lines and not head.endswith("\n"):
+        lines.pop()  # the partial line holding `pos` itself, e.g. indentation
+    doc: list[str] = []
+    for line in reversed(lines):
+        line = line.strip()
+        if not line.startswith("///"):
+            break
+        doc.insert(0, line[3:].strip())
+    return " ".join(doc)
+
+
 def extract_class_name(text: str) -> str | None:
     m = re.search(r"class\s+(?:\w+_EXPORT\s+)?(\w+)\s*:\s*public\s+(?:scopy::)?ApiObject", text)
     return m.group(1) if m else None
@@ -240,11 +257,15 @@ def parse_api_header(path: Path) -> tuple[dict[str, dict], list[str]]:
 
         methods = []
         for m in _INVOKABLE_RE.finditer(block):
-            methods.append({
+            method = {
                 "name": m.group(2),
                 "args": _parse_args_list(m.group(3)),
                 "returns": _clean_type(m.group(1)),
-            })
+            }
+            doc = _doc_above(block, m.start())
+            if doc:
+                method["doc"] = doc
+            methods.append(method)
 
         properties = []
         for m in _PROPERTY_RE.finditer(block):
@@ -257,6 +278,9 @@ def parse_api_header(path: Path) -> tuple[dict[str, dict], list[str]]:
             properties.append(prop)
 
         obj_meta = {"methods": methods}
+        class_doc = _doc_above(text, text.find(block))
+        if class_doc:
+            obj_meta["doc"] = class_doc
         if properties:
             obj_meta["properties"] = properties
         if nested_info:

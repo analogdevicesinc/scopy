@@ -257,13 +257,12 @@ def switch_tool(tool_name: str, device_id: str = "") -> str:
 # ---------------------------------------------------------------------------
 
 def _make_plugin_list_tool(plugin: str, obj_names: list[str]):
-    @mcp.tool(name=f"{plugin}_list_tools")
+    # An f-string is not a docstring, so the text goes in as the description.
+    @mcp.tool(name=f"{plugin}_list_tools",
+              description=f"List all JS API objects exposed by the '{plugin}' Scopy plugin. "
+                          f"Returns a JSON list of object names. Each object has a _call tool "
+                          f"(e.g. {obj_names[0]}_call) for invoking its methods.")
     def list_tools() -> str:
-        f"""List all JS API objects exposed by the '{plugin}' Scopy plugin.
-
-        Returns a JSON list of object names. Each object has a _call tool
-        (e.g. {obj_names[0]}_call) for invoking its methods.
-        """
         return json.dumps(obj_names)
 
     return list_tools
@@ -287,26 +286,32 @@ def _format_method_sig(m: dict) -> str:
             s += f"={a['default']}"
         args_parts.append(s)
     arg_str = ", ".join(args_parts)
-    return f"  {m['name']}({arg_str}) -> {m['returns']}"
+    sig = f"  {m['name']}({arg_str}) -> {m['returns']}"
+    return f"{sig}  — {m['doc']}" if "doc" in m else sig
 
 
-def _make_object_call_tool(obj: str, methods: list[dict]):
+def _make_object_call_tool(obj: str, methods: list[dict], doc: str = ""):
     """Create a single _call tool for a JS API object with full method list in description."""
     # Deduplicate method names for validation (overloads share a name)
     valid_names = {m["name"] for m in methods}
+    # Required-arg counts per name, one per overload, to tell an unused slot from a real "".
+    required: dict[str, set[int]] = {}
+    for m in methods:
+        required.setdefault(m["name"], set()).add(sum("default" not in a for a in m["args"]))
 
-    desc_lines = [f"Call a method on the '{obj}' Scopy API object.", "",
-                  "Available methods:"]
+    desc_lines = [f"Call a method on the '{obj}' Scopy API object."]
+    if doc:
+        desc_lines.append(doc)
+    desc_lines += ["", "Available methods:"]
     for m in methods:
         desc_lines.append(_format_method_sig(m))
 
     docstring = "\n".join(desc_lines)
 
-    @mcp.tool(name=f"{obj}_call")
+    @mcp.tool(name=f"{obj}_call", description=docstring)
     def call_method(method: str,
                     arg1: str = "", arg2: str = "",
                     arg3: str = "", arg4: str = "") -> str:
-        """placeholder"""
         if err := _ensure_connected():
             return err
         if method not in valid_names:
@@ -314,25 +319,28 @@ def _make_object_call_tool(obj: str, methods: list[dict]):
                 f"Unknown method '{method}' on {obj}. "
                 f"Available: {sorted(valid_names)}"
             )
-        args = [a for a in (arg1, arg2, arg3, arg4) if a]
+        # Trailing empties are unused slots, except up to the fewest required args of an
+        # overload that fits: those are a real "" (e.g. an empty key list).
+        args = [arg1, arg2, arg3, arg4]
+        while args and not args[-1]:
+            args.pop()
+        fits = [n for n in required[method] if len(args) <= n <= 4]
+        if fits:
+            args += [""] * (min(fits) - len(args))
         js = _build_js_call(obj, method, args)
         result = _run_tool(js)
         logger.info(f"{obj}.{method}({', '.join(args)}): {result}")
         return result
-
-    call_method.__doc__ = docstring
     return call_method
 
 
 def _make_object_list_tool(obj: str, methods: list[dict], properties: list[dict] | None = None):
     """Create a _list tool that returns the full method and property inventory as JSON."""
 
-    @mcp.tool(name=f"{obj}_list")
+    @mcp.tool(name=f"{obj}_list",
+              description=f"List all available methods and properties on the '{obj}' Scopy API object. "
+                          f"Returns a JSON object with 'methods' and 'properties' arrays.")
     def list_api() -> str:
-        f"""List all available methods and properties on the '{obj}' Scopy API object.
-
-        Returns a JSON object with 'methods' and 'properties' arrays.
-        """
         result = {}
         if methods:
             result["methods"] = [
@@ -343,6 +351,7 @@ def _make_object_list_tool(obj: str, methods: list[dict], properties: list[dict]
                         for a in m["args"]
                     ],
                     "returns": m["returns"],
+                    **({"doc": m["doc"]} if "doc" in m else {}),
                 }
                 for m in methods
             ]
@@ -365,7 +374,7 @@ def _make_object_list_tool(obj: str, methods: list[dict], properties: list[dict]
 for _obj, _meta in _API.get("objects", {}).items():
     _methods = _meta.get("methods", [])
     if _methods:
-        _make_object_call_tool(_obj, _methods)
+        _make_object_call_tool(_obj, _methods, _meta.get("doc", ""))
     _props = _meta.get("properties", [])
     if _methods or _props:
         _make_object_list_tool(_obj, _methods, _props)
@@ -408,9 +417,8 @@ def _make_property_read_tool(obj: str, properties: list[dict], meta: dict):
     docstring = "\n".join(desc_lines)
 
     if nested:
-        @mcp.tool(name=f"{obj}_read")
+        @mcp.tool(name=f"{obj}_read", description=docstring)
         def read_nested_property(property: str, index: int = 0, channel: int = -1) -> str:
-            """placeholder"""
             if err := _ensure_connected():
                 return err
             if property not in valid_names:
@@ -423,12 +431,9 @@ def _make_property_read_tool(obj: str, properties: list[dict], meta: dict):
             result = _run_tool(js)
             logger.info(f"{base}.{property}: {result}")
             return result
-
-        read_nested_property.__doc__ = docstring
     else:
-        @mcp.tool(name=f"{obj}_read")
+        @mcp.tool(name=f"{obj}_read", description=docstring)
         def read_property(property: str, channel: int = -1) -> str:
-            """placeholder"""
             if err := _ensure_connected():
                 return err
             if property not in valid_names:
@@ -440,8 +445,6 @@ def _make_property_read_tool(obj: str, properties: list[dict], meta: dict):
             result = _run_tool(js)
             logger.info(f"{obj}.{property}: {result}")
             return result
-
-        read_property.__doc__ = docstring
 
 
 def _make_property_write_tool(obj: str, properties: list[dict], meta: dict):
@@ -466,9 +469,8 @@ def _make_property_write_tool(obj: str, properties: list[dict], meta: dict):
     docstring = "\n".join(desc_lines)
 
     if nested:
-        @mcp.tool(name=f"{obj}_write")
+        @mcp.tool(name=f"{obj}_write", description=docstring)
         def write_nested_property(property: str, value: str, index: int = 0, channel: int = -1) -> str:
-            """placeholder"""
             if err := _ensure_connected():
                 return err
             if property not in valid_names:
@@ -482,12 +484,9 @@ def _make_property_write_tool(obj: str, properties: list[dict], meta: dict):
             result = _run_tool(js)
             logger.info(f"{base}.{property} = {value}: {result}")
             return result
-
-        write_nested_property.__doc__ = docstring
     else:
-        @mcp.tool(name=f"{obj}_write")
+        @mcp.tool(name=f"{obj}_write", description=docstring)
         def write_property(property: str, value: str, channel: int = -1) -> str:
-            """placeholder"""
             if err := _ensure_connected():
                 return err
             if property not in valid_names:
@@ -500,8 +499,6 @@ def _make_property_write_tool(obj: str, properties: list[dict], meta: dict):
             result = _run_tool(js)
             logger.info(f"{obj}.{property} = {value}: {result}")
             return result
-
-        write_property.__doc__ = docstring
 
 
 # Register property tools for objects that have properties

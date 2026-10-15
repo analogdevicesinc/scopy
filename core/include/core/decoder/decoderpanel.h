@@ -74,6 +74,13 @@ public:
 	// Rebuild annotation-source combo from manager's active decoders.
 	void refreshAnnotationSources();
 
+	// Set through the widgets, which apply on change, so the editor and the manager stay in
+	// step. Root stage only. False while the engine runs (applyNow() would drop the edit),
+	// for an unknown role/option, a key not offered by the combo, or a value it rejects.
+	bool setChannel(const QString &role, const QString &key);
+	bool setOption(const QString &id, const QString &value);
+	bool setSampleRate(double hz);
+
 Q_SIGNALS:
 	void removeRequested(const QString &uid);
 
@@ -175,6 +182,14 @@ public:
 
 	// Wired to decoderAdded/Removed; refreshes annotation-source combos.
 	void refreshAnnotationSources();
+
+	// What "+ Add…" and an editor's remove button do. addDecoder returns the uid, "" on failure.
+	QString addDecoder(const QString &decoderId);
+	void removeDecoder(const QString &uid);
+	DecoderEditor *editor(const QString &uid) const;
+
+	DecoderManager *manager() const { return m_mgr; }
+	IDecoderCatalog *catalog() const { return m_catalog; }
 
 private Q_SLOTS:
 	void onAddClicked();
