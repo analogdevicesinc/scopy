@@ -53,9 +53,9 @@ void MathProcessor::process(DataStore *store)
 
 	int n = 0;
 	for(const DataKey &k : keys) {
-		auto src = store->latestAs<QVector<float>>(k);
+		auto src = store->latestFloat(k);
 		if(!src) {
-			inputs.append(nullptr); // absent or non-float reads as 0
+			inputs.append(nullptr); // absent or non-numeric reads as 0
 			continue;
 		}
 		held.push_back(std::move(*src));

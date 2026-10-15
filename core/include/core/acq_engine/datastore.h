@@ -75,6 +75,10 @@ public:
 		return std::get<T>(std::move(*v));
 	}
 
+	// Newest chunk converted to float, whatever the stream's numeric type (a 1-bit logic
+	// line reads as 0.0/1.0). nullopt if absent, empty or annotations.
+	std::optional<QVector<float>> latestFloat(const DataKey &key) const;
+
 	// The newest `plotSize` samples, oldest-first, spanning as many chunks as
 	// the stream's claimed depth allows. Preserves the stream's sample type;
 	// windowFloat() converts, windowAs<T>() narrows.
