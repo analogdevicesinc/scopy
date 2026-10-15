@@ -28,31 +28,51 @@
 #include <deviceiconbuilder.h>
 #include <style.h>
 #include "scopy-cn0511_config.h"
-#include <iioutil/connectionprovider.h>
+#include <component/attribute.h>
+#include <component/attributewriter.h>
+#include <component/context.h>
+#include <component/device.h>
+#include <component/navigation.h>
 #include <iio-widgets/iiowidgetgroup.h>
 #include <pluginbase/scopyjs.h>
+#include <QCoro/QCoroTask>
 
 Q_LOGGING_CATEGORY(CAT_CN0511PLUGIN, "Cn0511Plugin")
 using namespace scopy::cn0511;
 
+namespace {
+
+// Blocking one-shot attribute write. onConnect() is a bool-returning override and
+// cannot be a coroutine, so the task is driven to completion with QCoro::waitFor.
+void writeAttr(scopy::component::Device *dev, const QString &name, const QString &value)
+{
+	scopy::component::Attribute *attr = scopy::component::attributeByName(dev, name);
+	if(!attr || !attr->writeCapability()) {
+		qWarning(CAT_CN0511PLUGIN) << "Attribute" << name << "is not writable";
+		return;
+	}
+
+	auto response = QCoro::waitFor(attr->writeCapability()->writeAsync(value));
+	if(!response) {
+		qWarning(CAT_CN0511PLUGIN) << "Failed to write" << name << "Error:" << response.error().message;
+	}
+}
+
+} // namespace
+
 bool Cn0511Plugin::compatible(QString m_param, QString category)
 {
 	qDebug(CAT_CN0511PLUGIN) << "Check CN0511 compatibility";
-	bool ret = false;
-	Connection *conn = ConnectionProvider::open(m_param);
 
-	if(!conn) {
+	component::ContextHandle ctx = component::Controller::context(m_param);
+
+	if(!ctx) {
 		qWarning(CAT_CN0511PLUGIN) << "No context available for CN0511";
 		return false;
 	}
 
-	iio_context *ctx = conn->context();
-	ret = (iio_context_find_device(ctx, "ad9166") != nullptr) &&
-		(iio_context_find_device(ctx, "ad9166-amp") != nullptr);
-
-	ConnectionProvider::close(m_param);
-
-	return ret;
+	return ctx->findChild<component::Device *>("ad9166", Qt::FindDirectChildrenOnly) != nullptr &&
+		ctx->findChild<component::Device *>("ad9166-amp", Qt::FindDirectChildrenOnly) != nullptr;
 }
 
 bool Cn0511Plugin::loadPage() { return false; }
@@ -88,32 +108,23 @@ QString Cn0511Plugin::displayName() { return CN0511_PLUGIN_DISPLAY_NAME; }
 
 bool Cn0511Plugin::onConnect()
 {
-	Connection *conn = ConnectionProvider::open(m_param);
+	m_context = component::Controller::context(m_param);
 
-	if(!conn) {
+	if(!m_context) {
 		qWarning(CAT_CN0511PLUGIN) << "No context available for CN0511";
 		return false;
 	}
 
 	m_widgetGroup = new IIOWidgetGroup(this);
 
-	iio_context *ctx = conn->context();
-
 	// Initialize device settings as per original cn0511.c
-	iio_device *dac = iio_context_find_device(ctx, "ad9166");
+	component::Device *dac = m_context->findChild<component::Device *>("ad9166", Qt::FindDirectChildrenOnly);
 	if(dac) {
-		int ret = iio_device_attr_write_longlong(dac, "fir85_enable", 1);
-		if(ret < 0) {
-			qWarning(CAT_CN0511PLUGIN) << "Failed to enable FIR85. Error:" << ret;
-		}
-
-		ret = iio_device_attr_write_longlong(dac, "sampling_frequency", 6000000000LL);
-		if(ret < 0) {
-			qWarning(CAT_CN0511PLUGIN) << "Failed to set sampling frequency. Error:" << ret;
-		}
+		writeAttr(dac, "fir85_enable", "1");
+		writeAttr(dac, "sampling_frequency", QString::number(6000000000LL));
 	}
 
-	CN0511 *cn0511 = new CN0511(ctx, m_widgetGroup);
+	CN0511 *cn0511 = new CN0511(m_context.get(), m_widgetGroup);
 	m_toolList[0]->setTool(cn0511);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(false);
@@ -153,7 +164,7 @@ bool Cn0511Plugin::onDisconnect()
 		m_widgetGroup = nullptr;
 	}
 
-	ConnectionProvider::close(m_param);
+	m_context = {};
 	return true;
 }
 

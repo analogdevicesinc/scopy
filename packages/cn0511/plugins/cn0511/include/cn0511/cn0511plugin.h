@@ -26,6 +26,7 @@
 
 #include "scopy-cn0511_export.h"
 #include <QObject>
+#include <component/controller.h>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 
@@ -63,6 +64,7 @@ private:
 
 	IIOWidgetGroup *m_widgetGroup = nullptr;
 	Cn0511_API *m_api = nullptr;
+	component::ContextHandle m_context;
 };
 } // namespace scopy::cn0511
 #endif // CN0511PLUGIN_H

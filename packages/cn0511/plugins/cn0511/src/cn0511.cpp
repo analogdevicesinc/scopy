@@ -30,6 +30,16 @@
 #include <style.h>
 #include <iio-widgets/iiowidgetgroup.h>
 
+#include <component/attribute.h>
+#include <component/attributereader.h>
+#include <component/channel.h>
+#include <component/context.h>
+#include <component/device.h>
+#include <component/navigation.h>
+#include <component/backends/iio/iiochannel.h>
+#include <component/backends/iio/iiocontext.h>
+#include <component/backends/iio/iiodevice.h>
+
 #include <iio.h>
 #include <ad9166.h>
 
@@ -40,7 +50,7 @@ using namespace cn0511;
 
 static const double MHZ_SCALE = 1000000.0;
 
-CN0511::CN0511(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
+CN0511::CN0511(component::Context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_ctx(ctx)
 	, m_group(group)
@@ -58,22 +68,7 @@ CN0511::CN0511(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	m_refreshButton = new AnimatedRefreshBtn(false, this);
 	m_tool->addWidgetToTopContainerHelper(m_refreshButton, TTA_RIGHT);
 
-	connect(m_refreshButton, &QPushButton::clicked, this, [this]() {
-		m_refreshButton->startAnimation();
-
-		QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
-		connect(
-			watcher, &QFutureWatcher<void>::finished, this,
-			[this, watcher]() {
-				m_refreshButton->stopAnimation();
-				watcher->deleteLater();
-			},
-			Qt::QueuedConnection);
-
-		QFuture<void> future = QtConcurrent::run([this]() { Q_EMIT readRequested(); });
-
-		watcher->setFuture(future);
-	});
+	connect(m_refreshButton, &QPushButton::clicked, this, &CN0511::refresh);
 
 	// Central scroll area
 	QWidget *controlsContainer = new QWidget(this);
@@ -91,22 +86,29 @@ CN0511::CN0511(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	controlsLayout->addWidget(scrollArea);
 
 	if(m_ctx != nullptr) {
-		m_dac = iio_context_find_device(m_ctx, "ad9166");
+		m_dac = m_ctx->findChild<component::Device *>("ad9166", Qt::FindDirectChildrenOnly);
 		if(m_dac) {
-			m_dacCh = iio_device_find_channel(m_dac, "altvoltage0", true);
+			// An input and an output channel can share the id "altvoltage0", so the
+			// direction has to be part of the lookup.
+			m_dacCh = component::channelById(m_dac, "altvoltage0", true);
 		}
 
 		controlWidgetLayout->addWidget(generateSingleToneSection(controlsWidget));
 		controlWidgetLayout->addWidget(generateDacAmpSection(controlsWidget));
 		controlWidgetLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
-
-		connect(this, &CN0511::readRequested, this, &CN0511::readFrequencyFromDevice, Qt::QueuedConnection);
 	}
 
 	m_tool->addWidgetToCentralContainerHelper(controlsContainer);
 }
 
-CN0511::~CN0511() {}
+CN0511::~CN0511()
+{
+	// A refresh in flight holds "this"; let it settle before the members go away.
+	if(!m_refreshTask.isReady()) {
+		QCoro::waitFor(m_refreshTask);
+	}
+	m_refreshTask = {};
+}
 
 QWidget *CN0511::generateSingleToneSection(QWidget *parent)
 {
@@ -175,19 +177,17 @@ QWidget *CN0511::generateDacAmpSection(QWidget *parent)
 	Style::setStyle(titleLabel, style::properties::label::menuBig);
 	layout->addWidget(titleLabel);
 
-	iio_device *dacAmp = iio_context_find_device(m_ctx, "ad9166-amp");
+	component::Device *dacAmp = m_ctx->findChild<component::Device *>("ad9166-amp", Qt::FindDirectChildrenOnly);
 	if(dacAmp) {
-		IIOWidget *enWidget = IIOWidgetBuilder(widget)
-					      .device(dacAmp)
-					      .attribute("en")
-					      .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-					      .title("Enable")
-					      .group(m_group)
-					      .buildSingle();
+		m_dacAmpEnWidget = IIOWidgetBuilder(widget)
+					   .attribute(component::attributeByName(dacAmp, "en"))
+					   .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+					   .title("Enable")
+					   .group(m_group)
+					   .buildSingle();
 
-		enWidget->showProgressBar(false);
-		layout->addWidget(enWidget);
-		connect(this, &CN0511::readRequested, enWidget, &IIOWidget::readAsync, Qt::QueuedConnection);
+		m_dacAmpEnWidget->showProgressBar(false);
+		layout->addWidget(m_dacAmpEnWidget);
 	}
 
 	return widget;
@@ -197,6 +197,24 @@ void CN0511::applyCalibration()
 {
 	if(!m_ctx || !m_dac || !m_dacCh) {
 		qWarning(CAT_CN0511) << "Cannot apply calibration: device not available";
+		return;
+	}
+
+	// libad9166 needs raw libiio pointers; recover them from the device-controller
+	// nodes' backend handles (pragmatic hybrid).
+	auto *iioCtx = dynamic_cast<component::iio::IIOContext *>(m_ctx);
+	auto *iioDac = dynamic_cast<component::iio::IIODevice *>(m_dac);
+	auto *iioDacCh = dynamic_cast<component::iio::IIOChannel *>(m_dacCh);
+	if(!iioCtx || !iioDac || !iioDacCh) {
+		qWarning(CAT_CN0511) << "Cannot apply calibration: not an IIO context";
+		return;
+	}
+
+	iio_context *rawCtx = static_cast<iio_context *>(iioCtx->handle().ptr);
+	iio_device *rawDac = static_cast<iio_device *>(iioDac->handle().ptr);
+	iio_channel *rawDacCh = static_cast<iio_channel *>(iioDacCh->handle().ptr);
+	if(!rawCtx || !rawDac || !rawDacCh) {
+		qWarning(CAT_CN0511) << "Cannot apply calibration: no raw libiio handles available";
 		return;
 	}
 
@@ -214,27 +232,27 @@ void CN0511::applyCalibration()
 		},
 		Qt::QueuedConnection);
 
-	QFuture<void> future = QtConcurrent::run([this, calibFreq, amplitude]() {
+	QFuture<void> future = QtConcurrent::run([rawCtx, rawDac, rawDacCh, calibFreq, amplitude]() {
 		qDebug(CAT_CN0511) << "Applying calibration: freq=" << calibFreq << " amplitude=" << amplitude;
 
 		struct ad9166_calibration_data *calibData = nullptr;
-		int ret = ad9166_context_find_calibration_data(m_ctx, "cn0511", &calibData);
+		int ret = ad9166_context_find_calibration_data(rawCtx, "cn0511", &calibData);
 		if(ret < 0) {
 			qWarning(CAT_CN0511) << "Failed to find calibration data. Error:" << ret;
 			return;
 		}
 
-		ret = ad9166_channel_set_freq(m_dacCh, calibFreq);
+		ret = ad9166_channel_set_freq(rawDacCh, calibFreq);
 		if(ret < 0) {
 			qWarning(CAT_CN0511) << "Failed to set frequency. Error:" << ret;
 		}
 
-		ret = ad9166_device_set_amplitude(m_dac, amplitude);
+		ret = ad9166_device_set_amplitude(rawDac, amplitude);
 		if(ret < 0) {
 			qWarning(CAT_CN0511) << "Failed to set amplitude. Error:" << ret;
 		}
 
-		ret = ad9166_device_set_iofs(m_dac, calibData, calibFreq);
+		ret = ad9166_device_set_iofs(rawDac, calibData, calibFreq);
 		if(ret < 0) {
 			qWarning(CAT_CN0511) << "Failed to set IOFS. Error:" << ret;
 		}
@@ -243,18 +261,50 @@ void CN0511::applyCalibration()
 	watcher->setFuture(future);
 }
 
-void CN0511::readFrequencyFromDevice()
+void CN0511::refresh()
 {
-	if(!m_dacCh || !m_freqSpinBox) {
+	// Guard against overlapping refreshes: skip if the previous one is still in flight.
+	if(!m_refreshTask.isReady()) {
 		return;
 	}
 
-	long long val = 0;
-	int ret = iio_channel_attr_read_longlong(m_dacCh, "nco_frequency", &val);
-	if(ret < 0) {
-		qWarning(CAT_CN0511) << "Failed to read nco_frequency. Error:" << ret;
-		return;
+	if(m_dacAmpEnWidget) {
+		m_dacAmpEnWidget->readAsync();
+	}
+
+	m_refreshButton->startAnimation();
+	m_refreshTask = readFrequencyFromDevice();
+}
+
+QCoro::Task<void> CN0511::readFrequencyFromDevice()
+{
+	if(!m_dacCh || !m_freqSpinBox) {
+		m_refreshButton->stopAnimation();
+		co_return;
+	}
+
+	component::Attribute *attr = component::attributeByName(m_dacCh, "nco_frequency");
+	if(!attr || !attr->readCapability()) {
+		qWarning(CAT_CN0511) << "nco_frequency is not readable";
+		m_refreshButton->stopAnimation();
+		co_return;
+	}
+
+	auto response = co_await attr->readCapability()->readAsync();
+	if(!response) {
+		qWarning(CAT_CN0511) << "Failed to read nco_frequency. Error:" << response.error().message;
+		m_refreshButton->stopAnimation();
+		co_return;
+	}
+
+	bool ok = false;
+	double val = QString::fromUtf8(response.value()).trimmed().toDouble(&ok);
+	if(!ok) {
+		qWarning(CAT_CN0511) << "Could not parse nco_frequency:" << response.value();
+		m_refreshButton->stopAnimation();
+		co_return;
 	}
 
 	m_freqSpinBox->setValue(val / MHZ_SCALE);
+	m_refreshButton->stopAnimation();
 }

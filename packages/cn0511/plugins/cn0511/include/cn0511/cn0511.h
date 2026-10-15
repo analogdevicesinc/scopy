@@ -30,37 +30,40 @@
 #include <tooltemplate.h>
 #include <animatedrefreshbtn.h>
 #include <iio-widgets/iiowidgetbuilder.h>
-
-struct iio_context;
-struct iio_device;
-struct iio_channel;
+#include <QCoro/QCoroTask>
 
 namespace scopy {
 class IIOWidgetGroup;
+
+namespace component {
+class Channel;
+class Context;
+class Device;
+} // namespace component
+
 namespace cn0511 {
 
 class SCOPY_CN0511_EXPORT CN0511 : public QWidget
 {
 	Q_OBJECT
 public:
-	CN0511(iio_context *ctx, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
+	CN0511(component::Context *ctx, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~CN0511();
-
-Q_SIGNALS:
-	void readRequested();
 
 private Q_SLOTS:
 	void applyCalibration();
+	void refresh();
 
 private:
 	friend class Cn0511_API;
-	iio_context *m_ctx = nullptr;
+	component::Context *m_ctx = nullptr;
 	IIOWidgetGroup *m_group = nullptr;
 	ToolTemplate *m_tool = nullptr;
 	AnimatedRefreshBtn *m_refreshButton = nullptr;
 
-	iio_device *m_dac = nullptr;
-	iio_channel *m_dacCh = nullptr;
+	component::Device *m_dac = nullptr;
+	component::Channel *m_dacCh = nullptr;
+	IIOWidget *m_dacAmpEnWidget = nullptr;
 
 	gui::MenuSpinbox *m_freqSpinBox = nullptr;
 	gui::MenuSpinbox *m_ampSpinBox = nullptr;
@@ -69,9 +72,11 @@ private:
 	double m_calibFreq = 4500000000.0;
 	int m_amplitude = 0;
 
+	QCoro::Task<void> m_refreshTask;
+
 	QWidget *generateSingleToneSection(QWidget *parent);
 	QWidget *generateDacAmpSection(QWidget *parent);
-	void readFrequencyFromDevice();
+	QCoro::Task<void> readFrequencyFromDevice();
 };
 } // namespace cn0511
 } // namespace scopy
