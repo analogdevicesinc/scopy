@@ -147,9 +147,9 @@ public:
 
 	// --- Lifecycle -------------------------------------------------------
 
-	void clear(); // drop chunks, keep keys and claims
-	void reset(); // drop everything
-	void remove(const DataKey &key);
+	void clear();			 // drop chunks, keep keys and claims
+	void reset();			 // drop everything
+	void remove(const DataKey &key); // drop the key's data, keep its claims
 
 	// Per-cycle dirty set: which keys were written since the last beginCycle().
 	// Drives processor scheduling in AcquisitionEngine.
