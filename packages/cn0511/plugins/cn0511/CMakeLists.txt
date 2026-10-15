@@ -76,9 +76,9 @@ target_link_libraries(
 	       Qt::Core
 	       scopy-pluginbase
 	       scopy-gui
-	       scopy-iioutil
 	       scopy-iio-widgets
 	       scopy-pkg-manager
+	       component
 	       ${AD9166_LIBRARIES}
 )
 
