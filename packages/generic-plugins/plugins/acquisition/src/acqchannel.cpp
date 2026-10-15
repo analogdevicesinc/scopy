@@ -93,6 +93,7 @@ AcqChannel::AcqChannel(const Args &args)
 	// because every consumer of it divides: a "time (s)" axis then reads in samples,
 	// which is wrong-but-readable, where a zero divisor is neither.
 	, m_sampleRate(args.info.sampleRate > 0.0 ? args.info.sampleRate : 1.0)
+	, m_rateDeclared(args.info.sampleRate > 0.0)
 {
 	// No depth claim here: plotSize and bufferSize belong to the manager, which calls
 	// reclaimDepth() right after attaching us.
@@ -451,9 +452,29 @@ void AcqChannel::setColor(const QColor &c)
 
 void AcqChannel::setFallbackSampleRate(double sr)
 {
+	if(sr <= 0.0) {
+		return;
+	}
+	m_fallbackSampleRate = sr;
 	// The producer's own statement wins: it knows the timeline its samples are on,
 	// and the view's fallback is a guess from the pipeline shape.
-	if(m_info.sampleRate > 0.0 || sr <= 0.0 || qFuzzyCompare(m_sampleRate, sr)) {
+	if(!m_rateDeclared) {
+		applySampleRate(sr);
+	}
+}
+
+void AcqChannel::refreshSampleRate()
+{
+	const std::optional<scopy::acq::StreamInfo> info =
+		m_engine.isNull() ? std::nullopt : m_engine->streamInfo(m_key);
+	// A producer that no longer knows its rate hands the channel back to the fallback.
+	m_rateDeclared = info && info->sampleRate > 0.0;
+	applySampleRate(m_rateDeclared ? info->sampleRate : m_fallbackSampleRate);
+}
+
+void AcqChannel::applySampleRate(double sr)
+{
+	if(qFuzzyCompare(m_sampleRate, sr)) {
 		return;
 	}
 	m_sampleRate = sr;
