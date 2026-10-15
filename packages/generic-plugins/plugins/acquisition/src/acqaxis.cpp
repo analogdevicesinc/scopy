@@ -301,8 +301,8 @@ void AcqAxis::setInterval(double min, double max)
 	if(m_axis.isNull() || !(max > min)) {
 		return;
 	}
-	m_reqMin = min;
-	m_reqMax = max;
+	// Not recorded as a request: like a reader's zoom, it holds until the data's own
+	// range changes, instead of being undone by the next frame's repeat.
 	m_axis->setInterval(min, max);
 }
 

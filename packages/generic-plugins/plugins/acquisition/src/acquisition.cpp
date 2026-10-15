@@ -23,6 +23,7 @@
 
 #include "acqinstrument.h"
 #include "acqinstrumentcontroller.h"
+#include "acquisition_api.h"
 #include "acquisitioninfopage.h"
 #include "scopy-acquisition_config.h"
 
@@ -160,11 +161,13 @@ bool AcquisitionPlugin::onConnect()
 		deleteInstrument(m_toolList.first());
 	}
 	newInstrument();
+	Acquisition_API::attach(this);
 	return true;
 }
 
 bool AcquisitionPlugin::onDisconnect()
 {
+	Acquisition_API::detach(this);
 	while(!m_toolList.isEmpty()) {
 		deleteInstrument(m_toolList.first());
 	}
