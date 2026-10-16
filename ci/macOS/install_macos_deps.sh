@@ -114,7 +114,7 @@ echo "MacOS version $OS_VERSION"
 # Qt6 via aqtinstall -- no Homebrew Qt package needed
 # ghr is deliberately absent: it was never invoked (releases use actions/upload-artifact)
 # and it has no x86_64 bottle, so on Intel it source-builds its `go` build dependency.
-PACKAGES="pkg-config cmake fftw bison gettext autoconf automake libzip libusb doxygen wget gnu-sed dylibbundler libxml2"
+PACKAGES="pkg-config cmake fftw bison gettext autoconf automake libzip libusb doxygen wget gnu-sed dylibbundler libxml2 zstd"
 
 install_packages() {
 
@@ -215,19 +215,24 @@ clone() {
 		echo "Cloning all repositories fresh..."
 
 		git clone --recursive https://github.com/sigrokproject/libserialport -b $LIBSERIALPORT_BRANCH libserialport
-		git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
-		git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
-		git clone --recursive https://github.com/analogdevicesinc/libad9166-iio.git -b $LIBAD9166_BRANCH libad9166
-		git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
 		git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
-		git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
 		git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
 		git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
 		git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
 		git clone --recursive https://github.com/analogdevicesinc/genalyzer.git -b $GENALYZER_BRANCH genalyzer
 		git clone --recursive https://github.com/qcoro/qcoro.git -b $QCORO_BRANCH qcoro
+		DEPENDENCY_REPOS="libserialport libiio qwt KDDockWidgets extra-cmake-modules karchive genalyzer qcoro"
+		if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
+			git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_V0_VERSION libiio
+			git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
+			git clone --recursive https://github.com/analogdevicesinc/libad9166-iio.git -b $LIBAD9166_BRANCH libad9166
+			git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
+			git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
+			DEPENDENCY_REPOS="$DEPENDENCY_REPOS libad9361 libad9166 libm2k libtinyiiod"
+		else
+			git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
+		fi
 
-		DEPENDENCY_REPOS="libserialport libiio libad9361 libad9166 libm2k qwt libtinyiiod KDDockWidgets extra-cmake-modules karchive genalyzer qcoro"
 		# Save to cache for next time
 		if [ "${CACHING_ENABLED}" == "true" ] && [ -n "$GIT_CACHE_DIR" ]; then
 			mkdir -p "$GIT_CACHE_DIR"
@@ -277,8 +282,35 @@ build_libserialport(){
 	popd
 }
 
+# libiio v1 as plain dylibs installed into STAGING_AREA_DEPS (OSX_FRAMEWORK/OSX_PACKAGE off), so dylibbundler
+# bundles it like any other dependency. LIBIIO_COMPAT=OFF: nothing in the v1 build uses the libiio v0 API.
 build_libiio() {
 	echo "### Building libiio - version $LIBIIO_VERSION"
+	CURRENT_BUILD=libiio
+	pushd $STAGING_AREA/libiio
+	save_version_info
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DWITH_TESTS:BOOL=OFF \
+		-DWITH_MAN:BOOL=OFF \
+		-DHAVE_DNS_SD:BOOL=ON \
+		-DCSHARP_BINDINGS:BOOL=OFF \
+		-DPYTHON_BINDINGS:BOOL=OFF \
+		-DINSTALL_UDEV_RULE:BOOL=OFF \
+		-DWITH_SERIAL_BACKEND:BOOL=ON \
+		-DENABLE_IPV6:BOOL=OFF \
+		-DOSX_FRAMEWORK:BOOL=OFF \
+		-DOSX_PACKAGE:BOOL=OFF \
+		-DWITH_IIOD_EMU:BOOL=ON \
+		-DWITH_EMU_BACKEND:BOOL=ON \
+		-DLIBIIO_COMPAT:BOOL=OFF \
+		"
+	build_with_cmake
+	make install
+	popd
+}
+
+build_libiio_v0() {
+	echo "### Building libiio - version $LIBIIO_V0_VERSION"
 	CURRENT_BUILD=libiio
 	pushd $STAGING_AREA/libiio
 	save_version_info
@@ -509,12 +541,17 @@ build_deps(){
 	echo "Building all dependencies from source..."
 
 	build_libserialport
-	build_libiio
-	build_libad9361
-	build_libad9166
-	build_libm2k
+	if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
+		# libiio v0 and its consumers
+		build_libiio_v0
+		build_libad9361
+		build_libad9166
+		build_libm2k
+		build_libtinyiiod
+	else
+		build_libiio
+	fi
 	build_qwt
-	build_libtinyiiod
 	build_kddock
 	build_ecm
 	build_karchive

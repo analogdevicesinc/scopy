@@ -16,7 +16,11 @@ export PATH="${QT_PATH}:$PATH"
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH;$STAGING_AREA_DEPS;$STAGING_AREA_DEPS/lib"
 
 LIBSERIALPORT_BRANCH=master
-LIBIIO_VERSION=v0.26
+# libiio API Scopy is built against: 1 (default) or 0. Each CI job builds its dependencies from source, so only
+# the selected libiio (and, for v0, the libraries built on it) is built - no separate v0 prefix is needed.
+SCOPY_LIBIIO_VERSION=${SCOPY_LIBIIO_VERSION:-1}
+LIBIIO_VERSION=v1.0.0
+LIBIIO_V0_VERSION=v0.26
 LIBAD9361_BRANCH=main
 LIBAD9166_BRANCH=libad9166-iio-v0
 LIBM2K_BRANCH=main
