@@ -22,21 +22,42 @@
 
 #include <QObject>
 
+#include <functional>
+
 #include <qcoro/qcorotask.h>
 
+namespace scopy {
+class ICmdExecutor;
+}
+
 namespace scopy::adalm2000 {
-class M2kContext;
 
 class M2kCalibration : public QObject
 {
 	Q_OBJECT
 public:
-	explicit M2kCalibration(M2kContext *ctx, QObject *parent = nullptr);
+	using Procedure = std::function<bool()>;
 
-	QCoro::Task<bool> run();
+	M2kCalibration(void *resource, Procedure isCalibrated, Procedure calibrate, Procedure resetCalibration,
+		       scopy::ICmdExecutor *executor, QObject *parent = nullptr);
+
+	bool isRunning() const { return m_running; }
+
+	QCoro::Task<void> run();
+
+Q_SIGNALS:
+	void started();
+	void finished(bool ok);
 
 private:
-	M2kContext *m_ctx;
+	QCoro::Task<bool> call(Procedure procedure);
+
+	void *m_resource;
+	Procedure m_isCalibrated;
+	Procedure m_calibrate;
+	Procedure m_resetCalibration;
+	scopy::ICmdExecutor *m_executor;
+	bool m_running = false;
 };
 
 } // namespace scopy::adalm2000

@@ -39,6 +39,17 @@
 
 Q_LOGGING_CATEGORY(CAT_M2KDIO_CONTROLLER, "M2kDigitalIoController")
 
+namespace {
+
+void settle(scopy::component::Attribute *attr)
+{
+	if(attr && attr->readCapability()) {
+		attr->readCapability()->readAsync();
+	}
+}
+
+} // namespace
+
 using namespace scopy;
 using namespace scopy::adalm2000;
 
@@ -102,6 +113,48 @@ M2kDigitalIoController::M2kDigitalIoController(component::Context *ctx, QObject 
 	m_outputEnabledAttr = component::attributeByName(dev, "output_enabled");
 	if(!m_gpiAttr || !m_outputEnabledAttr) {
 		qWarning(CAT_M2KDIO_CONTROLLER) << "digital device is missing gpi or output_enabled";
+	}
+
+	wireSiblingSettle();
+}
+
+// A group attribute and its eight pin attributes alias one dio::PinState, but
+// Attribute only re-reads the attribute that was written -- so a group write left
+// the pin caches stale and vice versa. Everything downstream reads those caches:
+// the bound switches, DigitalIO_API's getters, and snapshot() via isShorted.
+// Converges in one round: setCachedValue is change-gated and every reader reads
+// the same shadow, so the settling read never changes anything itself.
+void M2kDigitalIoController::wireSiblingSettle()
+{
+	for(int group = 0; group < dio::GROUP_COUNT; ++group) {
+		const int base = dio::groupBase(group);
+
+		if(m_groupDirection[group]) {
+			connect(m_groupDirection[group], &component::Attribute::valueChanged, this, [this, base]() {
+				for(int i = 0; i < dio::PINS_PER_GROUP; ++i) {
+					settle(m_pinDirection[base + i]);
+				}
+			});
+		}
+		if(m_groupValue[group]) {
+			connect(m_groupValue[group], &component::Attribute::valueChanged, this, [this, base]() {
+				for(int i = 0; i < dio::PINS_PER_GROUP; ++i) {
+					settle(m_pinValue[base + i]);
+				}
+			});
+		}
+
+		for(int i = 0; i < dio::PINS_PER_GROUP; ++i) {
+			const int pin = base + i;
+			if(m_pinDirection[pin]) {
+				connect(m_pinDirection[pin], &component::Attribute::valueChanged, this,
+					[this, group]() { settle(m_groupDirection[group]); });
+			}
+			if(m_pinValue[pin]) {
+				connect(m_pinValue[pin], &component::Attribute::valueChanged, this,
+					[this, group]() { settle(m_groupValue[group]); });
+			}
+		}
 	}
 }
 
