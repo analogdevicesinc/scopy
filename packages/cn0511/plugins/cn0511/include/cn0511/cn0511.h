@@ -31,6 +31,7 @@
 #include <animatedrefreshbtn.h>
 #include <iio-widgets/iiowidgetbuilder.h>
 #include <QCoro/QCoroTask>
+#include <QFuture>
 
 namespace scopy {
 class IIOWidgetGroup;
@@ -73,6 +74,7 @@ private:
 	int m_amplitude = 0;
 
 	QCoro::Task<void> m_refreshTask;
+	QFuture<void> m_calibFuture;
 
 	QWidget *generateSingleToneSection(QWidget *parent);
 	QWidget *generateDacAmpSection(QWidget *parent);

@@ -108,6 +108,10 @@ CN0511::~CN0511()
 		QCoro::waitFor(m_refreshTask);
 	}
 	m_refreshTask = {};
+
+	if(m_calibFuture.isRunning()) {
+		m_calibFuture.waitForFinished();
+	}
 }
 
 QWidget *CN0511::generateSingleToneSection(QWidget *parent)
@@ -172,6 +176,8 @@ QWidget *CN0511::generateDacAmpSection(QWidget *parent)
 
 	QVBoxLayout *layout = new QVBoxLayout(widget);
 	widget->setLayout(layout);
+	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setSpacing(10);
 
 	QLabel *titleLabel = new QLabel("DAC Amplifier", widget);
 	Style::setStyle(titleLabel, style::properties::label::menuBig);
@@ -186,8 +192,10 @@ QWidget *CN0511::generateDacAmpSection(QWidget *parent)
 					   .group(m_group)
 					   .buildSingle();
 
-		m_dacAmpEnWidget->showProgressBar(false);
-		layout->addWidget(m_dacAmpEnWidget);
+		if(m_dacAmpEnWidget) {
+			m_dacAmpEnWidget->showProgressBar(false);
+			layout->addWidget(m_dacAmpEnWidget);
+		}
 	}
 
 	return widget;
@@ -219,6 +227,7 @@ void CN0511::applyCalibration()
 	}
 
 	m_enterBtn->startAnimation();
+	m_refreshButton->setEnabled(false);
 
 	double calibFreq = m_calibFreq;
 	int amplitude = m_amplitude;
@@ -228,11 +237,12 @@ void CN0511::applyCalibration()
 		watcher, &QFutureWatcher<void>::finished, this,
 		[this, watcher]() {
 			m_enterBtn->stopAnimation();
+			m_refreshButton->setEnabled(true);
 			watcher->deleteLater();
 		},
 		Qt::QueuedConnection);
 
-	QFuture<void> future = QtConcurrent::run([rawCtx, rawDac, rawDacCh, calibFreq, amplitude]() {
+	m_calibFuture = QtConcurrent::run([rawCtx, rawDac, rawDacCh, calibFreq, amplitude]() {
 		qDebug(CAT_CN0511) << "Applying calibration: freq=" << calibFreq << " amplitude=" << amplitude;
 
 		struct ad9166_calibration_data *calibData = nullptr;
@@ -258,7 +268,7 @@ void CN0511::applyCalibration()
 		}
 	});
 
-	watcher->setFuture(future);
+	watcher->setFuture(m_calibFuture);
 }
 
 void CN0511::refresh()
@@ -272,6 +282,7 @@ void CN0511::refresh()
 		m_dacAmpEnWidget->readAsync();
 	}
 
+	m_enterBtn->setEnabled(false);
 	m_refreshButton->startAnimation();
 	m_refreshTask = readFrequencyFromDevice();
 }
@@ -280,6 +291,7 @@ QCoro::Task<void> CN0511::readFrequencyFromDevice()
 {
 	if(!m_dacCh || !m_freqSpinBox) {
 		m_refreshButton->stopAnimation();
+		m_enterBtn->setEnabled(true);
 		co_return;
 	}
 
@@ -287,6 +299,7 @@ QCoro::Task<void> CN0511::readFrequencyFromDevice()
 	if(!attr || !attr->readCapability()) {
 		qWarning(CAT_CN0511) << "nco_frequency is not readable";
 		m_refreshButton->stopAnimation();
+		m_enterBtn->setEnabled(true);
 		co_return;
 	}
 
@@ -294,6 +307,7 @@ QCoro::Task<void> CN0511::readFrequencyFromDevice()
 	if(!response) {
 		qWarning(CAT_CN0511) << "Failed to read nco_frequency. Error:" << response.error().message;
 		m_refreshButton->stopAnimation();
+		m_enterBtn->setEnabled(true);
 		co_return;
 	}
 
@@ -302,9 +316,11 @@ QCoro::Task<void> CN0511::readFrequencyFromDevice()
 	if(!ok) {
 		qWarning(CAT_CN0511) << "Could not parse nco_frequency:" << response.value();
 		m_refreshButton->stopAnimation();
+		m_enterBtn->setEnabled(true);
 		co_return;
 	}
 
 	m_freqSpinBox->setValue(val / MHZ_SCALE);
 	m_refreshButton->stopAnimation();
+	m_enterBtn->setEnabled(true);
 }
