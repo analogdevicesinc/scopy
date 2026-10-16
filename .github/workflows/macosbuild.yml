@@ -9,20 +9,25 @@ env:
 
 jobs:
   build:
-    runs-on: ${{ matrix.runner }}
-    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.platform.runner }}
+    name: ${{ matrix.platform.name }} (libiio v${{ matrix.libiio }})
     timeout-minutes: 120
 
     strategy:
       fail-fast: false
       matrix:
-        include:
+        platform:
           - runner: macos-15
             name: macOS 15 Qt6 (ARM64)
             artifact: Scopy-macOS15-arm64-qt6
           - runner: macos-15-large
             name: macOS 15 Qt6 (Intel)
             artifact: Scopy-macOS15-x86_64-qt6
+        # libiio v1 is the default build; each job builds only the libiio it needs.
+        libiio: ['1', '0']
+
+    env:
+      SCOPY_LIBIIO_VERSION: ${{ matrix.libiio }}
 
     steps:
         - uses: actions/checkout@v6
@@ -48,7 +53,7 @@ jobs:
         - uses: actions/upload-artifact@v7
           if: always()
           with:
-            name: ${{ matrix.artifact }}-${{ env.commit_sha }}
+            name: ${{ matrix.platform.artifact }}${{ matrix.libiio == '0' && '-libiio-v0' || '' }}-${{ env.commit_sha }}
             path: |
               build/Scopy.dmg
               build/ScopyApp.zip
