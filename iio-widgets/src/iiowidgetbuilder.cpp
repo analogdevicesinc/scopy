@@ -171,7 +171,8 @@ IIOWidget *IIOWidgetBuilder::buildSingle()
 	return widget;
 #else
 	Q_UNUSED(availableAttr)
-	qWarning(CAT_ATTRBUILDER) << "No component attribute set (raw libiio strategies are only built with libiio v0).";
+	qWarning(CAT_ATTRBUILDER)
+		<< "No component attribute set (raw libiio strategies are only built with libiio v0).";
 	return nullptr;
 #endif
 }
@@ -312,7 +313,8 @@ QList<IIOWidget *> IIOWidgetBuilder::buildAll()
 	Q_UNUSED(attrCount)
 	Q_UNUSED(attrName)
 	Q_UNUSED(availableAttr)
-	qWarning(CAT_ATTRBUILDER) << "No component container set (raw libiio strategies are only built with libiio v0).";
+	qWarning(CAT_ATTRBUILDER)
+		<< "No component container set (raw libiio strategies are only built with libiio v0).";
 	return result;
 #endif
 }
