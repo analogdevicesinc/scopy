@@ -40,7 +40,6 @@
 #include "search.hpp"
 #include "utils.hpp"
 
-
 #include <QLineEdit>
 #include <QPushButton>
 #include <qboxlayout.h>
