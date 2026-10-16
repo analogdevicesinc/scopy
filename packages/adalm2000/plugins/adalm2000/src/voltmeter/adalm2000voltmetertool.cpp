@@ -20,6 +20,7 @@
 
 #include "adalm2000voltmetertool.h"
 
+#include "m2kcalibration.h"
 #include "m2kcomponentbuilder.h"
 #include "m2kcontext.h"
 #include "m2kvoltmetercontroller.h"
@@ -344,6 +345,15 @@ void Adalm2000VoltmeterTool::setupUi()
 	m_tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	connect(m_runBtn, &QAbstractButton::toggled, m_tme, &ToolMenuEntry::setRunning);
 	connect(m_tme, &ToolMenuEntry::runToggled, m_runBtn, &QAbstractButton::setChecked);
+
+	if(auto *calibration = m_ctx->findChild<M2kCalibration *>()) {
+		connect(calibration, &M2kCalibration::started, this, [this]() {
+			m_runBtn->setChecked(false);
+			m_runBtn->setEnabled(false);
+		});
+		connect(calibration, &M2kCalibration::finished, this, [this](bool) { m_runBtn->setEnabled(true); });
+		m_runBtn->setEnabled(!calibration->isRunning());
+	}
 
 	m_gearBtn = new GearBtn(this);
 	m_gearBtn->setCheckable(true);

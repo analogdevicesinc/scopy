@@ -29,12 +29,17 @@
 
 #include <component/device.h>
 #include <iio-widgets/iiowidgetgroup.h>
+#include <pluginbase/statusbarmanager.h>
 #include <style.h>
 
 #include <QLabel>
 #include <QLoggingCategory>
 
 Q_LOGGING_CATEGORY(CAT_ADALM2000PLUGIN, "Adalm2000Plugin")
+
+// The Power Supply is absent on purpose: its rails are enabled individually from its
+// settings menu, so it has no run button for a ToolMenuEntry run state to mirror.
+static const QStringList RUN_CAPABLE_TOOL_IDS = {"adalm2000_dmm", "adalm2000_dio"};
 
 using namespace scopy;
 using namespace scopy::adalm2000;
@@ -109,32 +114,37 @@ bool Adalm2000Plugin::onConnect()
 	m_toolList[2]->setTool(dioTool);
 
 	for(auto &entry : m_toolList) {
-		entry->setEnabled(false);
+		entry->setEnabled(true);
 	}
-	calibrateAsync();
+	setToolsRunLocked(true);
+
+	auto *calibration = m_context->findChild<M2kCalibration *>();
+	if(!calibration) {
+		qWarning(CAT_ADALM2000PLUGIN) << "no calibration service on the context";
+		setToolsRunLocked(false);
+		return true;
+	}
+
+	connect(calibration, &M2kCalibration::started, this, [this]() { setToolsRunLocked(true); });
+	connect(calibration, &M2kCalibration::finished, this, [this](bool ok) {
+		setToolsRunLocked(false);
+		if(!ok) {
+			qWarning(CAT_ADALM2000PLUGIN) << "calibration failed; proceeding with uncalibrated readings";
+			StatusBarManager::pushUrgentMessage("Calibration failed");
+		}
+	});
+	calibration->run();
 	return true;
 }
 
-QCoro::Task<void> Adalm2000Plugin::calibrateAsync()
+void Adalm2000Plugin::setToolsRunLocked(bool locked)
 {
-	auto *m2kCtx = qobject_cast<M2kContext *>(m_context.get());
-	if(!m2kCtx) {
-		co_return;
-	}
-
-	M2kCalibration calibration(m2kCtx, this);
-	m_calibrated = co_await calibration.run();
-
-	for(auto &entry : m_toolList) {
-		entry->setEnabled(true);
-	}
-	// The Power Supply has no run button: its rails are enabled individually from
-	// its settings menu, so there is no single state for one to mirror.
-	m_toolList[0]->setRunBtnVisible(true);
-	m_toolList[2]->setRunBtnVisible(true);
-
-	if(!m_calibrated) {
-		qWarning(CAT_ADALM2000PLUGIN) << "proceeding with uncalibrated readings";
+	for(ToolMenuEntry *tme : std::as_const(m_toolList)) {
+		if(!RUN_CAPABLE_TOOL_IDS.contains(tme->id())) {
+			continue;
+		}
+		tme->setRunEnabled(!locked);
+		tme->setRunBtnVisible(!locked);
 	}
 }
 

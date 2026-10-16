@@ -83,6 +83,7 @@ Q_SIGNALS:
 private:
 	QCoro::Task<void> pollOnce();
 	dio::PinState snapshot() const;
+	void wireSiblingSettle();
 
 	component::Context *m_ctx;
 	component::Attribute *m_pinDirection[dio::PIN_COUNT] = {};
