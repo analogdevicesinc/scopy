@@ -16,6 +16,7 @@ source $REPO_SRC/ci/macOS/macos_config.sh
 # Build IIO Emulator
 # =================
 # Virtual IIO device for testing without hardware
+# libiio v0 emulator (libtinyiiod based). libiio v1 builds ship iiod-emu, installed with libiio itself.
 build_iio-emu(){
 	echo "### Clone and Build IIO-Emulator"
 	pushd $REPO_SRC
@@ -45,7 +46,7 @@ build_iio-emu(){
 }
 
 build_scopy(){
-	echo "### Building Scopy"
+	echo "### Building Scopy - libiio v$SCOPY_LIBIIO_VERSION"
 	ls -la $REPO_SRC
 	pushd $REPO_SRC
 
@@ -69,6 +70,7 @@ build_scopy(){
 		-DENABLE_PLUGIN_ADC=OFF \
 		-DWITH_SIGROK=OFF \
 		-DWITH_PYTHON=OFF \
+		-DSCOPY_LIBIIO_VERSION=$SCOPY_LIBIIO_VERSION \
 		../
 	CFLAGS=-I${STAGING_AREA_DEPS}/include LDFLAGS=-L${STAGING_AREA_DEPS}/lib make ${JOBS}
 	otool -l ./Scopy.app/Contents/MacOS/Scopy
@@ -76,5 +78,7 @@ build_scopy(){
 	popd
 }
 
-build_iio-emu
+if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
+	build_iio-emu
+fi
 build_scopy

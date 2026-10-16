@@ -22,9 +22,13 @@ PREFIXED_SEARCH_PATHS=()
 for p in "${SEARCH_PATHS[@]}"; do
     PREFIXED_SEARCH_PATHS+=(--search-path $p)
 done
+# libiio v0 ships as frameworks (iio, ad9361) that dylibbundler cannot copy, so they are copied and fixed by hand
+# below. libiio v1 is built as plain dylibs (see install_macos_deps.sh) and bundled by dylibbundler like the rest.
 echo "### Copy DLLs to Frameworks folder"
-cp -avR $STAGING_AREA_DEPS/lib/iio.framework Scopy.app/Contents/Frameworks/
-cp -avR $STAGING_AREA_DEPS/lib/ad9361.framework Scopy.app/Contents/Frameworks/
+if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
+	cp -avR $STAGING_AREA_DEPS/lib/iio.framework Scopy.app/Contents/Frameworks/
+	cp -avR $STAGING_AREA_DEPS/lib/ad9361.framework Scopy.app/Contents/Frameworks/
+fi
 cp -avR $STAGING_AREA_DEPS/lib/genalyzer.framework Scopy.app/Contents/Frameworks/
 mkdir -p $BUILDDIR/Scopy.app/Contents/MacOS/plugins/resources
 
@@ -41,16 +45,18 @@ do
 done
 
 
-iiorpath="$(otool -D ./Scopy.app/Contents/Frameworks/iio.framework/iio | grep @rpath)"
-iioid=${iiorpath#"@rpath/"}
+if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
+	iiorpath="$(otool -D ./Scopy.app/Contents/Frameworks/iio.framework/iio | grep @rpath)"
+	iioid=${iiorpath#"@rpath/"}
 
-ad9361rpath="$(otool -D ./Scopy.app/Contents/Frameworks/ad9361.framework/ad9361 | grep @rpath)"
-ad9361id=${ad9361rpath#"@rpath/"}
+	ad9361rpath="$(otool -D ./Scopy.app/Contents/Frameworks/ad9361.framework/ad9361 | grep @rpath)"
+	ad9361id=${ad9361rpath#"@rpath/"}
 
-libusbpath="$(otool -L ./Scopy.app/Contents/Frameworks/iio.framework/iio | grep libusb | cut -d " " -f 1 | awk '{$1=$1};1')"
-libusbid="$(echo ${libusbpath} | rev | cut -d "/" -f 1 | rev)"
-cp ${libusbpath} ./Scopy.app/Contents/Frameworks/
-chmod 755 ./Scopy.app/Contents/Frameworks/libusb*dylib
+	libusbpath="$(otool -L ./Scopy.app/Contents/Frameworks/iio.framework/iio | grep libusb | cut -d " " -f 1 | awk '{$1=$1};1')"
+	libusbid="$(echo ${libusbpath} | rev | cut -d "/" -f 1 | rev)"
+	cp ${libusbpath} ./Scopy.app/Contents/Frameworks/
+	chmod 755 ./Scopy.app/Contents/Frameworks/libusb*dylib
+fi
 
 # Copy libm2k if it exists (M2K package is disabled but deps are still built)
 m2kpath=${STAGING_AREA_DEPS}/lib/libm2k.?.?.?.dylib
@@ -110,29 +116,31 @@ dylibbundler -ns -of -b \
 	"${PREFIXED_SEARCH_PATHS[@]}"
 
 
-echo "### Fixing the frameworks dylibbundler failed to copy"
-echo "=== Fixing iio.framework"
-install_name_tool -id @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/iio.framework/iio
-install_name_tool -id @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/${iioid}
-install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/MacOS/Scopy
-for dylib in ${SCOPYLIBS} ${SCOPYPLUGINS}
-do
-	otool -L $dylib
-	[ -z "$(otool -L ${dylib}| grep iio.framework)" ] && echo "SKIP ${dylib##*/}" || install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ${dylib}
-done
+if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
+	echo "### Fixing the frameworks dylibbundler failed to copy"
+	echo "=== Fixing iio.framework"
+	install_name_tool -id @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/iio.framework/iio
+	install_name_tool -id @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/${iioid}
+	install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/MacOS/Scopy
+	for dylib in ${SCOPYLIBS} ${SCOPYPLUGINS}
+	do
+		otool -L $dylib
+		[ -z "$(otool -L ${dylib}| grep iio.framework)" ] && echo "SKIP ${dylib##*/}" || install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ${dylib}
+	done
 
 
-echo "=== Fixing ad9361.framework"
-install_name_tool -id @executable_path/../Frameworks/${ad9361id} ./Scopy.app/Contents/Frameworks/ad9361.framework/ad9361
-install_name_tool -id @executable_path/../Frameworks/${ad9361id} ./Scopy.app/Contents/Frameworks/${ad9361id}
-install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/${ad9361id}
-if ls ./Scopy.app/Contents/Frameworks/libgnuradio-iio* 1>/dev/null 2>&1; then
-	install_name_tool -change ${ad9361rpath} @executable_path/../Frameworks/${ad9361id} ./Scopy.app/Contents/Frameworks/libgnuradio-iio*
+	echo "=== Fixing ad9361.framework"
+	install_name_tool -id @executable_path/../Frameworks/${ad9361id} ./Scopy.app/Contents/Frameworks/ad9361.framework/ad9361
+	install_name_tool -id @executable_path/../Frameworks/${ad9361id} ./Scopy.app/Contents/Frameworks/${ad9361id}
+	install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/${ad9361id}
+	if ls ./Scopy.app/Contents/Frameworks/libgnuradio-iio* 1>/dev/null 2>&1; then
+		install_name_tool -change ${ad9361rpath} @executable_path/../Frameworks/${ad9361id} ./Scopy.app/Contents/Frameworks/libgnuradio-iio*
+	fi
+
+	echo "=== Fixing libusb"
+	install_name_tool -id @executable_path/../Frameworks/${libusbid} ./Scopy.app/Contents/Frameworks/${libusbid}
+	install_name_tool -change ${libusbpath} @executable_path/../Frameworks/${libusbid} ./Scopy.app/Contents/Frameworks/iio.framework/iio
 fi
-
-echo "=== Fixing libusb"
-install_name_tool -id @executable_path/../Frameworks/${libusbid} ./Scopy.app/Contents/Frameworks/${libusbid}
-install_name_tool -change ${libusbpath} @executable_path/../Frameworks/${libusbid} ./Scopy.app/Contents/Frameworks/iio.framework/iio
 
 if ls ./Scopy.app/Contents/Frameworks/libsigrokdecode* 1>/dev/null 2>&1; then
 	echo "=== Fixing python"
@@ -150,10 +158,12 @@ if ls ./Scopy.app/Contents/Frameworks/libsigrokdecode* 1>/dev/null 2>&1; then
 fi
 
 
-echo "=== Fixing libserialport"
-libserialportpath="$(otool -L ./Scopy.app/Contents/Frameworks/iio.framework/iio | grep libserialport | cut -d " " -f 1 | awk '{$1=$1};1')"
-libserialportid="$(echo ${libserialportpath} | rev | cut -d "/" -f 1 | rev)"
-install_name_tool -change ${libserialportpath} @executable_path/../Frameworks/${libserialportid} ./Scopy.app/Contents/Frameworks/iio.framework/iio
+if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
+	echo "=== Fixing libserialport"
+	libserialportpath="$(otool -L ./Scopy.app/Contents/Frameworks/iio.framework/iio | grep libserialport | cut -d " " -f 1 | awk '{$1=$1};1')"
+	libserialportid="$(echo ${libserialportpath} | rev | cut -d "/" -f 1 | rev)"
+	install_name_tool -change ${libserialportpath} @executable_path/../Frameworks/${libserialportid} ./Scopy.app/Contents/Frameworks/iio.framework/iio
+fi
 
 # Fix libm2k references if it was copied
 if ls ./Scopy.app/Contents/Frameworks/libm2k.?.?.?.dylib 1>/dev/null 2>&1; then
@@ -174,10 +184,17 @@ if ls ./Scopy.app/Contents/Frameworks/libgnuradio-scopy* 1>/dev/null 2>&1; then
 	fi
 fi
 
-echo "=== Fixing iio-emu + libtinyiiod"
-cp $REPO_SRC/iio-emu/build/iio-emu ./Scopy.app/Contents/MacOS/
+# Emulator: iiod-emu (from libiio v1) or iio-emu + libtinyiiod (libiio v0)
+if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
+	EMU_BIN=iio-emu
+	cp $REPO_SRC/iio-emu/build/iio-emu ./Scopy.app/Contents/MacOS/
+else
+	EMU_BIN=iiod-emu
+	cp $STAGING_AREA_DEPS/bin/iiod-emu ./Scopy.app/Contents/MacOS/
+fi
+echo "=== Fixing $EMU_BIN"
 dylibbundler -ns -of -b \
-	--fix-file $BUILDDIR/Scopy.app/Contents/MacOS/iio-emu \
+	--fix-file $BUILDDIR/Scopy.app/Contents/MacOS/$EMU_BIN \
 	--dest-dir $BUILDDIR/Scopy.app/Contents/Frameworks/ \
 	--install-path @executable_path/../Frameworks/ \
 	"${PREFIXED_SEARCH_PATHS[@]}"
@@ -216,7 +233,7 @@ if [ "$(uname -m)" = "arm64" ]; then
 	find Scopy.app -name "*.dylib" -exec codesign --force --sign - {} \;
 	find Scopy.app -name "*.so" -exec codesign --force --sign - {} \;
 	find Scopy.app -name "*.framework" -exec codesign --force --sign - {} \;
-	codesign --force --sign - Scopy.app/Contents/MacOS/iio-emu
+	codesign --force --sign - Scopy.app/Contents/MacOS/$EMU_BIN
 	codesign --force --sign - Scopy.app/Contents/MacOS/Scopy
 fi
 
