@@ -169,6 +169,9 @@ void AcqDigitalChannel::readData(scopy::acq::DataStore *store, int plotSize)
 	// is one allocation per cycle, against a quint8 per sample.
 	const QVector<quint8> bits = scopy::acq::toBits(windowFor(key(), plotSize));
 	if(bits.isEmpty()) {
+		if(AcqPlot *owner = plotOwner()) {
+			owner->setBufferEdges(this, {});
+		}
 		return;
 	}
 
@@ -183,6 +186,23 @@ void AcqDigitalChannel::readData(scopy::acq::DataStore *store, int plotSize)
 	// would be silently dropped.
 	m_item->setSampleCount(static_cast<quint64>(qMax(1, plotSize)));
 	m_item->setSamples(bits);
+
+	// Buffer markers, as AcqCurveChannel reports them. X is the sample index scaled by the
+	// stride DigitalCurveItem::draw lays the bits out with, so they line up with the track
+	// even while a partial window is stretched across the plot.
+	AcqPlot *owner = plotOwner();
+	if(owner && owner->wantsBufferEdges(this)) {
+		const double stride = static_cast<double>(qMax(1, plotSize)) / static_cast<double>(bits.size());
+		QVector<double> edges;
+		if(const auto starts = bufferStartsFor(key(), bits.size())) {
+			edges.append(0.0);
+			for(int p : *starts) {
+				edges.append(p * stride);
+			}
+			edges.append((bits.size() - 1) * stride);
+		}
+		owner->setBufferEdges(this, edges);
+	}
 }
 
 void AcqDigitalChannel::reset()

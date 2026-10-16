@@ -38,11 +38,13 @@ namespace scopy {
 class CursorController;
 class CursorSettings;
 class PlotAxis;
+class PlotChannel;
 class PlotLegend;
 class PlotWidget;
 
 namespace adc {
 
+class AcqBufferBand;
 class AcqChannel;
 
 // One plot in the manager's dock area: a plot widget and the axes its channels draw
@@ -138,6 +140,21 @@ public:
 	bool showCursors() const { return m_showCursors; }
 	void setShowCursors(bool on);
 
+	// Buffer markers, for a window wider than one acquired buffer: a dashed line at each
+	// boundary and a strip of numbered blocks, one per buffer, along the bottom. Drawn for
+	// one channel only — buffer sizes differ between sources — the selected curve or logic
+	// track, else the first enabled one.
+	bool showBufferStarts() const { return m_showBufferStarts; }
+	void setShowBufferStarts(bool on);
+	// Whether `ch` is the channel to report this frame's edges.
+	bool wantsBufferEdges(const AcqChannel *ch) const;
+	// N buffers as N+1 edges in the channel's X units, oldest first; empty clears. Taken
+	// only from the source, so a sibling cannot overwrite it — except that the last
+	// source may always clear, which is how its markers leave with it.
+	void setBufferEdges(const AcqChannel *from, const QVector<double> &edges);
+	// What is drawn now; empty while nothing is.
+	QVector<double> bufferEdges() const;
+
 public Q_SLOTS:
 	void replot();
 
@@ -147,6 +164,7 @@ Q_SIGNALS:
 	void showLabelsChanged(bool on);
 	void showLegendChanged(bool on);
 	void showCursorsChanged(bool on);
+	void showBufferStartsChanged(bool on);
 
 private:
 	QPointer<scopy::PlotWidget> m_plot;
@@ -177,12 +195,16 @@ private:
 	bool m_showLabels{true};
 	bool m_showLegend{false};
 	bool m_showCursors{false};
+	bool m_showBufferStarts{false};
 
 	// All created on demand and parented to this object. QPointer because the legend is
 	// also a child of the plot widget, which can be destroyed first.
 	QPointer<scopy::PlotLegend> m_legend;
 	QPointer<scopy::CursorController> m_cursors;
 	QPointer<scopy::CursorSettings> m_cursorSettings;
+	// Attached to the plot on first use; the plot deletes it if it goes first.
+	AcqBufferBand *m_bufferBand{nullptr};
+	const AcqChannel *m_bufferFrom{nullptr};
 };
 
 } // namespace adc

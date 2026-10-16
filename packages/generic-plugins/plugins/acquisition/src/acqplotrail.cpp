@@ -178,7 +178,7 @@ QWidget *AcqPlotRail::createViewSection(AcqPlot *p, QWidget *parent)
 {
 	MenuSectionCollapseWidget *section = m_shell->createMenuSection(tr("VIEW"), SO_VIEW, parent);
 
-	// All three are per plot, so all three are on the plot's own page rather than on a
+	// All of these are per plot, so all are on the plot's own page rather than on a
 	// bottom-rail button shared by every plot — which is what the cursors used to be.
 	MenuOnOffSwitch *labelsSw = new MenuOnOffSwitch(tr("Show plot labels"), section);
 	labelsSw->onOffswitch()->setChecked(p->showLabels());
@@ -189,6 +189,11 @@ QWidget *AcqPlotRail::createViewSection(AcqPlot *p, QWidget *parent)
 	legendSw->onOffswitch()->setChecked(p->showLegend());
 	connect(legendSw->onOffswitch(), &QAbstractButton::toggled, p, [p](bool on) { p->setShowLegend(on); });
 	section->add(legendSw);
+
+	MenuOnOffSwitch *buffersSw = new MenuOnOffSwitch(tr("Show buffers"), section);
+	buffersSw->onOffswitch()->setChecked(p->showBufferStarts());
+	connect(buffersSw->onOffswitch(), &QAbstractButton::toggled, p, [p](bool on) { p->setShowBufferStarts(on); });
+	section->add(buffersSw);
 
 	MenuOnOffSwitch *cursorSw = new MenuOnOffSwitch(tr("Show cursors"), section);
 	cursorSw->onOffswitch()->setChecked(p->showCursors());

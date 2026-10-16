@@ -347,6 +347,13 @@ protected:
 	// from empty.
 	std::optional<scopy::acq::SampleVariant> latestFor(const scopy::acq::DataKey &k) const;
 
+	// Where each acquired buffer starts inside a live window of `n` samples of `k`, as
+	// window indices in (0, n); empty when one buffer covers the window. A live window ends
+	// where the newest buffer does, and every buffer of a run is the same size, so the
+	// starts are n - c, n - 2c, ... nullopt on a trigger fire, whose window is cut
+	// mid-buffer, so that nothing is drawn rather than something wrong.
+	std::optional<QVector<int>> bufferStartsFor(const scopy::acq::DataKey &k, int n) const;
+
 	// latestFor() narrowed to one alternative, DataStore::latestAs<>()'s counterpart:
 	// nullopt on a type mismatch, because the narrowing is also the check that the key is
 	// a stream the caller can draw.
