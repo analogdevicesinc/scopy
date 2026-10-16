@@ -22,7 +22,10 @@
 
 #include "diogroupwidget.h"
 #include "digitalio_api.h"
+#include "m2kcalibration.h"
 #include "m2kdigitaliocontroller.h"
+
+#include <component/context.h>
 
 #include <QDesktopServices>
 #include <QLoggingCategory>
@@ -122,6 +125,12 @@ void Adalm2000DigitalIoTool::setupUi()
 	});
 	connect(m_runBtn, &QAbstractButton::toggled, m_tme, &ToolMenuEntry::setRunning);
 	connect(m_tme, &ToolMenuEntry::runToggled, m_runBtn, &QAbstractButton::setChecked);
+
+	if(auto *calibration = m_ctx->findChild<M2kCalibration *>()) {
+		connect(calibration, &M2kCalibration::started, this, [this]() { m_runBtn->setEnabled(false); });
+		connect(calibration, &M2kCalibration::finished, this, [this](bool) { m_runBtn->setEnabled(true); });
+		m_runBtn->setEnabled(!calibration->isRunning());
+	}
 
 	QWidget *central = new QWidget(this);
 	QVBoxLayout *centralLayout = new QVBoxLayout(central);
