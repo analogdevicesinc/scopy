@@ -72,9 +72,9 @@ if(ENABLE_TESTING)
 	add_subdirectory(test)
 endif()
 
-# FMCOMMS5 calibration and the MCS sync use the libiio v0 API directly (and libad9361, which is built on
-# libiio v0). They are compiled only when Scopy is built against libiio v0 (SCOPY_LIBIIO_VERSION=0); with
-# libiio v1 they are left out, so no libiio v0 code ends up in the process.
+# FMCOMMS5 calibration and the MCS sync use the libiio v0 API directly (and libad9361, which is built on libiio v0).
+# They are compiled only when Scopy is built against libiio v0 (SCOPY_LIBIIO_VERSION=0); with libiio v1 they are left
+# out, so no libiio v0 code ends up in the process.
 if(SCOPY_LIBIIO_VERSION STREQUAL "0")
 	find_library(AD9361_LIBRARIES NAMES ad9361 libad9361 REQUIRED)
 	find_path(AD9361_INCLUDE_DIRS ad9361.h REQUIRED)
