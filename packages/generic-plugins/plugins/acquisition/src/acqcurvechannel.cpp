@@ -124,6 +124,7 @@ void AcqCurveChannel::readData(scopy::acq::DataStore *store, int plotSize)
 	m_live = windowFor(key(), plotSize);
 	const scopy::acq::FloatView y = scopy::acq::toFloatView(m_live, m_scratch);
 	if(y.size <= 0) {
+		blankCurve();
 		return;
 	}
 
@@ -133,6 +134,7 @@ void AcqCurveChannel::readData(scopy::acq::DataStore *store, int plotSize)
 	// with the Y read above and one would overwrite the other.
 	m_xData = windowFloatFor(xKey(), plotSize);
 	if(m_xData.isEmpty()) {
+		blankCurve();
 		return;
 	}
 
@@ -191,12 +193,14 @@ void AcqCurveChannel::readData(scopy::acq::DataStore *store, int plotSize)
 
 	const int n = qMin(y.size, xCount);
 	if(n <= 0) {
+		blankCurve();
 		return;
 	}
 
-	// copy=true: Qwt keeps its own buffer, so no FloatView outlives this call and
-	// nothing can paint a prior run's tail.
-	m_ch->setSamples(xPtr, y.data, static_cast<size_t>(n), true);
+	// copy=false: Qwt borrows the members' buffers until the next setSamples. Y points
+	// into m_live (or m_scratch), X into m_xData or m_derivedX — all members, none
+	// touched again before this channel's next readData() or reset().
+	m_ch->setSamples(xPtr, y.data, static_cast<size_t>(n), false);
 
 	// The X range. Set here rather than by the manager for every mode, sample index
 	// included, which is what fixes retargeting an axis *back* to sample index: that used
@@ -229,20 +233,25 @@ void AcqCurveChannel::readData(scopy::acq::DataStore *store, int plotSize)
 
 void AcqCurveChannel::reset()
 {
+	// Blank first: the curve borrows the buffers cleared below.
+	blankCurve();
+
 	// Drop every cached window so no prior-run buffer is reachable on the next cycle.
 	m_live = scopy::acq::SampleVariant{};
 	m_scratch.clear();
 	m_xData.clear();
 	m_derivedX.clear();
 	m_derivedMode = -1;
+}
 
+void AcqCurveChannel::blankCurve()
+{
 	if(!m_ch || m_plot.isNull()) {
 		return;
 	}
-	// Blank the curve rather than leave the previous run's tail on screen. A dummy
-	// pointer with size 0, not nullptr: some Qwt paths dereference the data pointer
-	// even for empty ranges.
-	m_ch->setSamples(&m_kZero, &m_kZero, 0, true);
+	// A dummy pointer with size 0, not nullptr: some Qwt paths dereference the data
+	// pointer even for empty ranges.
+	m_ch->setSamples(&m_kZero, &m_kZero, 0, false);
 }
 
 QWidget *AcqCurveChannel::createKindSettings(QWidget *parent)
