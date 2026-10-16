@@ -27,8 +27,6 @@
 
 #include <QObject>
 
-#include <qcoro/qcorotask.h>
-
 #include <component/controller.h>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
@@ -59,11 +57,10 @@ public Q_SLOTS:
 	bool onDisconnect() override;
 
 private:
-	QCoro::Task<void> calibrateAsync();
+	void setToolsRunLocked(bool locked);
 
 	IIOWidgetGroup *m_widgetGroup = nullptr;
 	component::ContextHandle m_context;
-	bool m_calibrated = false;
 };
 
 } // namespace scopy::adalm2000
