@@ -55,9 +55,10 @@ namespace adc {
 //   3. If a view's contents must survive the call, memcpy into an owned
 //      QVector<float> — never store the pointer.
 //
-// setSamples() is called with copy=true so Qwt keeps its own buffer and no view
-// outlives readData(). If that ever changes to setRawSamples, m_live becomes live
-// storage for Qwt and reset() stops being merely cosmetic.
+// setSamples() is called with copy=false, so the curve borrows m_live/m_scratch (Y)
+// and m_xData/m_derivedX (X) until the next setSamples. That makes these members live
+// storage for Qwt: any path that reassigns or clears one must hand the curve new data
+// or blankCurve() before returning — readData()'s early returns and reset() do.
 class AcqCurveChannel : public AcqChannel
 {
 	Q_OBJECT
@@ -86,6 +87,9 @@ protected:
 	void onPlotAxisChanged(bool horizontal, scopy::PlotAxis *axis) override;
 
 private:
+	// Points the curve at m_kZero with size 0, dropping its borrow of the buffers.
+	void blankCurve();
+
 	QPointer<PlotWidget> m_plot;
 	PlotChannel *m_ch{nullptr};
 
