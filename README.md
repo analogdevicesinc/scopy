@@ -5,7 +5,7 @@
 [![Mingw build](https://github.com/analogdevicesinc/scopy/actions/workflows/mingwbuild.yml/badge.svg?branch=main)](https://github.com/analogdevicesinc/scopy/actions/workflows/mingwbuild.yml?query=branch%3Amain)
 [![macOS status](https://dev.azure.com/AnalogDevices/M2k/_apis/build/status/analogdevicesinc.scopy?branchName=main&label=Scopy%20macOS)](https://dev.azure.com/AnalogDevices/M2k/_build?definitionId=25&_a=summary&branchFilter=5915%2C5915)
 
-# Scopy [![GitHub Release](https://img.shields.io/github/release/analogdevicesinc/scopy.svg)](https://github.com/analogdevicesinc/scopy/releases/latest)  [![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://github.com/analogdevicesinc/scopy/blob/update-readme/LICENSE)
+# Scopy [![GitHub Release](https://img.shields.io/github/release/analogdevicesinc/scopy.svg)](https://github.com/analogdevicesinc/scopy/releases/latest)  [![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://github.com/analogdevicesinc/scopy/blob/update-readme/LICENSE) [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/analogdevicesinc/scopy)
 Scopy is a software oscilloscope and signal analysis toolset.
 
 ### Supported platforms
