@@ -202,6 +202,23 @@ void AcqCurveChannel::readData(scopy::acq::DataStore *store, int plotSize)
 	// touched again before this channel's next readData() or reset().
 	m_ch->setSamples(xPtr, y.data, static_cast<size_t>(n), false);
 
+	// Buffer markers. The starts are Y-window indices and the curve pairs y[i] with
+	// xPtr[i], so xPtr[] is their X in every mode.
+	AcqPlot *owner = plotOwner();
+	if(owner && owner->wantsBufferEdges(this)) {
+		QVector<double> edges;
+		if(const auto starts = bufferStartsFor(key(), y.size)) {
+			edges.append(xPtr[0]);
+			for(int p : *starts) {
+				if(p < n) {
+					edges.append(xPtr[p]);
+				}
+			}
+			edges.append(xPtr[n - 1]);
+		}
+		owner->setBufferEdges(this, edges);
+	}
+
 	// The X range. Set here rather than by the manager for every mode, sample index
 	// included, which is what fixes retargeting an axis *back* to sample index: that used
 	// to leave the previous stream's range in place until the reader touched the plot-width
@@ -252,6 +269,9 @@ void AcqCurveChannel::blankCurve()
 	// A dummy pointer with size 0, not nullptr: some Qwt paths dereference the data
 	// pointer even for empty ranges.
 	m_ch->setSamples(&m_kZero, &m_kZero, 0, false);
+	if(AcqPlot *owner = plotOwner()) {
+		owner->setBufferEdges(this, {});
+	}
 }
 
 QWidget *AcqCurveChannel::createKindSettings(QWidget *parent)

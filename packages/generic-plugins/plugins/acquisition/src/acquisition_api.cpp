@@ -717,6 +717,13 @@ void Acquisition_API::setPlotCursors(int uuid, bool on)
 	}
 }
 
+void Acquisition_API::setPlotBufferStarts(int uuid, bool on)
+{
+	if(AcqPlot *p = plot(uuid)) {
+		p->setShowBufferStarts(on);
+	}
+}
+
 void Acquisition_API::setPlotSize(int n)
 {
 	if(AcqInstrumentController *c = ctrl()) {

@@ -21,6 +21,9 @@
 
 #include "acqplot.h"
 
+#include "acqaxis.h"
+#include "acqchannel.h"
+
 #include <gui/cursorcontroller.h>
 #include <gui/plotaxis.h>
 #include <gui/plotchannel.h>
@@ -33,8 +36,13 @@
 #include <qwt_axis.h>
 #include <qwt_plot.h>
 #include <qwt_plot_canvas.h>
+#include <qwt_plot_item.h>
+#include <qwt_scale_map.h>
 
+#include <QApplication>
 #include <QDebug>
+#include <QFontMetrics>
+#include <QPainter>
 #include <QPen>
 
 using namespace scopy;
@@ -84,6 +92,11 @@ AcqPlot::~AcqPlot()
 	// not unregister itself from PlotWidget::m_plotAxis, so deleting one would leave a
 	// dangling entry for PlotNavigator to walk. They are parented to this object, so Qt
 	// frees the QObjects — which is exactly as much as is safe.
+
+	// A plot that went first has already deleted every item still attached to it.
+	if(!m_plot.isNull()) {
+		delete m_bufferBand;
+	}
 }
 
 PlotWidget *AcqPlot::plot() const { return m_plot.data(); }
@@ -107,7 +120,12 @@ void AcqPlot::addChannelRef(AcqChannel *ch)
 	m_channels.append(ch);
 }
 
-void AcqPlot::removeChannelRef(AcqChannel *ch) { m_channels.removeOne(ch); }
+void AcqPlot::removeChannelRef(AcqChannel *ch)
+{
+	m_channels.removeOne(ch);
+	// Its markers leave with it. The next source draws its own next frame.
+	setBufferEdges(ch, {});
+}
 
 bool AcqPlot::supportsPerChannelAxes() const { return plotKindPoolsAxes(m_kind); }
 
@@ -276,6 +294,152 @@ void AcqPlot::setShowCursors(bool on)
 		m_cursors->setVisible(false);
 	}
 	Q_EMIT showCursorsChanged(on);
+}
+
+// The buffer markers. One item for both the lines and the strip, so they cannot drift
+// apart. Opaque throughout — colours mixed into the background instead of alpha — so
+// drawing them costs no blending.
+class scopy::adc::AcqBufferBand : public QwtPlotItem
+{
+public:
+	AcqBufferBand()
+	{
+		setItemAttribute(QwtPlotItem::AutoScale, false);
+		setItemAttribute(QwtPlotItem::Legend, false);
+		// Under the traces, which draw at z 20.
+		setZ(19.0);
+	}
+
+	QVector<double> edges;
+	QColor line, fill, fillAlt;
+
+	void draw(QPainter *p, const QwtScaleMap &xMap, const QwtScaleMap &, const QRectF &canvas) const override
+	{
+		// Past this many buffers the blocks are slivers and the lines a wall.
+		if(edges.size() < 2 || edges.size() > 513) {
+			return;
+		}
+		const double bottom = canvas.bottom() - 3.0;
+		const double top = bottom - 16.0;
+		p->save();
+		p->setClipRect(canvas);
+
+		// Dashes in pen widths: 6 px dash, 10 px gap. Down to the strip, not through it.
+		QPen pen(line, 2);
+		pen.setDashPattern({3, 5});
+		pen.setCapStyle(Qt::FlatCap);
+		p->setPen(pen);
+		for(int i = 1; i + 1 < edges.size(); ++i) {
+			const double x = xMap.transform(edges[i]);
+			p->drawLine(QPointF(x, canvas.top()), QPointF(x, top));
+		}
+
+		QFont f = QApplication::font();
+		f.setPixelSize(10);
+		p->setFont(f);
+		const QFontMetrics fm(f);
+		for(int i = 0; i + 1 < edges.size(); ++i) {
+			const double x1 = xMap.transform(edges[i]);
+			const double x2 = xMap.transform(edges[i + 1]);
+			// 1 px in from each edge, so neighbours read as separate blocks.
+			const QRectF r(QPointF(qMin(x1, x2) + 1.0, top), QPointF(qMax(x1, x2) - 1.0, bottom));
+			if(r.width() < 1.0) {
+				continue;
+			}
+			p->setPen(Qt::NoPen);
+			p->setBrush(i % 2 ? fillAlt : fill);
+			p->drawRoundedRect(r, 3.0, 3.0);
+			const QString label = QStringLiteral("#%1").arg(i);
+			if(fm.horizontalAdvance(label) + 6 <= r.width()) {
+				p->setPen(Style::getColor(json::theme::content_default));
+				p->drawText(r, Qt::AlignCenter, label);
+			}
+		}
+		p->restore();
+	}
+};
+
+void AcqPlot::setShowBufferStarts(bool on)
+{
+	if(m_showBufferStarts == on) {
+		return;
+	}
+	m_showBufferStarts = on;
+	// The markers arrive with the next frame's read, so turning this on while stopped
+	// shows them on the next run.
+	if(!on) {
+		setBufferEdges(m_bufferFrom, {});
+	}
+	Q_EMIT showBufferStartsChanged(on);
+}
+
+bool AcqPlot::wantsBufferEdges(const AcqChannel *ch) const
+{
+	if(!m_showBufferStarts || !ch) {
+		return false;
+	}
+	PlotChannel *sel = m_plot.isNull() ? nullptr : m_plot->selectedChannel();
+	const AcqChannel *first = nullptr;
+	for(const AcqChannel *c : m_channels) {
+		// Only curves and logic tracks have buffers to mark.
+		const QString kind = c->kindName();
+		if(!c->isEnabled() || (kind != QLatin1String("CURVE") && kind != QLatin1String("DIGITAL"))) {
+			continue;
+		}
+		if(sel && c->plotChannel() == sel) {
+			return c == ch;
+		}
+		if(!first) {
+			first = c;
+		}
+	}
+	return first == ch;
+}
+
+void AcqPlot::setBufferEdges(const AcqChannel *from, const QVector<double> &edges)
+{
+	if(m_plot.isNull() || !from) {
+		return;
+	}
+	const bool clear = edges.size() < 2;
+	if(!(clear ? from == m_bufferFrom : wantsBufferEdges(from))) {
+		return;
+	}
+	m_bufferFrom = clear ? nullptr : from;
+	if(!m_bufferBand) {
+		if(clear) {
+			return;
+		}
+		m_bufferBand = new AcqBufferBand();
+		m_bufferBand->attach(m_plot->plot());
+	}
+	m_bufferBand->edges = clear ? QVector<double>{} : edges;
+	if(!clear) {
+		// The channel colour pulled toward gray, then mixed into the theme's background
+		// (the canvas is coloured by stylesheet, so QwtPlot::canvasBackground() is not it).
+		QColor fg = (from->color().isValid() ? from->color() : Style::getColor(json::theme::content_silent))
+				    .toHsl();
+		fg.setHslF(fg.hslHueF(), fg.hslSaturationF() * 0.4, fg.lightnessF());
+		fg = fg.toRgb();
+		const QColor bg = Style::getColor(json::theme::background_plot);
+		auto mix = [&](double k) {
+			return QColor::fromRgbF(fg.redF() * k + bg.redF() * (1 - k),
+						fg.greenF() * k + bg.greenF() * (1 - k),
+						fg.blueF() * k + bg.blueF() * (1 - k));
+		};
+		m_bufferBand->line = mix(0.75);
+		m_bufferBand->fill = mix(0.45);
+		m_bufferBand->fillAlt = mix(0.3);
+		// The channel's own X; the Y is unused, the strip being placed in pixels.
+		PlotAxis *x = from->xAxis() && from->xAxis()->plotAxis() ? from->xAxis()->plotAxis() : m_plot->xAxis();
+		m_bufferBand->setXAxis(x->axisId());
+	}
+	m_bufferBand->itemChanged();
+}
+
+QVector<double> AcqPlot::bufferEdges() const
+{
+	return m_bufferBand && !m_plot.isNull() ? m_bufferBand->edges : QVector<double>{};
 }
 
 void AcqPlot::replot()
