@@ -214,15 +214,17 @@ void DioGroupWidget::onModeChanged(int index)
 {
 	m_stack->setCurrentIndex(index);
 
-	// Re-writing the group direction attribute is what re-applies it to all eight
-	// pins; its writer is that fan-out.
+	// Read, never write: this is a display-mode change and must not touch the pins.
+	// Writing the cached value here used to re-apply a stale direction to all eight
+	// pins -- silently dropping outputs configured on the Individual page, or
+	// forcing pins the user had set to read into driving. The read refreshes the
+	// cache and still drives onGroupDirectionChanged, which owns m_groupIsOutput.
 	if(index != GROUP_PAGE || !m_controller) {
 		return;
 	}
 	component::Attribute *dirAttr = m_controller->groupDirection(m_groupIndex);
-	if(dirAttr && dirAttr->writeCapability()) {
-		dirAttr->writeCapability()->writeAsync(dirAttr->cachedValue().isEmpty() ? QStringLiteral("in")
-											: dirAttr->cachedValue());
+	if(dirAttr && dirAttr->readCapability()) {
+		dirAttr->readCapability()->readAsync();
 	}
 }
 

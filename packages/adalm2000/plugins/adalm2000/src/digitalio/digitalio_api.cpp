@@ -61,6 +61,16 @@ bool writeSync(component::Attribute *attr, const QString &value)
 	return true;
 }
 
+// The controller settles aliasing siblings on valueChanged, but those reads are
+// queued. A script expects the next statement to see the write, so the siblings
+// have to be settled synchronously on this path too.
+void settleSync(component::Attribute *attr)
+{
+	if(attr && attr->readCapability()) {
+		QCoro::waitFor(attr->readCapability()->readAsync());
+	}
+}
+
 } // namespace
 
 DigitalIO_API::DigitalIO_API(Adalm2000DigitalIoTool *tool)
@@ -193,8 +203,15 @@ bool DigitalIO_API::setGroupDirection(int group, bool output)
 	if(!c) {
 		return false;
 	}
-	return writeSync(c->groupDirection(group),
-			 output ? QLatin1String(dio::DIRECTION_OPTIONS[0]) : QLatin1String(dio::DIRECTION_OPTIONS[1]));
+	if(!writeSync(c->groupDirection(group),
+		      output ? QLatin1String(dio::DIRECTION_OPTIONS[0]) : QLatin1String(dio::DIRECTION_OPTIONS[1]))) {
+		return false;
+	}
+	const int base = dio::groupBase(group);
+	for(int i = 0; i < dio::PINS_PER_GROUP; ++i) {
+		settleSync(c->pinDirection(base + i));
+	}
+	return true;
 }
 
 bool DigitalIO_API::isGroupOutput(int group) const
@@ -214,7 +231,14 @@ bool DigitalIO_API::setGroupValue(int group, int value)
 		qWarning(CAT_DIGITALIO_API) << "group value" << value << "is outside 0.." << dio::GROUP_VALUE_MAX;
 		return false;
 	}
-	return writeSync(c->groupValue(group), QString::number(value));
+	if(!writeSync(c->groupValue(group), QString::number(value))) {
+		return false;
+	}
+	const int base = dio::groupBase(group);
+	for(int i = 0; i < dio::PINS_PER_GROUP; ++i) {
+		settleSync(c->pinValue(base + i));
+	}
+	return true;
 }
 
 int DigitalIO_API::groupOutput(int group) const
@@ -239,8 +263,12 @@ bool DigitalIO_API::setPinDirection(int pin, bool output)
 	if(!c) {
 		return false;
 	}
-	return writeSync(c->pinDirection(pin),
-			 output ? QLatin1String(dio::DIRECTION_OPTIONS[0]) : QLatin1String(dio::DIRECTION_OPTIONS[1]));
+	if(!writeSync(c->pinDirection(pin),
+		      output ? QLatin1String(dio::DIRECTION_OPTIONS[0]) : QLatin1String(dio::DIRECTION_OPTIONS[1]))) {
+		return false;
+	}
+	settleSync(c->groupDirection(pin / dio::PINS_PER_GROUP));
+	return true;
 }
 
 bool DigitalIO_API::setPinOutput(int pin, bool high)
@@ -249,8 +277,12 @@ bool DigitalIO_API::setPinOutput(int pin, bool high)
 	if(!c) {
 		return false;
 	}
-	return writeSync(c->pinValue(pin),
-			 high ? QLatin1String(dio::VALUE_OPTIONS[0]) : QLatin1String(dio::VALUE_OPTIONS[1]));
+	if(!writeSync(c->pinValue(pin),
+		      high ? QLatin1String(dio::VALUE_OPTIONS[0]) : QLatin1String(dio::VALUE_OPTIONS[1]))) {
+		return false;
+	}
+	settleSync(c->groupValue(pin / dio::PINS_PER_GROUP));
+	return true;
 }
 
 int DigitalIO_API::pinOutput(int pin) const
@@ -287,6 +319,9 @@ bool DigitalIO_API::setDirectionWord(int word)
 				   : QLatin1String(dio::DIRECTION_OPTIONS[1])) &&
 			ok;
 	}
+	for(int group = 0; group < dio::GROUP_COUNT; ++group) {
+		settleSync(c->groupDirection(group));
+	}
 	return ok;
 }
 
@@ -306,6 +341,9 @@ bool DigitalIO_API::setOutputWord(int word)
 		ok = writeSync(c->pinValue(pin),
 			       high ? QLatin1String(dio::VALUE_OPTIONS[0]) : QLatin1String(dio::VALUE_OPTIONS[1])) &&
 			ok;
+	}
+	for(int group = 0; group < dio::GROUP_COUNT; ++group) {
+		settleSync(c->groupValue(group));
 	}
 	return ok;
 }

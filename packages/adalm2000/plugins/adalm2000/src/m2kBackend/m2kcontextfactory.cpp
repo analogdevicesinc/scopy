@@ -20,6 +20,7 @@
 
 #include "m2kcontextfactory.h"
 
+#include "m2kcalibration.h"
 #include "m2kcomponentbuilder.h"
 #include "m2kcontext.h"
 
@@ -58,6 +59,10 @@ component::Context *M2kContextFactory::create(const QString &uri, const int maxT
 
 	auto *executor = new PooledCmdExecutor(maxThreads, ctx);
 	ctx->setExecutor(executor);
+
+	new M2kCalibration(
+		m2k, [m2k]() { return m2k->isCalibrated(); }, [m2k]() { return m2k->calibrate(); },
+		[m2k]() { return m2k->resetCalibration(); }, executor, ctx);
 
 	M2kComponentBuilder builder;
 	if(!builder.build(ctx, executor)) {
