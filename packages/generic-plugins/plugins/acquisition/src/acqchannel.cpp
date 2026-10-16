@@ -351,6 +351,23 @@ QVector<float> AcqChannel::windowFloatFor(const scopy::acq::DataKey &k, int plot
 	return scopy::acq::toFloat(windowFor(k, plotSize));
 }
 
+std::optional<QVector<int>> AcqChannel::bufferStartsFor(const scopy::acq::DataKey &k, int n) const
+{
+	if(m_snap || m_store.isNull()) {
+		return std::nullopt;
+	}
+	const std::optional<scopy::acq::SampleVariant> newest = m_store->latest(k);
+	const int c = newest ? std::visit([](const auto &v) { return int(v.size()); }, *newest) : 0;
+	if(c <= 0) {
+		return std::nullopt;
+	}
+	QVector<int> starts;
+	for(int p = n - c; p > 0; p -= c) {
+		starts.prepend(p);
+	}
+	return starts;
+}
+
 std::optional<scopy::acq::SampleVariant> AcqChannel::latestFor(const scopy::acq::DataKey &k) const
 {
 	if(m_snap) {
@@ -401,6 +418,10 @@ void AcqChannel::setEnabled(bool en)
 	}
 	m_enabled = en;
 	m_enabledBeforeVanish = en;
+	// Its buffer markers go with it; the next source draws its own next frame.
+	if(!en && m_owner) {
+		m_owner->setBufferEdges(this, {});
+	}
 	onEnabledChanged(en);
 	Q_EMIT enabledChanged(en);
 }

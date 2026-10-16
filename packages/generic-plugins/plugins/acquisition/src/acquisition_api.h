@@ -184,6 +184,9 @@ public:
 	Q_INVOKABLE void setPlotLabels(int uuid, bool on);
 	/// Show/hide a plot's cursors.
 	Q_INVOKABLE void setPlotCursors(int uuid, bool on);
+	/// Show/hide a strip of labelled blocks along the bottom of a plot, one per acquired buffer,
+	/// and a dashed vertical line at each boundary between buffers.
+	Q_INVOKABLE void setPlotBufferStarts(int uuid, bool on);
 	/// Samples shown across time plots (the visible window, may exceed bufferSize).
 	Q_INVOKABLE void setPlotSize(int n);
 	/// Samples shown across time plots.
