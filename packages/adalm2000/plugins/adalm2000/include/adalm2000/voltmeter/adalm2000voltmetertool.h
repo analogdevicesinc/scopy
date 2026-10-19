@@ -32,8 +32,6 @@
 #include <qcoro/qcorotask.h>
 
 #include <gui/widgets/toolbuttons.h>
-#include <iio-widgets/iiowidget.h>
-#include <iio-widgets/iiowidgetgroup.h>
 #include <pluginbase/toolmenuentry.h>
 #include <tooltemplate.h>
 #include <style.h>
@@ -42,6 +40,7 @@ class QTimer;
 class QVBoxLayout;
 
 namespace scopy {
+class FileBrowserWidget;
 class MenuCombo;
 class MenuOnOffSwitch;
 class PlotChannel;
@@ -61,16 +60,19 @@ class Context;
 } // namespace component
 
 namespace adalm2000 {
+class Adalm2000Voltmeter_API;
+class M2kVoltmeterCsvLogger;
 class M2kVoltmeterController;
 class M2kVoltmeterReader;
 
 class SCOPY_ADALM2000_EXPORT Adalm2000VoltmeterTool : public QWidget
 {
 	Q_OBJECT
+	friend class Adalm2000Voltmeter_API;
 
 public:
-	explicit Adalm2000VoltmeterTool(ToolMenuEntry *tme, component::Context *ctx, IIOWidgetGroup *group,
-					const QString &uri, QWidget *parent = nullptr);
+	explicit Adalm2000VoltmeterTool(ToolMenuEntry *tme, component::Context *ctx, const QString &uri,
+					QWidget *parent = nullptr);
 	~Adalm2000VoltmeterTool() override = default;
 
 private:
@@ -100,7 +102,6 @@ private:
 
 	ToolMenuEntry *m_tme;
 	component::Context *m_ctx;
-	IIOWidgetGroup *m_group;
 	QString m_uri;
 
 	ToolTemplate *m_tool = nullptr;
@@ -140,6 +141,14 @@ private:
 	bool m_peakSeen[2] = {false, false};
 
 	int m_lastRangeLow[2] = {-1, -1};
+
+	double m_lastReading[2] = {0.0, 0.0};
+
+	M2kVoltmeterCsvLogger *m_logger = nullptr;
+	MenuOnOffSwitch *m_logSwitch = nullptr;
+	scopy::FileBrowserWidget *m_logFilePath = nullptr;
+
+	Adalm2000Voltmeter_API *m_api = nullptr;
 
 	const QString m_settingsMenuId = "settings";
 };

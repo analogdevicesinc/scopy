@@ -20,9 +20,11 @@
 
 #include "adalm2000voltmetertool.h"
 
+#include "adalm2000voltmeter_api.h"
 #include "m2kcalibration.h"
 #include "m2kcomponentbuilder.h"
 #include "m2kcontext.h"
+#include "m2kvoltmetercsvlogger.h"
 #include "m2kvoltmetercontroller.h"
 #include "m2kvoltmeterreader.h"
 
@@ -41,6 +43,7 @@
 #include <gui/plotchannel.h>
 #include <gui/plotnavigator.hpp>
 #include <gui/plotwidget.h>
+#include <gui/widgets/filebrowserwidget.h>
 #include <gui/widgets/menucombo.h>
 #include <gui/widgets/menuonoffswitch.h>
 #include <gui/widgets/menuplotaxisrangecontrol.h>
@@ -49,6 +52,7 @@
 #include <gui/widgets/menuwidget.h>
 #include <gui/widgets/valuebarwidget.h>
 #include <gui/widgets/valuemonitorwidget.h>
+#include <pluginbase/scopyjs.h>
 #include <pluginbase/statusbarmanager.h>
 
 #include <component/attribute.h>
@@ -66,15 +70,20 @@ constexpr int PLOT_MIN_HEIGHT_PX = 120;
 using namespace scopy;
 using namespace scopy::adalm2000;
 
-Adalm2000VoltmeterTool::Adalm2000VoltmeterTool(ToolMenuEntry *tme, component::Context *ctx, IIOWidgetGroup *group,
-					       const QString &uri, QWidget *parent)
+Adalm2000VoltmeterTool::Adalm2000VoltmeterTool(ToolMenuEntry *tme, component::Context *ctx, const QString &uri,
+					       QWidget *parent)
 	: QWidget(parent)
 	, m_tme(tme)
 	, m_ctx(ctx)
-	, m_group(group)
 	, m_uri(uri)
 {
 	setupUi();
+
+	m_logger = new M2kVoltmeterCsvLogger(this);
+
+	m_api = new Adalm2000Voltmeter_API(this);
+	m_api->setObjectName("dmm");
+	ScopyJS::GetInstance()->registerApi(m_api);
 }
 
 component::Attribute *Adalm2000VoltmeterTool::findRangeAttribute(int channel) const
@@ -432,6 +441,44 @@ void Adalm2000VoltmeterTool::setupUi()
 
 	settingsMenu->add(peakSection, "peakhold");
 
+	MenuSectionCollapseWidget *logSection = new MenuSectionCollapseWidget(
+		"Data Logging", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, settingsMenu);
+
+	m_logFilePath = new FileBrowserWidget(FileBrowserWidget::SAVE_FILE, logSection);
+	m_logFilePath->setFilter("CSV files (*.csv)");
+	logSection->contentLayout()->addWidget(m_logFilePath);
+
+	m_logSwitch = new MenuOnOffSwitch("Enable logging", logSection);
+	logSection->contentLayout()->addWidget(m_logSwitch);
+
+	connect(m_logFilePath->lineEdit(), &QLineEdit::textChanged, this, [this]() {
+		QSignalBlocker blocker(m_logSwitch->onOffswitch());
+		m_logSwitch->onOffswitch()->setChecked(false);
+		if(m_logger->isOpen()) {
+			m_logger->close();
+		}
+	});
+
+	connect(m_logSwitch->onOffswitch(), &QAbstractButton::toggled, this, [this](bool on) {
+		if(on) {
+			const QString path = m_logFilePath->lineEdit()->text();
+			if(path.isEmpty()) {
+				QSignalBlocker blocker(m_logSwitch->onOffswitch());
+				m_logSwitch->onOffswitch()->setChecked(false);
+				StatusBarManager::pushMessage("Voltmeter: set a log file path first", 3000);
+				return;
+			}
+			if(!m_logger->open(path)) {
+				QSignalBlocker blocker(m_logSwitch->onOffswitch());
+				m_logSwitch->onOffswitch()->setChecked(false);
+			}
+		} else {
+			m_logger->close();
+		}
+	});
+
+	settingsMenu->add(logSection, "datalogger");
+
 	m_tool->rightStack()->add(m_settingsMenuId, settingsMenu);
 
 	connect(m_gearBtn, &QPushButton::toggled, this, [this](bool toggled) {
@@ -474,6 +521,11 @@ void Adalm2000VoltmeterTool::setupUi()
 			}
 			m_reader->requestStop();
 			m_controller->release();
+			if(m_logger && m_logger->isOpen()) {
+				m_logger->close();
+				QSignalBlocker blocker(m_logSwitch->onOffswitch());
+				m_logSwitch->onOffswitch()->setChecked(false);
+			}
 			return;
 		}
 		for(int c = 0; c < 2; ++c) {
@@ -506,6 +558,7 @@ void Adalm2000VoltmeterTool::onReadings(int channel, double dcVolts, double acVo
 
 	const double shown = m_acMode[channel] ? acVolts : dcVolts;
 	m_monitor[channel]->setValue(shown);
+	m_lastReading[channel] = shown;
 
 	applyScalePreset(channel, m_autoScaler[channel].push(shown));
 	m_scale[channel]->setValue(shown);
@@ -521,6 +574,10 @@ void Adalm2000VoltmeterTool::onReadings(int channel, double dcVolts, double acVo
 	}
 	m_monitor[channel]->setMin(m_peakMin[channel]);
 	m_monitor[channel]->setMax(m_peakMax[channel]);
+
+	if(channel == 1 && m_logger && m_logger->isOpen()) {
+		m_logger->append(m_lastReading[0], m_lastReading[1]);
+	}
 }
 
 void Adalm2000VoltmeterTool::onModeChanged(int channel, int index)
