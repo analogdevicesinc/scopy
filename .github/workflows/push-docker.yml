@@ -44,8 +44,8 @@ jobs:
         - name: Generate Cloudsmith OIDC Token
           uses: cloudsmith-io/cloudsmith-cli-action@18665afcce9f859312b61989671af9af7402e4fb # v2.0.2
           with:
-            oidc-namespace: 'adi'
-            oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+            oidc-namespace: ${{ vars.CLOUDSMITH_NAMESPACE }}
+            oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG_FOR_DOCKER_PUSH }}
             oidc-auth-only: 'true'
 
         - name: Login to Cloudsmith Docker registry
@@ -71,8 +71,8 @@ jobs:
         - name: Generate Cloudsmith OIDC Token
           uses: cloudsmith-io/cloudsmith-cli-action@18665afcce9f859312b61989671af9af7402e4fb # v2.0.2
           with:
-            oidc-namespace: 'adi'
-            oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+            oidc-namespace: ${{ vars.CLOUDSMITH_NAMESPACE }}
+            oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG_FOR_DOCKER_PUSH }}
             oidc-auth-only: 'true'
 
         - name: Login to Cloudsmith Docker registry
@@ -98,8 +98,8 @@ jobs:
         - name: Generate Cloudsmith OIDC Token
           uses: cloudsmith-io/cloudsmith-cli-action@18665afcce9f859312b61989671af9af7402e4fb # v2.0.2
           with:
-            oidc-namespace: 'adi'
-            oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+            oidc-namespace: ${{ vars.CLOUDSMITH_NAMESPACE }}
+            oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG_FOR_DOCKER_PUSH }}
             oidc-auth-only: 'true'
 
         - name: Login to Cloudsmith Docker registry
@@ -120,8 +120,8 @@ jobs:
         - name: Generate Cloudsmith OIDC Token
           uses: cloudsmith-io/cloudsmith-cli-action@18665afcce9f859312b61989671af9af7402e4fb # v2.0.2
           with:
-            oidc-namespace: 'adi'
-            oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+            oidc-namespace: ${{ vars.CLOUDSMITH_NAMESPACE }}
+            oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG_FOR_DOCKER_PUSH }}
             oidc-auth-only: 'true'
 
         - name: Download tarballs from Cloudsmith
@@ -170,8 +170,8 @@ jobs:
         - name: Generate Cloudsmith OIDC Token
           uses: cloudsmith-io/cloudsmith-cli-action@18665afcce9f859312b61989671af9af7402e4fb # v2.0.2
           with:
-            oidc-namespace: 'adi'
-            oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+            oidc-namespace: ${{ vars.CLOUDSMITH_NAMESPACE }}
+            oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG_FOR_DOCKER_PUSH }}
             oidc-auth-only: 'true'
 
         - name: Login to Cloudsmith Docker registry
@@ -205,8 +205,8 @@ jobs:
         - name: Generate Cloudsmith OIDC Token
           uses: cloudsmith-io/cloudsmith-cli-action@18665afcce9f859312b61989671af9af7402e4fb # v2.0.2
           with:
-            oidc-namespace: 'adi'
-            oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+            oidc-namespace: ${{ vars.CLOUDSMITH_NAMESPACE }}
+            oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG_FOR_DOCKER_PUSH }}
             oidc-auth-only: 'true'
 
         - name: Login to Cloudsmith Docker registry
