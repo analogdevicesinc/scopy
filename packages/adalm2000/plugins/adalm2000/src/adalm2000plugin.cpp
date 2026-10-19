@@ -104,7 +104,7 @@ bool Adalm2000Plugin::onConnect()
 
 	m_widgetGroup = new IIOWidgetGroup(this);
 
-	auto *tool = new Adalm2000VoltmeterTool(m_toolList[0], m_context.get(), m_widgetGroup, m_param);
+	auto *tool = new Adalm2000VoltmeterTool(m_toolList[0], m_context.get(), m_param);
 	m_toolList[0]->setTool(tool);
 
 	auto *powerTool = new Adalm2000PowerSupplyTool(m_context.get(), m_widgetGroup);
@@ -130,7 +130,7 @@ bool Adalm2000Plugin::onConnect()
 		setToolsRunLocked(false);
 		if(!ok) {
 			qWarning(CAT_ADALM2000PLUGIN) << "calibration failed; proceeding with uncalibrated readings";
-			StatusBarManager::pushUrgentMessage("Calibration failed");
+			StatusBarManager::pushUrgentMessage("Calibration failed", 15000);
 		}
 	});
 	calibration->run();
