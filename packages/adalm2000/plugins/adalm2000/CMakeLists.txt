@@ -115,6 +115,7 @@ target_link_libraries(
 	       scopy-gui
 	       scopy-iioutil
 	       scopy-iio-widgets
+	       component
 	       libm2k::libm2k
 )
 
