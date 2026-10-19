@@ -110,6 +110,7 @@ setup_dependencies_cache() {
 
 OS_VERSION=${1:-$(sw_vers -productVersion)}
 echo "MacOS version $OS_VERSION"
+MACOS_MAJOR=$(echo "$OS_VERSION" | cut -d '.' -f 1)
 
 # Qt6 via aqtinstall -- no Homebrew Qt package needed
 # ghr is deliberately absent: it was never invoked (releases use actions/upload-artifact)
@@ -165,6 +166,40 @@ install_qt() {
 	pip3 install --break-system-packages aqtinstall
 	# Use aqt directly (installed by pip3 in same bin dir) to avoid python3/pip3 interpreter mismatch
 	aqt install-qt --outputdir $QT_INSTALL_LOCATION mac desktop 6.8.3 clang_64 -m qt3d qtscxml
+}
+
+patch_qt_macos26() {
+	# Qt 6.8.3 predates Qt's AGL-removal fix (qtbase cdb33c3d, shipped 6.8.4+); AGL.framework is
+	# gone from the macOS 26 SDK. Strip every AGL link reference ("-framework AGL" and AGL.framework
+	# paths) across mkspecs, cmake modules/targets and framework .prl files so qmake and cmake link clean.
+	[ "$MACOS_MAJOR" -ge 26 ] || return 0
+	echo "### Patching Qt: removing AGL.framework references (dropped in macOS 26 SDK)"
+	# FindWrapOpenGL.cmake also find_library()s AGL, which still resolves to the host's
+	# /System/Library/Frameworks copy and becomes "-framework AGL" at link time. Drop the whole
+	# AGL block, matching upstream qtbase 93ff6e6af4.
+	sed -i '' \
+		-e '/find_library(WrapOpenGL_AGL/,/^ *endif()/d' \
+		-e '/if(NOT __opengl_agl_fw_path)/,/^ *endif()/d' \
+		-e '/__opengl_agl_fw_path})/d' \
+		"$QT/lib/cmake/Qt6/FindWrapOpenGL.cmake"
+	local f
+	for f in $(grep -rl "AGL" "$QT/mkspecs" "$QT/lib/cmake" 2>/dev/null; find "$QT/lib" -name "*.prl" 2>/dev/null); do
+		sed -i '' \
+			-e 's#-framework AGL##g' \
+			-e 's#-weak_framework AGL##g' \
+			-e 's#[^;" ]*/AGL\.framework/[^;" ]*##g' \
+			"$f" 2>/dev/null || true
+	done
+	echo "### Verifying no AGL link references remain:"
+	local leftover
+	leftover=$( { grep -rnw "AGL" "$QT/mkspecs" "$QT/lib/cmake" 2>/dev/null; \
+		find "$QT/lib" -name "*.prl" -exec grep -Hnw "AGL" {} + 2>/dev/null; } | grep -v ':[[:space:]]*#' || true)
+	if [ -n "$leftover" ]; then
+		echo "$leftover"
+		echo "ERROR: AGL references remain in Qt after patching"
+		exit 1
+	fi
+	echo "clean - no AGL references remain"
 }
 
 export_paths(){
@@ -441,7 +476,7 @@ build_libm2k() {
 }
 
 build_qwt() {
-	echo "### Building qwt - branch qwt-multiaxes"
+	echo "### Building qwt - branch $QWT_BRANCH"
 	CURRENT_BUILD=qwt
 	pushd $STAGING_AREA/qwt
 	save_version_info
@@ -453,7 +488,8 @@ build_qwt() {
 	# Fix subproject link references so they find qwt_scopy, not the old qwt name
 	sed -i '' 's|qwtAddLibrary($${QWT_OUT_ROOT}/lib, qwt)|qwtAddLibrary($${QWT_OUT_ROOT}/lib, qwt_scopy)|' \
 		designer/designer.pro examples/examples.pri playground/playground.pri tests/tests.pri
-	$QMAKE_BIN INCLUDEPATH=$STAGING_AREA_DEPS/include LIBS=-L$STAGING_AREA_DEPS/lib qwt.pro
+	$QMAKE_BIN INCLUDEPATH=$STAGING_AREA_DEPS/include LIBS=-L$STAGING_AREA_DEPS/lib \
+		QMAKE_CXXFLAGS+="-Wno-implicit-function-declaration" qwt.pro
 	make $JOBS
 	make install
 	popd
@@ -570,6 +606,7 @@ check_cache_sizes
 install_packages
 install_qt
 export_paths
+patch_qt_macos26
 clone
 generate_status_file
 build_deps
