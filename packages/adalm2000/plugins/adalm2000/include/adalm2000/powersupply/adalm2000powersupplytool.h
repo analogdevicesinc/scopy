@@ -48,11 +48,13 @@ class Context;
 }
 
 namespace adalm2000 {
+class Adalm2000PowerSupply_API;
 class M2kPowerSupplyController;
 
 class SCOPY_ADALM2000_EXPORT Adalm2000PowerSupplyTool : public QWidget
 {
 	Q_OBJECT
+	friend class Adalm2000PowerSupply_API;
 
 public:
 	explicit Adalm2000PowerSupplyTool(component::Context *ctx, IIOWidgetGroup *group, QWidget *parent = nullptr);
@@ -97,6 +99,8 @@ private:
 	double m_setpoint[2] = {0.0, 0.0};
 	bool m_railOn[2] = {false, false};
 	bool m_tracking = false;
+
+	Adalm2000PowerSupply_API *m_api = nullptr;
 
 	const QString m_settingsMenuId = "settings";
 };
