@@ -20,7 +20,11 @@
 
 #include "adalm2000powersupplytool.h"
 
+#include "adalm2000powersupply_api.h"
 #include "m2kpowersupplycontroller.h"
+#include "m2kcalibration.h"
+
+#include <component/context.h>
 
 #include <QComboBox>
 #include <QHBoxLayout>
@@ -40,6 +44,7 @@
 #include <gui/widgets/valuebarwidget.h>
 #include <gui/widgets/valuemonitorwidget.h>
 #include <iio-widgets/iiowidgetbuilder.h>
+#include <pluginbase/scopyjs.h>
 #include <pluginbase/statusbarmanager.h>
 #include <style.h>
 
@@ -72,6 +77,10 @@ Adalm2000PowerSupplyTool::Adalm2000PowerSupplyTool(component::Context *ctx, IIOW
 	connect(m_controller, &M2kPowerSupplyController::failed, this,
 		[](const QString &msg) { StatusBarManager::pushMessage(msg, 4000); });
 
+	m_api = new Adalm2000PowerSupply_API(this);
+	m_api->setObjectName("power");
+	ScopyJS::GetInstance()->registerApi(m_api);
+
 	if(!m_controller->isUsable()) {
 		StatusBarManager::pushUrgentMessage("Power Supply: this device exposes no usable rails");
 		for(int ch = 0; ch < 2; ++ch) {
@@ -81,10 +90,25 @@ Adalm2000PowerSupplyTool::Adalm2000PowerSupplyTool(component::Context *ctx, IIOW
 	}
 
 	m_controller->initialize();
+
+	if(auto *calibration = m_ctx->findChild<M2kCalibration *>()) {
+		connect(calibration, &M2kCalibration::started, this, [this]() {
+			m_enableBtn[0]->setChecked(false);
+			m_enableBtn[1]->setChecked(false);
+			m_enableBtn[0]->setEnabled(false);
+			m_enableBtn[1]->setEnabled(false);
+		});
+		connect(calibration, &M2kCalibration::finished, this, [this](bool) {
+			m_enableBtn[0]->setEnabled(true);
+			m_enableBtn[1]->setEnabled(!m_tracking);
+		});
+	}
 }
 
 Adalm2000PowerSupplyTool::~Adalm2000PowerSupplyTool()
 {
+	delete m_api;
+	m_api = nullptr;
 	if(m_controller) {
 		m_controller->shutdown();
 	}
