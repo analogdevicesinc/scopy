@@ -421,7 +421,10 @@ build_qwt() {
 	# Fix subproject link references so they find qwt_scopy, not the old qwt name
 	sed -i '' 's|qwtAddLibrary($${QWT_OUT_ROOT}/lib, qwt)|qwtAddLibrary($${QWT_OUT_ROOT}/lib, qwt_scopy)|' \
 		designer/designer.pro examples/examples.pri playground/playground.pri tests/tests.pri
-	$QMAKE_BIN INCLUDEPATH=$STAGING_AREA_DEPS/include LIBS=-L$STAGING_AREA_DEPS/lib qwt.pro
+	$QMAKE_BIN INCLUDEPATH=$STAGING_AREA_DEPS/include LIBS=-L$STAGING_AREA_DEPS/lib \
+		QMAKE_CXXFLAGS+="-Wno-implicit-function-declaration" qwt.pro
+	# AGL.framework was removed from macOS 26; strip it from qmake-generated Makefiles before make runs
+	find . -name "Makefile*" -exec sed -i '' 's/ -framework AGL//g' {} \; 2>/dev/null || true
 	make $JOBS
 	make install
 	popd
