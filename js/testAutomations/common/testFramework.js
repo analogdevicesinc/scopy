@@ -59,6 +59,40 @@ var TestFramework = {
             this.deviceUri = uri;
         }
 
+        // Dev mode pre-adds the device and addDevice() then returns "". Ids are
+        // dev_<cat>_<param>_<uuid>; match the delimited uri, not the first entry.
+        var preexisting = scopy.getDevicesName();
+        var reused = "";
+        for (var pi = 0; pi < preexisting.length; pi++) {
+            if (preexisting[pi].indexOf("_" + this.deviceUri + "_") !== -1) {
+                reused = preexisting[pi];
+                break;
+            }
+        }
+        if (reused !== "") {
+            this.deviceId = reused;
+            this.isConnected = true;
+            printToConsole("Reusing device already added by Scopy: " + this.deviceId);
+
+            // No tools means the connect is still in flight, and we run nested inside
+            // it -- it cannot finish until we return, so start our own.
+            if (scopy.getTools().length === 0) {
+                printToConsole("Device not connected yet; connecting from the script");
+                scopy.connectDevice(this.deviceId);
+                var waited = 0;
+                while (scopy.getTools().length === 0 && waited < 120000) {
+                    msleep(250);
+                    waited += 250;
+                }
+            }
+            if (scopy.getTools().length === 0) {
+                printToConsole("✗ Device never produced a tool list");
+                return false;
+            }
+            printToConsole("✓ Device ready\n");
+            return true;
+        }
+
         // Try real device first (ip:192.168.2.1)
         try {
             printToConsole("Connecting to device: " + this.deviceUri);
@@ -109,6 +143,18 @@ var TestFramework = {
                 printToConsole("Warning: Error disconnecting: " + e);
             }
         }
+    },
+
+    // Calibrate-on-connect plugins hide the run button until calibration finishes.
+    waitForRunEnabled: function(toolName, timeoutMs) {
+        var waited = 0;
+        var step = 250;
+        while (waited < timeoutMs) {
+            if (scopy.getToolBtnState(toolName)) { return true; }
+            msleep(step);
+            waited += step;
+        }
+        return scopy.getToolBtnState(toolName);
     },
 
     // Run a single test
