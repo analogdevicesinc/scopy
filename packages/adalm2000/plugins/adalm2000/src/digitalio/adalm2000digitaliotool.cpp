@@ -127,7 +127,10 @@ void Adalm2000DigitalIoTool::setupUi()
 	connect(m_tme, &ToolMenuEntry::runToggled, m_runBtn, &QAbstractButton::setChecked);
 
 	if(auto *calibration = m_ctx->findChild<M2kCalibration *>()) {
-		connect(calibration, &M2kCalibration::started, this, [this]() { m_runBtn->setEnabled(false); });
+		connect(calibration, &M2kCalibration::started, this, [this]() {
+			m_runBtn->setChecked(false);
+			m_runBtn->setEnabled(false);
+		});
 		connect(calibration, &M2kCalibration::finished, this, [this](bool) { m_runBtn->setEnabled(true); });
 		m_runBtn->setEnabled(!calibration->isRunning());
 	}
