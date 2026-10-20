@@ -66,6 +66,13 @@ void M2kVoltmeterReader::resetChannels()
 	}
 }
 
+void M2kVoltmeterReader::setLowRangeLimit(double limit)
+{
+	for(dsp::AutoGain &gain : m_autoGain) {
+		gain.setLowRangeLimit(limit);
+	}
+}
+
 void M2kVoltmeterReader::setAutoGainEnabled(int channel, bool enabled)
 {
 	if(channel < 0 || channel > 1) {
