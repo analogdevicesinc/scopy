@@ -46,17 +46,7 @@ build_with_configure() {
 	CURRENT_BUILD_MAKE_ARGS=()
 }
 
-# The Android SDK: cmdline-tools (for sdkmanager), the NDK, and exactly one platform and one
-# build-tools revision - see android_toolchain.sh for why "exactly one".
-#
-# Nothing newer than android-$ANDROID_SDK_PLATFORM can turn up, because sdkmanager installs only
-# the packages it is named. That makes the symlink-farm workaround check_sdk_platforms describes
-# unnecessary in a purpose-built image, and leaves that guard as a cheap regression check.
-#
-# Deliberately NOT installed: emulator, system-images, sources and the SDK's own cmake - several
-# GB that nothing in this build touches.
-#
-# Idempotent, so configure_system can re-enter it and the Dockerfile can keep it in its own layer.
+# Installs cmdline-tools, the NDK, one SDK platform and one build-tools revision. Idempotent.
 download_sdk() {
 	echo "### Installing Android SDK - platform $ANDROID_SDK_PLATFORM, build-tools $ANDROID_SDK_BUILD_TOOLS, NDK $NDK_VERSION"
 	if [ ! -x "$SDKMANAGER" ]; then
@@ -66,16 +56,14 @@ download_sdk() {
 		pushd $dl
 		wget -q https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_CMDLINE_TOOLS}_latest.zip -O cmdline-tools.zip
 		unzip -q cmdline-tools.zip
-		# The zip unpacks to ./cmdline-tools, but sdkmanager only infers its SDK root when it
-		# sits at $ANDROID_SDK_ROOT/cmdline-tools/latest, so install it there.
+		# sdkmanager only finds its SDK root at cmdline-tools/latest.
 		mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
 		mv cmdline-tools $ANDROID_SDK_ROOT/cmdline-tools/latest
 		popd
 		rm -rf $dl
 	fi
 
-	# Licences have to be accepted before anything will install; stdout is thousands of lines of
-	# licence text.
+	# Licences must be accepted before anything installs.
 	yes | $SDKMANAGER --sdk_root=$ANDROID_SDK_ROOT --licenses > /dev/null
 
 	$SDKMANAGER --sdk_root=$ANDROID_SDK_ROOT \
@@ -323,31 +311,34 @@ collect_extra_libs() {
 	find $STAGING_AREA_DEPS/lib -maxdepth 1 -name 'lib*.so' | sort | paste -sd';' -
 }
 
-# Scopy itself, and the APK.
-#
-# This uses the Qt KIT toolchain file, not the NDK one set_cmake_opts() uses for the
-# dependencies. Only qt.toolchain.cmake brings in Qt's Android deployment machinery - the
-# scopy_make_apk / "apk" targets, androiddeployqt, Gradle - and it chainloads the NDK's own
-# android.toolchain.cmake itself, from $ANDROID_NDK_ROOT. Its compiled-in fallback is
-# /opt/android/android-ndk-r26b, which exists only in Qt's CI; if neither the env var nor -D is
-# set it merely WARNS and then configures with no Android toolchain at all, so pass both
-# ANDROID_*_ROOT explicitly.
-#
-# It deliberately does not reuse set_cmake_opts/build_with_cmake: those encode dependency-build
-# policy that is wrong for Scopy - a staging install prefix, CMAKE_PLATFORM_NO_VERSIONED_SONAME,
-# the NDK toolchain file, and make where the verified configuration used Ninja.
+# Reuses an existing keystore, else generates a debug one. A generated key differs per run, so
+# Android will not install one CI APK over another.
+ensure_keystore() {
+	if [ -n "$ANDROID_KEYSTORE" ]; then
+		[ -f "$ANDROID_KEYSTORE" ] || {
+			echo "ERROR: ANDROID_KEYSTORE does not exist: $ANDROID_KEYSTORE" >&2
+			return 1
+		}
+	elif [ -f "$HOME/.android/debug.keystore" ]; then
+		ANDROID_KEYSTORE=$HOME/.android/debug.keystore
+	else
+		ANDROID_KEYSTORE=$1/debug.keystore
+		keytool -genkeypair -keystore "$ANDROID_KEYSTORE" -alias "$ANDROID_KEYSTORE_ALIAS" \
+			-keyalg RSA -keysize 2048 -validity 10000 \
+			-storepass "$ANDROID_KEYSTORE_PASS" -keypass "$ANDROID_KEYSTORE_PASS" \
+			-dname "CN=Scopy Debug, O=Analog Devices, C=US"
+	fi
+	echo "### Signing with $ANDROID_KEYSTORE"
+}
+
+# Builds Scopy and the APK. Uses the Qt kit toolchain, which is what provides the apk target.
 build_scopy() {
 	print_config
 
-	# android_toolchain.sh exports CFLAGS/CPPFLAGS/LDFLAGS for cross-building the DEPENDENCIES
-	# (-I/-L into the staging prefix, -Wl,--undefined-version for NDK r26). CMake seeds
-	# CMAKE_C_FLAGS and CMAKE_*_LINKER_FLAGS from the environment on the first configure, so
-	# leaving them set would put the staging include dir ahead of Scopy's own headers.
+	# These are for the dependency builds; CMake would seed CMAKE_*_FLAGS from them.
 	unset CFLAGS CPPFLAGS LDFLAGS
 
-	# androiddeployqt only copies the libraries listed here, plus the app binary's recursive
-	# closure - and CMakeLists.txt merely warns when the list is empty, which ships an APK that
-	# starts with no plugins and no style. Fail here instead.
+	# CMakeLists.txt only warns on an empty list, which ships an APK with no plugins.
 	local extra_libs
 	extra_libs=$(collect_extra_libs)
 	[ -n "$extra_libs" ] || {
@@ -357,18 +348,17 @@ build_scopy() {
 
 	git config --global --add safe.directory $SRC_DIR
 
-	# ENABLE_PLUGIN_ADC=OFF keeps gr-util out, and with it gnuradio/volk/genalyzer. SIGROK and
-	# PYTHON have no Android dependency build; ENABLE_PLUGIN_DEBUGGER needs a local iio-emu
-	# binary. M2K, TEST-PLUGINS and EXTPROC are already forced off in packages/CMakeLists.txt.
-	# CMAKE_PREFIX_PATH intentionally omits $QT_ANDROID: qt.toolchain.cmake prepends the Qt
-	# cmake dir itself, and listing it twice trips the path-collapsing bug that file documents.
-	#
-	# CMAKE_FIND_ROOT_PATH is NOT redundant with CMAKE_PREFIX_PATH. android.toolchain.cmake, which
-	# qt.toolchain.cmake chainloads, sets CMAKE_FIND_ROOT_PATH_MODE_INCLUDE and _LIBRARY to ONLY, so
-	# find_path/find_library search only beneath CMAKE_FIND_ROOT_PATH and re-root CMAKE_PREFIX_PATH
-	# entries under it. Without the staging prefix here, CMakeLists.txt's find_path for iio.h fails
-	# with IIO_INCLUDE_DIRS-NOTFOUND even though the header is installed. Only the staging prefix is
-	# listed: android.toolchain.cmake appends the NDK sysroot to this list itself.
+	local build_dir=${SCOPY_BUILD_DIR:-$SRC_DIR/build-android-$ABI}
+	mkdir -p $build_dir
+
+	ensure_keystore $build_dir
+	export QT_ANDROID_KEYSTORE_PATH=$ANDROID_KEYSTORE
+	export QT_ANDROID_KEYSTORE_ALIAS=$ANDROID_KEYSTORE_ALIAS
+	export QT_ANDROID_KEYSTORE_STORE_PASS=$ANDROID_KEYSTORE_PASS
+	export QT_ANDROID_KEYSTORE_KEY_PASS=$ANDROID_KEYSTORE_PASS
+
+	# ADC=OFF keeps gr-util and gnuradio out. CMAKE_FIND_ROOT_PATH is required as well as
+	# CMAKE_PREFIX_PATH: the NDK toolchain sets FIND_ROOT_PATH_MODE_INCLUDE/LIBRARY to ONLY.
 	local opts=(
 		-G Ninja
 		-DCMAKE_TOOLCHAIN_FILE="$QT_ANDROID/lib/cmake/Qt6/qt.toolchain.cmake"
@@ -390,26 +380,31 @@ build_scopy() {
 		-DWITH_PYTHON=OFF
 		-DWITH_SIGROK=OFF
 		-DWITH_LIBSERIALPORT=ON
+		-DQT_ANDROID_SIGN_APK=ON
 	)
 
-	local build_dir=${SCOPY_BUILD_DIR:-$SRC_DIR/build-android-$ABI}
-	mkdir -p $build_dir
 	pushd $build_dir
 	$CMAKE_BIN "${opts[@]}" $SRC_DIR
-	# "apk" is the phony alias qt_finalize_executable() creates for scopy_make_apk, which depends
-	# on scopy_android_package and through it on every plugin target - so this one target builds
-	# Scopy, stages the assets and runs androiddeployqt + Gradle.
+	# "apk" pulls in every plugin, stages the assets and runs androiddeployqt + Gradle.
 	$CMAKE_BIN --build . --target apk -- $JOBS
 	popd
+
+	verify_apk $build_dir
 }
 
-# Image-build entry point (ci/android/docker/Dockerfile), mirroring
-# ci/ubuntu/ubuntu_build_process.sh configure_system. Everything it does is baked into the
-# published image; CI then runs only build_scopy.
-#
-# build_deps ends in verify_deps, which returns non-zero on a wrong-architecture or versioned-
-# SONAME library - so under this script's "set -e" a bad dependency fails the docker build
-# rather than shipping a broken image.
+# An unsigned APK installs nowhere, so assert rather than trust the build.
+verify_apk() {
+	local apk
+	apk=$(find $1/android-build -maxdepth 1 -name '*.apk' | head -1)
+	[ -n "$apk" ] || {
+		echo "ERROR: no APK in $1/android-build" >&2
+		return 1
+	}
+	$ANDROID_SDK_ROOT/build-tools/$ANDROID_SDK_BUILD_TOOLS/apksigner verify --verbose "$apk"
+	echo "### Signed APK: $apk"
+}
+
+# Image-build entry point; baked into the published image. CI then runs only build_scopy.
 configure_system() {
 	download_sdk
 	clone
