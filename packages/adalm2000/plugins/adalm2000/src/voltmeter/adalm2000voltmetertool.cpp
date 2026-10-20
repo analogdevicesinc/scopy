@@ -508,6 +508,21 @@ void Adalm2000VoltmeterTool::setupUi()
 		&Adalm2000VoltmeterTool::onRangeChangeRequested);
 	connect(m_reader, &M2kVoltmeterReader::finished, this, [this]() { m_runBtn->setChecked(false); });
 
+	if(auto *analogIn = m_ctx->findChild<component::Device *>("analog-in", Qt::FindDirectChildrenOnly)) {
+		if(component::Attribute *lowRangeMax = component::attributeByName(analogIn, "low_range_max")) {
+			connect(lowRangeMax, &component::Attribute::valueChanged, this, [this](const QString &v) {
+				bool ok = false;
+				const double limit = v.toDouble(&ok);
+				if(ok) {
+					m_reader->setLowRangeLimit(limit);
+				}
+			});
+			if(lowRangeMax->readCapability()) {
+				lowRangeMax->readCapability()->readAsync();
+			}
+		}
+	}
+
 	connect(m_controller, &M2kVoltmeterController::resourceLost, this, [this]() {
 		m_reader->requestStop();
 		m_runBtn->setChecked(false);

@@ -48,6 +48,7 @@ public:
 
 	void resetChannels();
 	void setAutoGainEnabled(int channel, bool enabled);
+	void setLowRangeLimit(double limit);
 
 Q_SIGNALS:
 	void readingsUpdated(int channel, double dcVolts, double acVolts);
