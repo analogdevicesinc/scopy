@@ -169,15 +169,22 @@ install_qt() {
 }
 
 patch_qt_macos26() {
-	# AGL.framework was removed from macOS 26 SDK; Qt 6.8.3 still references it in both
-	# qmake mkspecs and CMake target files. Patch once here so all downstream builds are covered.
+	# Qt 6.8.3 predates Qt's AGL-removal fix (qtbase cdb33c3d, shipped 6.8.4+); AGL.framework is
+	# gone from the macOS 26 SDK. Strip every AGL link reference ("-framework AGL" and AGL.framework
+	# paths) across mkspecs, cmake modules/targets and framework .prl files so qmake and cmake link clean.
 	[ "$MACOS_MAJOR" -ge 26 ] || return 0
-	echo "### Patching Qt: removing AGL.framework (dropped in macOS 26 SDK)"
-	grep -rl "framework AGL" "$QT/mkspecs" "$QT/lib/cmake" 2>/dev/null | \
-		xargs sed -i '' \
-			-e 's/ -framework AGL//g' \
-			-e 's/;-framework AGL//g' \
-			-e 's/-framework AGL;//g' 2>/dev/null || true
+	echo "### Patching Qt: removing AGL.framework references (dropped in macOS 26 SDK)"
+	local f
+	for f in $(grep -rl "AGL" "$QT/mkspecs" "$QT/lib/cmake" 2>/dev/null; find "$QT/lib" -name "*.prl" 2>/dev/null); do
+		sed -i '' \
+			-e 's#-framework AGL##g' \
+			-e 's#-weak_framework AGL##g' \
+			-e 's#[^;" ]*/AGL\.framework/[^;" ]*##g' \
+			"$f" 2>/dev/null || true
+	done
+	echo "### Verifying no AGL link references remain:"
+	grep -rn "framework AGL\|AGL\.framework" "$QT/mkspecs" "$QT/lib/cmake" "$QT/lib"/*.prl "$QT/lib"/*/*.prl 2>/dev/null \
+		|| echo "clean - no AGL references remain"
 }
 
 export_paths(){
