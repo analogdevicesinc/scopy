@@ -35,6 +35,8 @@ private Q_SLOTS:
 	void updateArrivesEveryDecimationSamples();
 	void autoGainNeedsAllTwentyFiveToDropDown();
 	void autoGainGoesUpOnOneFrame();
+	void autoGainHonoursDeviceReportedLimit();
+	void autoGainIgnoresNonPositiveLimit();
 };
 
 void TST_VoltmeterDsp::movingAverageOfConstantIsThatConstant()
@@ -95,6 +97,30 @@ void TST_VoltmeterDsp::autoGainGoesUpOnOneFrame()
 		g.push(-0.5, 0.5);
 	}
 	QCOMPARE(g.push(-10.0, 10.0), AutoGain::Range::Plus25V);
+}
+
+void TST_VoltmeterDsp::autoGainHonoursDeviceReportedLimit()
+{
+	AutoGain g;
+	g.setLowRangeLimit(1.0);
+	QCOMPARE(g.lowRangeLimit(), 1.0);
+
+	for(int i = 0; i < 25; ++i) {
+		g.push(-0.5, 0.5);
+	}
+	QCOMPARE(g.push(-0.5, 0.5), AutoGain::Range::Plus2_5V);
+
+	// 1.5 V clears the stock 2.5 V threshold but not a device-reported 1.0 V one.
+	QCOMPARE(g.push(-1.5, 1.5), AutoGain::Range::Plus25V);
+}
+
+void TST_VoltmeterDsp::autoGainIgnoresNonPositiveLimit()
+{
+	AutoGain g;
+	g.setLowRangeLimit(0.0);
+	QCOMPARE(g.lowRangeLimit(), AutoGain::DEFAULT_LOW_RANGE_LIMIT);
+	g.setLowRangeLimit(-3.0);
+	QCOMPARE(g.lowRangeLimit(), AutoGain::DEFAULT_LOW_RANGE_LIMIT);
 }
 
 QTEST_MAIN(TST_VoltmeterDsp)
