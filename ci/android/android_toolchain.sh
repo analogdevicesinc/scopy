@@ -63,6 +63,24 @@ export ANDROID_SDK_ROOT=${ANDROID_SDK_ROOT:-${ANDROID_HOME:-$HOME/Android/Sdk}}
 export ANDROID_NDK_ROOT=${ANDROID_NDK_ROOT:-$ANDROID_SDK_ROOT/ndk/$NDK_VERSION}
 export ANDROID_NDK=$ANDROID_NDK_ROOT
 
+############### ANDROID SDK COMPONENTS ###############
+# Exactly ONE platform and ONE build-tools revision are installed, and that is what makes the
+# build reproducible:
+#   - androiddeployqt writes androidCompileSdkVersion=android-<target-sdk> into
+#     android-build/gradle.properties, so this platform MUST equal the
+#     QT_ANDROID_TARGET_SDK_VERSION set in CMakeLists.txt (34). The two numbers have to move
+#     together; nothing enforces it.
+#   - Qt's _qt_internal_android_get_sdk_build_tools_revision() globs $ANDROID_SDK_ROOT/build-tools
+#     and takes the highest by LEXICOGRAPHIC sort, with no CMake-level override - "9.0.0" would
+#     sort above "34.0.0". One revision removes the whole class of problem.
+# These are the revisions the first working APK was built with.
+ANDROID_SDK_PLATFORM=${ANDROID_SDK_PLATFORM:-34}
+ANDROID_SDK_BUILD_TOOLS=${ANDROID_SDK_BUILD_TOOLS:-34.0.0}
+# cmdline-tools 16.0. The "_latest" in Google's filename is part of the URL, not a moving pointer:
+# the build number is the version, so pin it.
+ANDROID_CMDLINE_TOOLS=${ANDROID_CMDLINE_TOOLS:-11076708}
+SDKMANAGER=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager
+
 TOOLCHAIN=$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/$HOST_ARCH
 TOOLCHAIN_BIN=$TOOLCHAIN/bin
 SYSROOT=$TOOLCHAIN/sysroot
