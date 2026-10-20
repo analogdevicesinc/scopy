@@ -49,9 +49,20 @@ public class ScopyApplication extends QtApplication {
     // and dlopen'd from there; LD_LIBRARY_PATH points at the flat nativeLibraryDir so that
     // their dependencies (the Scopy framework libs and the third-party .so's, which Qt does
     // place in lib/<abi>/) resolve.
+    // Scopy's stylesheet is authored in fixed pixels for a ~96 dpi desktop (gui/style/json/
+    // global.json: font_size 13px, unit_1 16, ...), but Qt on Android uses the screen's density
+    // bucket as the device pixel ratio - 3.0 on a 480 dpi handset - which triples every font and
+    // dimension. QT_SCALE_FACTOR scales that back down.
+    //
+    // It has to be set here rather than in main.cpp: Qt reads it in the QApplication constructor,
+    // and onCreate() runs before super.onCreate() and long before main(). The Qt5 code did this
+    // over JNI from ScopyActivity.getScaleFactor(), which cannot work on Qt6 - the Android context
+    // comes from QNativeInterface::QAndroidApplication::context(), only valid once the platform
+    // plugin is up, i.e. after QApplication, by which point the variable is too late.
     try {
       Os.setenv("APPDATA", cache, true);
       Os.setenv("LD_LIBRARY_PATH", libdir, true);
+      Os.setenv("QT_SCALE_FACTOR", "0.5", true);
     } catch (ErrnoException x) {
       Log.e(TAG, "Cannot set environment variables", x);
     }
