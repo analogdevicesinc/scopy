@@ -43,6 +43,7 @@ inline constexpr int POLL_INTERVAL_MS = 500;
 // "1"). Reversing either pair silently inverts every switch in the tool.
 inline constexpr const char *DIRECTION_OPTIONS[2] = {"out", "in"};
 inline constexpr const char *VALUE_OPTIONS[2] = {"1", "0"};
+inline constexpr const char *OUTPUT_MODE_OPTIONS[2] = {"push-pull", "open-drain"};
 
 // `direction` and `gpo` hold the user's INTENT; the hardware only holds
 // intent & outputEnabled, and Run flushes the difference. Shadowing the intent

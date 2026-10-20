@@ -220,7 +220,7 @@ public:
 	};
 
 	static constexpr std::size_t DEPTH = 25;
-	static constexpr double LOW_RANGE_LIMIT = 2.5;
+	static constexpr double DEFAULT_LOW_RANGE_LIMIT = 2.5;
 
 	AutoGain()
 		: m_hist(DEPTH, Range::Plus25V)
@@ -228,7 +228,7 @@ public:
 
 	Range push(double blockMinV, double blockMaxV)
 	{
-		const bool fitsLow = std::max(std::abs(blockMinV), std::abs(blockMaxV)) < LOW_RANGE_LIMIT;
+		const bool fitsLow = std::max(std::abs(blockMinV), std::abs(blockMaxV)) < m_lowRangeLimit;
 		m_hist.push_back(fitsLow ? Range::Plus2_5V : Range::Plus25V);
 		m_hist.pop_front();
 
@@ -242,8 +242,17 @@ public:
 
 	void reset() { m_hist.assign(DEPTH, Range::Plus25V); }
 
+	void setLowRangeLimit(double limit)
+	{
+		if(limit > 0.0) {
+			m_lowRangeLimit = limit;
+		}
+	}
+	double lowRangeLimit() const { return m_lowRangeLimit; }
+
 private:
 	std::deque<Range> m_hist;
+	double m_lowRangeLimit = DEFAULT_LOW_RANGE_LIMIT;
 };
 
 } // namespace scopy::adalm2000::dsp
