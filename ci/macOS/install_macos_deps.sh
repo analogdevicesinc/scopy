@@ -110,6 +110,7 @@ setup_dependencies_cache() {
 
 OS_VERSION=${1:-$(sw_vers -productVersion)}
 echo "MacOS version $OS_VERSION"
+MACOS_MAJOR=$(echo "$OS_VERSION" | cut -d '.' -f 1)
 
 # Qt6 via aqtinstall -- no Homebrew Qt package needed
 # ghr is deliberately absent: it was never invoked (releases use actions/upload-artifact)
@@ -409,7 +410,7 @@ build_libm2k() {
 }
 
 build_qwt() {
-	echo "### Building qwt - branch qwt-multiaxes"
+	echo "### Building qwt - branch $QWT_BRANCH"
 	CURRENT_BUILD=qwt
 	pushd $STAGING_AREA/qwt
 	save_version_info
@@ -421,10 +422,13 @@ build_qwt() {
 	# Fix subproject link references so they find qwt_scopy, not the old qwt name
 	sed -i '' 's|qwtAddLibrary($${QWT_OUT_ROOT}/lib, qwt)|qwtAddLibrary($${QWT_OUT_ROOT}/lib, qwt_scopy)|' \
 		designer/designer.pro examples/examples.pri playground/playground.pri tests/tests.pri
+	# macOS 26 SDK dropped AGL.framework but Qt still links it via OpenGL; keep OpenGL, drop AGL
+	QMAKE_OPENGL_OPT=()
+	if [ "$MACOS_MAJOR" -ge 26 ]; then
+		QMAKE_OPENGL_OPT+=("QMAKE_LIBS_OPENGL=-framework OpenGL")
+	fi
 	$QMAKE_BIN INCLUDEPATH=$STAGING_AREA_DEPS/include LIBS=-L$STAGING_AREA_DEPS/lib \
-		QMAKE_CXXFLAGS+="-Wno-implicit-function-declaration" qwt.pro
-	# AGL.framework was removed from macOS 26; strip it from qmake-generated Makefiles before make runs
-	find . -name "Makefile*" -exec sed -i '' 's/ -framework AGL//g' {} \; 2>/dev/null || true
+		QMAKE_CXXFLAGS+="-Wno-implicit-function-declaration" "${QMAKE_OPENGL_OPT[@]}" qwt.pro
 	make $JOBS
 	make install
 	popd
