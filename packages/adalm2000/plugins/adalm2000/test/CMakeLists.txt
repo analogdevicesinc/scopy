@@ -67,4 +67,6 @@ add_adalm2000_unit_test(powersupplymath)
 
 add_adalm2000_unit_test(digitaliomath)
 
+add_adalm2000_unit_test(m2kstreamformat ../include/adalm2000/m2kBackend/m2kstreamformat.h)
+
 setup_scopy_tests(pluginloader)
