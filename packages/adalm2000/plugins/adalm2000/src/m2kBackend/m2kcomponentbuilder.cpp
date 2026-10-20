@@ -23,6 +23,9 @@
 #include "m2kattributereader.h"
 #include "m2kattributewriter.h"
 #include "m2kcontext.h"
+#include "m2kdigitalstreams.h"
+#include "m2kinputstream.h"
+#include "m2koutputstream.h"
 #include "m2kping.h"
 
 #include "component/attribute.h"
@@ -251,6 +254,7 @@ bool buildAnalogIn(component::Context *ctx, libm2k::context::M2k *m2k, ICmdExecu
 	}
 	buildAnalogInDeviceAttrs(analogIn, ain, m2k, executor);
 
+	new M2kInputStream(m2k, ain, executor, analogIn);
 	return true;
 }
 
@@ -362,6 +366,8 @@ void buildAnalogOut(component::Context *ctx, libm2k::context::M2k *m2k, ICmdExec
 	for(unsigned int i = 0; i < channels; ++i) {
 		buildAnalogOutChannel(analogOut, aout, m2k, static_cast<int>(i), executor);
 	}
+
+	new M2kOutputStream(m2k, aout, executor, analogOut);
 }
 
 void addRail(component::Device *dev, libm2k::analog::M2kPowerSupply *supply, void *resource, int index, double minV,
@@ -654,6 +660,9 @@ void buildDigital(component::Context *ctx, libm2k::context::M2k *m2k, ICmdExecut
 	}
 	addDigitalDeviceAttrs(digitalDev, digital, m2k, state, executor);
 	addDigitalBufferAttrs(digitalDev, digital, m2k, executor);
+
+	new M2kDigitalInputStream(m2k, digital, executor, digitalDev);
+	new M2kDigitalOutputStream(m2k, digital, executor, digitalDev);
 }
 
 } // namespace
