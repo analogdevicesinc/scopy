@@ -64,20 +64,10 @@ export ANDROID_NDK_ROOT=${ANDROID_NDK_ROOT:-$ANDROID_SDK_ROOT/ndk/$NDK_VERSION}
 export ANDROID_NDK=$ANDROID_NDK_ROOT
 
 ############### ANDROID SDK COMPONENTS ###############
-# Exactly ONE platform and ONE build-tools revision are installed, and that is what makes the
-# build reproducible:
-#   - androiddeployqt writes androidCompileSdkVersion=android-<target-sdk> into
-#     android-build/gradle.properties, so this platform MUST equal the
-#     QT_ANDROID_TARGET_SDK_VERSION set in CMakeLists.txt (34). The two numbers have to move
-#     together; nothing enforces it.
-#   - Qt's _qt_internal_android_get_sdk_build_tools_revision() globs $ANDROID_SDK_ROOT/build-tools
-#     and takes the highest by LEXICOGRAPHIC sort, with no CMake-level override - "9.0.0" would
-#     sort above "34.0.0". One revision removes the whole class of problem.
-# These are the revisions the first working APK was built with.
+# One platform and one build-tools revision only; androiddeployqt always picks the highest.
+# ANDROID_SDK_PLATFORM must match QT_ANDROID_TARGET_SDK_VERSION in CMakeLists.txt.
 ANDROID_SDK_PLATFORM=${ANDROID_SDK_PLATFORM:-34}
 ANDROID_SDK_BUILD_TOOLS=${ANDROID_SDK_BUILD_TOOLS:-34.0.0}
-# cmdline-tools 16.0. The "_latest" in Google's filename is part of the URL, not a moving pointer:
-# the build number is the version, so pin it.
 ANDROID_CMDLINE_TOOLS=${ANDROID_CMDLINE_TOOLS:-11076708}
 SDKMANAGER=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager
 
@@ -99,6 +89,13 @@ QMAKE_BIN=$QT_ANDROID/bin/qmake6
 STAGING_AREA=${STAGING_AREA:-$SRC_SCRIPT/staging_android}
 STAGING_AREA_SRC=$STAGING_AREA/src
 STAGING_AREA_DEPS=$STAGING_AREA/$ABI/dependencies
+
+############### SIGNING ###############
+# An unsigned APK cannot be installed, so the build always signs. Defaults are Android's
+# conventional debug values; override to sign with a real key.
+ANDROID_KEYSTORE=${ANDROID_KEYSTORE:-}
+ANDROID_KEYSTORE_ALIAS=${ANDROID_KEYSTORE_ALIAS:-androiddebugkey}
+ANDROID_KEYSTORE_PASS=${ANDROID_KEYSTORE_PASS:-android}
 
 JOBS=${JOBS:--j$(nproc)}
 CMAKE_BIN=${CMAKE_BIN:-$(command -v cmake)}

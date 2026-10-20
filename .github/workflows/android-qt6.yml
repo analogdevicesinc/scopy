@@ -1,0 +1,83 @@
+name: Android arm64-v8a Qt6 APK
+
+on:
+    workflow_call:
+      inputs:
+        docker_tag:
+          required: true
+          type: string
+      secrets:
+        CLOUDSMITH_SERVICE_SLUG:
+          required: true
+
+env:
+  CI_SCRIPT: "ON"
+  ABI: arm64-v8a
+
+permissions:
+  id-token: write
+  contents: read
+  artifact-metadata: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Android arm64-v8a Qt6
+
+    steps:
+        - name: check storage space
+          run: df -h
+
+        # The image brings its own SDK/NDK, so the preinstalled one is dead weight.
+        - name: Runner cleanup
+          run: |
+            sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+            sudo docker image prune --all --force || true
+            df -h
+
+        - uses: actions/checkout@v6
+          with:
+            fetch-depth: '0'
+
+        - name: Generate Cloudsmith OIDC Token
+          uses: cloudsmith-io/cloudsmith-cli-action@18665afcce9f859312b61989671af9af7402e4fb # v2.0.2
+          with:
+            oidc-namespace: 'adi'
+            oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+            oidc-auth-only: 'true'
+
+        - name: Docker login to Cloudsmith
+          run: docker login docker.cloudsmith.io -u token -p "$CLOUDSMITH_API_KEY"
+
+        - name: Pull Docker image
+          run: docker pull docker.cloudsmith.io/adi/scopy-dockers/scopy2-android-qt6:${{ inputs.docker_tag }}
+
+        # No --user root: the image user is uid 1001, the same uid that owns the workspace, and
+        # Scopy's configure step writes into the source tree.
+        - name: Build Scopy and the APK
+          run: |
+            docker run --rm \
+              -e CI_SCRIPT=ON \
+              -e GITHUB_WORKSPACE=$GITHUB_WORKSPACE \
+              -e ABI=$ABI \
+              -v $GITHUB_WORKSPACE:$GITHUB_WORKSPACE \
+              -w $GITHUB_WORKSPACE \
+              docker.cloudsmith.io/adi/scopy-dockers/scopy2-android-qt6:${{ inputs.docker_tag }} \
+              bash -c "$GITHUB_WORKSPACE/ci/android/android_deps_build.sh build_scopy"
+
+        - name: Set short git commit SHA
+          shell: bash
+          run: echo "commit_sha=$(git rev-parse --short ${{ github.sha }})" >> "$GITHUB_ENV"
+
+        # Named explicitly: Gradle leaves a second identical copy under outputs/apk/release.
+        - name: Upload APK
+          uses: actions/upload-artifact@v7
+          with:
+            name: scopy-android-arm64-v8a-qt6-apk-${{ env.commit_sha }}
+            path: ${{ github.workspace }}/build-android-arm64-v8a/android-build/scopy.apk
+            if-no-files-found: error
+            retention-days: 30
+
+        - name: check storage space
+          if: always()
+          run: df -h
