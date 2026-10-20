@@ -168,6 +168,18 @@ install_qt() {
 	aqt install-qt --outputdir $QT_INSTALL_LOCATION mac desktop 6.8.3 clang_64 -m qt3d qtscxml
 }
 
+patch_qt_macos26() {
+	# AGL.framework was removed from macOS 26 SDK; Qt 6.8.3 still references it in both
+	# qmake mkspecs and CMake target files. Patch once here so all downstream builds are covered.
+	[ "$MACOS_MAJOR" -ge 26 ] || return 0
+	echo "### Patching Qt: removing AGL.framework (dropped in macOS 26 SDK)"
+	grep -rl "framework AGL" "$QT/mkspecs" "$QT/lib/cmake" 2>/dev/null | \
+		xargs sed -i '' \
+			-e 's/ -framework AGL//g' \
+			-e 's/;-framework AGL//g' \
+			-e 's/-framework AGL;//g' 2>/dev/null || true
+}
+
 export_paths(){
 	BREW_PREFIX="$(brew --prefix)"
 	export PATH="$BREW_PREFIX/bin:$PATH"
@@ -424,11 +436,6 @@ build_qwt() {
 		designer/designer.pro examples/examples.pri playground/playground.pri tests/tests.pri
 	$QMAKE_BIN INCLUDEPATH=$STAGING_AREA_DEPS/include LIBS=-L$STAGING_AREA_DEPS/lib \
 		QMAKE_CXXFLAGS+="-Wno-implicit-function-declaration" qwt.pro
-	if [ "$MACOS_MAJOR" -ge 26 ]; then
-		# macOS 26 removed AGL.framework; force src/Makefile to generate now so the strip catches it
-		make qmake_all
-		find . -name "Makefile*" -exec sed -i '' 's/ -framework AGL//g' {} \; 2>/dev/null || true
-	fi
 	make $JOBS
 	make install
 	popd
@@ -540,6 +547,7 @@ check_cache_sizes
 install_packages
 install_qt
 export_paths
+patch_qt_macos26
 clone
 generate_status_file
 build_deps
