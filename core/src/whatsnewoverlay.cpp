@@ -92,8 +92,8 @@ WhatsNewOverlay::WhatsNewOverlay(QWidget *parent)
 
 WhatsNewOverlay::~WhatsNewOverlay()
 {
-	// TODO
-	if(m_tintedOverlay != nullptr) {
+	// sibling widget -- may be destroyed before this destructor runs
+	if(!m_tintedOverlay.isNull()) {
 		m_tintedOverlay->deleteLater();
 	}
 }
