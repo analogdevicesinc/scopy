@@ -33,6 +33,10 @@ class DeviceFactory : public QObject
 	Q_OBJECT
 public:
 	static DeviceImpl *build(QString param, QString category = "", QObject *parent = nullptr);
+
+	// The device category is the backend id ("iio" → IIOCtxBackend). A category without a registered
+	// backend builds a context-less device and yields an empty id.
+	static component::BackendId backendFor(const QString &category);
 };
 } // namespace scopy
 #endif // DEVICEFACTORY_H
