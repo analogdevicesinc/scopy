@@ -21,30 +21,45 @@
 
 #pragma once
 
-#include "component/contextfactory.h"
+#include "component/contextbackend.h"
 #include "iioutil/handles.h"
 #include "component/component_export.h"
+
+#include <memory>
 
 namespace scopy::iio {
 class IBackend;
 }
 
+namespace scopy::component {
+class DeviceMonitor;
+}
+
 namespace scopy::component::iio {
 
-// Builds a libiio-backed Context: instantiates the libiio backend linked into this
-// build (SCOPY_LIBIIO_VERSION selects v0 or v1 at compile time), opens the context
-// handle, attaches a serial executor, and runs the IIO component builder.
-class COMPONENT_EXPORT IIOContextFactory : public ContextFactory
+// The libiio backend: instantiates the libiio backend linked into this build (SCOPY_LIBIIO_VERSION
+// selects v0 or v1 at compile time), opens the context handle, attaches a serial executor and runs
+// the IIO component builder. Scans through IScanOps; its monitor polls "usb".
+class COMPONENT_EXPORT IIOCtxBackend : public ContextBackend
 {
 public:
-	IIOContextFactory() = default;
+	static constexpr const char *ID = "libiio";
 
+	IIOCtxBackend();
+	~IIOCtxBackend() override;
+
+	BackendId id() const override { return ID; }
 	Context *create(const QString &uri, const int maxThreads) override;
+	QVector<ScanResult> scan(const QString &filter = QString()) override;
+	QStringList scanFilters() const override;
+	DeviceMonitor *monitor() override;
 
-	// The process-wide libiio backend linked into this build. Lets non-context clients
-	// (e.g. the device scanner via IBackend::scanOps()) reach the backend without opening
-	// a context. Kept resident for the whole process; never null.
+	// The process-wide libiio backend linked into this build. Lets non-context clients reach the
+	// backend without opening a context. Kept resident for the whole process; never null.
 	static scopy::iio::IBackend *defaultBackend();
+
+private:
+	std::unique_ptr<DeviceMonitor> m_monitor;
 };
 
 } // namespace scopy::component::iio

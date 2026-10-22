@@ -45,9 +45,6 @@ public Q_SLOTS:
 	void disconnectDev() override;
 
 private:
-	void acquireGenericContext();
-
-	int m_maxThreads = 4;
 	bool m_swapPending = false;
 };
 

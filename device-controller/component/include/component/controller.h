@@ -22,6 +22,7 @@
 #pragma once
 
 #include "component/context.h"
+#include "component/contextbackend.h"
 
 #include <QList>
 #include <QMap>
@@ -33,15 +34,7 @@
 
 namespace scopy::component {
 
-class ContextFactory;
-
-enum class BackendKind
-{
-	Libiio, // libiio v0 or v1, fixed at build time (SCOPY_LIBIIO_VERSION)
-	M2k,
-	Audio,
-	Default
-};
+class DeviceMonitor;
 
 class COMPONENT_EXPORT ContextHandle
 {
@@ -95,11 +88,23 @@ public:
 
 	static Controller *GetInstance();
 
-	// Register a factory for a backend kind. Called at construction for the
-	// built-in kinds; extra kinds can be registered before connect().
-	void registerFactory(BackendKind kind, std::shared_ptr<ContextFactory> factory);
+	// Backend registry. libiio is registered at construction; a package can register its own
+	// backend at runtime (e.g. from Plugin::init()). Thread-safe.
+	// Fails if the id is empty or already registered.
+	bool registerBackend(std::shared_ptr<ContextBackend> backend);
+	// Fails while contexts created by that backend are still open.
+	bool unregisterBackend(const BackendId &id);
+	QList<BackendId> backends() const;
+	std::shared_ptr<ContextBackend> backend(const BackendId &id) const;
 
-	static ContextHandle connectCtx(const QString &uri, BackendKind backend, int maxThreads)
+	// Blocking scan through one backend; call it off the UI thread.
+	QVector<ScanResult> scan(const BackendId &id, const QString &filter = QString()) const;
+	// The backend's auto-scan source, or nullptr.
+	DeviceMonitor *monitor(const BackendId &id) const;
+
+	// An empty backend means libiio. If uri is already open, its context is shared; requesting a
+	// different backend for it fails.
+	static ContextHandle connectCtx(const QString &uri, const BackendId &backend = {}, int maxThreads = 1)
 	{
 		Context *ctx = GetInstance()->_connectCtx(uri, backend, maxThreads);
 		return ctx ? ContextHandle(uri, ctx) : ContextHandle();
@@ -114,6 +119,8 @@ Q_SIGNALS:
 	void componentAdded(scopy::component::Context *ctx);
 	void componentRemoved(scopy::component::Context *ctx);
 	void connectionLost(scopy::component::Context *ctx);
+	void backendRegistered(const QString &id);
+	void backendUnregistered(const QString &id);
 
 private:
 	friend class ContextHandle;
@@ -122,17 +129,21 @@ private:
 	{
 		Context *ctx = nullptr;
 		int refCount = 0;
+		BackendId backend;
 	};
 
-	Context *_connectCtx(const QString &uri, BackendKind backend, int maxThreads);
+	Context *_connectCtx(const QString &uri, const BackendId &backend, int maxThreads);
+	std::shared_ptr<ContextBackend> _resolveBackend(const BackendId &backend) const;
 	ContextHandle _acquireExisting(const QString &uri);
 	void _disconnectCtx(const QString &uri);
 
 	static Controller *pinstance_;
 	static std::mutex mutex_;
+	// Lock order: m_ctxMutex, then m_backendsMutex.
 	std::mutex m_ctxMutex;
 	QMap<QString, CtxEntry> m_contexts;
-	QMap<BackendKind, std::shared_ptr<ContextFactory>> m_factories;
+	mutable std::mutex m_backendsMutex;
+	QMap<BackendId, std::shared_ptr<ContextBackend>> m_backends;
 };
 
 } // namespace scopy::component

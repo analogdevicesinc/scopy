@@ -21,10 +21,11 @@
 
 #include "devicefactory.h"
 
-#include "iiodeviceimpl.h"
 #include "m2kdeviceimpl.h"
-#include "swiotdeviceimpl.h"
 
+#include <QThread>
+
+#include <component/backends/iio/iioctxbackend.h>
 #include <component/context.h>
 #include <component/device.h>
 #include <pluginbase/preferences.h>
@@ -36,19 +37,15 @@ DeviceImpl *DeviceFactory::build(QString param, QString category, QObject *paren
 	int maxThreads = Preferences::get("dc_cmd_execution_parallel").toBool() ? QThread::idealThreadCount() : 1;
 	if(category.compare("iio", Qt::CaseInsensitive) == 0) {
 		component::ContextHandle ctx =
-			component::Controller::connectCtx(param, component::BackendKind::Libiio, maxThreads);
-		if(ctx && ctx->findChild<component::Device *>("swiot", Qt::FindDirectChildrenOnly)) {
-			return new SWIOTDeviceImpl(param, maxThreads, parent);
-		}
+			component::Controller::connectCtx(param, component::iio::IIOCtxBackend::ID, maxThreads);
 		if(ctx && ctx->findChild<component::Device *>("m2k-adc", Qt::FindDirectChildrenOnly) &&
 		   ctx->findChild<component::Device *>("m2k-dac-a", Qt::FindDirectChildrenOnly) &&
 		   ctx->findChild<component::Device *>("m2k-dac-b", Qt::FindDirectChildrenOnly)) {
 			return new M2kDeviceImpl(param, maxThreads, parent);
 		}
-		return new IIODeviceImpl(param, maxThreads, parent);
-	} else {
-		return new DeviceImpl(param, category, parent);
+		return new DeviceImpl(param, category, component::iio::IIOCtxBackend::ID, maxThreads, parent);
 	}
+	return new DeviceImpl(param, category, {}, 1, parent);
 }
 
 #include "moc_devicefactory.cpp"

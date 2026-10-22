@@ -21,12 +21,15 @@
 
 #include "component/controller.h"
 
-#include "component/backends/iio/iiocontextfactory.h"
-#include "component/contextfactory.h"
+#include "component/backends/iio/iioctxbackend.h"
 
 #include "iioutil/handles.h"
 
 #include <component/ping.h>
+
+#include <QLoggingCategory>
+
+Q_LOGGING_CATEGORY(CAT_CONTROLLER, "Controller")
 
 using namespace scopy::component;
 
@@ -53,37 +56,103 @@ Controller *Controller::GetInstance()
 Controller::Controller(QObject *parent)
 	: QObject(parent)
 {
-	auto iioFactory = std::make_shared<iio::IIOContextFactory>();
-	registerFactory(BackendKind::Libiio, iioFactory);
-	registerFactory(BackendKind::Default, iioFactory);
+	registerBackend(std::make_shared<iio::IIOCtxBackend>());
 }
 
 Controller::~Controller() = default;
 
-void Controller::registerFactory(BackendKind kind, std::shared_ptr<ContextFactory> factory)
+bool Controller::registerBackend(std::shared_ptr<ContextBackend> backend)
 {
-	m_factories.insert(kind, std::move(factory));
+	if(!backend || backend->id().isEmpty()) {
+		return false;
+	}
+	const BackendId id = backend->id();
+	{
+		std::lock_guard<std::mutex> lock(m_backendsMutex);
+		if(m_backends.contains(id)) {
+			qWarning(CAT_CONTROLLER) << "backend already registered:" << id;
+			return false;
+		}
+		m_backends.insert(id, std::move(backend));
+	}
+	Q_EMIT backendRegistered(id);
+	return true;
 }
 
-Context *Controller::_connectCtx(const QString &uri, BackendKind backend, int maxThreads)
+bool Controller::unregisterBackend(const BackendId &id)
 {
-	auto it = m_factories.constFind(backend);
-	if(it == m_factories.constEnd() || !it.value()) {
-		return nullptr;
+	{
+		std::lock_guard<std::mutex> ctxLock(m_ctxMutex);
+		for(const CtxEntry &e : std::as_const(m_contexts)) {
+			if(e.backend == id) {
+				qWarning(CAT_CONTROLLER) << "backend" << id << "still has open contexts";
+				return false;
+			}
+		}
+		std::lock_guard<std::mutex> lock(m_backendsMutex);
+		if(m_backends.remove(id) == 0) {
+			return false;
+		}
 	}
+	Q_EMIT backendUnregistered(id);
+	return true;
+}
 
+QList<BackendId> Controller::backends() const
+{
+	std::lock_guard<std::mutex> lock(m_backendsMutex);
+	return m_backends.keys();
+}
+
+std::shared_ptr<ContextBackend> Controller::backend(const BackendId &id) const
+{
+	std::lock_guard<std::mutex> lock(m_backendsMutex);
+	return m_backends.value(id);
+}
+
+QVector<ScanResult> Controller::scan(const BackendId &id, const QString &filter) const
+{
+	std::shared_ptr<ContextBackend> b = backend(id);
+	return b ? b->scan(filter) : QVector<ScanResult>();
+}
+
+DeviceMonitor *Controller::monitor(const BackendId &id) const
+{
+	std::shared_ptr<ContextBackend> b = backend(id);
+	return b ? b->monitor() : nullptr;
+}
+
+std::shared_ptr<ContextBackend> Controller::_resolveBackend(const BackendId &backend) const
+{
+	std::lock_guard<std::mutex> lock(m_backendsMutex);
+	return m_backends.value(backend.isEmpty() ? BackendId(iio::IIOCtxBackend::ID) : backend);
+}
+
+Context *Controller::_connectCtx(const QString &uri, const BackendId &backend, int maxThreads)
+{
 	std::lock_guard<std::mutex> lock(m_ctxMutex);
 	if(auto e = m_contexts.find(uri); e != m_contexts.end()) {
+		if(!backend.isEmpty() && backend != e->backend) {
+			qWarning(CAT_CONTROLLER)
+				<< uri << "is already open with backend" << e->backend << "not" << backend;
+			return nullptr;
+		}
 		e->refCount++;
 		return e->ctx;
 	}
-	Context *ctx = it.value()->create(uri, maxThreads);
+
+	std::shared_ptr<ContextBackend> b = _resolveBackend(backend);
+	if(!b) {
+		return nullptr;
+	}
+	Context *ctx = b->create(uri, maxThreads);
 	if(ctx) {
 		ctx->setParent(this);
-		m_contexts.insert(uri, CtxEntry{ctx, 1});
-		Ping *ping = ctx->findChild<Ping *>();
-		connect(ping, &Ping::connectionLost, this, [this, ctx]() { Q_EMIT connectionLost(ctx); });
-		ping->startMonitoring(2000);
+		m_contexts.insert(uri, CtxEntry{ctx, 1, b->id()});
+		if(Ping *ping = ctx->findChild<Ping *>()) {
+			connect(ping, &Ping::connectionLost, this, [this, ctx]() { Q_EMIT connectionLost(ctx); });
+			ping->startMonitoring(2000);
+		}
 		Q_EMIT componentAdded(ctx);
 	}
 	return ctx;

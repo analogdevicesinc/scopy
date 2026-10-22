@@ -39,6 +39,7 @@
 #include <pluginrepository.h>
 #include <style.h>
 
+#include <component/attribute.h>
 #include <common/debugtimer.h>
 #include <common/scopyconfig.h>
 #include <gui/widgets/hoverwidget.h>
@@ -49,11 +50,13 @@
 Q_LOGGING_CATEGORY(CAT_DEVICEIMPL, "Device")
 
 namespace scopy {
-DeviceImpl::DeviceImpl(QString param, QString category, QObject *parent)
+DeviceImpl::DeviceImpl(QString param, QString category, component::BackendId backend, int maxThreads, QObject *parent)
 	: QObject{parent}
-	, m_param(param)
-	, m_category(category)
 	, m_reloadPluginsSet({})
+	, m_category(category)
+	, m_param(param)
+	, m_backend(backend)
+	, m_maxThreads(maxThreads)
 {
 	setState(DEV_INIT);
 	m_id = "dev_" + category + "_" + param + "_" + scopy::config::getUuid();
@@ -67,7 +70,39 @@ DeviceImpl::DeviceImpl(QString param, QString category, QObject *parent)
 			}
 		},
 		Qt::QueuedConnection);
+
+	if(!m_backend.isEmpty()) {
+		acquireContext();
+		connect(this, &DeviceImpl::stateChanged, this, &DeviceImpl::onStateChanged, Qt::DirectConnection);
+	}
 }
+
+void DeviceImpl::onStateChanged(DeviceState_t state)
+{
+	switch(state) {
+	case DEV_CONNECTING:
+		acquireContext();
+		break;
+	case DEV_IDLE:
+		releaseContext();
+		break;
+	default:
+		break;
+	}
+}
+
+void DeviceImpl::acquireContext()
+{
+	if(m_context) {
+		return;
+	}
+	m_context = component::Controller::connectCtx(m_param, m_backend, m_maxThreads);
+	if(!m_context) {
+		qWarning(CAT_DEVICEIMPL) << "Failed to acquire context for" << m_param;
+	}
+}
+
+void DeviceImpl::releaseContext() { m_context = component::ContextHandle{}; }
 
 void DeviceImpl::init()
 {
@@ -140,12 +175,28 @@ void DeviceImpl::unloadPlugins()
 	DEBUGTIMER_LOG(benchmark, this->displayName() + " plugins unload took:");
 }
 
-bool DeviceImpl::verify() { return true; }
+bool DeviceImpl::verify() { return m_backend.isEmpty() || static_cast<bool>(m_context); }
 
 QMap<QString, QString> DeviceImpl::readDeviceInfo()
 {
-	QMap<QString, QString> map;
-	return map;
+	QMap<QString, QString> contextAttributes;
+	if(m_backend.isEmpty()) {
+		return contextAttributes;
+	}
+	if(!m_context) {
+		qWarning(CAT_DEVICEIMPL) << "Cannot read the device info! (unavailable context)";
+		return contextAttributes;
+	}
+	const QList<component::Attribute *> attributes =
+		m_context->findChildren<component::Attribute *>(Qt::FindDirectChildrenOnly);
+	for(component::Attribute *attr : attributes) {
+		if(!attr->readCapability()) {
+			continue;
+		}
+		QCoro::waitFor(attr->readCapability()->readAsync());
+		contextAttributes[attr->name()] = attr->cachedValue();
+	}
+	return contextAttributes;
 }
 
 void DeviceImpl::removeDisabledPlugins()

@@ -72,3 +72,9 @@ component::Context *M2kContextFactory::create(const QString &uri, const int maxT
 	}
 	return ctx;
 }
+
+QVector<component::ScanResult> M2kContextFactory::scan(const QString &filter)
+{
+	Q_UNUSED(filter)
+	return {};
+}

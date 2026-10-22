@@ -21,7 +21,7 @@
 
 #include "core/m2kdeviceimpl.h"
 
-#include <component/contextfactory.h>
+#include <component/contextbackend.h>
 #include <component/controller.h>
 
 #include <QTest>
@@ -31,9 +31,11 @@
 
 using namespace scopy;
 
-class CountingM2kFactory : public component::ContextFactory
+class CountingM2kFactory : public component::ContextBackend
 {
 public:
+	component::BackendId id() const override { return QStringLiteral("m2k"); }
+	QVector<component::ScanResult> scan(const QString & = QString()) override { return {}; }
 	component::Context *create(const QString &, const int) override
 	{
 		++calls;
@@ -57,8 +59,9 @@ private:
 
 void TST_M2kDeviceImpl::init()
 {
+	component::Controller::GetInstance()->unregisterBackend(QStringLiteral("m2k"));
 	m_factory = std::make_shared<CountingM2kFactory>();
-	component::Controller::GetInstance()->registerFactory(component::BackendKind::M2k, m_factory);
+	component::Controller::GetInstance()->registerBackend(m_factory);
 }
 
 void TST_M2kDeviceImpl::queuedSwapIsAbandonedOnDisconnect()
