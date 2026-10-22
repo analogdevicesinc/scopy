@@ -67,7 +67,7 @@ private:
 	void loadDeviceInfoPage();
 	void initializeDevice();
 	void removePluginsCheckBoxes();
-#ifdef __linux__
+#if defined(__linux__) && !defined(__ANDROID__)
 	void createSudoDialog();
 #endif
 

@@ -71,6 +71,10 @@ void PluginRepository::_init(QString location)
 	}
 	QStringList pluginFiles;
 
+	if(plugins.isEmpty()) {
+		qWarning(CAT_PLUGINREPOSTIORY) << "Could not access any plugin files at: " << location;
+	}
+
 	for(const QFileInfo &p : std::as_const(plugins)) {
 		if(p.fileName() == pluginMetaFileName) {
 			pluginMetaFilePath = p.absoluteFilePath();

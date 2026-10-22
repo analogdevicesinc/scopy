@@ -1,0 +1,43 @@
+name: Android Qt6 APK (standalone)
+
+# Branch-pinned entry point while the Android job is brought up. Once it is stable, move these two
+# jobs into ci.yml and delete this file.
+
+on:
+  push:
+    branches:
+      - scopy_qt6_android_ci
+  pull_request:
+    branches:
+      - scopy_qt6_android_ci
+  workflow_dispatch:
+    inputs:
+      docker_tag:
+        description: 'Explicit tag. Empty or "auto" resolves from the branch name.'
+        required: false
+        default: 'auto'
+        type: string
+
+# A run takes hours; do not let pushes stack.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  id-token: write
+  contents: read
+  artifact-metadata: write
+
+jobs:
+  docker_tag:
+    uses: ./.github/workflows/get_docker_tag.yml
+    with:
+      override: ${{ inputs.docker_tag }}
+
+  android-qt6:
+    needs: docker_tag
+    uses: ./.github/workflows/android-qt6.yml
+    with:
+      docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
+    secrets:
+      CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
