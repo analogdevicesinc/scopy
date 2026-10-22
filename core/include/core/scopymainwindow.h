@@ -38,7 +38,7 @@
 #include "pluginbase/preferences.h"
 #include "pluginbase/versionchecker.h"
 #include <gui/widgets/scopystatusbar.h>
-#include <component/devicemonitor.h>
+#include "devicescanner.h"
 #include "versioncheckmessage.h"
 
 #include "toolmenumanager.h"
@@ -91,7 +91,7 @@ private:
 	ScopyHomePage *hp;
 	DeviceManager *dm;
 
-	component::DeviceMonitor *scanMonitor;
+	DeviceScanner *m_scanner;
 	DetachedToolWindowManager *dtm;
 
 	LicenseOverlay *license = nullptr;

@@ -34,7 +34,7 @@
 #include "toolstack.h"
 #include "whatsnewoverlay.h"
 #include <component/controller.h>
-#include <component/backends/iio/iioctxbackend.h>
+#include "devicefactory.h"
 using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_SCOPY_API, "Scopy_API")
@@ -60,23 +60,24 @@ void ScopyMainWindow_API::acceptLicense()
 namespace {
 // Lightweight "can we open this context?" probe through the device-controller, replacing the old
 // ConnectionProvider::open() used purely as a connectivity check. The handle releases immediately.
-bool probeUri(const QString &uri)
+// A category without a backend falls back to libiio.
+bool probeUri(const QString &uri, const QString &cat)
 {
-	auto h = scopy::component::Controller::connectCtx(uri, scopy::component::iio::IIOCtxBackend::ID, 1);
+	auto h = scopy::component::Controller::connectCtx(uri, scopy::DeviceFactory::backendFor(cat), 1);
 	return static_cast<bool>(h);
 }
 } // namespace
 
 QString ScopyMainWindow_API::addDevice(QString uri, QString cat, bool async)
 {
-	bool conn = probeUri(uri);
+	bool conn = probeUri(uri, cat);
 	QString devID = "";
 	if(conn) {
 		Q_ASSERT(m_w->dm != nullptr);
 		devID = m_w->dm->createDevice(cat, uri, async);
 	} else {
 		uri = "ip:" + uri;
-		conn = probeUri(uri);
+		conn = probeUri(uri, cat);
 		if(conn) {
 			devID = m_w->dm->createDevice(cat, uri, async);
 		} else {
@@ -88,14 +89,14 @@ QString ScopyMainWindow_API::addDevice(QString uri, QString cat, bool async)
 
 QString ScopyMainWindow_API::addDevice(QString uri, QList<QString> plugins, QString cat, bool async)
 {
-	bool conn = probeUri(uri);
+	bool conn = probeUri(uri, cat);
 	QString devID = "";
 	if(conn) {
 		Q_ASSERT(m_w->dm != nullptr);
 		devID = m_w->dm->createDevice(cat, uri, async, plugins);
 	} else {
 		uri = "ip:" + uri;
-		conn = probeUri(uri);
+		conn = probeUri(uri, cat);
 		if(conn) {
 			devID = m_w->dm->createDevice(cat, uri, async, plugins);
 		} else {
@@ -119,7 +120,7 @@ Device *ScopyMainWindow_API::getDevice(int idx)
 
 bool ScopyMainWindow_API::removeDevice(QString uri, QString cat)
 {
-	bool conn = probeUri(uri);
+	bool conn = probeUri(uri, cat);
 	Q_ASSERT(m_w->dm != nullptr);
 	bool devRemoved = false;
 	if(conn) {
@@ -146,8 +147,7 @@ bool ScopyMainWindow_API::removeDevice(int idx)
 
 bool ScopyMainWindow_API::startScan(bool scanState)
 {
-	ScanButtonController *sbc = new ScanButtonController(m_w->scanMonitor, m_w->hp->scanControlBtn(), this);
-	sbc->enableScan(scanState);
+	m_w->m_sbc->enableScan(scanState);
 	return scanState;
 }
 
@@ -454,7 +454,7 @@ QStringList ScopyMainWindow_API::getPlugins(int idx)
 QStringList ScopyMainWindow_API::getPlugins(QString uri, QString cat)
 {
 	QStringList pluginList;
-	bool conn = probeUri(uri);
+	bool conn = probeUri(uri, cat);
 	if(conn) {
 		pluginList = availablePlugins(uri, cat, nullptr);
 	} else {
