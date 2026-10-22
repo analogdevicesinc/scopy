@@ -21,6 +21,8 @@
 
 #include "m2kdeviceimpl.h"
 
+#include <component/backends/iio/iioctxbackend.h>
+
 #include <QLoggingCategory>
 #include <QMetaObject>
 
@@ -28,23 +30,11 @@ Q_LOGGING_CATEGORY(CAT_M2K_DEVICEIMPL, "M2kDevice")
 
 using namespace scopy;
 
-M2kDeviceImpl::M2kDeviceImpl(QString param, int maxThreads, QObject *parent)
-	: DeviceImpl(param, "iio", parent)
-	, m_maxThreads(maxThreads)
-{
-	acquireGenericContext();
-}
+static const component::BackendId M2K_BACKEND_ID = QStringLiteral("m2k");
 
-void M2kDeviceImpl::acquireGenericContext()
-{
-	if(m_context) {
-		return;
-	}
-	m_context = component::Controller::connectCtx(m_param, component::BackendKind::Libiio, m_maxThreads);
-	if(!m_context) {
-		qWarning(CAT_M2K_DEVICEIMPL) << "Failed to acquire the generic context for" << m_param;
-	}
-}
+M2kDeviceImpl::M2kDeviceImpl(QString param, int maxThreads, QObject *parent)
+	: DeviceImpl(param, "iio", component::iio::IIOCtxBackend::ID, maxThreads, parent)
+{}
 
 void M2kDeviceImpl::connectDev()
 {
@@ -59,13 +49,12 @@ void M2kDeviceImpl::connectDev()
 			}
 			m_swapPending = false;
 
-			m_context =
-				component::Controller::connectCtx(m_param, component::BackendKind::M2k, m_maxThreads);
+			m_context = component::Controller::connectCtx(m_param, M2K_BACKEND_ID, m_maxThreads);
 			if(!m_context) {
 				qInfo(CAT_M2K_DEVICEIMPL)
 					<< "No M2K context for" << m_param << "- falling back to libiio";
-				m_context = component::Controller::connectCtx(m_param, component::BackendKind::Libiio,
-									      m_maxThreads);
+				m_context = component::Controller::connectCtx(
+					m_param, component::iio::IIOCtxBackend::ID, m_maxThreads);
 			}
 			DeviceImpl::connectDev();
 		},

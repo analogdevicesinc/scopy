@@ -20,13 +20,17 @@
 
 #pragma once
 
-#include "component/contextfactory.h"
+#include "component/contextbackend.h"
 
 namespace scopy::adalm2000 {
 
-class M2kContextFactory : public component::ContextFactory
+class M2kContextFactory : public component::ContextBackend
 {
 public:
+	static constexpr const char *ID = "m2k";
+
+	component::BackendId id() const override { return ID; }
+	QVector<component::ScanResult> scan(const QString &filter = QString()) override;
 	component::Context *create(const QString &uri, const int maxThreads) override;
 };
 

@@ -50,8 +50,7 @@ using namespace scopy::adalm2000;
 
 void Adalm2000Plugin::init()
 {
-	component::Controller::GetInstance()->registerFactory(component::BackendKind::M2k,
-							      std::make_shared<M2kContextFactory>());
+	component::Controller::GetInstance()->registerBackend(std::make_shared<M2kContextFactory>());
 }
 
 bool Adalm2000Plugin::compatible(QString param, QString category)
