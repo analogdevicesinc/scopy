@@ -28,6 +28,7 @@
 #include "decoder/idecoderbackend.h"
 
 #include <QList>
+#include <QMutex>
 #include <QVector>
 #include <memory>
 #include <vector>
@@ -38,6 +39,12 @@ namespace acq {
 // ProcessorBlock that packs raw digital keys, invokes an IDecoderBackend
 // once per cycle, and writes the resulting annotations back to DataStore.
 // process() runs on the engine worker thread.
+//
+// Every setter is safe while the engine runs: the inputs live under one mutex and
+// process() works on a snapshot taken at the start of its cycle, so an edit lands on
+// the next cycle and a cycle never sees half of one. The backends hold no state
+// between calls — the config travels with every decode — so nothing else has to
+// follow a change.
 class SCOPY_CORE_EXPORT ExternalDecoderProcessor : public ProcessorBlock
 {
 	Q_OBJECT
@@ -46,25 +53,27 @@ public:
 				 QObject *parent = nullptr);
 	~ExternalDecoderProcessor() override;
 
-	void setConfig(const scopy::decoder::DecoderConfig &cfg) { m_cfg = cfg; }
-	const scopy::decoder::DecoderConfig &config() const { return m_cfg; }
+	void setConfig(const scopy::decoder::DecoderConfig &cfg);
+	scopy::decoder::DecoderConfig config() const;
 
-	// Bit i of each packed sample is taken from keys[i].
-	void setOrderedRawKeys(const QList<DataKey> &keys) { m_orderedRawKeys = keys; }
+	// The config and the raw inputs it describes, swapped together: cfg.numChannels and
+	// the key count must agree, and two separate calls would let a cycle in between see
+	// one without the other. Bit i of each packed sample is taken from rawKeys[i].
+	void setRawInput(const scopy::decoder::DecoderConfig &cfg, const QList<DataKey> &rawKeys);
 
 	// Annotation-input source (used only when cfg.rootInput == Annotations).
-	void setAnnotationInputKey(const DataKey &k) { m_annInKey = k; }
-	const DataKey &annotationInputKey() const { return m_annInKey; }
+	void setAnnotationInputKey(const DataKey &k);
+	DataKey annotationInputKey() const;
 
 	// One DataKey per stack stage (index 0 = root); demuxed by stageIndex.
-	void setOutputKeys(const QList<DataKey> &keys) { m_outKeys = keys; }
-	QList<DataKey> outputKeys() const override { return m_outKeys; }
+	void setOutputKeys(const QList<DataKey> &keys);
+	QList<DataKey> outputKeys() const override;
 
-	double sampleRate() const { return m_cfg.sampleRate; }
+	double sampleRate() const;
 
 	// Samples/cycle to assemble from ordered raw keys; 0 = single chunk.
-	void setWindowSize(int n) { m_windowSize = n; }
-	int windowSize() const { return m_windowSize; }
+	void setWindowSize(int n);
+	int windowSize() const;
 
 	void process(DataStore *store) override;
 	void reset() override;
@@ -81,22 +90,31 @@ Q_SIGNALS:
 	void cycleProduced(scopy::acq::DataKey outKey);
 
 private:
+	// Everything the GUI may change, kept together so process() can copy it in one lock.
+	struct Inputs
+	{
+		scopy::decoder::DecoderConfig cfg;
+		QList<DataKey> rawKeys;
+		DataKey annInKey;
+		QList<DataKey> outKeys;
+		int windowSize{0};
+	};
+	Inputs inputs() const;
+
 	// Both fill `perStage` (one bucket per output key) and leave publishing
 	// to process(), so a bail-out still writes a defined empty result.
-	void decodeAnnotationInput(DataStore *store, std::vector<QVector<Annotation>> &perStage);
-	void decodeLogicInput(DataStore *store, std::vector<QVector<Annotation>> &perStage);
-	void publish(DataStore *store, std::vector<QVector<Annotation>> &perStage);
+	void decodeAnnotationInput(const Inputs &in, DataStore *store, std::vector<QVector<Annotation>> &perStage);
+	void decodeLogicInput(const Inputs &in, DataStore *store, std::vector<QVector<Annotation>> &perStage);
+	void publish(const Inputs &in, DataStore *store, std::vector<QVector<Annotation>> &perStage);
 	// Declares each output stream's AnnotationStreamInfo, so a decoder reading
 	// these annotations as input can interpret them without being told how.
-	void publishStreamInfo(DataStore *store);
+	void publishStreamInfo(const Inputs &in, DataStore *store);
 
 	std::unique_ptr<scopy::decoder::IDecoderBackend> m_backend;
-	scopy::decoder::DecoderConfig m_cfg;
-	QList<DataKey> m_orderedRawKeys;
-	DataKey m_annInKey;
-	QList<DataKey> m_outKeys;
+	mutable QMutex m_inMutex;
+	Inputs m_in;
+	// Worker-only scratch.
 	std::vector<uint8_t> m_packed;
-	int m_windowSize{0};
 };
 
 } // namespace acq

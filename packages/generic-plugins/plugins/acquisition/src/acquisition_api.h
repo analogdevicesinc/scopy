@@ -125,11 +125,11 @@ public:
 	/// Active decoders: [{uid, stages[] (decoder ids), inputs[] (bound keys, bit order), outputs[]}].
 	Q_INVOKABLE QVariantList getDecoders();
 	/// Bind a decoder channel role (an id from getDecoderInfo(), e.g. "rx") to a raw key; empty
-	/// unassigns. The key must already be in the store. False while running.
+	/// unassigns. The key must already be in the store. Live: a running engine picks it up next cycle.
 	Q_INVOKABLE bool setDecoderChannel(const QString &uid, const QString &role, const QString &key);
-	/// Set a decoder option (an id from getDecoderInfo(), e.g. "baudrate"). False while running.
+	/// Set a decoder option (an id from getDecoderInfo(), e.g. "baudrate"). Live, like setDecoderChannel.
 	Q_INVOKABLE bool setDecoderOption(const QString &uid, const QString &option, const QString &value);
-	/// The sample rate the decoder assumes for its input, in Hz. False while running.
+	/// The sample rate the decoder assumes for its input, in Hz. Live, like setDecoderChannel.
 	Q_INVOKABLE bool setDecoderSampleRate(const QString &uid, double hz);
 
 	// --- datastore: discovery
