@@ -27,6 +27,7 @@ done
 echo "### Copy DLLs to Frameworks folder"
 if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
 	cp -avR $STAGING_AREA_DEPS/lib/iio.framework Scopy.app/Contents/Frameworks/
+	rm -rf Scopy.app/Contents/Frameworks/iio.framework/Tools # empty dir breaks framework codesign
 	cp -avR $STAGING_AREA_DEPS/lib/ad9361.framework Scopy.app/Contents/Frameworks/
 fi
 cp -avR $STAGING_AREA_DEPS/lib/genalyzer.framework Scopy.app/Contents/Frameworks/
