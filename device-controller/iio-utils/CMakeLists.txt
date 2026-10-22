@@ -19,7 +19,7 @@
 #
 
 # iio-utils — libiio backend interfaces (I*Ops), opaque handles, concrete commands and the scan helper. Depends on core;
-# no direct libiio (the backends implement these interfaces; IIOContextFactory instantiates the one linked in).
+# no direct libiio (the backends implement these interfaces; IIOCtxBackend instantiates the one linked in).
 file(GLOB IIOUTIL_HEADERS include/iioutil/*.h include/iioutil/commands/*.h)
 file(GLOB IIOUTIL_SOURCES src/*.cpp)
 

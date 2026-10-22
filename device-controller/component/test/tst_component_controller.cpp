@@ -22,6 +22,7 @@
 #include "component/attribute.h"
 #include "component/channel.h"
 #include "component/context.h"
+#include "component/contextbackend.h"
 #include "component/controller.h"
 #include "component/device.h"
 
@@ -48,6 +49,26 @@ static Context *makeFakeTree()
 	return ctx;
 }
 
+// Runtime-registered backend that serves fake trees for "fake:" uris.
+class FakeBackend : public ContextBackend
+{
+public:
+	explicit FakeBackend(BackendId id = "fake")
+		: m_id(std::move(id))
+	{}
+	BackendId id() const override { return m_id; }
+	Context *create(const QString &uri, const int) override
+	{
+		Context *ctx = makeFakeTree();
+		ctx->setUri(uri);
+		return ctx;
+	}
+	QVector<ScanResult> scan(const QString &) override { return {{"fake:0", "fake device", m_id}}; }
+
+private:
+	BackendId m_id;
+};
+
 class TstComponentController : public QObject
 {
 	Q_OBJECT
@@ -56,6 +77,10 @@ private Q_SLOTS:
 	void refCountKeepsContextAlive();
 	void disconnectCascades();
 	void unknownBackendReturnsNull();
+	void runtimeBackendBuildsTree();
+	void duplicateBackendIsRefused();
+	void unregisterRefusedWhileOpen();
+	void otherBackendOnOpenUriFails();
 };
 
 void TstComponentController::adoptEmitsAndBuildsTree()
@@ -118,8 +143,66 @@ void TstComponentController::disconnectCascades()
 void TstComponentController::unknownBackendReturnsNull()
 {
 	int maxThreads = 1;
-	// M2k has no registered factory -> connectCtx yields an empty handle.
-	QVERIFY(!Controller::connectCtx("fake://m2k", BackendKind::M2k, maxThreads));
+	// No "m2k" backend is registered -> connectCtx yields an empty handle.
+	QVERIFY(!Controller::connectCtx("fake://m2k", "m2k", maxThreads));
+}
+
+void TstComponentController::runtimeBackendBuildsTree()
+{
+	Controller *c = Controller::GetInstance();
+	QSignalSpy registered(c, &Controller::backendRegistered);
+	QVERIFY(c->registerBackend(std::make_shared<FakeBackend>("fake-rt")));
+	QCOMPARE(registered.count(), 1);
+	QVERIFY(c->backends().contains("fake-rt"));
+	QCOMPARE(c->scan("fake-rt").size(), 1);
+
+	{
+		ContextHandle h = Controller::connectCtx("fake:rt", "fake-rt");
+		QVERIFY(h);
+		QCOMPARE(h->findChildren<Attribute *>().size(), 2);
+	}
+	QVERIFY(c->unregisterBackend("fake-rt"));
+	QVERIFY(!c->backends().contains("fake-rt"));
+}
+
+void TstComponentController::duplicateBackendIsRefused()
+{
+	Controller *c = Controller::GetInstance();
+	QVERIFY(c->registerBackend(std::make_shared<FakeBackend>("fake-dup")));
+	QVERIFY(!c->registerBackend(std::make_shared<FakeBackend>("fake-dup")));
+	QVERIFY(!c->registerBackend(std::make_shared<FakeBackend>("")));
+	QVERIFY(c->unregisterBackend("fake-dup"));
+}
+
+void TstComponentController::unregisterRefusedWhileOpen()
+{
+	Controller *c = Controller::GetInstance();
+	QVERIFY(c->registerBackend(std::make_shared<FakeBackend>("fake-open")));
+	ContextHandle h = Controller::connectCtx("fake:open", "fake-open");
+	QVERIFY(h);
+	QVERIFY(!c->unregisterBackend("fake-open"));
+	h.reset();
+	QVERIFY(c->unregisterBackend("fake-open"));
+}
+
+void TstComponentController::otherBackendOnOpenUriFails()
+{
+	Controller *c = Controller::GetInstance();
+	QVERIFY(c->registerBackend(std::make_shared<FakeBackend>("fake-a")));
+	QVERIFY(c->registerBackend(std::make_shared<FakeBackend>("fake-b")));
+	ContextHandle h = Controller::connectCtx("fake:shared", "fake-a");
+	QVERIFY(h);
+	QVERIFY(!Controller::connectCtx("fake:shared", "fake-b"));
+	// Same backend or no backend shares the open context.
+	ContextHandle same = Controller::connectCtx("fake:shared", "fake-a");
+	ContextHandle any = Controller::connectCtx("fake:shared");
+	QCOMPARE(same.get(), h.get());
+	QCOMPARE(any.get(), h.get());
+	same.reset();
+	any.reset();
+	h.reset();
+	QVERIFY(c->unregisterBackend("fake-a"));
+	QVERIFY(c->unregisterBackend("fake-b"));
 }
 
 QTEST_MAIN(TstComponentController)
