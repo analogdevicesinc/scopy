@@ -30,7 +30,7 @@ namespace scopy::component {
 class Context;
 class DeviceMonitor;
 
-// A backend is identified by a string id ("libiio", "m2k", "audio", ...), so a package can add
+// A backend is identified by a string id ("iio", "m2k", "audio", ...), so a package can add
 // one at runtime without changing the device-controller.
 using BackendId = QString;
 

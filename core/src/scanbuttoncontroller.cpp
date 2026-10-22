@@ -21,14 +21,14 @@
 
 #include "scanbuttoncontroller.h"
 
-#include <component/devicemonitor.h>
+#include "devicescanner.h"
 
 using namespace scopy;
 
-ScanButtonController::ScanButtonController(component::DeviceMonitor *monitor, QCheckBox *btn, QObject *parent)
+ScanButtonController::ScanButtonController(DeviceScanner *scanner, QCheckBox *btn, QObject *parent)
 	: QObject{parent}
 {
-	m_monitor = monitor;
+	m_scanner = scanner;
 	this->btn = btn;
 	m_scanTimeout = 2000;
 	conn = connect(this->btn, &QAbstractButton::toggled, this, &ScanButtonController::enableScan);
@@ -46,17 +46,13 @@ void ScanButtonController::enableScan(bool b)
 
 void ScanButtonController::startScan()
 {
-	if(m_monitor) {
-		m_monitor->start(m_scanTimeout);
-	}
+	m_scanner->start(m_scanTimeout);
 	btn->setChecked(true);
 }
 
 void ScanButtonController::stopScan()
 {
-	if(m_monitor) {
-		m_monitor->stop();
-	}
+	m_scanner->stop();
 	btn->setChecked(false);
 }
 

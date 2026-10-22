@@ -23,18 +23,25 @@
 
 #include <QThread>
 
-#include <component/backends/iio/iioctxbackend.h>
+#include <component/controller.h>
 #include <pluginbase/preferences.h>
 
 using namespace scopy;
 
+component::BackendId DeviceFactory::backendFor(const QString &category)
+{
+	const QList<component::BackendId> ids = component::Controller::GetInstance()->backends();
+	return ids.contains(category) ? category : component::BackendId();
+}
+
 DeviceImpl *DeviceFactory::build(QString param, QString category, QObject *parent)
 {
-	int maxThreads = Preferences::get("dc_cmd_execution_parallel").toBool() ? QThread::idealThreadCount() : 1;
-	if(category.compare("iio", Qt::CaseInsensitive) == 0) {
-		return new DeviceImpl(param, category, component::iio::IIOCtxBackend::ID, maxThreads, parent);
+	const component::BackendId backend = backendFor(category);
+	if(backend.isEmpty()) {
+		return new DeviceImpl(param, category, {}, 1, parent);
 	}
-	return new DeviceImpl(param, category, {}, 1, parent);
+	int maxThreads = Preferences::get("dc_cmd_execution_parallel").toBool() ? QThread::idealThreadCount() : 1;
+	return new DeviceImpl(param, category, backend, maxThreads, parent);
 }
 
 #include "moc_devicefactory.cpp"
