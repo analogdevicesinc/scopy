@@ -329,11 +329,9 @@ void DecoderManager::applyConfig(const QString &uid, const DecoderConfig &cfg,
 			m_logger->warning(kMgrId, QStringLiteral("applyConfig: unknown uid ") + uid);
 		return;
 	}
-	if(isEngineRunning()) {
-		if(m_logger)
-			m_logger->warning(kMgrId, QStringLiteral("applyConfig: refusing mid-run mutation for ") + uid);
-		return;
-	}
+	// No running-engine check: the processor's inputs are mutex-guarded and snapshotted per
+	// cycle, so an edit lands on the next cycle. Stack changes stay stopped-only — they
+	// create and remove store keys — and the size check below keeps this from being one.
 	if(static_cast<int>(cfg.stack.size()) != d->stageIds.size()) {
 		if(m_logger)
 			m_logger->warning(kMgrId,
@@ -344,7 +342,6 @@ void DecoderManager::applyConfig(const QString &uid, const DecoderConfig &cfg,
 	}
 
 	d->cfg = cfg;
-	d->proc->setConfig(cfg);
 
 	if(cfg.rootInput == RootInput::Annotations) {
 		// Annotation-in: ignore orderedRawKeys; resolve source outKey.
@@ -361,13 +358,14 @@ void DecoderManager::applyConfig(const QString &uid, const DecoderConfig &cfg,
 		}
 		const scopy::acq::DataKey srcKey = src->outKeys[cfg.annotationInput.sourceStageIndex];
 		d->orderedRawKeys.clear();
+		d->proc->setRawInput(cfg, {});
 		d->proc->setAnnotationInputKey(srcKey);
 		d->proc->setWatchedKeys({srcKey});
 		if(m_store)
 			m_store->releaseClaimant(uid);
 	} else {
 		d->orderedRawKeys = orderedRawKeys;
-		d->proc->setOrderedRawKeys(orderedRawKeys);
+		d->proc->setRawInput(cfg, orderedRawKeys);
 		d->proc->setWatchedKeys(orderedRawKeys);
 		claimWindowDepth(*d);
 	}

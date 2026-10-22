@@ -75,8 +75,8 @@ public:
 	void refreshAnnotationSources();
 
 	// Set through the widgets, which apply on change, so the editor and the manager stay in
-	// step. Root stage only. False while the engine runs (applyNow() would drop the edit),
-	// for an unknown role/option, a key not offered by the combo, or a value it rejects.
+	// step. Root stage only, and live: a running engine picks the edit up on its next cycle.
+	// False for an unknown role/option, a key not offered by the combo, or a value it rejects.
 	bool setChannel(const QString &role, const QString &key);
 	bool setOption(const QString &id, const QString &value);
 	bool setSampleRate(double hz);
@@ -93,7 +93,8 @@ public:
 	void appendStage(const DecoderInfo &info);
 
 private Q_SLOTS:
-	// Collect UI state -> DecoderConfig and push to manager.
+	// Collect UI state -> DecoderConfig and push to manager. Takes effect on the next
+	// cycle, running or not.
 	void applyNow();
 
 private:

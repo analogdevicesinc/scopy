@@ -476,7 +476,7 @@ void DecoderEditor::refreshKeys(const QList<scopy::acq::DataKey> &keys)
 
 bool DecoderEditor::setChannel(const QString &role, const QString &key)
 {
-	if(m_stages.isEmpty() || !m_mgr || m_mgr->isEngineRunning())
+	if(m_stages.isEmpty() || !m_mgr)
 		return false;
 	const Stage &st = m_stages[0];
 	for(int i = 0; i < st.info.channels.size() && i < st.channelCombos.size(); ++i) {
@@ -494,7 +494,7 @@ bool DecoderEditor::setChannel(const QString &role, const QString &key)
 
 bool DecoderEditor::setOption(const QString &id, const QString &value)
 {
-	if(m_stages.isEmpty() || !m_mgr || m_mgr->isEngineRunning())
+	if(m_stages.isEmpty() || !m_mgr)
 		return false;
 	QWidget *w = m_stages[0].optionWidgets.value(id, nullptr);
 	bool ok = true;
@@ -521,8 +521,7 @@ bool DecoderEditor::setOption(const QString &id, const QString &value)
 
 bool DecoderEditor::setSampleRate(double hz)
 {
-	if(!m_sampleRateSpin || !m_mgr || m_mgr->isEngineRunning() || hz < m_sampleRateSpin->minimum() ||
-	   hz > m_sampleRateSpin->maximum())
+	if(!m_sampleRateSpin || !m_mgr || hz < m_sampleRateSpin->minimum() || hz > m_sampleRateSpin->maximum())
 		return false;
 	m_sampleRateSpin->setValue(hz);
 	return true;
@@ -657,10 +656,7 @@ void DecoderEditor::applyNow()
 {
 	if(!m_mgr)
 		return;
-	// applyConfig requires a stopped engine; edits while running are dropped.
-	if(m_mgr->isEngineRunning())
-		return;
-
+	// Applied whether or not the engine runs: the processor picks it up on its next cycle.
 	DecoderConfig cfg;
 	QList<scopy::acq::DataKey> keys;
 	collect(cfg, keys);
