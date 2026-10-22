@@ -6710,7 +6710,7 @@
             }
           ],
           "returns": "bool",
-          "doc": "Bind a decoder channel role (an id from getDecoderInfo(), e.g. \"rx\") to a raw key; empty unassigns. The key must already be in the store. False while running."
+          "doc": "Bind a decoder channel role (an id from getDecoderInfo(), e.g. \"rx\") to a raw key; empty unassigns. The key must already be in the store. Live: a running engine picks it up next cycle."
         },
         {
           "name": "setDecoderOption",
@@ -6729,7 +6729,7 @@
             }
           ],
           "returns": "bool",
-          "doc": "Set a decoder option (an id from getDecoderInfo(), e.g. \"baudrate\"). False while running."
+          "doc": "Set a decoder option (an id from getDecoderInfo(), e.g. \"baudrate\"). Live, like setDecoderChannel."
         },
         {
           "name": "setDecoderSampleRate",
@@ -6744,7 +6744,7 @@
             }
           ],
           "returns": "bool",
-          "doc": "The sample rate the decoder assumes for its input, in Hz. False while running."
+          "doc": "The sample rate the decoder assumes for its input, in Hz. Live, like setDecoderChannel."
         },
         {
           "name": "setDevice",
