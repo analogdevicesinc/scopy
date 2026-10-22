@@ -55,7 +55,16 @@ This directory contains scripts for building Scopy on macOS. The build process u
 
 ## CI Integration
 
-- Built on Azure: See `azure-pipelines.yml` in repository root
+- Built on GitHub Actions: See `.github/workflows/macosbuild.yml`
+
+### Caching
+
+The workflow caches two things with `actions/cache`, on every runner (ARM and Intel):
+
+- **Homebrew kegs** (`~/brew-kegs`): the formulae `install_macos_deps.sh` installs or upgrades. Keyed on the runner image (`ImageOS`, `ImageVersion`) and the install script. On a hit `brew update`/`brew install` are skipped and the kegs are linked back into the Cellar.
+- **Built dependencies** (`staging/dependencies`): keyed on the libiio version, the Homebrew key, `macos_config.sh` and the upstream commits resolved by `deps_cache_key.sh`. On a hit clone and `build_deps` are skipped.
+
+Changing either script or a pinned ref produces a new key, so the cache rebuilds automatically.
 
 ## Notes
 
