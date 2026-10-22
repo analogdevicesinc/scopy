@@ -130,9 +130,11 @@ void PlotMarkerController::deinitFixedMarker()
 void PlotMarkerController::computeFixedMarkerFrequency()
 {
 	for(int i = 0; i < m_nrOfMarkers; i++) {
-		m_markerInfo[i].peak.y = m_ch->plotChannel()->getValueAt(m_markerInfo[i].peak.x);
+		m_markerInfo[i].peak.y = valueAt(m_markerInfo[i].peak.x);
 	}
 }
+
+double PlotMarkerController::valueAt(double x) { return m_ch ? m_ch->plotChannel()->getValueAt(x) : 0.0; }
 
 const QList<PlotMarkerController::MarkerInfo> &PlotMarkerController::markerInfo() const { return m_markerInfo; }
 
