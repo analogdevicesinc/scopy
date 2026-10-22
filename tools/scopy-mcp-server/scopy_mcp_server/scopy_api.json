@@ -39,7 +39,8 @@
     "generic-plugins": [
       "regmap",
       "iioExplorer",
-      "datalogger"
+      "datalogger",
+      "acq"
     ],
     "pqmon": [
       "pqm"
@@ -6236,6 +6237,697 @@
           "returns": "void"
         }
       ]
+    },
+    "acq": {
+      "methods": [
+        {
+          "name": "addDecoder",
+          "args": [
+            {
+              "name": "decoderId",
+              "type": "QString"
+            }
+          ],
+          "returns": "QString",
+          "doc": "Add a decoder, as the Decoders panel's \"+ Add\" does. Returns its uid, \"\" on failure."
+        },
+        {
+          "name": "addPlot",
+          "args": [
+            {
+              "name": "name",
+              "type": "QString"
+            },
+            {
+              "name": "kind",
+              "type": "QString"
+            }
+          ],
+          "returns": "int",
+          "doc": "Add a plot, kind \"basic\" (curves) or \"waterfall\". Returns its uuid, -1 on failure."
+        },
+        {
+          "name": "addPlotChannel",
+          "args": [
+            {
+              "name": "plotUuid",
+              "type": "int"
+            },
+            {
+              "name": "kind",
+              "type": "QString"
+            },
+            {
+              "name": "yKey",
+              "type": "QString"
+            },
+            {
+              "name": "xKey",
+              "type": "QString"
+            }
+          ],
+          "returns": "int",
+          "doc": "Draw yKey on a plot. kind: \"curve\" | \"digital\" | \"annotations\" | \"waterfall\". Empty xKey = the key's default abscissa (sample index, or frequency for the FFT output \"genalyzer_spectrum_fft\"). Returns uid, -1 on failure."
+        },
+        {
+          "name": "claimDepth",
+          "args": [
+            {
+              "name": "key",
+              "type": "QString"
+            },
+            {
+              "name": "chunks",
+              "type": "int"
+            }
+          ],
+          "returns": "void",
+          "doc": "Keep at least `chunks` past chunks of a key, for getChunk()/getWindow() across cycles. History builds within one run(); every run, single() included, starts empty."
+        },
+        {
+          "name": "clearStore",
+          "args": [],
+          "returns": "void",
+          "doc": "Discard all stored samples; keys and depth claims stay."
+        },
+        {
+          "name": "getAnnotations",
+          "args": [
+            {
+              "name": "key",
+              "type": "QString"
+            },
+            {
+              "name": "max",
+              "type": "int"
+            }
+          ],
+          "returns": "QVariantList",
+          "doc": "Newest decoder annotations of a key, at most max (<=0: all): [{start, end, decoder, class, text, severity, value?}]."
+        },
+        {
+          "name": "getAxis",
+          "args": [
+            {
+              "name": "uid",
+              "type": "int"
+            },
+            {
+              "name": "axis",
+              "type": "QString"
+            }
+          ],
+          "returns": "QVariantMap",
+          "doc": "A plot channel's axis: {min, max, autoscale, unit, source}."
+        },
+        {
+          "name": "getBlockInfo",
+          "args": [
+            {
+              "name": "block",
+              "type": "QString"
+            }
+          ],
+          "returns": "QVariantMap",
+          "doc": "A block's state: {enabled, source(bool), in[] (watched input keys), out[] (keys it writes)}; sources also list channels[] (the enabled channel ids)."
+        },
+        {
+          "name": "getBufferSize",
+          "args": [],
+          "returns": "int",
+          "doc": "Samples read per channel per cycle."
+        },
+        {
+          "name": "getChunk",
+          "args": [
+            {
+              "name": "key",
+              "type": "QString"
+            },
+            {
+              "name": "index",
+              "type": "int"
+            }
+          ],
+          "returns": "QVariantList",
+          "doc": "One retained chunk of a key; index 0 = newest, 1 = the one before, ..."
+        },
+        {
+          "name": "getDeclaredKeys",
+          "args": [],
+          "returns": "QStringList",
+          "doc": "Keys every block declares, enabled or not, whether or not they hold data yet."
+        },
+        {
+          "name": "getDecoderIds",
+          "args": [],
+          "returns": "QStringList",
+          "doc": "Ids of the protocol decoders available (e.g. \"uart\", \"i2c\", \"spi\")."
+        },
+        {
+          "name": "getDecoderInfo",
+          "args": [
+            {
+              "name": "decoderId",
+              "type": "QString"
+            }
+          ],
+          "returns": "QVariantMap",
+          "doc": "A decoder's description: {id, name, description, inputs[], outputs[], channels[{id, name, required}], options[{id, name, default, choices[]}]}."
+        },
+        {
+          "name": "getDecoders",
+          "args": [],
+          "returns": "QVariantList",
+          "doc": "Active decoders: [{uid, stages[] (decoder ids), inputs[] (bound keys, bit order), outputs[]}]."
+        },
+        {
+          "name": "getDevice",
+          "args": [],
+          "returns": "QString",
+          "doc": "URI of the device the other calls act on."
+        },
+        {
+          "name": "getDevices",
+          "args": [],
+          "returns": "QStringList",
+          "doc": "URIs of all connected acquisition devices."
+        },
+        {
+          "name": "getKeyInfo",
+          "args": [
+            {
+              "name": "key",
+              "type": "QString"
+            }
+          ],
+          "returns": "QVariantMap",
+          "doc": "Key metadata: {key, source, channel, stage, present, type, depth, capacity, chunkSize, label, unit, sampleRate, xKey, kind}."
+        },
+        {
+          "name": "getKeys",
+          "args": [],
+          "returns": "QStringList",
+          "doc": "Keys written at least once since connect; they stay listed after clearStore(), empty."
+        },
+        {
+          "name": "getLatest",
+          "args": [
+            {
+              "name": "key",
+              "type": "QString"
+            }
+          ],
+          "returns": "QVariantList",
+          "doc": "Newest chunk (one cycle, bufferSize samples) of a numeric key as a number array."
+        },
+        {
+          "name": "getMode",
+          "args": [],
+          "returns": "QString",
+          "doc": "Current engine mode: \"continuous\" or \"triggered\"."
+        },
+        {
+          "name": "getPlotChannels",
+          "args": [],
+          "returns": "QVariantList",
+          "doc": "All plot channels: [{uid, plot, kind, yKey, xKey, name, color, enabled, keyPresent, sampleRate}]."
+        },
+        {
+          "name": "getPlotSize",
+          "args": [],
+          "returns": "int",
+          "doc": "Samples shown across time plots."
+        },
+        {
+          "name": "getPlots",
+          "args": [],
+          "returns": "QVariantList",
+          "doc": "All plots: [{uuid, name, kind (\"basic\"|\"waterfall\"), channels[] (plot channel uids)}]."
+        },
+        {
+          "name": "getProcessors",
+          "args": [],
+          "returns": "QStringList",
+          "doc": "Names of the processor blocks (e.g. \"genalyzer-fft\", \"trigger\"), usable as `block` args."
+        },
+        {
+          "name": "getSourceChannels",
+          "args": [
+            {
+              "name": "source",
+              "type": "QString"
+            }
+          ],
+          "returns": "QStringList",
+          "doc": "Channel ids of a source block (e.g. \"voltage0\")."
+        },
+        {
+          "name": "getSources",
+          "args": [],
+          "returns": "QStringList",
+          "doc": "Names of the source blocks (one per IIO device), usable as `block`/`source` args."
+        },
+        {
+          "name": "getStats",
+          "args": [
+            {
+              "name": "key",
+              "type": "QString"
+            },
+            {
+              "name": "n",
+              "type": "int"
+            }
+          ],
+          "returns": "QVariantMap",
+          "doc": "Statistics of the newest n samples: {count, min, max, mean, rms, pp}."
+        },
+        {
+          "name": "getWindow",
+          "args": [
+            {
+              "name": "key",
+              "type": "QString"
+            },
+            {
+              "name": "n",
+              "type": "int"
+            }
+          ],
+          "returns": "QVariantList",
+          "doc": "Newest n samples of a numeric key, spanning chunks if retained (see claimDepth)."
+        },
+        {
+          "name": "getWriteCount",
+          "args": [],
+          "returns": "double",
+          "doc": "Total store writes so far; grows each cycle, so a change means new data arrived."
+        },
+        {
+          "name": "hasKey",
+          "args": [
+            {
+              "name": "key",
+              "type": "QString"
+            }
+          ],
+          "returns": "bool",
+          "doc": "True if the key has been written (see getKeys()); getLatest() tells whether it holds data."
+        },
+        {
+          "name": "isRunning",
+          "args": [],
+          "returns": "bool",
+          "doc": "True while acquiring."
+        },
+        {
+          "name": "releaseDepth",
+          "args": [
+            {
+              "name": "key",
+              "type": "QString"
+            }
+          ],
+          "returns": "void",
+          "doc": "Drop the history kept by claimDepth()."
+        },
+        {
+          "name": "removeDecoder",
+          "args": [
+            {
+              "name": "uid",
+              "type": "QString"
+            }
+          ],
+          "returns": "void",
+          "doc": "Remove a decoder and its annotation channels."
+        },
+        {
+          "name": "removePlot",
+          "args": [
+            {
+              "name": "uuid",
+              "type": "int"
+            }
+          ],
+          "returns": "void",
+          "doc": "Remove a plot and its channels."
+        },
+        {
+          "name": "removePlotChannel",
+          "args": [
+            {
+              "name": "uid",
+              "type": "int"
+            }
+          ],
+          "returns": "void",
+          "doc": "Remove a plot channel."
+        },
+        {
+          "name": "run",
+          "args": [],
+          "returns": "void",
+          "doc": "Start continuous acquisition; runs until stop()."
+        },
+        {
+          "name": "saveCsv",
+          "args": [
+            {
+              "name": "keys",
+              "type": "QString"
+            },
+            {
+              "name": "n",
+              "type": "int"
+            },
+            {
+              "name": "path",
+              "type": "QString"
+            }
+          ],
+          "returns": "bool",
+          "doc": "Write the newest n samples of each key (comma-separated) to a CSV file, one column per key."
+        },
+        {
+          "name": "setAxisAutoscale",
+          "args": [
+            {
+              "name": "uid",
+              "type": "int"
+            },
+            {
+              "name": "axis",
+              "type": "QString"
+            },
+            {
+              "name": "on",
+              "type": "bool"
+            }
+          ],
+          "returns": "void",
+          "doc": "Turn autoscale of a plot channel's axis on/off."
+        },
+        {
+          "name": "setAxisRange",
+          "args": [
+            {
+              "name": "uid",
+              "type": "int"
+            },
+            {
+              "name": "axis",
+              "type": "QString"
+            },
+            {
+              "name": "min",
+              "type": "double"
+            },
+            {
+              "name": "max",
+              "type": "double"
+            }
+          ],
+          "returns": "void",
+          "doc": "Fix a plot channel's axis to [min, max]; turns autoscale off."
+        },
+        {
+          "name": "setBlockEnabled",
+          "args": [
+            {
+              "name": "block",
+              "type": "QString"
+            },
+            {
+              "name": "en",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool",
+          "doc": "Enable/disable a source or processor block. A disabled block produces nothing."
+        },
+        {
+          "name": "setBlockInputs",
+          "args": [
+            {
+              "name": "block",
+              "type": "QString"
+            },
+            {
+              "name": "keys",
+              "type": "QString"
+            }
+          ],
+          "returns": "bool",
+          "doc": "Set a processor's input keys (comma-separated). The FFT (\"genalyzer-fft\", output \"genalyzer_spectrum_fft\") produces nothing until set: 1 key = real FFT, 2 keys = complex I/Q FFT, empty = none. Refused while the engine runs with the block enabled."
+        },
+        {
+          "name": "setBufferSize",
+          "args": [
+            {
+              "name": "n",
+              "type": "int"
+            }
+          ],
+          "returns": "bool",
+          "doc": "Samples read per channel per cycle (power of two, 16..1048576); also the FFT size. False if out of range or while running."
+        },
+        {
+          "name": "setDecoderChannel",
+          "args": [
+            {
+              "name": "uid",
+              "type": "QString"
+            },
+            {
+              "name": "role",
+              "type": "QString"
+            },
+            {
+              "name": "key",
+              "type": "QString"
+            }
+          ],
+          "returns": "bool",
+          "doc": "Bind a decoder channel role (an id from getDecoderInfo(), e.g. \"rx\") to a raw key; empty unassigns. The key must already be in the store. Live: a running engine picks it up next cycle."
+        },
+        {
+          "name": "setDecoderOption",
+          "args": [
+            {
+              "name": "uid",
+              "type": "QString"
+            },
+            {
+              "name": "option",
+              "type": "QString"
+            },
+            {
+              "name": "value",
+              "type": "QString"
+            }
+          ],
+          "returns": "bool",
+          "doc": "Set a decoder option (an id from getDecoderInfo(), e.g. \"baudrate\"). Live, like setDecoderChannel."
+        },
+        {
+          "name": "setDecoderSampleRate",
+          "args": [
+            {
+              "name": "uid",
+              "type": "QString"
+            },
+            {
+              "name": "hz",
+              "type": "double"
+            }
+          ],
+          "returns": "bool",
+          "doc": "The sample rate the decoder assumes for its input, in Hz. Live, like setDecoderChannel."
+        },
+        {
+          "name": "setDevice",
+          "args": [
+            {
+              "name": "uri",
+              "type": "QString"
+            }
+          ],
+          "returns": "bool",
+          "doc": "Select the device (by URI from getDevices()) the other calls act on. False if unknown."
+        },
+        {
+          "name": "setMode",
+          "args": [
+            {
+              "name": "mode",
+              "type": "QString"
+            }
+          ],
+          "returns": "bool",
+          "doc": "Engine mode: \"continuous\" or \"triggered\". Triggered waits for a fire only with the trigger block enabled; without it, single() is one plain cycle. Refused while running."
+        },
+        {
+          "name": "setPlotChannelColor",
+          "args": [
+            {
+              "name": "uid",
+              "type": "int"
+            },
+            {
+              "name": "color",
+              "type": "QString"
+            }
+          ],
+          "returns": "void",
+          "doc": "Set a plot channel's color: \"#rrggbb\" or an SVG color name."
+        },
+        {
+          "name": "setPlotChannelEnabled",
+          "args": [
+            {
+              "name": "uid",
+              "type": "int"
+            },
+            {
+              "name": "en",
+              "type": "bool"
+            }
+          ],
+          "returns": "void",
+          "doc": "Show/hide a plot channel."
+        },
+        {
+          "name": "setPlotChannelName",
+          "args": [
+            {
+              "name": "uid",
+              "type": "int"
+            },
+            {
+              "name": "name",
+              "type": "QString"
+            }
+          ],
+          "returns": "void",
+          "doc": "Rename a plot channel."
+        },
+        {
+          "name": "setPlotCursors",
+          "args": [
+            {
+              "name": "uuid",
+              "type": "int"
+            },
+            {
+              "name": "on",
+              "type": "bool"
+            }
+          ],
+          "returns": "void",
+          "doc": "Show/hide a plot's cursors."
+        },
+        {
+          "name": "setPlotLabels",
+          "args": [
+            {
+              "name": "uuid",
+              "type": "int"
+            },
+            {
+              "name": "on",
+              "type": "bool"
+            }
+          ],
+          "returns": "void",
+          "doc": "Show/hide a plot's axis labels."
+        },
+        {
+          "name": "setPlotLegend",
+          "args": [
+            {
+              "name": "uuid",
+              "type": "int"
+            },
+            {
+              "name": "on",
+              "type": "bool"
+            }
+          ],
+          "returns": "void",
+          "doc": "Show/hide a plot's legend."
+        },
+        {
+          "name": "setPlotName",
+          "args": [
+            {
+              "name": "uuid",
+              "type": "int"
+            },
+            {
+              "name": "name",
+              "type": "QString"
+            }
+          ],
+          "returns": "void",
+          "doc": "Rename a plot."
+        },
+        {
+          "name": "setPlotSize",
+          "args": [
+            {
+              "name": "n",
+              "type": "int"
+            }
+          ],
+          "returns": "void",
+          "doc": "Samples shown across time plots (the visible window, may exceed bufferSize)."
+        },
+        {
+          "name": "setSourceChannelEnabled",
+          "args": [
+            {
+              "name": "source",
+              "type": "QString"
+            },
+            {
+              "name": "channel",
+              "type": "QString"
+            },
+            {
+              "name": "en",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool",
+          "doc": "Enable/disable one channel of a source block. All start disabled; only enabled ones stream."
+        },
+        {
+          "name": "single",
+          "args": [],
+          "returns": "void",
+          "doc": "One acquisition cycle (or, in triggered mode, until one trigger fire); returns immediately."
+        },
+        {
+          "name": "singleAndWait",
+          "args": [
+            {
+              "name": "timeoutMs",
+              "type": "int"
+            }
+          ],
+          "returns": "bool",
+          "doc": "single(), then block until it ends. False on timeout (the run is then stopped) or when a block failed and the engine stopped itself; true only for a clean capture."
+        },
+        {
+          "name": "stop",
+          "args": [],
+          "returns": "void",
+          "doc": "Stop acquisition."
+        }
+      ],
+      "doc": "Generic IIO acquisition instrument: sources stream device channels into a DataStore, processors (FFT, trigger, decoders) derive new streams from it, and plots draw them. Streams are named by key strings \"source_channel_stage\" (e.g. \"dc_cf-ad9361-lpc:voltage0_raw\"); list them with getKeys(). Plots are addressed by uuid, plot channels by uid, as getPlots()/getPlotChannels() list them. Several connected devices share this one object: setDevice() picks which one the calls act on (default: the last connected)."
     },
     "datalogger": {
       "methods": [

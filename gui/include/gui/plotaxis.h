@@ -27,6 +27,7 @@
 #include "plotwidget.h"
 #include "plot_utils.hpp"
 #include "basicscaledraw.h"
+#include "insidescaledraw.h"
 #include "scopy-gui_export.h"
 #include "edgelessplot.h"
 
@@ -72,6 +73,9 @@ public:
 	void setUnitsVisible(bool visible);
 	void setScaleEn(bool en);
 
+	void setLabelsInside(bool inside);
+	bool labelsInside() const;
+
 public Q_SLOTS:
 	void setMax(double newMax);
 	void setMin(double newMin);
@@ -97,12 +101,18 @@ private:
 	PrefixFormatter *m_formatter;
 	EdgelessPlotScaleItem *m_scaleItem;
 
+	bool m_labelsInside;
+	bool m_visible;
+
 	int m_id;
 	double m_divs;
+	// Set while setInterval() changes both ends, so the scale is applied once.
+	bool m_deferScaleUpdate{false};
 	double m_min;
 	double m_max;
 
 	void setupAxisScale();
+	BasicScaleDraw *insideScaleDraw() const;
 	Q_PROPERTY(double max READ max WRITE setMax NOTIFY maxChanged)
 	Q_PROPERTY(double min READ min WRITE setMin NOTIFY minChanged)
 };
