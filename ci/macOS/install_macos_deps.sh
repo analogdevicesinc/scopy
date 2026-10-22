@@ -9,103 +9,44 @@ set -ex
 REPO_SRC=$(git rev-parse --show-toplevel)
 source $REPO_SRC/ci/macOS/macos_config.sh
 
-# Cache configuration
-CACHE_BASE_DIR="${PIPELINE_WORKSPACE}"
-GIT_CACHE_DIR="${CACHE_BASE_DIR}/.git-cache"
-HOMEBREW_CACHE_DIR="${CACHE_BASE_DIR}/.homebrew-cache"
-CACHE_SIZE_WARNING_GB=8
+# GitHub Actions cache (see .github/workflows/macosbuild.yml): the workflow restores these and sets the *_CACHE_HIT vars
+BREW_KEGS_DIR=$HOME/brew-kegs
 
-# Cache size monitoring
-check_cache_sizes() {
-    if [ -d "$CACHE_BASE_DIR" ]; then
-        local total_size_gb=$(du -sg "$CACHE_BASE_DIR" 2>/dev/null | cut -f1 || echo "0")
-        echo "Total cache size: ${total_size_gb}GB"
-
-        if [ "$total_size_gb" -gt "$CACHE_SIZE_WARNING_GB" ]; then
-            echo "WARNING: Cache size (${total_size_gb}GB) approaching Azure DevOps limits"
-        fi
-    fi
-}
-
-
-# Cache cleanup function
-cleanup_old_caches() {
-    echo "Cleaning up old cache directories..."
-
-    # Remove any temporary cache directories older than 7 days
-    if [ -d "$CACHE_BASE_DIR" ]; then
-        find "$CACHE_BASE_DIR" -name "*.tmp" -type d -mtime +7 -exec rm -rf {} + 2>/dev/null || true
-        find "$CACHE_BASE_DIR" -name "*.old" -type d -mtime +7 -exec rm -rf {} + 2>/dev/null || true
-    fi
-}
-
-setup_homebrew_cache() {
-	if [ "${CACHING_ENABLED}" == "true" ]; then
-		echo "Setting up Homebrew cache..."
-        mkdir -p "$HOMEBREW_CACHE_DIR"
-
-        if [ "${HOMEBREW_PACKAGES_CACHE}" == "true" ]; then
-                echo "Homebrew cache found, restoring cached packages"
-                # Validate cache isn't corrupted
-                if [ -d "$HOMEBREW_CACHE_DIR" ] && [ "$(ls -A $HOMEBREW_CACHE_DIR 2>/dev/null)" ]; then
-                        echo "Found cached Homebrew packages in $HOMEBREW_CACHE_DIR"
-                        export HOMEBREW_CACHE_ENABLED=true
-                        export HOMEBREW_NO_AUTO_UPDATE=1
-                else
-                        echo "Homebrew cache directory empty or corrupted - clearing and rebuilding"
-                        rm -rf "$HOMEBREW_CACHE_DIR"
-                        mkdir -p "$HOMEBREW_CACHE_DIR"
-                        export HOMEBREW_CACHE_ENABLED=false
-                fi
-        else
-                echo "No Homebrew cache - downloading fresh packages"
-                export HOMEBREW_CACHE_ENABLED=false
-        fi
-
-        export HOMEBREW_CACHE="$HOMEBREW_CACHE_DIR"
-	fi
-}
-
-setup_git_cache() {
-	if [ "${CACHING_ENABLED}" == "true" ]; then
-		echo "Setting up Git cache..."
-		mkdir -p "$GIT_CACHE_DIR"
-
-		if [ "${GIT_REPOS_CACHE}" == "true" ]; then
-			echo "Git repositories cache found, restoring cached repositories"
-			# Validate cache isn't corrupted
-			if [ -d "$GIT_CACHE_DIR" ] && [ "$(ls -A $GIT_CACHE_DIR 2>/dev/null)" ]; then
-				export GIT_CACHE_ENABLED=true
-			else
-				echo "Git cache directory empty - clearing and rebuilding"
-				rm -rf "$GIT_CACHE_DIR"
-				mkdir -p "$GIT_CACHE_DIR"
-				export GIT_CACHE_ENABLED=false
-			fi
+# Copy every keg added or upgraded since BREW_BEFORE into BREW_KEGS_DIR, so the workflow can cache it
+save_brew_kegs() {
+	local prefix f keg
+	prefix=$(brew --prefix)
+	rm -rf $BREW_KEGS_DIR
+	mkdir -p $BREW_KEGS_DIR
+	touch $BREW_KEGS_DIR/formulae.txt
+	for f in $(comm -13 <(echo "$BREW_BEFORE" | sort) <(brew list --formula --versions | sort) | cut -d ' ' -f 1); do
+		keg=$(cd $prefix/opt/$f && pwd -P)
+		mkdir -p $BREW_KEGS_DIR/$f
+		cp -a $keg $BREW_KEGS_DIR/$f/
+		# keg-only formulae are not linked, so restore links only what brew linked here
+		if [ -L $prefix/var/homebrew/linked/$f ]; then
+			echo "$f linked" >> $BREW_KEGS_DIR/formulae.txt
 		else
-			echo "No Git cache - cloning fresh repositories"
-			export GIT_CACHE_ENABLED=false
+			echo "$f" >> $BREW_KEGS_DIR/formulae.txt
 		fi
-	fi
+	done
+	cat $BREW_KEGS_DIR/formulae.txt
 }
 
-setup_dependencies_cache() {
-    if [ "${CACHING_ENABLED}" == "true" ] && [ "${BUILT_DEPS_CACHE}" == "true" ]; then
-        echo "Built dependencies cache found, restoring cached dependencies"
-        # Validate cache isn't corrupted
-        if [ -d "$STAGING_AREA_DEPS" ] && [ "$(ls -A $STAGING_AREA_DEPS 2>/dev/null)" ]; then
-            echo "Found cached dependencies in $STAGING_AREA_DEPS"
-            export DEPENDENCIES_CACHED=true
-        else
-            echo "Dependencies cache directory empty or corrupted - clearing and rebuilding"
-            rm -rf "$STAGING_AREA_DEPS"
-            export DEPENDENCIES_CACHED=false
-        fi
-    else
-        echo "No dependencies cache - building fresh"
-        export DEPENDENCIES_CACHED=false
-    fi
-
+# Put the cached kegs back into the Cellar and recreate their opt/ and prefix links
+restore_brew_kegs() {
+	local prefix f linked keg
+	prefix=$(brew --prefix)
+	while read -r f linked <&3; do
+		brew unlink $f 2>/dev/null || true
+		rm -rf $prefix/Cellar/$f
+		cp -a $BREW_KEGS_DIR/$f $prefix/Cellar/
+		keg=$(ls $prefix/Cellar/$f)
+		ln -sfn ../Cellar/$f/$keg $prefix/opt/$f
+		if [ "$linked" == "linked" ]; then
+			brew link --overwrite $f
+		fi
+	done 3< $BREW_KEGS_DIR/formulae.txt
 }
 
 OS_VERSION=${1:-$(sw_vers -productVersion)}
@@ -134,12 +75,19 @@ install_packages() {
 	macos_version=$(sw_vers -productVersion)
 	major_version=$(echo "$macos_version" | cut -d '.' -f 1)
 
-	# Package installation based on cache status
-	if [ "${CACHING_ENABLED}" = "true" ] && [ "${HOMEBREW_CACHE_ENABLED}" = "true" ]; then
-		echo "Installing packages with cache optimization (skipping update/upgrade)..."
+	if [ "$major_version" -gt 12 ]; then
+		# Workaround: Install or update libtool package only if macOS version is greater than 12
+		# Note: libtool (v2.4.7) is pre-installed by default, but it can be updated to v2.5.3
+		PACKAGES="$PACKAGES libtool"
+	fi
+
+	if [ "${BREW_CACHE_HIT}" == "true" ]; then
+		echo "Restoring cached Homebrew kegs (skipping update/install)..."
 		export HOMEBREW_NO_AUTO_UPDATE=1
+		restore_brew_kegs
 	else
 		echo "Installing packages fresh..."
+		BREW_BEFORE=$(brew list --formula --versions)
 		brew update
 
 		if [ "$major_version" -gt 12 ]; then
@@ -149,14 +97,14 @@ install_packages() {
 			# building x86_64 bottles in Sept 2026, so 29 of those compiled from source on
 			# Intel -- node@22 took 46 min and llvm@22 was still building when the 120 min
 			# timeout killed the job. Scopy links none of them. See tasks/ci-macos-updates.md.
-			# Workaround: Install or update libtool package only if macOS version is greater than 12
-			# Note: libtool (v2.4.7) is pre-installed by default, but it can be updated to v2.5.3
-			PACKAGES="$PACKAGES libtool"
+		fi
+
+		brew install --overwrite --display-times $PACKAGES 2>&1 | grep -v "already installed and up-to-date"
+
+		if [ "${GITHUB_ACTIONS}" == "true" ]; then
+			save_brew_kegs
 		fi
 	fi
-
-
-	brew install --overwrite --display-times $PACKAGES 2>&1 | grep -v "already installed and up-to-date"
 
 	pip3 install --break-system-packages mako
 }
@@ -226,55 +174,30 @@ export_paths(){
 }
 
 clone() {
+	if [ "${DEPS_CACHE_HIT}" == "true" ]; then
+		echo "Dependencies restored from cache - skipping clone"
+		return 0
+	fi
+
 	echo "#######CLONE#######"
 	mkdir -p $STAGING_AREA
 	pushd $STAGING_AREA
 
-	if [ "${CACHING_ENABLED}" == "true" ] && [ "$GIT_CACHE_ENABLED" == "true" ]; then
-		echo "Using cached repositories..."
-
-		# If cache directory has content, use it
-		if [ -d "$GIT_CACHE_DIR" ] && [ "$(ls -A $GIT_CACHE_DIR 2>/dev/null)" ]; then
-			echo "Copying cached repositories"
-			cp -r "$GIT_CACHE_DIR"/* .
-		else
-			echo "Git cache directory empty - cloning fresh"
-			export GIT_CACHE_ENABLED=false
-		fi
+	git clone --recursive https://github.com/sigrokproject/libserialport -b $LIBSERIALPORT_BRANCH libserialport
+	git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
+	git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
+	git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
+	git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
+	git clone --recursive https://github.com/analogdevicesinc/genalyzer.git -b $GENALYZER_BRANCH genalyzer
+	git clone --recursive https://github.com/qcoro/qcoro.git -b $QCORO_BRANCH qcoro
+	if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
+		git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_V0_VERSION libiio
+		git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
+		git clone --recursive https://github.com/analogdevicesinc/libad9166-iio.git -b $LIBAD9166_BRANCH libad9166
+		git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
+		git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
 	else
-			echo "Git cache disabled - cloning fresh"
-			export GIT_CACHE_ENABLED=false
-	fi
-
-	if [ "$GIT_CACHE_ENABLED" == "false" ]; then
-		echo "Cloning all repositories fresh..."
-
-		git clone --recursive https://github.com/sigrokproject/libserialport -b $LIBSERIALPORT_BRANCH libserialport
-		git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
-		git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
-		git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
-		git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
-		git clone --recursive https://github.com/analogdevicesinc/genalyzer.git -b $GENALYZER_BRANCH genalyzer
-		git clone --recursive https://github.com/qcoro/qcoro.git -b $QCORO_BRANCH qcoro
-		DEPENDENCY_REPOS="libserialport libiio qwt KDDockWidgets extra-cmake-modules karchive genalyzer qcoro"
-		if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
-			git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_V0_VERSION libiio
-			git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
-			git clone --recursive https://github.com/analogdevicesinc/libad9166-iio.git -b $LIBAD9166_BRANCH libad9166
-			git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
-			git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
-			DEPENDENCY_REPOS="$DEPENDENCY_REPOS libad9361 libad9166 libm2k libtinyiiod"
-		else
-			git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
-		fi
-
-		# Save to cache for next time
-		if [ "${CACHING_ENABLED}" == "true" ] && [ -n "$GIT_CACHE_DIR" ]; then
-			mkdir -p "$GIT_CACHE_DIR"
-			for repo in $DEPENDENCY_REPOS; do
-				cp -r "$repo" "$GIT_CACHE_DIR/"
-			done
-		fi
+		git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
 	fi
 
 	popd
@@ -284,11 +207,14 @@ generate_status_file(){
 	# Generate build status info for the about page
 	BUILD_STATUS_FILE=${REPO_SRC}/build-status
 	brew list --versions $PACKAGES > $BUILD_STATUS_FILE
+	cat $STAGING_AREA_DEPS/deps-versions >> $BUILD_STATUS_FILE
 }
 
+# Kept inside STAGING_AREA_DEPS so it is cached together with the dependencies
 save_version_info() {
+	mkdir -p $STAGING_AREA_DEPS
 	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
-	>> $BUILD_STATUS_FILE
+	>> $STAGING_AREA_DEPS/deps-versions
 }
 
 build_with_cmake() {
@@ -569,12 +495,13 @@ build_qcoro() {
 }
 
 build_deps(){
-	if [ "${CACHING_ENABLED}" == "true" ] && [ "$DEPENDENCIES_CACHED" == "true" ]; then
-		echo "Found cached dependencies in $STAGING_AREA_DEPS"
+	if [ "${DEPS_CACHE_HIT}" == "true" ]; then
+		echo "Dependencies restored from cache in $STAGING_AREA_DEPS"
 		return 0
 	fi
 
 	echo "Building all dependencies from source..."
+	rm -f $STAGING_AREA_DEPS/deps-versions
 
 	build_libserialport
 	if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
@@ -595,18 +522,11 @@ build_deps(){
 	build_qcoro
 }
 
-# Setup cache management
-cleanup_old_caches
-setup_homebrew_cache
-setup_git_cache
-setup_dependencies_cache
-check_cache_sizes
-
 # Install Qt6 via aqtinstall, install dependencies, clone repositories, and build all dependencies
 install_packages
 install_qt
 export_paths
 patch_qt_macos26
 clone
-generate_status_file
 build_deps
+generate_status_file
