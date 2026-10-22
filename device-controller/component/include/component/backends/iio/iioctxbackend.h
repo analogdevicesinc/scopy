@@ -43,7 +43,8 @@ namespace scopy::component::iio {
 class COMPONENT_EXPORT IIOCtxBackend : public ContextBackend
 {
 public:
-	static constexpr const char *ID = "libiio";
+	// Also the device category of the devices it opens.
+	static constexpr const char *ID = "iio";
 
 	IIOCtxBackend();
 	~IIOCtxBackend() override;

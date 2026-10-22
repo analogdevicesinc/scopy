@@ -27,16 +27,14 @@
 #include <QCheckBox>
 #include <QObject>
 
-namespace scopy::component {
-class DeviceMonitor;
-}
-
 namespace scopy {
+class DeviceScanner;
+
 class SCOPY_CORE_EXPORT ScanButtonController : public QObject
 {
 	Q_OBJECT
 public:
-	explicit ScanButtonController(component::DeviceMonitor *monitor, QCheckBox *btn, QObject *parent);
+	explicit ScanButtonController(DeviceScanner *scanner, QCheckBox *btn, QObject *parent);
 	~ScanButtonController();
 
 	int scanTimeout() const;
@@ -49,7 +47,7 @@ public Q_SLOTS:
 
 private:
 	QCheckBox *btn;
-	component::DeviceMonitor *m_monitor;
+	DeviceScanner *m_scanner;
 	QMetaObject::Connection conn;
 
 	int m_scanTimeout;
