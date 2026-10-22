@@ -63,9 +63,16 @@ void PlotMarkerController::setNrOfMarkers(int n)
 		delete m_markers[i];
 	}
 	m_markers.clear();
+	deinitFixedMarker();
+	if(m_markerType != MC_FIXED) {
+		m_markerInfo.clear();
+	}
 
 	m_nrOfMarkers = n;
 	if(m_markerType == MC_NONE) {
+		if(m_plot) {
+			m_plot->replot();
+		}
 		return;
 	}
 
@@ -86,7 +93,6 @@ void PlotMarkerController::setNrOfMarkers(int n)
 	}
 
 	if(m_markerType == MC_FIXED) {
-		deinitFixedMarker();
 		initFixedMarker();
 	}
 }
@@ -130,9 +136,11 @@ void PlotMarkerController::deinitFixedMarker()
 void PlotMarkerController::computeFixedMarkerFrequency()
 {
 	for(int i = 0; i < m_nrOfMarkers; i++) {
-		m_markerInfo[i].peak.y = m_ch->plotChannel()->getValueAt(m_markerInfo[i].peak.x);
+		m_markerInfo[i].peak.y = valueAt(m_markerInfo[i].peak.x);
 	}
 }
+
+double PlotMarkerController::valueAt(double x) { return m_ch ? m_ch->plotChannel()->getValueAt(x) : 0.0; }
 
 const QList<PlotMarkerController::MarkerInfo> &PlotMarkerController::markerInfo() const { return m_markerInfo; }
 

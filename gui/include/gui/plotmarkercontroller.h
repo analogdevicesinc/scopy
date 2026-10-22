@@ -97,6 +97,9 @@ protected:
 	virtual void computeSingleToneMarkers() = 0;
 	virtual void computePeaks() = 0;
 	virtual void initFixedMarker() = 0;
+	// The curve's value under a fixed marker. The default reads the PlotComponentChannel
+	// this controller was built on; a controller built without one overrides it.
+	virtual double valueAt(double x);
 
 	QwtPlot *m_plot;
 	QwtAxisId m_xAxis;
@@ -125,7 +128,7 @@ private:
 
 	MarkerTypes m_markerType;
 
-	PlotComponentChannel *m_ch;
+	PlotComponentChannel *m_ch{nullptr};
 };
 
 class SCOPY_GUI_EXPORT MarkerPanel : public QWidget
