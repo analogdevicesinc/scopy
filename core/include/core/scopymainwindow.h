@@ -30,7 +30,6 @@
 #include "scopyhomepage.h"
 #include "scriptingtool.h"
 #include "devicemanager.h"
-#include "scannediiocontextcollector.h"
 #include "detachedtoolwindowmanager.h"
 #include "pluginrepository.h"
 #include "scopy-core_export.h"
@@ -38,9 +37,8 @@
 #include "scopypreferencespage.h"
 #include "pluginbase/preferences.h"
 #include "pluginbase/versionchecker.h"
-#include "iioutil/cyclicaltask.h"
-#include "dcioscantask.h"
 #include <gui/widgets/scopystatusbar.h>
+#include <component/devicemonitor.h>
 #include "versioncheckmessage.h"
 
 #include "toolmenumanager.h"
@@ -93,9 +91,7 @@ private:
 	ScopyHomePage *hp;
 	DeviceManager *dm;
 
-	CyclicalTask *scanCycle;
-	DcIioScanTask *scanTask;
-	ScannedIIOContextCollector *scc;
+	component::DeviceMonitor *scanMonitor;
 	DetachedToolWindowManager *dtm;
 
 	LicenseOverlay *license = nullptr;

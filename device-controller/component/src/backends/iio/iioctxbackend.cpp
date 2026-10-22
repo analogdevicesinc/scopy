@@ -19,31 +19,55 @@
  *
  */
 
-#include "component/backends/iio/iiocontextfactory.h"
+#include "component/backends/iio/iioctxbackend.h"
 
 #include "component/backends/iio/iiocomponentbuilder.h"
 #include "component/backends/iio/iiocontext.h"
+#include "component/devicemonitor.h"
 
 #include "core/pooledcmdexecutor.h"
 #include "iioutil/ibackend.h"
 #include "iioutil/icontextops.h"
+#include "iioutil/iscanops.h"
 
 using namespace scopy;
 using namespace scopy::component;
 using namespace scopy::component::iio;
 
+namespace {
+// libiio reports "name (hw_model ...), serial=..."; keep the part users recognise.
+QString parseDescription(const QString &d)
+{
+	int startPos = d.indexOf('(');
+	if(startPos == -1) {
+		return d;
+	}
+	int endPos = d.indexOf(")), serial=");
+	if(endPos == -1) {
+		endPos = d.lastIndexOf(')');
+	} else {
+		startPos += 1;
+	}
+	return d.mid(startPos, endPos - startPos + 1);
+}
+} // namespace
+
 // Implemented by the libiio backend linked into `component` (iio-backend-v0 or iio-backend-v1,
 // selected at build time by SCOPY_LIBIIO_VERSION). Resolved at link time — no dlopen.
 extern "C" scopy::iio::IBackend *createIIOBackend();
 
-scopy::iio::IBackend *IIOContextFactory::defaultBackend()
+IIOCtxBackend::IIOCtxBackend() = default;
+
+IIOCtxBackend::~IIOCtxBackend() = default;
+
+scopy::iio::IBackend *IIOCtxBackend::defaultBackend()
 {
 	// The backend is stateless and kept resident for the whole process.
 	static scopy::iio::IBackend *s_backend = createIIOBackend();
 	return s_backend;
 }
 
-Context *IIOContextFactory::create(const QString &uri, const int maxThreads)
+Context *IIOCtxBackend::create(const QString &uri, const int maxThreads)
 {
 	scopy::iio::IBackend *backend = defaultBackend();
 	if(!backend) {
@@ -69,4 +93,32 @@ Context *IIOContextFactory::create(const QString &uri, const int maxThreads)
 		return nullptr;
 	}
 	return ctx;
+}
+
+QVector<ScanResult> IIOCtxBackend::scan(const QString &filter)
+{
+	QVector<ScanResult> results;
+	scopy::iio::IBackend *backend = defaultBackend();
+	if(!backend) {
+		return results;
+	}
+	const QVector<scopy::iio::ScanResult> found = backend->scanOps()->scan(filter);
+	for(const scopy::iio::ScanResult &r : found) {
+		results.append({r.uri, parseDescription(r.description), ID});
+	}
+	return results;
+}
+
+QStringList IIOCtxBackend::scanFilters() const
+{
+	scopy::iio::IBackend *backend = defaultBackend();
+	return backend ? backend->scanOps()->availableBackends() : QStringList();
+}
+
+DeviceMonitor *IIOCtxBackend::monitor()
+{
+	if(!m_monitor) {
+		m_monitor = std::make_unique<PollingDeviceMonitor>(this, QStringLiteral("usb"));
+	}
+	return m_monitor.get();
 }

@@ -34,6 +34,7 @@
 #include "toolstack.h"
 #include "whatsnewoverlay.h"
 #include <component/controller.h>
+#include <component/backends/iio/iioctxbackend.h>
 using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_SCOPY_API, "Scopy_API")
@@ -61,7 +62,7 @@ namespace {
 // ConnectionProvider::open() used purely as a connectivity check. The handle releases immediately.
 bool probeUri(const QString &uri)
 {
-	auto h = scopy::component::Controller::connectCtx(uri, scopy::component::BackendKind::Libiio, 1);
+	auto h = scopy::component::Controller::connectCtx(uri, scopy::component::iio::IIOCtxBackend::ID, 1);
 	return static_cast<bool>(h);
 }
 } // namespace
@@ -145,7 +146,7 @@ bool ScopyMainWindow_API::removeDevice(int idx)
 
 bool ScopyMainWindow_API::startScan(bool scanState)
 {
-	ScanButtonController *sbc = new ScanButtonController(m_w->scanCycle, m_w->hp->scanControlBtn(), this);
+	ScanButtonController *sbc = new ScanButtonController(m_w->scanMonitor, m_w->hp->scanControlBtn(), this);
 	sbc->enableScan(scanState);
 	return scanState;
 }

@@ -21,11 +21,9 @@
 
 #include "devicefactory.h"
 
-#include "iiodeviceimpl.h"
-#include "swiotdeviceimpl.h"
+#include <QThread>
 
-#include <component/context.h>
-#include <component/device.h>
+#include <component/backends/iio/iioctxbackend.h>
 #include <pluginbase/preferences.h>
 
 using namespace scopy;
@@ -34,15 +32,9 @@ DeviceImpl *DeviceFactory::build(QString param, QString category, QObject *paren
 {
 	int maxThreads = Preferences::get("dc_cmd_execution_parallel").toBool() ? QThread::idealThreadCount() : 1;
 	if(category.compare("iio", Qt::CaseInsensitive) == 0) {
-		component::ContextHandle ctx =
-			component::Controller::connectCtx(param, component::BackendKind::Libiio, maxThreads);
-		if(ctx && ctx->findChild<component::Device *>("swiot", Qt::FindDirectChildrenOnly)) {
-			return new SWIOTDeviceImpl(param, maxThreads, parent);
-		}
-		return new IIODeviceImpl(param, maxThreads, parent);
-	} else {
-		return new DeviceImpl(param, category, parent);
+		return new DeviceImpl(param, category, component::iio::IIOCtxBackend::ID, maxThreads, parent);
 	}
+	return new DeviceImpl(param, category, {}, 1, parent);
 }
 
 #include "moc_devicefactory.cpp"
