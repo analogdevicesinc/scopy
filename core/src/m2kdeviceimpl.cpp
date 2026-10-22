@@ -40,7 +40,7 @@ void M2kDeviceImpl::acquireGenericContext()
 	if(m_context) {
 		return;
 	}
-	m_context = component::Controller::connectCtx(m_param, component::BackendKind::Libiiov0, m_maxThreads);
+	m_context = component::Controller::connectCtx(m_param, component::BackendKind::Libiio, m_maxThreads);
 	if(!m_context) {
 		qWarning(CAT_M2K_DEVICEIMPL) << "Failed to acquire the generic context for" << m_param;
 	}
@@ -64,7 +64,7 @@ void M2kDeviceImpl::connectDev()
 			if(!m_context) {
 				qInfo(CAT_M2K_DEVICEIMPL)
 					<< "No M2K context for" << m_param << "- falling back to libiio";
-				m_context = component::Controller::connectCtx(m_param, component::BackendKind::Libiiov0,
+				m_context = component::Controller::connectCtx(m_param, component::BackendKind::Libiio,
 									      m_maxThreads);
 			}
 			DeviceImpl::connectDev();
