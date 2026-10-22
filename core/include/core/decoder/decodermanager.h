@@ -59,7 +59,7 @@ struct DecoderInstance
 
 // Owns active decoder instances and wires their processors. Each processor writes its
 // annotations to the DataStore; drawing is up to the view.
-// Main-thread only; config mutation requires the engine to be stopped.
+// Main-thread only. Config edits apply mid-run; stack changes require the engine to be stopped.
 class SCOPY_CORE_EXPORT DecoderManager : public QObject
 {
 	Q_OBJECT
@@ -96,7 +96,8 @@ public:
 	// Remove stages index >= fromIndex (fromIndex >= 1). Engine must be stopped.
 	void popStagesFrom(const QString &uid, int fromIndex);
 
-	// Engine must be stopped.
+	// Safe while the engine is running: takes effect on the next cycle. The stack depth
+	// must match the instance's — stacking goes through pushStage()/popStagesFrom().
 	void applyConfig(const QString &uid, const DecoderConfig &cfg,
 			 const QList<scopy::acq::DataKey> &orderedRawKeys);
 
