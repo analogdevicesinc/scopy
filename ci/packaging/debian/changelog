@@ -1,0 +1,5 @@
+scopy (${VERSION}) UNRELEASED; urgency=low
+
+${RELEASE_NOTES}
+
+ -- EngineerZone <linux@analog.com>  @DATE@
