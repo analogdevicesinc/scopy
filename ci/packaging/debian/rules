@@ -19,8 +19,14 @@ override_dh_auto_configure:
 	# No configuration needed for AppImage repackaging
 
 override_dh_auto_build:
-	# Copy the already-built AppImage from the provided path
-	cp $(APPIMAGE_PATH) $(SCOPY)
+	# Copy the already-built AppImage from the provided path.
+	# DEB_APPIMAGE_PATH is used (not APPIMAGE_PATH) because debuild sanitizes
+	# the build environment and only preserves variables matching DEB_* by default.
+	@if [ -z "$(DEB_APPIMAGE_PATH)" ]; then \
+		echo "ERROR: DEB_APPIMAGE_PATH is empty; the caller must point it at the built AppImage." >&2; \
+		exit 1; \
+	fi
+	cp $(DEB_APPIMAGE_PATH) $(SCOPY)
 	chmod +x $(SCOPY)
 
 override_dh_auto_install:
