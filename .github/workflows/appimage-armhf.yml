@@ -69,17 +69,41 @@ jobs:
           id: version
           run: |
             ver=$(grep -oP 'project\(scopy VERSION \K[0-9.]+' CMakeLists.txt)
-            phase=$(grep -oP 'set\(SCOPY_RELEASE_PHASE \K[^)]+' CMakeLists.txt || true)
-            phase=${phase//\"/}
-            echo "version=${ver}${phase//-/~}" >> "$GITHUB_OUTPUT"
+            phase=$(grep -oP 'set\(SCOPY_RELEASE_PHASE \K[^)]+' CMakeLists.txt | tr -d '"' | sed 's/^-/~/' || true)
+            printf 'version=%s%s\n' "$ver" "$phase" >> "$GITHUB_OUTPUT"
+
+        - name: Checkout shared-actions for build-deb.sh
+          uses: actions/checkout@v6
+          with:
+            repository: analogdevicesinc/shared-actions
+            ref: 9efc4d656aced2e6cba05ff76c24eea54c9e3688
+            path: shared-actions
+
+        - name: Set up QEMU for armhf containers
+          uses: docker/setup-qemu-action@v3
 
         - name: Generate .deb package
-          uses: analogdevicesinc/shared-actions/deb-generator-action@9efc4d656aced2e6cba05ff76c24eea54c9e3688
-          env:
-            APPIMAGE_PATH: ${{ github.workspace }}/Scopy-armhf.AppImage
+          id: deb
+          run: |
+            IGNORE_PATH=$(printf '%s\n' '${{ env.APPIMAGE_NAME }}.AppImage' 'shared-actions' 'build*' 'ci/arm/staging')
+            docker run --rm --platform linux/arm/v7 \
+              -e VERSION=${{ steps.version.outputs.version }} \
+              -e WORKING_DIRECTORY=/scopy \
+              -e CONTROL_PATH=ci/packaging/debian \
+              -e IGNORE_PATH="$IGNORE_PATH" \
+              -e GITHUB_WORKSPACE=/scopy \
+              -e DEB_APPIMAGE_PATH=/scopy/${{ env.APPIMAGE_NAME }}.AppImage \
+              -v "$GITHUB_WORKSPACE:/scopy" \
+              -v "$GITHUB_WORKSPACE/shared-actions:/shared-actions:ro" \
+              arm32v7/debian:bookworm \
+              bash -c "apt-get update && apt-get install -y --no-install-recommends curl ca-certificates && bash /shared-actions/deb-generator-action/build-deb.sh"
+            echo "artifact-dir=$GITHUB_WORKSPACE/artifacts" >> "$GITHUB_OUTPUT"
+
+        - name: Upload deb package
+          uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
           with:
-            version: ${{ steps.version.outputs.version }}
-            control-path: ci/packaging/debian
+            name: scopy-deb-armhf${{ matrix.libiio == '0' && '-libiio-v0' || '' }}
+            path: ${{ steps.deb.outputs.artifact-dir }}/*.deb
 
         - name: Set short git commit SHA
           shell: bash

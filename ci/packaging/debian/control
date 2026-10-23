@@ -8,7 +8,7 @@ Homepage: https://github.com/analogdevicesinc/scopy
 
 Package: scopy
 Architecture: @ARCHITECTURE@
-Depends: libfuse2t64, libxcb-icccm4, libxcb-image0, libxcb-keysyms1, libxcb-render-util0, libxcb-xinerama0, libxkbcommon-x11-0, libxcb-xkb1
+Depends: ${misc:Depends}, libfuse2 | libfuse2t64, libopengl0, libgl1, libglx0, libegl1, libxcb-icccm4, libxcb-image0, libxcb-keysyms1, libxcb-render-util0, libxcb-xinerama0, libxkbcommon-x11-0, libxcb-xkb1
 Description: Scopy - software oscilloscope and signal analysis toolset
  Scopy is a software oscilloscope and signal analysis toolset from
  Analog Devices Inc.
