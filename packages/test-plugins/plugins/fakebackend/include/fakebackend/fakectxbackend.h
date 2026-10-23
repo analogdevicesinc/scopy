@@ -47,6 +47,7 @@ public:
 	component::Context *create(const QString &uri, const int maxThreads) override;
 	QVector<component::ScanResult> scan(const QString &filter = QString()) override;
 	component::DeviceMonitor *monitor() override;
+	QString uriHint() const override { return "fake:0, fake:hotplug"; }
 
 private:
 	QVector<component::ScanResult> available() const;

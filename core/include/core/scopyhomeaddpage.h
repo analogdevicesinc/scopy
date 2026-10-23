@@ -22,6 +22,7 @@
 #ifndef SCOPYHOMEADDPAGE_H
 #define SCOPYHOMEADDPAGE_H
 
+#include "backendstabwidget.h"
 #include "deviceimpl.h"
 #include "emuwidget.h"
 #include "iiotabwidget.h"
@@ -56,7 +57,7 @@ public Q_SLOTS:
 	void deviceAddedToUi(QString);
 
 private Q_SLOTS:
-	void futureVerify(QString uri, QString cat);
+	void futureVerify(QWidget *source, QString uri, QString cat);
 	void onVerifyFinished();
 	void deviceLoaderInitialized();
 	void addBtnClicked();
@@ -78,6 +79,9 @@ private:
 
 	EmuWidget *m_emuWidget;
 	IioTabWidget *m_iioTabWidget;
+	BackendsTabWidget *m_backendsTabWidget;
+	// The tab that started the running verify; it gets the result.
+	QWidget *m_verifySource = nullptr;
 	QString m_pendingUri;
 	QFutureWatcher<bool> *m_fw;
 

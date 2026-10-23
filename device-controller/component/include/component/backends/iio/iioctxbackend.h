@@ -53,6 +53,7 @@ public:
 	Context *create(const QString &uri, const int maxThreads) override;
 	QVector<ScanResult> scan(const QString &filter = QString()) override;
 	QStringList scanFilters() const override;
+	QString uriHint() const override { return "ip:192.168.2.1, usb:1.2.3, serial:/dev/ttyUSB0,115200,8n1"; }
 	DeviceMonitor *monitor() override;
 
 	// The process-wide libiio backend linked into this build. Lets non-context clients reach the
