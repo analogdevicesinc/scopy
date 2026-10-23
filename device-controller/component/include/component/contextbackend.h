@@ -56,8 +56,14 @@ public:
 	virtual Context *create(const QString &uri, const int maxThreads) = 0;
 
 	// Blocking scan, call it off the UI thread. filter is backend-specific (e.g. "usb", "ip:").
-	// Results carry a display-ready description.
+	// Results carry a display-ready description and a uri in this backend's own scheme. A backend
+	// that reaches devices over a serial port lists the ports itself and recognises its devices by
+	// VID:PID / description / serial number; it must not open ports to probe them, since another
+	// backend (or the user) may be using the same port.
 	virtual QVector<ScanResult> scan(const QString &filter = QString()) = 0;
+
+	// Uri format shown to users typing a uri by hand (e.g. "ip:192.168.2.1, usb:1.2.3").
+	virtual QString uriHint() const { return {}; }
 
 	// Scan filters supported by this backend (e.g. "usb", "ip", "serial" for libiio).
 	virtual QStringList scanFilters() const { return {}; }
