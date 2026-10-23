@@ -1,5 +1,5 @@
-scopy (${VERSION}) UNRELEASED; urgency=low
+scopy (@VERSION@) UNRELEASED; urgency=low
 
-${RELEASE_NOTES}
+  * CI release.
 
  -- EngineerZone <linux@analog.com>  @DATE@

@@ -86,17 +86,27 @@ jobs:
           id: version
           run: |
             ver=$(grep -oP 'project\(scopy VERSION \K[0-9.]+' CMakeLists.txt)
-            phase=$(grep -oP 'set\(SCOPY_RELEASE_PHASE \K[^)]+' CMakeLists.txt || true)
-            phase=${phase//\"/}
-            echo "version=${ver}${phase//-/~}" >> "$GITHUB_OUTPUT"
+            phase=$(grep -oP 'set\(SCOPY_RELEASE_PHASE \K[^)]+' CMakeLists.txt | tr -d '"' | sed 's/^-/~/' || true)
+            printf 'version=%s%s\n' "$ver" "$phase" >> "$GITHUB_OUTPUT"
 
         - name: Generate .deb package
+          id: deb
           uses: analogdevicesinc/shared-actions/deb-generator-action@9efc4d656aced2e6cba05ff76c24eea54c9e3688
           env:
-            APPIMAGE_PATH: ${{ github.workspace }}/${{ env.app_image_name }}
+            DEB_APPIMAGE_PATH: ${{ github.workspace }}/${{ env.app_image_name }}
           with:
             version: ${{ steps.version.outputs.version }}
             control-path: ci/packaging/debian
+            ignore-path: |
+              ${{ env.app_image_name }}
+              build*
+              ci/x86_64/staging
+
+        - name: Upload deb package
+          uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+          with:
+            name: scopy-deb-x86_64-ubuntu${{ matrix.ubuntu_version }}${{ matrix.libiio == '0' && '-libiio-v0' || '' }}
+            path: ${{ steps.deb.outputs.artifact-dir }}/*.deb
 
         - name: Set short git commit SHA
           shell: bash
