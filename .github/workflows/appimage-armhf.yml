@@ -65,6 +65,22 @@ jobs:
                                         cd /home/runner/scopy && \
                                         ./ci/arm/arm_cross_build_process.sh download_cmake generate_appimage
                                         '
+        - name: Extract Scopy version
+          id: version
+          run: |
+            ver=$(grep -oP 'project\(scopy VERSION \K[0-9.]+' CMakeLists.txt)
+            phase=$(grep -oP 'set\(SCOPY_RELEASE_PHASE \K[^)]+' CMakeLists.txt || true)
+            phase=${phase//\"/}
+            echo "version=${ver}${phase//-/~}" >> "$GITHUB_OUTPUT"
+
+        - name: Generate .deb package
+          uses: analogdevicesinc/shared-actions/deb-generator-action@9efc4d656aced2e6cba05ff76c24eea54c9e3688
+          env:
+            APPIMAGE_PATH: ${{ github.workspace }}/Scopy-armhf.AppImage
+          with:
+            version: ${{ steps.version.outputs.version }}
+            control-path: ci/packaging/debian
+
         - name: Set short git commit SHA
           shell: bash
           run: echo "commit_sha=$(git rev-parse --short ${{ github.sha }})" >> "$GITHUB_ENV"

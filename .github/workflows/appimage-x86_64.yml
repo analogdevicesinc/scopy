@@ -82,6 +82,22 @@ jobs:
             echo "app_image_folder=scopy-qt6-x86_64-appimage-ubuntu${UBUNTU_VERSION_SHORT}${LIBIIO_SUFFIX}" >> "$GITHUB_ENV"
             echo "app_image_name=scopy-qt6-x86_64-appimage-ubuntu${UBUNTU_VERSION_SHORT}${LIBIIO_SUFFIX}.AppImage" >> "$GITHUB_ENV"
 
+        - name: Extract Scopy version
+          id: version
+          run: |
+            ver=$(grep -oP 'project\(scopy VERSION \K[0-9.]+' CMakeLists.txt)
+            phase=$(grep -oP 'set\(SCOPY_RELEASE_PHASE \K[^)]+' CMakeLists.txt || true)
+            phase=${phase//\"/}
+            echo "version=${ver}${phase//-/~}" >> "$GITHUB_OUTPUT"
+
+        - name: Generate .deb package
+          uses: analogdevicesinc/shared-actions/deb-generator-action@9efc4d656aced2e6cba05ff76c24eea54c9e3688
+          env:
+            APPIMAGE_PATH: ${{ github.workspace }}/${{ env.app_image_name }}
+          with:
+            version: ${{ steps.version.outputs.version }}
+            control-path: ci/packaging/debian
+
         - name: Set short git commit SHA
           shell: bash
           run: |

@@ -1,0 +1,14 @@
+Source: scopy
+Section: misc
+Priority: optional
+Maintainer: EngineerZone <linux@analog.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.0
+Homepage: https://github.com/analogdevicesinc/scopy
+
+Package: scopy
+Architecture: @ARCHITECTURE@
+Depends: libfuse2t64, libxcb-icccm4, libxcb-image0, libxcb-keysyms1, libxcb-render-util0, libxcb-xinerama0, libxkbcommon-x11-0, libxcb-xkb1
+Description: Scopy - software oscilloscope and signal analysis toolset
+ Scopy is a software oscilloscope and signal analysis toolset from
+ Analog Devices Inc.
