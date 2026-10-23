@@ -69,8 +69,17 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent)
 	// verify iio device
 	m_fw = new QFutureWatcher<bool>(this);
 	connect(m_fw, &QFutureWatcher<bool>::finished, this, &ScopyHomeAddPage::onVerifyFinished, Qt::QueuedConnection);
-	connect(this, &ScopyHomeAddPage::verifyFinished, m_iioTabWidget, &IioTabWidget::onVerifyFinished);
-	connect(m_iioTabWidget, &IioTabWidget::startVerify, this, &ScopyHomeAddPage::futureVerify);
+	connect(this, &ScopyHomeAddPage::verifyFinished, this, [this](bool result) {
+		if(m_verifySource == m_backendsTabWidget) {
+			m_backendsTabWidget->onVerifyFinished(result);
+		} else {
+			m_iioTabWidget->onVerifyFinished(result);
+		}
+	});
+	connect(m_iioTabWidget, &IioTabWidget::startVerify, this,
+		[this](QString uri, QString cat) { futureVerify(m_iioTabWidget, uri, cat); });
+	connect(m_backendsTabWidget, &BackendsTabWidget::startVerify, this,
+		[this](QString uri, QString cat) { futureVerify(m_backendsTabWidget, uri, cat); });
 
 	connect(m_emuWidget, &EmuWidget::emuDeviceAvailable, this, &ScopyHomeAddPage::onEmuDeviceAvailable);
 
@@ -89,8 +98,9 @@ ScopyHomeAddPage::~ScopyHomeAddPage()
 	}
 }
 
-void ScopyHomeAddPage::futureVerify(QString uri, QString cat)
+void ScopyHomeAddPage::futureVerify(QWidget *source, QString uri, QString cat)
 {
+	m_verifySource = source;
 	removePluginsCheckBoxes();
 	m_deviceInfoPage->clear();
 	m_deviceImpl = DeviceFactory::build(uri, cat);
@@ -170,6 +180,7 @@ void ScopyHomeAddPage::deviceAddedToUi(QString id)
 	if(!m_pendingUri.isEmpty()) {
 		m_deviceImpl = nullptr;
 		m_iioTabWidget->updateUri("");
+		m_backendsTabWidget->updateUri("");
 		m_stackedWidget->setCurrentWidget(m_tabWidget);
 		Q_EMIT requestDevice(id);
 		m_pendingUri = "";
@@ -203,6 +214,8 @@ QTabWidget *ScopyHomeAddPage::createTabWidget(QWidget *parent)
 	QTabWidget *tabWidget = new QTabWidget(parent);
 	m_iioTabWidget = new IioTabWidget(tabWidget);
 	tabWidget->addTab(m_iioTabWidget, "IIO");
+	m_backendsTabWidget = new BackendsTabWidget(tabWidget);
+	tabWidget->addTab(m_backendsTabWidget, "Devices");
 	m_emuWidget = new EmuWidget(tabWidget);
 	tabWidget->addTab(m_emuWidget, "Emulator");
 	tabWidget->setCurrentWidget(m_iioTabWidget);
