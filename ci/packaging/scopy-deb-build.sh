@@ -40,7 +40,7 @@ set +a
 
 export SCOPY=Scopy.AppImage
 export SCOPY_ROOT=scopy-root
-export APPIMAGE_PATH=$(readlink -f "$APPIMAGE_PATH")
+export DEB_APPIMAGE_PATH=$(readlink -f "$APPIMAGE_PATH")
 
 WORK_DIR="${PACKAGE}-${VERSION}"
 
