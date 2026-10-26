@@ -43,7 +43,9 @@ public:
 	void clear();
 	QList<Plugin *> getOriginalPlugins() const;
 	QList<Plugin *> getPlugins(QString category = "");
-	QList<Plugin *> getCompatiblePlugins(QString param, QString category = "");
+	// `backends` (the device connection's compatible views) widens the accepted categories; empty
+	// means only `category`.
+	QList<Plugin *> getCompatiblePlugins(QString param, QString category = "", QStringList backends = {});
 	QList<PluginInfo> getPluginsInfo() const;
 	QList<PluginInfo> getLoadedPlugins() const;
 	QList<PluginInfo> getUnloadedPlugins() const;

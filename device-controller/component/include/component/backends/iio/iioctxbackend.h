@@ -22,46 +22,21 @@
 #pragma once
 
 #include "component/contextbackend.h"
-#include "iioutil/handles.h"
+
 #include "component/component_export.h"
-
-#include <memory>
-
-namespace scopy::iio {
-class IBackend;
-}
-
-namespace scopy::component {
-class DeviceMonitor;
-}
 
 namespace scopy::component::iio {
 
-// The libiio backend: instantiates the libiio backend linked into this build (SCOPY_LIBIIO_VERSION
-// selects v0 or v1 at compile time), opens the context handle, attaches a serial executor and runs
-// the IIO component builder. Scans through IScanOps; its monitor polls "usb".
+// The generic IIO view: runs the IIO component builder over an IIOConnection.
 class COMPONENT_EXPORT IIOCtxBackend : public ContextBackend
 {
 public:
-	// Also the device category of the devices it opens.
 	static constexpr const char *ID = "iio";
 
-	IIOCtxBackend();
-	~IIOCtxBackend() override;
-
 	BackendId id() const override { return ID; }
-	Context *create(const QString &uri, const int maxThreads) override;
-	QVector<ScanResult> scan(const QString &filter = QString()) override;
-	QStringList scanFilters() const override;
-	QString uriHint() const override { return "ip:192.168.2.1, usb:1.2.3, serial:/dev/ttyUSB0,115200,8n1"; }
-	DeviceMonitor *monitor() override;
-
-	// The process-wide libiio backend linked into this build. Lets non-context clients reach the
-	// backend without opening a context. Kept resident for the whole process; never null.
-	static scopy::iio::IBackend *defaultBackend();
-
-private:
-	std::unique_ptr<DeviceMonitor> m_monitor;
+	ConnectionKind connectionKind() const override;
+	bool compatible(const Connection &c) const override;
+	Context *create(Connection &c) override;
 };
 
 } // namespace scopy::component::iio

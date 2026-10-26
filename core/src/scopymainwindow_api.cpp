@@ -58,12 +58,11 @@ void ScopyMainWindow_API::acceptLicense()
 }
 
 namespace {
-// Lightweight "can we open this context?" probe through the device-controller, replacing the old
-// ConnectionProvider::open() used purely as a connectivity check. The handle releases immediately.
-// A category without a backend falls back to libiio.
+// "Can we open this uri?" probe; the handle releases immediately. A category without a provider
+// falls back to libiio.
 bool probeUri(const QString &uri, const QString &cat)
 {
-	auto h = scopy::component::Controller::connectCtx(uri, scopy::DeviceFactory::backendFor(cat), 1);
+	auto h = scopy::component::Controller::open(uri, scopy::DeviceFactory::kindFor(cat));
 	return static_cast<bool>(h);
 }
 } // namespace
@@ -472,7 +471,9 @@ QStringList ScopyMainWindow_API::availablePlugins(QString uri, QString cat, Devi
 	if(!uri.isEmpty()) {
 		compatiblePlugins = pr->getCompatiblePlugins(uri, cat);
 	} else if(dev) {
-		compatiblePlugins = pr->getCompatiblePlugins(dev->param(), dev->category());
+		auto *impl = dynamic_cast<DeviceImpl *>(dev);
+		compatiblePlugins = pr->getCompatiblePlugins(dev->param(), dev->category(),
+							     impl ? impl->backends() : QStringList());
 	}
 
 	for(int i = 0; i < compatiblePlugins.size(); i++) {

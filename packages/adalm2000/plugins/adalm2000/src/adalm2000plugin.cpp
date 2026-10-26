@@ -30,6 +30,7 @@
 #include "m2kcontext.h"
 #include "m2kcontextfactory.h"
 
+#include <component/backends/iio/iioctxbackend.h>
 #include <component/device.h>
 #include <iio-widgets/iiowidgetgroup.h>
 #include <pluginbase/statusbarmanager.h>
@@ -56,7 +57,7 @@ void Adalm2000Plugin::init()
 bool Adalm2000Plugin::compatible(QString param, QString category)
 {
 	Q_UNUSED(category)
-	component::ContextHandle ctx = component::Controller::context(param);
+	component::ContextHandle ctx = component::Controller::context(param, component::iio::IIOCtxBackend::ID);
 	if(!ctx) {
 		return false;
 	}
@@ -106,7 +107,7 @@ QString Adalm2000Plugin::description() { return "ADALM2000 (libm2k backend)"; }
 
 bool Adalm2000Plugin::onConnect()
 {
-	m_context = component::Controller::context(m_param);
+	m_context = component::Controller::context(m_param, M2kContextFactory::ID);
 	if(!m_context) {
 		qWarning(CAT_ADALM2000PLUGIN) << "No context for" << m_param;
 		return false;

@@ -28,15 +28,15 @@
 #include <QObject>
 #include <QPointer>
 
-#include <component/contextbackend.h>
+#include <component/connectionprovider.h>
 #include <component/devicemonitor.h>
 
 namespace scopy {
 
-// Aggregates the auto-scan monitors of every registered backend. Monitors of backends registered
-// later (e.g. by a package) are picked up through Controller::backendRegistered and started if a
-// scan is running. found/lost carry the id of the backend that reported the uri, which is also the
-// device category.
+// Aggregates the auto-scan monitors of every registered connection provider. Providers registered
+// later (e.g. by a package) are picked up through Controller::providerRegistered and started if a
+// scan is running. found/lost carry the kind of the provider that reported the uri, which is also
+// the device category.
 class SCOPY_CORE_EXPORT DeviceScanner : public QObject
 {
 	Q_OBJECT
@@ -56,18 +56,17 @@ public:
 	void release(const QString &uri);
 	void forget(const QString &uri);
 
-	QList<component::BackendId> backends() const;
+	QList<component::ConnectionKind> kinds() const;
 
 Q_SIGNALS:
 	void found(const QString &category, const QString &uri);
 	void lost(const QString &category, const QString &uri);
 
 private:
-	void attach(const component::BackendId &id);
-	void detach(const component::BackendId &id);
+	void attach(const component::ConnectionKind &kind);
 	QList<component::DeviceMonitor *> monitors() const;
 
-	QMap<component::BackendId, QPointer<component::DeviceMonitor>> m_monitors;
+	QMap<component::ConnectionKind, QPointer<component::DeviceMonitor>> m_monitors;
 	bool m_running = false;
 	int m_periodMs = 0;
 };
