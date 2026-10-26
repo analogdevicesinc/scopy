@@ -22,6 +22,8 @@
 #ifndef ACQDIGITALCHANNEL_H
 #define ACQDIGITALCHANNEL_H
 
+#include "scopy-core_export.h"
+
 #include "acqchannel.h"
 
 #include <QPointer>
@@ -59,7 +61,7 @@ namespace adc {
 // uses. Without setSampleCount() the sample indices would be read as X scale
 // values and a 1024-sample track would be crammed into the first 1024 units of
 // whatever the axis happens to span.
-class AcqDigitalChannel : public AcqChannel
+class SCOPY_CORE_EXPORT AcqDigitalChannel : public AcqChannel
 {
 	Q_OBJECT
 public:

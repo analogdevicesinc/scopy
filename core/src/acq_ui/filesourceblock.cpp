@@ -22,7 +22,6 @@
 #include "filesourceblock.h"
 
 #include "filesourcewidget.h"
-#include "sourceregistry.h"
 
 #include <core/acq_engine/datakey.h>
 #include <core/acq_engine/datastore.h>
@@ -462,16 +461,5 @@ QWidget *FileSourceBlock::createSettingsWidget(QWidget *parent)
 	// widget needs nothing but the block.
 	return withBaseSettings(new FileSourceWidget(this), parent);
 }
-
-// No isAvailable() override: this source reads files, so it is there whether or not a context was
-// opened, and it ignores the one it is handed.
-static const bool s_fileSourceRegistered = AcqSourceRegistry::instance().add(
-	[](scopy::component::Context *, QObject *parent) -> scopy::acq::SourceBlock * {
-		auto *src = new FileSourceBlock(QStringLiteral("file"), parent);
-		// One empty slot, so the panel opens on something to configure rather than on a
-		// bare "add" button.
-		src->addSlot();
-		return src;
-	});
 
 #include "moc_filesourceblock.cpp"

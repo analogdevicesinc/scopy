@@ -22,12 +22,14 @@
 #ifndef WAVFILEREADER_H
 #define WAVFILEREADER_H
 
+#include "scopy-core_export.h"
+
 #include "filereader.h"
 
 namespace scopy {
 namespace adc {
 
-class WavFileReader : public FileReader
+class SCOPY_CORE_EXPORT WavFileReader : public FileReader
 {
 public:
 	bool open(const QString &path, QString *err) override;

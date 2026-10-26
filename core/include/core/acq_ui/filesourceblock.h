@@ -22,6 +22,8 @@
 #ifndef FILESOURCEBLOCK_H
 #define FILESOURCEBLOCK_H
 
+#include "scopy-core_export.h"
+
 #include "csvfilereader.h"
 #include "filereader.h"
 
@@ -51,7 +53,7 @@ namespace adc {
 // Non-cyclic with this as the only enabled source, a run has nothing to block on and the engine
 // loop will spin on one core. Any other enabled source paces it, and cyclic mode is bounded by
 // the chunks it hands out.
-class FileSourceBlock : public scopy::acq::SourceBlock
+class SCOPY_CORE_EXPORT FileSourceBlock : public scopy::acq::SourceBlock
 {
 	Q_OBJECT
 public:

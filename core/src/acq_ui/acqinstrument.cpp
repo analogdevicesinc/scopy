@@ -143,6 +143,10 @@ void AcqInstrument::start(unsigned int cycles)
 	if(m_engine->isRunning()) {
 		return;
 	}
+	if(m_runGuard && !m_runGuard()) {
+		onStopped();
+		return;
+	}
 	// Claims stay, chunks go: otherwise a window would splice the last run onto this one.
 	m_store->clear();
 	if(cycles == 0) {
@@ -161,6 +165,8 @@ void AcqInstrument::stop() { m_engine->stop(); }
 void AcqInstrument::setMode(int mode) { m_modeCombo->combo()->setCurrentIndex(mode); }
 
 void AcqInstrument::setBufferSize(int n) { m_bufferSpin->setValue(n); }
+
+void AcqInstrument::setBufferControlVisible(bool visible) { m_bufferSpin->setVisible(visible); }
 
 void AcqInstrument::setRunning(bool running)
 {

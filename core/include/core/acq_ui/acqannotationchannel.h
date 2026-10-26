@@ -22,6 +22,8 @@
 #ifndef ACQANNOTATIONCHANNEL_H
 #define ACQANNOTATIONCHANNEL_H
 
+#include "scopy-core_export.h"
+
 #include "acqchannel.h"
 
 #include <QPoint>
@@ -68,7 +70,7 @@ namespace adc {
 //     picks a stable HSL hash per class, so a UART decode is four colours whether
 //     or not anyone asked. onColorChanged() therefore only tints the handle; the
 //     channel colour is the band's identity in the rail, not on the plot.
-class AcqAnnotationChannel : public AcqChannel
+class SCOPY_CORE_EXPORT AcqAnnotationChannel : public AcqChannel
 {
 	Q_OBJECT
 public:

@@ -154,10 +154,6 @@ void AcqTriggerMarkerView::updateWindow(int width)
 	}
 
 	m_marker->setWindow(n, 0.0, x1);
-	// The same `n` for the processor's fire window and the target spinbox's maximum: the fire
-	// index is in these units and the marker maps it back through them, so the three must be
-	// one number. Stated rather than applied — this class holds no processor.
-	Q_EMIT windowChanged(n);
 }
 
 #include "moc_acqtriggermarkerview.cpp"

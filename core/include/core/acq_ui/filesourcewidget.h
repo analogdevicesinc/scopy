@@ -22,6 +22,8 @@
 #ifndef FILESOURCEWIDGET_H
 #define FILESOURCEWIDGET_H
 
+#include "scopy-core_export.h"
+
 #include "filesourceblock.h"
 
 #include <QList>
@@ -48,7 +50,7 @@ namespace adc {
 // Built here rather than by the block, exactly as SnapshotSourceWidget is: the rows are a view of
 // a list that changes while the instrument is alive, and a block's createSettingsWidget() is
 // called once.
-class FileSourceWidget : public QWidget
+class SCOPY_CORE_EXPORT FileSourceWidget : public QWidget
 {
 	Q_OBJECT
 public:
