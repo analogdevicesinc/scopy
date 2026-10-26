@@ -409,15 +409,7 @@ void AcqChannel::setEnabled(bool en)
 	if(m_enabled == en) {
 		return;
 	}
-	// A channel whose key is gone has nothing to draw, so it stays off until the key
-	// returns — but remember what was asked for, or re-enabling the key would also
-	// silently re-enable a channel the reader had switched off.
-	if(en && !m_keyPresent) {
-		m_enabledBeforeVanish = true;
-		return;
-	}
 	m_enabled = en;
-	m_enabledBeforeVanish = en;
 	// Its buffer markers go with it; the next source draws its own next frame.
 	if(!en && m_owner) {
 		m_owner->setBufferEdges(this, {});
@@ -431,23 +423,9 @@ void AcqChannel::setKeyPresent(bool present)
 	if(m_keyPresent == present) {
 		return;
 	}
+	// Only recorded: the enable state stays the reader's. A channel with no data draws
+	// nothing — every readData() handles an absent key — and resumes when it returns.
 	m_keyPresent = present;
-
-	if(!present) {
-		// Remember and switch off. Not deleted: the key usually comes back on the next
-		// run, and deleting would take this channel's settings page with it.
-		m_enabledBeforeVanish = m_enabled;
-		if(m_enabled) {
-			m_enabled = false;
-			onEnabledChanged(false);
-			Q_EMIT enabledChanged(false);
-		}
-	} else if(m_enabledBeforeVanish && !m_enabled) {
-		m_enabled = true;
-		onEnabledChanged(true);
-		Q_EMIT enabledChanged(true);
-	}
-
 	Q_EMIT keyPresentChanged(present);
 }
 

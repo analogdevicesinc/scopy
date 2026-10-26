@@ -26,6 +26,7 @@
 #include "widgets/menucollapsesection.h"
 #include "widgets/toolbuttons.h"
 
+#include <QGridLayout>
 #include <QHBoxLayout>
 #include <QIntValidator>
 #include <QLineEdit>
@@ -285,10 +286,13 @@ void InstrumentTemplate::setupTopRail()
 	// one asked for, so they read as a pair rather than as another engine control.
 	// Stacked because the rail is 44px tall and two rows of this size fit where a
 	// third labelled control beside the buffer size would not.
+	// A grid so the readout stays over the field it pairs with, with the field's label
+	// in the column to their left.
 	QWidget *fpsBox = new QWidget(m_engineSection);
-	QVBoxLayout *fpsLay = new QVBoxLayout(fpsBox);
+	QGridLayout *fpsLay = new QGridLayout(fpsBox);
 	fpsLay->setContentsMargins(0, 0, 0, 0);
-	fpsLay->setSpacing(0);
+	fpsLay->setVerticalSpacing(0);
+	fpsLay->setHorizontalSpacing(Style::getDimension(json::global::unit_0_5));
 
 	m_fps = new QLabel(fpsBox);
 	m_fps->setFixedWidth(fpsFieldWidth());
@@ -302,8 +306,13 @@ void InstrumentTemplate::setupTopRail()
 	m_targetFps->setValidator(new QIntValidator(1, 1000, m_targetFps));
 	Style::setStyle(m_targetFps, style::properties::lineedit::menuLineEdit);
 
-	fpsLay->addWidget(m_fps);
-	fpsLay->addWidget(m_targetFps);
+	QLabel *targetFpsLabel = new QLabel("Limit:", fpsBox);
+	targetFpsLabel->setToolTip(m_targetFps->toolTip());
+	Style::setStyle(targetFpsLabel, style::properties::label::subtle);
+
+	fpsLay->addWidget(m_fps, 0, 1);
+	fpsLay->addWidget(targetFpsLabel, 1, 0);
+	fpsLay->addWidget(m_targetFps, 1, 1);
 
 	connect(m_targetFps, &QLineEdit::editingFinished, this, [this]() {
 		bool ok = false;

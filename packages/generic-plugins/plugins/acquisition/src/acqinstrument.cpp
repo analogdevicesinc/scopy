@@ -169,10 +169,9 @@ void AcqInstrument::setRunning(bool running)
 		QSignalBlocker b(m_it->runBtn());
 		m_it->runBtn()->setChecked(running);
 	}
-	{
-		QSignalBlocker b(m_it->singleBtn());
-		m_it->singleBtn()->setChecked(false);
-	}
+	// Not blocked: the button's own toggled handler is what puts its label back to
+	// "Single", and the controller's handler ignores an uncheck.
+	m_it->singleBtn()->setChecked(false);
 	m_it->singleBtn()->setEnabled(!running);
 	m_modeCombo->setEnabled(!running);
 	m_bufferSpin->setEnabled(!running);

@@ -209,8 +209,8 @@ public:
 	// Whether the key currently exists in the store. A channel whose key vanished —
 	// the reader disabled that source channel, or a decoder stopped producing — is
 	// never deleted: the key usually comes back on the next run, and deleting would
-	// take the reader's per-channel settings with it. It is disabled and greyed
-	// instead, and restored to the enable state it had when the key returns.
+	// take the reader's per-channel settings with it. It just draws nothing until the
+	// key returns.
 	bool isKeyPresent() const { return m_keyPresent; }
 	void setKeyPresent(bool present);
 
@@ -411,9 +411,6 @@ private:
 
 	bool m_enabled{true};
 	bool m_keyPresent{true};
-	// The enable state to restore when a vanished key comes back, so a reader who had
-	// this channel switched off does not find it switched on after a re-run.
-	bool m_enabledBeforeVanish{true};
 
 	double m_sampleRate{1.0};
 	// The producer declared m_sampleRate, so the view's fallback must not replace it.
