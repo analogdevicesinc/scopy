@@ -293,8 +293,8 @@ AcqChannel *AcqPlotManager::addChannel(AcqPlot *p, scopy::acq::ReprKind kind, co
 	// both of which attach() creates.
 	m_rail->registerChannel(ch);
 
-	// Greyed from the start if the key is only declared, not written — otherwise a channel
-	// created before the first cycle would look live while reading nothing.
+	// Recorded from the start if the key is only declared, not written, so the API's
+	// keyPresent is right before the first cycle.
 	ch->setKeyPresent(m_store->contains(yKey));
 
 	// After attach(), which is what created the channel's axis pair the marker may ride.
