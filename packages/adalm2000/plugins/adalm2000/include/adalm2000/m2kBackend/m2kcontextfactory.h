@@ -30,8 +30,9 @@ public:
 	static constexpr const char *ID = "m2k";
 
 	component::BackendId id() const override { return ID; }
-	QVector<component::ScanResult> scan(const QString &filter = QString()) override;
-	component::Context *create(const QString &uri, const int maxThreads) override;
+	component::ConnectionKind connectionKind() const override;
+	bool compatible(const component::Connection &c) const override;
+	component::Context *create(component::Connection &c) override;
 };
 
 } // namespace scopy::adalm2000

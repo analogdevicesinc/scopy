@@ -48,6 +48,7 @@ public:
 	void cancelByResource(void *resource) override;
 	void cancelAll() override;
 	int pendingCount() const override;
+	int maxThreads() const { return m_pool.maxThreadCount(); }
 
 private:
 	QThreadPool m_pool;

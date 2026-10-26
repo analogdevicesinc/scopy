@@ -52,11 +52,6 @@ M2kContext::~M2kContext()
 		s->cancel();
 	}
 
-	if(m_executor) {
-		delete m_executor;
-		m_executor = nullptr;
-	}
-
 	for(M2kInputStream *s : inputs) {
 		s->detach();
 	}
@@ -74,7 +69,7 @@ M2kContext::~M2kContext()
 		return;
 	}
 	try {
-		libm2k::context::contextClose(m_m2k, true);
+		libm2k::context::contextClose(m_m2k, false);
 	} catch(const std::exception &e) {
 		qWarning(CAT_M2K_CONTEXT) << "contextClose failed:" << e.what();
 	}

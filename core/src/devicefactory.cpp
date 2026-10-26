@@ -21,40 +21,27 @@
 
 #include "devicefactory.h"
 
-#include "m2kdeviceimpl.h"
-
 #include <QThread>
 
-#include <component/backends/iio/iioctxbackend.h>
-#include <component/context.h>
 #include <component/controller.h>
-#include <component/device.h>
 #include <pluginbase/preferences.h>
 
 using namespace scopy;
 
-component::BackendId DeviceFactory::backendFor(const QString &category)
+component::ConnectionKind DeviceFactory::kindFor(const QString &category)
 {
-	const QList<component::BackendId> ids = component::Controller::GetInstance()->backends();
-	return ids.contains(category) ? category : component::BackendId();
+	const QList<component::ConnectionKind> kinds = component::Controller::GetInstance()->providers();
+	return kinds.contains(category) ? category : component::ConnectionKind();
 }
 
 DeviceImpl *DeviceFactory::build(QString param, QString category, QObject *parent)
 {
-	const component::BackendId backend = backendFor(category);
-	if(backend.isEmpty()) {
+	const component::ConnectionKind kind = kindFor(category);
+	if(kind.isEmpty()) {
 		return new DeviceImpl(param, category, {}, 1, parent);
 	}
 	int maxThreads = Preferences::get("dc_cmd_execution_parallel").toBool() ? QThread::idealThreadCount() : 1;
-	if(backend == component::iio::IIOCtxBackend::ID) {
-		component::ContextHandle ctx = component::Controller::connectCtx(param, backend, maxThreads);
-		if(ctx && ctx->findChild<component::Device *>("m2k-adc", Qt::FindDirectChildrenOnly) &&
-		   ctx->findChild<component::Device *>("m2k-dac-a", Qt::FindDirectChildrenOnly) &&
-		   ctx->findChild<component::Device *>("m2k-dac-b", Qt::FindDirectChildrenOnly)) {
-			return new M2kDeviceImpl(param, maxThreads, parent);
-		}
-	}
-	return new DeviceImpl(param, category, backend, maxThreads, parent);
+	return new DeviceImpl(param, category, kind, maxThreads, parent);
 }
 
 #include "moc_devicefactory.cpp"
