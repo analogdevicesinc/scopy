@@ -22,6 +22,8 @@
 #ifndef ACQAXIS_H
 #define ACQAXIS_H
 
+#include "scopy-core_export.h"
+
 #include <core/acq_engine/acquisitionengine.h>
 #include <core/acq_engine/datakey.h>
 // Not forward-declared: plotAxis() dereferences a QPointer<PlotAxis> inline, and
@@ -73,7 +75,7 @@ namespace adc {
 // supplies the numbers an axis is scaled against is a view decision, and retargeting
 // it is a re-claim rather than a rebuild — hence sourceChanged(), which the manager
 // answers by moving the depth claim.
-class AcqAxis : public QObject
+class SCOPY_CORE_EXPORT AcqAxis : public QObject
 {
 	Q_OBJECT
 public:

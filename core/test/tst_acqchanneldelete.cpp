@@ -19,11 +19,11 @@
  *
  */
 
-#include "acqaxis.h"
-#include "acqchannel.h"
-#include "acqplot.h"
-#include "acqplotkind.h"
-#include "acqplotmanager.h"
+#include <core/acq_ui/acqaxis.h>
+#include <core/acq_ui/acqchannel.h>
+#include <core/acq_ui/acqplot.h>
+#include <core/acq_ui/acqplotkind.h>
+#include <core/acq_ui/acqplotmanager.h>
 
 #include <core/acq_engine/acquisitionengine.h>
 #include <core/acq_engine/datastore.h>

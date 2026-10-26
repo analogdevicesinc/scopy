@@ -23,15 +23,16 @@
 
 #include "acqinstrument.h"
 #include "acqplotmanager.h"
+#include "dcsource.h"
 #include "filesourceblock.h"
 #include "logview.h"
-#include "sourceregistry.h"
 
 #include <core/acq_engine/acquisitionengine.h>
 #include <core/acq_engine/block.h>
 #include <core/acq_engine/datastore.h>
 #include <core/acq_engine/genalyzerfftprocessor.h>
 #include <core/acq_engine/pipelineinspector.h>
+#include <core/acq_engine/snapshotsource.h>
 #include <core/acq_engine/sourceblock.h>
 #include <core/acq_engine/triggermarker.h>
 #include <core/acq_engine/triggerprocessor.h>
@@ -50,7 +51,6 @@
 #include <QCheckBox>
 #include <QColor>
 #include <QComboBox>
-#include <QMap>
 #include <QVBoxLayout>
 
 #include <algorithm>
@@ -108,11 +108,6 @@ AcqInstrumentController::~AcqInstrumentController()
 
 void AcqInstrumentController::init(scopy::component::Context *ctx)
 {
-	if(m_initialized) {
-		return;
-	}
-	m_initialized = true;
-
 	// Order matters: blocks before plots (the plots point at their keys), plots before the
 	// trigger and decoders (both use the plot window), the analysis panel last (it sits
 	// beside the center widget setupPlots() installs).
@@ -122,6 +117,12 @@ void AcqInstrumentController::init(scopy::component::Context *ctx)
 	setupTrigger();
 	setupDecoders();
 	setupAnalysisPanel();
+
+	if(m_plots) {
+		connect(m_plots, &AcqPlotManager::plotSizeChanged, this, &AcqInstrumentController::applyPlotSize);
+		connect(m_plots, &AcqPlotManager::keysAvailable, this, &AcqInstrumentController::refreshKeyPickers);
+		applyPlotSize(m_plots->plotSize());
+	}
 
 	connect(m_ui->shell()->singleBtn(), &QAbstractButton::toggled, this, [this](bool checked) {
 		if(checked) {
@@ -151,15 +152,28 @@ void AcqInstrumentController::setupBlocks(scopy::component::Context *ctx)
 	scopy::acq::AcquisitionEngine *engine = m_ui->engine();
 	MenuSectionCollapseWidget *sources = m_ui->shell()->addChannelGroup("Sources");
 
-	for(const AcqSourceFactory &make : AcqSourceRegistry::instance().all()) {
-		// Built to be asked: each source decides whether its device is in the context.
-		std::unique_ptr<scopy::acq::SourceBlock> src(make(ctx, engine));
-		if(!src || !src->isAvailable()) {
-			continue;
+	if(ctx) {
+		auto *dc = new DcSource(ctx, QStringLiteral("dc"), engine);
+		if(dc->hasDevices()) {
+			addSource(sources, dc);
+		} else {
+			delete dc;
 		}
-		addBlockRow(sources, src.get(), src->id(), src->id().toUpper(), src->id());
-		engine->addSource(src.release());
 	}
+
+	m_fileSrc = new FileSourceBlock(QStringLiteral("file"), engine);
+	m_fileSrc->addSlot();
+	addSource(sources, m_fileSrc);
+
+	auto *snapshot = new scopy::acq::SnapshotSource(QStringLiteral("snapshot"), engine);
+	snapshot->addSlot();
+	addSource(sources, snapshot);
+}
+
+void AcqInstrumentController::addSource(MenuSectionCollapseWidget *group, scopy::acq::SourceBlock *src)
+{
+	addBlockRow(group, src->settingsWidget(), src->id(), src->id().toUpper(), src->id(), src);
+	m_ui->engine()->addSource(src);
 }
 
 void AcqInstrumentController::setupProcessors()
@@ -175,35 +189,21 @@ void AcqInstrumentController::setupProcessors()
 	m_fftProc->setAveragingStore(m_ui->store());
 	engine->addProcessor(m_fftProc);
 
-	addBlockRow(procs, m_fftProc, QStringLiteral("FFT"), QStringLiteral("GENALYZER FFT"), QStringLiteral("fft"));
+	addBlockRow(procs, m_fftProc->settingsWidget(), QStringLiteral("FFT"), QStringLiteral("GENALYZER FFT"),
+		    QStringLiteral("fft"), m_fftProc);
 }
 
-MenuControlButton *AcqInstrumentController::addBlockRow(MenuSectionCollapseWidget *group, QWidget *body,
-							const QString &label, const QString &pageTitle,
-							const QString &menuId)
+void AcqInstrumentController::addBlockRow(MenuSectionCollapseWidget *group, QWidget *body, const QString &label,
+					  const QString &pageTitle, const QString &menuId, scopy::acq::Block *block)
 {
-	if(!group || !body) {
-		return nullptr;
-	}
 	InstrumentTemplate *it = m_ui->shell();
 
 	// No colour: a swatch on the rail means "the curve in that colour", and only plot
 	// channels have one.
 	MenuControlButton *row = it->addChannelRow(group, label, QColor(), menuId);
 	it->addMenuPage(menuId, widgetPage(it, body, pageTitle));
-	return row;
-}
-
-MenuControlButton *AcqInstrumentController::addBlockRow(MenuSectionCollapseWidget *group, scopy::acq::Block *block,
-							const QString &label, const QString &pageTitle,
-							const QString &menuId)
-{
 	if(!block) {
-		return nullptr;
-	}
-	MenuControlButton *row = addBlockRow(group, block->settingsWidget(), label, pageTitle, menuId);
-	if(!row) {
-		return nullptr;
+		return;
 	}
 
 	// Both ways; Block::setEnabled drops a write that changes nothing, so no loop.
@@ -211,7 +211,6 @@ MenuControlButton *AcqInstrumentController::addBlockRow(MenuSectionCollapseWidge
 	chk->setChecked(block->isEnabled());
 	connect(chk, &QAbstractButton::toggled, block, &scopy::acq::Block::setEnabled);
 	connect(block, &scopy::acq::Block::enabledChanged, chk, &QCheckBox::setChecked);
-	return row;
 }
 
 void AcqInstrumentController::setupPlots()
@@ -222,24 +221,15 @@ void AcqInstrumentController::setupPlots()
 	m_plots = new AcqPlotManager(m_ui->store(), engine, it, m_ui);
 	it->setCenterWidget(m_plots);
 
-	// AcqInstrument's signals are already on the GUI thread. With the trigger on, a plot
-	// draws the cycle that fired, not every cycle.
-	connect(m_ui, &AcqInstrument::cycleComplete, m_plots, [this]() {
-		if(!m_trigProc || !m_trigProc->isEnabled()) {
-			m_plots->onCycleComplete();
-		}
-	});
 	connect(m_ui, &AcqInstrument::started, m_plots, &AcqPlotManager::onStarted);
 	connect(m_ui, &AcqInstrument::stopped, m_plots, &AcqPlotManager::onStopped);
 
 	// A file is published outside any cycle, so it draws with the engine stopped.
-	for(scopy::acq::SourceBlock *src : engine->sources()) {
-		if(auto *fileSrc = qobject_cast<FileSourceBlock *>(src)) {
-			connect(fileSrc, &FileSourceBlock::published, m_plots, [this]() {
-				m_plots->onCycleComplete();
-				m_plots->replot();
-			});
-		}
+	if(m_fileSrc) {
+		connect(m_fileSrc, &FileSourceBlock::published, m_plots, [this]() {
+			m_plots->onCycleComplete();
+			m_plots->replot();
+		});
 	}
 
 	// How much history is drawn, independent of how much arrives per cycle.
@@ -251,11 +241,6 @@ void AcqInstrumentController::setupPlots()
 		[this](double v) { m_plots->setPlotSize(static_cast<int>(v)); });
 	connect(m_plots, &AcqPlotManager::plotSizeChanged, plotSpin,
 		[plotSpin](int n) { plotSpin->setValueSilent(n); });
-
-	// The sample-index ramp must be at least as long as the plot window.
-	connect(m_plots, &AcqPlotManager::plotSizeChanged, engine,
-		[engine](int n) { engine->setIndexRampLength(static_cast<std::size_t>(n)); });
-	engine->setIndexRampLength(static_cast<std::size_t>(m_plots->plotSize()));
 }
 
 void AcqInstrumentController::setupTrigger()
@@ -265,22 +250,13 @@ void AcqInstrumentController::setupTrigger()
 
 	m_trigProc = new scopy::acq::TriggerProcessor(QStringLiteral("trigger"), engine);
 	m_trigProc->setEnabled(false);
-	m_trigProc->setWindowSize(m_plots->plotSize());
 	m_trigProc->setTriggerPosition(0.5);
 	// Its snapshot spans the whole store, so it runs after the FFT and the decoders.
 	m_trigProc->setRunsLast(true);
 	engine->addProcessor(m_trigProc);
 
 	m_trigMarker = new scopy::acq::TriggerMarker(m_trigProc, this);
-
-	// Draw the fire's own windows: re-reading the store would draw the newest samples
-	// instead of the window the fire index names. Fires arrive on this thread, coalesced.
-	connect(m_trigProc, &scopy::acq::TriggerProcessor::fired, m_plots,
-		[this](quint32, const QMap<QString, scopy::acq::SampleVariant> &snap) {
-			if(m_trigProc->isEnabled()) {
-				m_plots->onTriggerFired(snap);
-			}
-		});
+	m_plots->setTrigger(m_trigProc);
 
 	// The settings page, built here and handed to the block so the Pipeline tab shows this
 	// same widget. The base checkbox explicitly: TriggerProcessor's own
@@ -304,21 +280,12 @@ void AcqInstrumentController::setupTrigger()
 	lay->addWidget(axisSection);
 
 	m_trigWidget = new scopy::acq::TriggerProcessorWidget(m_trigProc, body);
-	m_trigWidget->setMaxTargetSample(std::max(0, m_plots->plotSize() - 1));
 	lay->addWidget(m_trigWidget);
 	m_trigProc->setSettingsWidget(body);
 
-	addBlockRow(it->addChannelGroup(kProcessorsGroup), m_trigProc, tr("Trigger"), QStringLiteral("TRIGGER"),
-		    QStringLiteral("trigger"));
+	addBlockRow(it->addChannelGroup(kProcessorsGroup), body, tr("Trigger"), QStringLiteral("TRIGGER"),
+		    QStringLiteral("trigger"), m_trigProc);
 
-	// The manager resolves which axis the marker rides and reports the window it spans;
-	// the processor and its spinbox follow that one number.
-	connect(m_plots, &AcqPlotManager::triggerWindowChanged, this, [this](int n) {
-		m_trigProc->setWindowSize(n);
-		if(m_trigWidget) {
-			m_trigWidget->setMaxTargetSample(std::max(0, n - 1));
-		}
-	});
 	// Key first, then the marker: the second call is the one that resolves.
 	m_plots->setTriggerAxisKey(AcqPlotManager::keyFromCombo(m_trigAxisCombo.data()));
 	m_plots->setTriggerMarker(m_trigMarker);
@@ -328,21 +295,6 @@ void AcqInstrumentController::setupTrigger()
 
 	connect(m_ui, &AcqInstrument::started, m_trigWidget, [this]() { m_trigWidget->setAcquisitionRunning(true); });
 	connect(m_ui, &AcqInstrument::stopped, m_trigWidget, [this]() { m_trigWidget->setAcquisitionRunning(false); });
-
-	// Both key pickers follow the store's key list.
-	connect(m_plots, &AcqPlotManager::keysAvailable, this, [this](const QList<scopy::acq::DataKey> &keys) {
-		if(m_trigWidget) {
-			QStringList names;
-			names.reserve(keys.size());
-			for(const scopy::acq::DataKey &k : keys) {
-				names << k.toString();
-			}
-			m_trigWidget->setAvailableKeys(names);
-		}
-		if(m_trigAxisCombo && m_plots) {
-			m_plots->populateKeyCombo(m_trigAxisCombo.data(), /*withSampleIndex=*/true);
-		}
-	});
 }
 
 void AcqInstrumentController::setupDecoders()
@@ -359,32 +311,23 @@ void AcqInstrumentController::setupDecoders()
 		[log](int sev) { log->setMinLevel(static_cast<scopy::decoder::LogLevel>(sev)); });
 	logView->setMinSeverity(static_cast<int>(log->minLevel()));
 
-	auto catalog = std::make_unique<scopy::decoder::SigrokCliCatalog>();
-	catalog->setLogger(log);
-	auto factory = std::make_unique<scopy::decoder::SigrokCliBackendFactory>(catalog.get());
-	factory->setLogger(log);
+	m_decoderCatalog = std::make_unique<scopy::decoder::SigrokCliCatalog>();
+	m_decoderCatalog->setLogger(log);
+	m_decoderFactory = std::make_unique<scopy::decoder::SigrokCliBackendFactory>(m_decoderCatalog.get());
+	m_decoderFactory->setLogger(log);
 
-	m_decoderMgr = std::make_unique<scopy::decoder::DecoderManager>(engine, m_ui->store(), factory.get());
+	m_decoderMgr = std::make_unique<scopy::decoder::DecoderManager>(engine, m_ui->store(), m_decoderFactory.get());
 	m_decoderMgr->setLogger(log);
-	m_decoderMgr->setDecoderWindowSize(m_plots->plotSize());
 
 	// HostScrolls: the right menu already scrolls, and a nested scroll area would cut the
 	// panel off.
-	m_decoderPanel = new scopy::decoder::DecoderPanel(m_decoderMgr.get(), m_ui->store(), catalog.get(), m_ui,
+	m_decoderPanel = new scopy::decoder::DecoderPanel(m_decoderMgr.get(), m_ui->store(), m_decoderCatalog.get(), m_ui,
 							  scopy::decoder::DecoderPanel::HostScrolls);
 	m_decoderPanel->setLogger(log);
 
 	// A page with no one block behind it: the manager creates decoder blocks on demand.
 	addBlockRow(it->addChannelGroup(kProcessorsGroup), m_decoderPanel, tr("Decoders"), tr("DECODERS"),
 		    QStringLiteral("decoders"));
-
-	m_decoderCatalog = std::move(catalog);
-	m_decoderFactory = std::move(factory);
-
-	connect(m_decoderMgr.get(), &scopy::decoder::DecoderManager::decoderAdded, m_decoderPanel,
-		[this](const QString &) { m_decoderPanel->refreshKeys(m_ui->store()->keys()); });
-	connect(m_plots, &AcqPlotManager::keysAvailable, m_decoderPanel,
-		[this](const QList<scopy::acq::DataKey> &keys) { m_decoderPanel->refreshKeys(keys); });
 
 	m_ui->pipeline()->setDecoderManager(m_decoderMgr.get());
 
@@ -453,6 +396,9 @@ void AcqInstrumentController::setupAnalysisPanel()
 
 void AcqInstrumentController::single()
 {
+	if(m_ui->engine()->isRunning()) {
+		return;
+	}
 	if(!m_trigProc || !m_trigProc->isEnabled()) {
 		m_ui->single();
 		return;
@@ -466,6 +412,38 @@ void AcqInstrumentController::single()
 		m_ui->stop();
 	});
 	m_ui->run();
+}
+
+void AcqInstrumentController::applyPlotSize(int n)
+{
+	m_ui->engine()->setIndexRampLength(static_cast<std::size_t>(n));
+	if(m_trigProc) {
+		m_trigProc->setWindowSize(n);
+	}
+	if(m_trigWidget) {
+		m_trigWidget->setMaxTargetSample(std::max(0, n - 1));
+	}
+	if(m_decoderMgr) {
+		m_decoderMgr->setDecoderWindowSize(n);
+	}
+}
+
+void AcqInstrumentController::refreshKeyPickers(const QList<scopy::acq::DataKey> &keys)
+{
+	if(m_trigWidget) {
+		QStringList names;
+		names.reserve(keys.size());
+		for(const scopy::acq::DataKey &k : keys) {
+			names << k.toString();
+		}
+		m_trigWidget->setAvailableKeys(names);
+	}
+	if(m_trigAxisCombo) {
+		m_plots->populateKeyCombo(m_trigAxisCombo.data(), /*withSampleIndex=*/true);
+	}
+	if(m_decoderPanel) {
+		m_decoderPanel->refreshKeys(keys);
+	}
 }
 
 void AcqInstrumentController::stop()

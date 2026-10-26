@@ -22,6 +22,8 @@
 #ifndef ACQPLOTRAIL_H
 #define ACQPLOTRAIL_H
 
+#include "scopy-core_export.h"
+
 #include "acqplotkind.h"
 
 #include <core/acq_engine/acquisitionengine.h>
@@ -60,7 +62,7 @@ class AcqPlot;
 // Rows and pages are owned by the shell. Plots and channels are borrowed and used only as the
 // keys of the two maps, which is why a stale pointer is never dereferenced: the manager
 // unregisters before it destroys.
-class AcqPlotRail : public QObject
+class SCOPY_CORE_EXPORT AcqPlotRail : public QObject
 {
 	Q_OBJECT
 public:

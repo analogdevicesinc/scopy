@@ -22,6 +22,8 @@
 #ifndef ACQWATERFALLCHANNEL_H
 #define ACQWATERFALLCHANNEL_H
 
+#include "scopy-core_export.h"
+
 #include "acqchannel.h"
 
 #include <QPointer>
@@ -68,7 +70,7 @@ namespace adc {
 //
 // The claim is exactly m_rows because that is what the ring can show; retaining
 // chunks nobody paints would pay for a deeper scan for nothing.
-class AcqWaterfallChannel : public AcqChannel
+class SCOPY_CORE_EXPORT AcqWaterfallChannel : public AcqChannel
 {
 	Q_OBJECT
 public:

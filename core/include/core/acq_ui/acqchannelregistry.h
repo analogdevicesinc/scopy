@@ -22,6 +22,8 @@
 #ifndef ACQCHANNELREGISTRY_H
 #define ACQCHANNELREGISTRY_H
 
+#include "scopy-core_export.h"
+
 #include "acqchannel.h"
 
 #include <core/acq_engine/samplebuffer.h>
@@ -40,7 +42,7 @@ namespace adc {
 //
 // The test for the whole design: adding a fifth kind is a new .cpp with one
 // REGISTER_ACQ_CHANNEL_KIND at file scope, and no edit to acqplotmanager.cpp.
-class AcqChannelRegistry
+class SCOPY_CORE_EXPORT AcqChannelRegistry
 {
 public:
 	using Factory = std::function<AcqChannel *(const AcqChannel::Args &)>;

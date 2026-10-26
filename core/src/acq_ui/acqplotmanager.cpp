@@ -27,7 +27,9 @@
 #include "acqplotrail.h"
 #include "acqtriggermarkerview.h"
 
+#include <core/acq_engine/acquisitionengine.h>
 #include <core/acq_engine/datastore.h>
+#include <core/acq_engine/triggerprocessor.h>
 
 // The factories, needed here and not in the header: they are static free functions, so
 // the translation unit that calls one must include it (see the ODR note in
@@ -90,7 +92,17 @@ AcqPlotManager::AcqPlotManager(scopy::acq::DataStore *store, scopy::acq::Acquisi
 	connect(m_rail, &AcqPlotRail::removePlotRequested, this, &AcqPlotManager::removePlot);
 
 	m_trigMarkerView = new AcqTriggerMarkerView(this);
-	connect(m_trigMarkerView, &AcqTriggerMarkerView::windowChanged, this, &AcqPlotManager::triggerWindowChanged);
+
+	if(!m_engine.isNull()) {
+		connect(
+			m_engine.data(), &scopy::acq::AcquisitionEngine::cycleComplete, this,
+			[this]() {
+				if(m_trig.isNull() || !m_trig->isEnabled()) {
+					onCycleComplete();
+				}
+			},
+			Qt::QueuedConnection);
+	}
 
 	m_frameTimer = new QTimer(this);
 	m_frameTimer->setInterval(m_kFrameIntervalMs);
@@ -372,6 +384,17 @@ void AcqPlotManager::setTriggerAxisKey(const scopy::acq::DataKey &key)
 	retargetTriggerHandle();
 }
 
+void AcqPlotManager::setTrigger(scopy::acq::TriggerProcessor *trig)
+{
+	m_trig = trig;
+	connect(trig, &scopy::acq::TriggerProcessor::fired, this,
+		[this](quint32, const QMap<QString, scopy::acq::SampleVariant> &snap) {
+			if(!m_trig.isNull() && m_trig->isEnabled()) {
+				onTriggerFired(snap);
+			}
+		});
+}
+
 void AcqPlotManager::retargetTriggerHandle() { m_trigMarkerView->retarget(m_plots, m_plotSize); }
 
 void AcqPlotManager::updateTriggerMarkerWindow() { m_trigMarkerView->updateWindow(m_plotSize); }
@@ -422,8 +445,7 @@ void AcqPlotManager::setPlotSize(int n)
 	applyWindowToIndexAxes();
 	reclaimAll();
 	// The marker's axis needs nothing — the curve re-requests its range on the next read —
-	// but its window does, and one call carries the new width to the marker and to whoever
-	// owns the processor, so the two cannot disagree.
+	// but its window does.
 	updateTriggerMarkerWindow();
 	Q_EMIT plotSizeChanged(n);
 	markDirty();

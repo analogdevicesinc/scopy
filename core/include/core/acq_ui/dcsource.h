@@ -51,8 +51,8 @@ namespace adc {
 // "voltage0" stay distinct. This is also why DataKey's channel component must tolerate
 // underscores.
 //
-// Threading: the engine calls onStart() on the GUI thread before the worker exists, then
-// acquire() and onStop() on the worker, which has no running event loop. The component API is
+// Threading: the engine calls onStart(), acquire() and onStop() on its worker, which has no
+// running event loop. The component API is
 // coroutine-based, so every call here goes through QCoro::waitFor(), whose nested QEventLoop
 // pumps the calling thread's dispatcher while a pooled executor thread runs the command.
 // Nothing in this block touches libiio.
@@ -64,7 +64,7 @@ public:
 			  QObject *parent = nullptr);
 	~DcSource() override;
 
-	bool isAvailable() const override;
+	bool hasDevices() const;
 
 	void onStart() override;
 	void acquire(scopy::acq::DataStore *store) override;

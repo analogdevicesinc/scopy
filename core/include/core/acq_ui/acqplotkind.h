@@ -22,6 +22,8 @@
 #ifndef ACQPLOTKIND_H
 #define ACQPLOTKIND_H
 
+#include "scopy-core_export.h"
+
 #include <QList>
 #include <QString>
 
@@ -45,13 +47,13 @@ enum class AcqPlotKind
 //
 // Never null — an unrecognised kind gets a plain PlotWidget rather than nothing, so no
 // caller has to handle a plot that failed to build.
-scopy::PlotWidget *createPlotWidget(AcqPlotKind kind, QWidget *parent);
+SCOPY_CORE_EXPORT scopy::PlotWidget *createPlotWidget(AcqPlotKind kind, QWidget *parent);
 
 // Shown in the add-plot picker and as a read-only label on the plot's page.
-QString plotKindName(AcqPlotKind kind);
+SCOPY_CORE_EXPORT QString plotKindName(AcqPlotKind kind);
 
 // Every kind, in enum order, for the add-plot picker.
-QList<AcqPlotKind> allPlotKinds();
+SCOPY_CORE_EXPORT QList<AcqPlotKind> allPlotKinds();
 
 // Whether channels on this kind of plot take their own axes out of AcqPlot's pool. False
 // for a widget that manages its own axes (a waterfall owns an inverted time Y and an Hz
@@ -60,7 +62,7 @@ QList<AcqPlotKind> allPlotKinds();
 //
 // Not a compatibility check — this decides which axes are actually allocated, in
 // AcqChannel::acquireAxes/releaseAxes.
-bool plotKindPoolsAxes(AcqPlotKind kind);
+SCOPY_CORE_EXPORT bool plotKindPoolsAxes(AcqPlotKind kind);
 
 } // namespace adc
 } // namespace scopy

@@ -22,6 +22,8 @@
 #ifndef DATASTOREVIEWER_H
 #define DATASTOREVIEWER_H
 
+#include "scopy-core_export.h"
+
 #include <QLabel>
 #include <QPointer>
 #include <QPushButton>
@@ -59,7 +61,7 @@ namespace adc {
 //
 // Main-thread only. Nothing here connects to the engine; the owner calls
 // refresh() from its own (queued) cycle handler.
-class DataStoreViewer : public QWidget
+class SCOPY_CORE_EXPORT DataStoreViewer : public QWidget
 {
 	Q_OBJECT
 public:

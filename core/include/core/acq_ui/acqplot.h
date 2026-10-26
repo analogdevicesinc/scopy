@@ -22,6 +22,8 @@
 #ifndef ACQPLOT_H
 #define ACQPLOT_H
 
+#include "scopy-core_export.h"
+
 #include "acqplotkind.h"
 
 #include <QList>
@@ -56,7 +58,7 @@ class AcqChannel;
 // ONE AXIS PER SOURCE, NOT PER CHANNEL. An axis is identified by (QwtAxis position,
 // stream), so every channel reading one stream on one side shares a scale. Axes are
 // created on first use and never destroyed: Qwt has no axis removal path.
-class AcqPlot : public QObject
+class SCOPY_CORE_EXPORT AcqPlot : public QObject
 {
 	Q_OBJECT
 public:
