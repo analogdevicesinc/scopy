@@ -22,6 +22,8 @@
 #ifndef ACQCHANNEL_H
 #define ACQCHANNEL_H
 
+#include "scopy-core_export.h"
+
 #include <core/acq_engine/acquisitionengine.h>
 #include <core/acq_engine/datakey.h>
 // Not forward-declarable: DepthNeed below aliases DataStore::Claim.
@@ -77,7 +79,7 @@ using DepthNeed = scopy::acq::DataStore::Claim;
 // pays for a read, the owner and the axis pair always match the last attach) and a subclass cannot
 // forget to maintain them. Implement readData/depthNeeded/attachTo/detachFrom and
 // leave the guards alone.
-class AcqChannel : public QObject
+class SCOPY_CORE_EXPORT AcqChannel : public QObject
 {
 	Q_OBJECT
 public:

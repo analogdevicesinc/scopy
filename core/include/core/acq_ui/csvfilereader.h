@@ -22,12 +22,14 @@
 #ifndef CSVFILEREADER_H
 #define CSVFILEREADER_H
 
+#include "scopy-core_export.h"
+
 #include "filereader.h"
 
 namespace scopy {
 namespace adc {
 
-class CsvFileReader : public FileReader
+class SCOPY_CORE_EXPORT CsvFileReader : public FileReader
 {
 public:
 	enum class FirstColumnMode

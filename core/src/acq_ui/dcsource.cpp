@@ -21,8 +21,6 @@
 
 #include "dcsource.h"
 
-#include "sourceregistry.h"
-
 #include <core/acq_engine/datakey.h>
 #include <core/acq_engine/datastore.h>
 
@@ -89,7 +87,7 @@ DcSource::DcSource(component::Context *ctx, const QString &id, QObject *parent)
 
 DcSource::~DcSource() { closeAll(); }
 
-bool DcSource::isAvailable() const { return m_ctx && !m_devices.isEmpty(); }
+bool DcSource::hasDevices() const { return !m_devices.isEmpty(); }
 
 void DcSource::discover()
 {
@@ -375,12 +373,5 @@ QWidget *DcSource::createSettingsWidget(QWidget *parent)
 	lay->addStretch();
 	return withBaseSettings(own, parent);
 }
-
-// Discovery is the constructor's, and isAvailable() answers from it, so this is the constructor
-// alone — the same shape every other source registers with.
-static const bool s_dcRegistered = AcqSourceRegistry::instance().add(
-	[](scopy::component::Context *ctx, QObject *parent) -> scopy::acq::SourceBlock * {
-		return new DcSource(ctx, QStringLiteral("dc"), parent);
-	});
 
 #include "moc_dcsource.cpp"

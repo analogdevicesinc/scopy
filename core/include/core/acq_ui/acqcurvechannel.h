@@ -22,6 +22,8 @@
 #ifndef ACQCURVECHANNEL_H
 #define ACQCURVECHANNEL_H
 
+#include "scopy-core_export.h"
+
 #include "acqchannel.h"
 
 #include <QPointer>
@@ -59,7 +61,7 @@ namespace adc {
 // and m_xData/m_derivedX (X) until the next setSamples. That makes these members live
 // storage for Qwt: any path that reassigns or clears one must hand the curve new data
 // or blankCurve() before returning — readData()'s early returns and reset() do.
-class AcqCurveChannel : public AcqChannel
+class SCOPY_CORE_EXPORT AcqCurveChannel : public AcqChannel
 {
 	Q_OBJECT
 public:

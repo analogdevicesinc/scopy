@@ -22,6 +22,8 @@
 #ifndef ACQTRIGGERMARKERVIEW_H
 #define ACQTRIGGERMARKERVIEW_H
 
+#include "scopy-core_export.h"
+
 #include <core/acq_engine/datakey.h>
 
 #include <QList>
@@ -50,7 +52,7 @@ class AcqPlot;
 // axis is shared with every channel drawing that source and outlives the marker. The plot and
 // axis are kept only so the window can be measured in the right plot's width and the right
 // axis's units — the attach decision is the marker's own.
-class AcqTriggerMarkerView : public QObject
+class SCOPY_CORE_EXPORT AcqTriggerMarkerView : public QObject
 {
 	Q_OBJECT
 public:
@@ -78,13 +80,6 @@ public:
 
 	// Re-measure the window without re-resolving the axis, for a width change.
 	void updateWindow(int width);
-
-Q_SIGNALS:
-	// The window the marker's sample↔axis map now spans, in samples: the marker plot's own
-	// width. The processor's fire window and the target spinbox's maximum are the same
-	// number, so they follow this rather than each deriving it. Emitted on a retarget and on
-	// a width change.
-	void windowChanged(int samples);
 
 private:
 	// The X PlotAxis a channel on `plot` draws against for `key`, or null when no channel
