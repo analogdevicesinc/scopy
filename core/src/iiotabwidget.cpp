@@ -31,7 +31,7 @@
 #include <style.h>
 #include <stylehelper.h>
 #include <iioutil/serialportenumerator.h>
-#include <component/backends/iio/iioctxbackend.h>
+#include <component/backends/iio/iioprovider.h>
 #include <component/controller.h>
 
 Q_LOGGING_CATEGORY(CAT_IIO_ADD_PAGE, "IIOTabWidget")
@@ -39,9 +39,9 @@ Q_LOGGING_CATEGORY(CAT_IIO_ADD_PAGE, "IIOTabWidget")
 using namespace scopy;
 
 namespace {
-std::shared_ptr<scopy::component::ContextBackend> iioBackend()
+std::shared_ptr<scopy::component::ConnectionProvider> iioBackend()
 {
-	return scopy::component::Controller::GetInstance()->backend(scopy::component::iio::IIOCtxBackend::ID);
+	return scopy::component::Controller::GetInstance()->provider(scopy::component::iio::IIOProvider::KIND);
 }
 
 // Appends {description, uri} for each found context. Returns the number found, or -1 on error.
@@ -51,7 +51,7 @@ int scanContexts(QVector<QPair<QString, QString>> *ctxs, QString scanParams)
 		return -1;
 	}
 	const QVector<scopy::component::ScanResult> results =
-		scopy::component::Controller::GetInstance()->scan(scopy::component::iio::IIOCtxBackend::ID, scanParams);
+		scopy::component::Controller::GetInstance()->scan(scopy::component::iio::IIOProvider::KIND, scanParams);
 	for(const scopy::component::ScanResult &r : results) {
 		ctxs->append({r.description, r.uri});
 	}

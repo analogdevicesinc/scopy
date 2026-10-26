@@ -50,7 +50,8 @@ public:
 
 	static QList<Plugin *> getOriginalPlugins();
 	static QList<Plugin *> getPlugins(QString category = "");
-	static QList<Plugin *> getCompatiblePlugins(const QString &param, const QString &category = "");
+	static QList<Plugin *> getCompatiblePlugins(const QString &param, const QString &category = "",
+						    const QStringList &backends = {});
 	static QList<PluginInfo> getPluginsInfo();
 
 	static Plugin *getCompatiblePluginByName(const QString &param, const QString &category,

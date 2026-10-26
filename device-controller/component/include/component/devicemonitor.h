@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "component/contextbackend.h"
+#include "component/connectionprovider.h"
 #include "component/component_export.h"
 
 #include <QMap>
@@ -68,12 +68,12 @@ private:
 	QSet<QString> m_held;
 };
 
-// Polls ContextBackend::scan(filter) on a worker thread, one scan at a time.
+// Polls ConnectionProvider::scan(filter) on a worker thread, one scan at a time.
 class COMPONENT_EXPORT PollingDeviceMonitor : public DeviceMonitor
 {
 	Q_OBJECT
 public:
-	PollingDeviceMonitor(ContextBackend *backend, QString filter, QObject *parent = nullptr);
+	PollingDeviceMonitor(ConnectionProvider *provider, QString filter, QObject *parent = nullptr);
 	~PollingDeviceMonitor() override;
 
 	void start(int periodMs) override;
@@ -82,7 +82,7 @@ public:
 	void scanBlocking() override;
 
 private:
-	ContextBackend *m_backend;
+	ConnectionProvider *m_provider;
 	QString m_filter;
 	QTimer *m_timer;
 	QThreadPool m_pool;

@@ -74,9 +74,9 @@ void DeviceMonitor::publish(const QVector<ScanResult> &results)
 	}
 }
 
-PollingDeviceMonitor::PollingDeviceMonitor(ContextBackend *backend, QString filter, QObject *parent)
+PollingDeviceMonitor::PollingDeviceMonitor(ConnectionProvider *provider, QString filter, QObject *parent)
 	: DeviceMonitor(parent)
-	, m_backend(backend)
+	, m_provider(provider)
 	, m_filter(std::move(filter))
 	, m_timer(new QTimer(this))
 {
@@ -109,7 +109,7 @@ void PollingDeviceMonitor::stop()
 void PollingDeviceMonitor::scanBlocking()
 {
 	m_pool.waitForDone();
-	publish(m_backend->scan(m_filter));
+	publish(m_provider->scan(m_filter));
 }
 
 void PollingDeviceMonitor::scanNow()
@@ -119,7 +119,7 @@ void PollingDeviceMonitor::scanNow()
 	}
 	m_busy = true;
 	m_pool.start([this]() {
-		QVector<ScanResult> results = m_backend->scan(m_filter);
+		QVector<ScanResult> results = m_provider->scan(m_filter);
 		QMetaObject::invokeMethod(
 			this,
 			[this, results]() {

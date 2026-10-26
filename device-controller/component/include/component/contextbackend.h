@@ -21,55 +21,35 @@
 
 #pragma once
 
-#include <QString>
-#include <QStringList>
-#include <QVector>
+#include "component/connection.h"
 
 namespace scopy::component {
 
 class Context;
-class DeviceMonitor;
 
-// A backend is identified by a string id ("iio", "m2k", "audio", ...), so a package can add
-// one at runtime without changing the device-controller.
-using BackendId = QString;
-
-struct ScanResult
-{
-	QString uri;
-	QString description;
-	BackendId backend;
-};
-
-// One unit per backend: context creation and discovery (scan + optional auto-scan monitor).
-// Each concrete backend owns all backend-specific knowledge (loader, handle, builder), so the
-// Controller stays backend-agnostic.
+// A view: builds one component tree over an open Connection of the kind it declares. Views are
+// flat and independent; several can share one connection (e.g. "iio" and "m2k" on one
+// iio_context). Registered at runtime by id.
 class ContextBackend
 {
 public:
 	virtual ~ContextBackend() = default;
 
 	virtual BackendId id() const = 0;
+	virtual ConnectionKind connectionKind() const = 0;
 
-	// Builds a fully built, executor-backed Context. Called with the Controller's context mutex
-	// held: must not call back into the Controller.
-	virtual Context *create(const QString &uri, const int maxThreads) = 0;
+	// Cheap check on the open, idle connection (context attributes, device names); no tree.
+	// Must not call back into the Controller.
+	virtual bool compatible(const Connection &c) const = 0;
 
-	// Blocking scan, call it off the UI thread. filter is backend-specific (e.g. "usb", "ip:").
-	// Results carry a display-ready description and a uri in this backend's own scheme. A backend
-	// that reaches devices over a serial port lists the ports itself and recognises its devices by
-	// VID:PID / description / serial number; it must not open ports to probe them, since another
-	// backend (or the user) may be using the same port.
-	virtual QVector<ScanResult> scan(const QString &filter = QString()) = 0;
+	// 1 = this view needs a serial executor on the connection; -1 = no constraint.
+	virtual int maxThreads() const { return -1; }
 
-	// Uri format shown to users typing a uri by hand (e.g. "ip:192.168.2.1, usb:1.2.3").
-	virtual QString uriHint() const { return {}; }
+	// Builds the tree; drives I/O through c.executor(). The Controller parents the result to c.
+	virtual Context *create(Connection &c) = 0;
 
-	// Scan filters supported by this backend (e.g. "usb", "ip", "serial" for libiio).
-	virtual QStringList scanFilters() const { return {}; }
-
-	// Optional auto-scan source, owned by the backend. Lives in the thread that first calls monitor().
-	virtual DeviceMonitor *monitor() { return nullptr; }
+	// Releases backend resources of a view before the Controller deletes it.
+	virtual void destroy(Context *ctx) { Q_UNUSED(ctx); }
 };
 
 } // namespace scopy::component

@@ -22,6 +22,7 @@
 #ifndef FAKECTXBACKEND_H
 #define FAKECTXBACKEND_H
 
+#include <component/connectionprovider.h>
 #include <component/contextbackend.h>
 #include <component/devicemonitor.h>
 
@@ -29,22 +30,22 @@
 
 namespace scopy {
 
-// Test backend registered at runtime from FakeBackendPlugin::init(). Serves hardware-free trees
-// for "fake:<n>" uris and reports them through a polling monitor. "fake:hotplug" appears and
-// disappears every HOTPLUG_PERIOD_S seconds to exercise found/lost.
-class FakeCtxBackend : public component::ContextBackend
+// Test transport registered at runtime from FakeBackendPlugin::init(). Opens hardware-free
+// connections for "fake:<n>" uris and reports them through a polling monitor. "fake:hotplug"
+// appears and disappears every HOTPLUG_PERIOD_S seconds to exercise found/lost.
+class FakeProvider : public component::ConnectionProvider
 {
 public:
 	// Also the device category, so plugins declare "category": ["fake"].
-	static constexpr const char *ID = "fake";
+	static constexpr const char *KIND = "fake";
 	static constexpr const char *HOTPLUG_URI = "fake:hotplug";
 	static constexpr int HOTPLUG_PERIOD_S = 10;
 
-	explicit FakeCtxBackend(int deviceCount);
-	~FakeCtxBackend() override;
+	explicit FakeProvider(int deviceCount);
+	~FakeProvider() override;
 
-	component::BackendId id() const override { return ID; }
-	component::Context *create(const QString &uri, const int maxThreads) override;
+	component::ConnectionKind kind() const override { return KIND; }
+	component::Connection *open(const QString &uri) override;
 	QVector<component::ScanResult> scan(const QString &filter = QString()) override;
 	component::DeviceMonitor *monitor() override;
 	QString uriHint() const override { return "fake:0, fake:hotplug"; }
@@ -54,6 +55,18 @@ private:
 
 	int m_deviceCount;
 	std::unique_ptr<component::DeviceMonitor> m_monitor;
+};
+
+// Test view over a FakeProvider connection; plugins reach it with "category": ["fake"].
+class FakeCtxBackend : public component::ContextBackend
+{
+public:
+	static constexpr const char *ID = "fake";
+
+	component::BackendId id() const override { return ID; }
+	component::ConnectionKind connectionKind() const override { return FakeProvider::KIND; }
+	bool compatible(const component::Connection &c) const override { return c.kind() == FakeProvider::KIND; }
+	component::Context *create(component::Connection &c) override;
 };
 
 } // namespace scopy

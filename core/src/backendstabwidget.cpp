@@ -39,14 +39,14 @@ Q_LOGGING_CATEGORY(CAT_BACKENDS_ADD_PAGE, "BackendsTabWidget")
 using namespace scopy;
 
 namespace {
-QVector<component::ScanResult> scanBackends(const QList<component::BackendId> &ids)
+QVector<component::ScanResult> scanBackends(const QList<component::ConnectionKind> &kinds)
 {
 	QVector<component::ScanResult> results;
 	component::Controller *c = component::Controller::GetInstance();
-	for(const component::BackendId &id : ids) {
-		std::shared_ptr<component::ContextBackend> backend = c->backend(id);
-		if(backend) {
-			results.append(backend->scan());
+	for(const component::ConnectionKind &kind : kinds) {
+		std::shared_ptr<component::ConnectionProvider> p = c->provider(kind);
+		if(p) {
+			results.append(p->scan());
 		}
 	}
 	return results;
@@ -84,11 +84,10 @@ BackendsTabWidget::BackendsTabWidget(QWidget *parent)
 		[this](QString uri) { m_btnVerify->setEnabled(!uri.isEmpty() && m_backendCb->count() > 0); });
 
 	component::Controller *c = component::Controller::GetInstance();
-	connect(c, &component::Controller::backendRegistered, this, &BackendsTabWidget::addBackend);
-	connect(c, &component::Controller::backendUnregistered, this, &BackendsTabWidget::removeBackend);
-	const QList<component::BackendId> ids = c->backends();
-	for(const component::BackendId &id : ids) {
-		addBackend(id);
+	connect(c, &component::Controller::providerRegistered, this, &BackendsTabWidget::addBackend);
+	const QList<component::ConnectionKind> kinds = c->providers();
+	for(const component::ConnectionKind &kind : kinds) {
+		addBackend(kind);
 	}
 
 	addScanFeedbackMsg("No scanned devices... Press the refresh button!");
@@ -202,17 +201,9 @@ void BackendsTabWidget::addBackend(const QString &id)
 
 void BackendsTabWidget::updateUriHint(const QString &id)
 {
-	std::shared_ptr<component::ContextBackend> backend = component::Controller::GetInstance()->backend(id);
-	const QString hint = backend ? backend->uriHint() : QString();
+	std::shared_ptr<component::ConnectionProvider> p = component::Controller::GetInstance()->provider(id);
+	const QString hint = p ? p->uriHint() : QString();
 	m_uriEdit->setPlaceholderText(hint.isEmpty() ? "The device you are connecting to" : hint);
-}
-
-void BackendsTabWidget::removeBackend(const QString &id)
-{
-	if(QCheckBox *cb = m_filters.take(id)) {
-		delete cb;
-	}
-	m_backendCb->removeItem(m_backendCb->findText(id));
 }
 
 void BackendsTabWidget::futureScan()
@@ -220,14 +211,14 @@ void BackendsTabWidget::futureScan()
 	if(m_fwScan->isRunning()) {
 		return;
 	}
-	QList<component::BackendId> ids;
+	QList<component::ConnectionKind> kinds;
 	for(auto it = m_filters.cbegin(); it != m_filters.cend(); ++it) {
 		if(it.value()->isChecked()) {
-			ids.append(it.key());
+			kinds.append(it.key());
 		}
 	}
 	m_btnScan->startAnimation();
-	m_fwScan->setFuture(QtConcurrent::run(scanBackends, ids));
+	m_fwScan->setFuture(QtConcurrent::run(scanBackends, kinds));
 }
 
 void BackendsTabWidget::scanFinished()
@@ -242,7 +233,7 @@ void BackendsTabWidget::scanFinished()
 	m_resultsCb->blockSignals(true);
 	m_resultsCb->clear();
 	for(const component::ScanResult &r : std::as_const(m_results)) {
-		m_resultsCb->addItem(r.description + " [" + r.uri + "] (" + r.backend + ")");
+		m_resultsCb->addItem(r.description + " [" + r.uri + "] (" + r.kind + ")");
 	}
 	m_resultsCb->setEnabled(true);
 	m_resultsCb->setCurrentIndex(0);
@@ -255,7 +246,7 @@ void BackendsTabWidget::selectResult(int idx)
 	if(idx < 0 || idx >= m_results.size()) {
 		return;
 	}
-	m_backendCb->setCurrentText(m_results[idx].backend);
+	m_backendCb->setCurrentText(m_results[idx].kind);
 	updateUri(m_results[idx].uri);
 }
 

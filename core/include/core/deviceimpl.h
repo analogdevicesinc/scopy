@@ -33,6 +33,8 @@
 
 #include <component/controller.h>
 
+#include <map>
+
 namespace scopy {
 class ConnectionLostWidget;
 
@@ -40,11 +42,12 @@ class SCOPY_CORE_EXPORT DeviceImpl : public QObject, public Device
 {
 	Q_OBJECT
 public:
-	// A non-empty backend makes this a context-backed device: the context is acquired on
-	// construction and on every connect, and released when the device goes idle, so each
-	// connect gets a fresh tree once every handle is dropped.
-	explicit DeviceImpl(QString param, QString category = "", component::BackendId backend = {}, int maxThreads = 1,
-			    QObject *parent = nullptr);
+	// A non-empty kind makes this a connection-backed device: the connection and every
+	// compatible view are opened on construction (so plugins can inspect them in compatible()),
+	// released when the device goes idle, and on every connect only the views the loaded plugins
+	// declare through their "category" are rebuilt.
+	explicit DeviceImpl(QString param, QString category = "", component::ConnectionKind kind = {},
+			    int maxThreads = 1, QObject *parent = nullptr);
 	virtual ~DeviceImpl();
 
 	// Device interface
@@ -70,7 +73,11 @@ public:
 	DeviceImpl::DeviceState_t state() override;
 	Plugin *getPluginByName(const QString &pluginName);
 
-	component::Context *context() const;
+	component::Connection *connection() const;
+	// Compatible backends of the connection; empty for a connection-less device.
+	QStringList backends() const;
+	// A held view; an empty backend means "iio", or the first held view if there is none.
+	component::Context *context(const component::BackendId &backend = {}) const;
 
 public Q_SLOTS:
 	virtual void connectDev() override;
@@ -105,8 +112,10 @@ protected:
 	void loadCompatiblePluginsTab(QWidget *pluginsTab);
 	QStringList getPluginsName();
 	void setState(DeviceState_t state);
-	void acquireContext();
+	void acquireConnection();
+	void acquireViews(const QStringList &backends);
 	void releaseContext();
+	QStringList declaredBackends() const;
 
 private:
 	void onStateChanged(DeviceState_t state);
@@ -129,9 +138,10 @@ protected:
 	QTabWidget *m_configPage;
 	QPushButton *connbtn, *discbtn;
 	ConnectionLostWidget *m_connectionLostWidget = nullptr;
-	component::BackendId m_backend;
+	component::ConnectionKind m_kind;
 	int m_maxThreads = 1;
-	component::ContextHandle m_context;
+	component::ConnectionHandle m_conn;
+	std::map<component::BackendId, component::ContextHandle> m_views;
 };
 } // namespace scopy
 

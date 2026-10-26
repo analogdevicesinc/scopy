@@ -22,6 +22,7 @@
 #pragma once
 
 #include "core/icmdexecutor.h"
+#include "component/connection.h"
 
 #include <QObject>
 #include <QString>
@@ -30,17 +31,11 @@
 
 namespace scopy::component {
 
-// Identity component: the root of one connection's tree. Plain QObject — the
-// whole subtree is composed under it via Qt parent-child, so disconnecting
-// (deleting the Context) cascades destruction to every child.
+// Identity component: the root of one view's tree, parented to its Connection. The whole
+// subtree is composed under it via Qt parent-child, so deleting the Context cascades to every
+// child. The executor is the connection's, injected by the Controller.
 //
-// The Context owns the per-context ICmdExecutor (Qt ownership): the Controller
-// creates the executor parented to the Context, hands it to the builder for
-// injection into I/O leaves, and it dies with the Context on disconnect.
-//
-// Concrete backends subclass this (IIOContext, ...) to carry backend-specific
-// identity fields. The base carries only what every backend shares. Shared
-// identity is exposed through Q_PROPERTY so clients can bind to it uniformly.
+// Concrete backends subclass this (IIOContext, ...) to carry backend-specific identity fields.
 class COMPONENT_EXPORT Context : public QObject
 {
 	Q_OBJECT
@@ -65,8 +60,12 @@ public:
 	}
 	void setDescription(const QString &description) { m_description = description; }
 
-	// The executor driving all I/O in this context's subtree. Owned by the
-	// Context (parented to it); the builder injects it into I/O leaves.
+	// The connection this view is built on (= parent()), or nullptr before it is attached.
+	Connection *connection() const { return qobject_cast<Connection *>(parent()); }
+	BackendId backend() const { return m_backend; }
+	void setBackend(const BackendId &id) { m_backend = id; }
+
+	// The executor driving all I/O in this context's subtree; the connection's, not owned.
 	ICmdExecutor *executor() const { return m_executor; }
 	void setExecutor(ICmdExecutor *exec) { m_executor = exec; }
 
@@ -92,6 +91,7 @@ protected:
 	QString m_uri;
 	QString m_name;
 	QString m_description;
+	BackendId m_backend;
 	ICmdExecutor *m_executor = nullptr;
 };
 
