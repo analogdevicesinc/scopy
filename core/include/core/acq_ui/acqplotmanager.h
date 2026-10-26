@@ -22,6 +22,8 @@
 #ifndef ACQPLOTMANAGER_H
 #define ACQPLOTMANAGER_H
 
+#include "scopy-core_export.h"
+
 #include "acqchannel.h"
 // For AcqPlotKind, which is part of addPlot's signature.
 #include "acqplotkind.h"
@@ -53,6 +55,7 @@ class PlotWidget;
 namespace acq {
 class DataStore;
 class TriggerMarker;
+class TriggerProcessor;
 } // namespace acq
 
 namespace adc {
@@ -93,7 +96,7 @@ class AcqTriggerMarkerView;
 // AN EMPTY MANAGER IS A VALID STATE. Any plot is deletable, including the last one, so
 // nothing here may assume a first plot exists — sharedPlot() answers null when there are
 // no plots.
-class AcqPlotManager : public QWidget
+class SCOPY_CORE_EXPORT AcqPlotManager : public QWidget
 {
 	Q_OBJECT
 public:
@@ -208,6 +211,9 @@ public:
 	// happens.
 	void setTriggerAxisKey(const scopy::acq::DataKey &key);
 
+	// While `trig` is enabled the plots draw its fires instead of every cycle.
+	void setTrigger(scopy::acq::TriggerProcessor *trig);
+
 	// ---- generic draw helpers -------------------------------------------------
 
 	// Draw `yKey` as `kind` on the first plot there is, skipping it when some channel already
@@ -255,15 +261,9 @@ Q_SIGNALS:
 	// the pipeline is producing.
 	void keysAvailable(QList<scopy::acq::DataKey> keys);
 
-	// The plot width changed, in samples. A signal rather than a call: this class holds no
-	// engine, so the controller applies it (the index ramp length, the decode window).
+	// The plot width changed, in samples. The controller applies it to the index ramp, the
+	// trigger window and the decode window.
 	void plotSizeChanged(int n);
-
-	// The window the trigger marker's sample↔axis map now spans, in samples: the marker
-	// plot's own width. The processor's fire window and the target spinbox's maximum are the
-	// same number, so they follow this rather than each deriving it. Emitted on a retarget
-	// and on a width change.
-	void triggerWindowChanged(int samples);
 
 private Q_SLOTS:
 	// Re-applies every channel's depth claim (reset()/remove() erase claims), greys the
@@ -300,6 +300,7 @@ private:
 	// from the store. Asked on demand rather than cached, so a block that re-declares
 	// needs no notification path.
 	QPointer<scopy::acq::AcquisitionEngine> m_engine;
+	QPointer<scopy::acq::TriggerProcessor> m_trig;
 
 	// The container every plot's dock is added to. Which implementation this is —
 	// KDDockWidgets or the plain-layout fallback — is createDockableArea's decision. It

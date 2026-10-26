@@ -22,6 +22,8 @@
 #ifndef FILEREADER_H
 #define FILEREADER_H
 
+#include "scopy-core_export.h"
+
 #include <memory>
 #include <QString>
 #include <QStringList>
@@ -30,7 +32,7 @@
 namespace scopy {
 namespace adc {
 
-class FileReader
+class SCOPY_CORE_EXPORT FileReader
 {
 public:
 	virtual ~FileReader() = default;
@@ -53,8 +55,8 @@ protected:
 	static const QVector<float> &emptyChannel();
 };
 
-std::unique_ptr<FileReader> makeFileReader(const QString &path);
-QString fileReaderFilter();
+SCOPY_CORE_EXPORT std::unique_ptr<FileReader> makeFileReader(const QString &path);
+SCOPY_CORE_EXPORT QString fileReaderFilter();
 
 } // namespace adc
 } // namespace scopy

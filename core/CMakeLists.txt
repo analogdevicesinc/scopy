@@ -56,6 +56,7 @@ file(
 	src/*.cc
 	src/pkggui/*.cpp
 	src/acq_engine/*.cpp
+	src/acq_ui/*.cpp
 	src/decoder/*.cpp
 	# sigrok-cli-specific annotation-input machinery; private to the backend.
 	src/decoder/sigrok/*.cpp
@@ -67,6 +68,7 @@ file(
 	include/${SCOPY_MODULE}/*.hpp
 	include/${SCOPY_MODULE}/pkggui/*.h
 	include/${SCOPY_MODULE}/acq_engine/*.h
+	include/${SCOPY_MODULE}/acq_ui/*.h
 	include/${SCOPY_MODULE}/decoder/*.h
 )
 file(GLOB UI_LIST ui/*.ui)
@@ -150,6 +152,7 @@ target_include_directories(
 		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
 		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/pkggui
 		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/acq_engine
+		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/acq_ui
 		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/decoder
 		${GLIB_INCLUDE_DIRS}
 		${GLIBCONFIG_INCLUDE_DIRS}
@@ -187,6 +190,7 @@ target_link_libraries(
 	       scopy-gui
 	       scopy-pluginbase
 	       scopy-iioutil
+	       scopy-iio-widgets
 	       scopy-pkg-manager
 	       component
 	       ${LIBSIGROK_DECODE_LINK_LIBRARIES}

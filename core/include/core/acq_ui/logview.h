@@ -22,6 +22,8 @@
 #ifndef LOGVIEW_H
 #define LOGVIEW_H
 
+#include "scopy-core_export.h"
+
 #include <QComboBox>
 #include <QString>
 #include <QTextEdit>
@@ -42,7 +44,7 @@ namespace adc {
 // Severity is an int on the API because the two producers use different enums
 // with the same ordering: AcquisitionError::Severity and decoder::LogLevel are
 // both Info=0, Warning=1, Critical=2.
-class LogView : public QWidget
+class SCOPY_CORE_EXPORT LogView : public QWidget
 {
 	Q_OBJECT
 public:

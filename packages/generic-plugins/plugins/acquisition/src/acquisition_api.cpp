@@ -21,12 +21,12 @@
 
 #include "acquisition_api.h"
 
-#include "acqaxis.h"
-#include "acqchannel.h"
-#include "acqinstrument.h"
-#include "acqinstrumentcontroller.h"
-#include "acqplot.h"
-#include "acqplotmanager.h"
+#include <core/acq_ui/acqaxis.h>
+#include <core/acq_ui/acqchannel.h>
+#include <core/acq_ui/acqinstrument.h>
+#include <core/acq_ui/acqinstrumentcontroller.h>
+#include <core/acq_ui/acqplot.h>
+#include <core/acq_ui/acqplotmanager.h>
 
 #include "acquisition.h"
 

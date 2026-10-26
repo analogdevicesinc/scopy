@@ -22,7 +22,11 @@
 #ifndef ACQINSTRUMENT_H
 #define ACQINSTRUMENT_H
 
+#include "scopy-core_export.h"
+
 #include <QWidget>
+
+#include <functional>
 
 namespace scopy {
 class InstrumentTemplate;
@@ -48,7 +52,7 @@ class LogView;
 //
 // Every engine signal arrives from the worker thread, so every connection to one here is
 // queued; the signals below re-emit them on the GUI thread.
-class AcqInstrument : public QWidget
+class SCOPY_CORE_EXPORT AcqInstrument : public QWidget
 {
 	Q_OBJECT
 public:
@@ -67,6 +71,13 @@ public:
 	// Set through the controls, which apply them to the engine, so the two stay in step.
 	void setMode(int mode);
 	void setBufferSize(int n);
+
+	// The Buffer size top-rail control, for an owner that sets the buffer itself.
+	void setBufferControlVisible(bool visible);
+
+	// Asked on the GUI thread before every run or single; false refuses the start, which
+	// then reads as an immediate stop. For an owner that must claim hardware first.
+	void setRunGuard(std::function<bool()> guard) { m_runGuard = std::move(guard); }
 
 public Q_SLOTS:
 	// Safe in any state; ignored while running. The buttons follow the engine's own
@@ -108,6 +119,8 @@ private:
 	scopy::acq::PipelineInspector *m_pipeline{nullptr};
 	DataStoreViewer *m_storeViewer{nullptr};
 	LogView *m_logView{nullptr};
+
+	std::function<bool()> m_runGuard;
 };
 
 } // namespace adc
