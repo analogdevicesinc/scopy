@@ -40,7 +40,6 @@
 #include <QLineEdit>
 #include <QLoggingCategory>
 #include <QPushButton>
-#include <QSignalBlocker>
 #include <QVBoxLayout>
 
 Q_LOGGING_CATEGORY(CAT_ACQ_PLOTRAIL, "AcqPlotRail")
@@ -332,19 +331,12 @@ void AcqPlotRail::registerChannel(AcqChannel *ch)
 
 	if(SmallOnOffSwitch *sw = InstrumentTemplate::rowSwitch(row)) {
 		connect(sw, &QAbstractButton::toggled, ch, &AcqChannel::setEnabled);
-		// Both directions: a channel can be disabled from code (a vanished key), and the
-		// switch has to show it.
-		connect(ch, &AcqChannel::enabledChanged, sw, [sw](bool en) {
-			QSignalBlocker b(sw);
-			sw->setChecked(en);
-		});
+		// Both directions: a channel can be toggled from code (the API), and the switch has
+		// to show it. Not under a QSignalBlocker: that also blocks the switch's own
+		// toggled -> toggleAnim, leaving the thumb on the wrong side. The echo back into
+		// setEnabled() is a no-op, the value already matches.
+		connect(ch, &AcqChannel::enabledChanged, sw, &QAbstractButton::setChecked);
 		sw->setChecked(ch->isEnabled());
-
-		// A vanished key greys the row rather than removing it. Disabling the switch is the
-		// whole of "greyed": the channel is already force-disabled underneath, and leaving
-		// the switch live would let the reader tick a channel that cannot read.
-		connect(ch, &AcqChannel::keyPresentChanged, sw, [sw](bool present) { sw->setEnabled(present); });
-		sw->setEnabled(ch->isKeyPresent());
 	}
 
 	// The rail row is the channel's name in the UI, so a rename from the settings page has
