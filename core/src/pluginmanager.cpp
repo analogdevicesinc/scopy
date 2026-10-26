@@ -121,13 +121,14 @@ QList<Plugin *> PluginManager::getPlugins(QString category)
 	return newlist;
 }
 
-QList<Plugin *> PluginManager::getCompatiblePlugins(QString param, QString category)
+QList<Plugin *> PluginManager::getCompatiblePlugins(QString param, QString category, QStringList backends)
 {
 	QList<Plugin *> comp;
+	const QStringList accepted = backends.isEmpty() ? QStringList{category} : backends;
 	const QList<PluginInfo> loaded = getLoadedPlugins();
 	for(const PluginInfo &pluginInfo : loaded) {
 		Plugin *plugin = pluginInfo.pluginInstance();
-		if(!PluginFilter::pluginInCategory(plugin, category)) {
+		if(!PluginFilter::pluginInCategories(plugin, accepted)) {
 			continue;
 		}
 		bool enable = (!PluginFilter::pluginInExclusionList(comp, plugin));

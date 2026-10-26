@@ -21,6 +21,7 @@
 
 #ifndef PLUGINFILTER_H
 #define PLUGINFILTER_H
+#include <QStringList>
 #include <pluginbase/plugin.h>
 
 namespace scopy {
@@ -32,6 +33,10 @@ private:
 
 public:
 	static bool pluginInCategory(Plugin *p, QString category); // PluginFilter class (?)
+	// "category" metadata (string or list); empty if missing.
+	static QStringList pluginCategories(Plugin *p);
+	// True if any plugin category is in `accepted`, or if either side is empty.
+	static bool pluginInCategories(Plugin *p, const QStringList &accepted);
 	static bool pluginInExclusionList(QList<Plugin *> pl, Plugin *p);
 	static bool pluginForcedInclusionList(QList<Plugin *> pl, Plugin *p);
 };

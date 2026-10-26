@@ -28,6 +28,7 @@
 #include <functional>
 
 #include <component/attribute.h>
+#include <component/connection.h>
 #include <component/context.h>
 #include <component/device.h>
 
@@ -64,21 +65,48 @@ Attribute *addAttribute(QObject *parent, const QString &name, std::function<QStr
 }
 } // namespace
 
-FakeCtxBackend::FakeCtxBackend(int deviceCount)
+FakeProvider::FakeProvider(int deviceCount)
 	: m_deviceCount(deviceCount)
 {}
 
-FakeCtxBackend::~FakeCtxBackend() = default;
+FakeProvider::~FakeProvider() = default;
 
-Context *FakeCtxBackend::create(const QString &uri, const int)
+Connection *FakeProvider::open(const QString &uri)
 {
 	const QVector<ScanResult> devices = available();
 	if(std::none_of(devices.cbegin(), devices.cend(), [&uri](const ScanResult &r) { return r.uri == uri; })) {
 		return nullptr;
 	}
+	return new Connection(uri, KIND);
+}
 
+QVector<ScanResult> FakeProvider::scan(const QString &) { return available(); }
+
+QVector<ScanResult> FakeProvider::available() const
+{
+	QVector<ScanResult> results;
+	for(int i = 0; i < m_deviceCount; i++) {
+		const QString uri = QString("fake:%1").arg(i);
+		results.append({uri, "Fake device " + uri, KIND});
+	}
+	if((QDateTime::currentSecsSinceEpoch() / HOTPLUG_PERIOD_S) % 2 == 0) {
+		results.append({HOTPLUG_URI, "Fake hotplug device", KIND});
+	}
+	return results;
+}
+
+DeviceMonitor *FakeProvider::monitor()
+{
+	if(!m_monitor) {
+		m_monitor = std::make_unique<PollingDeviceMonitor>(this, QString());
+	}
+	return m_monitor.get();
+}
+
+Context *FakeCtxBackend::create(Connection &c)
+{
+	const QString uri = c.uri();
 	auto *ctx = new Context;
-	ctx->setUri(uri);
 	ctx->setName("fake");
 	ctx->setDescription("Fake device " + uri);
 	addAttribute(ctx, "hw_model", [uri]() { return "Fake device (" + uri + ")"; });
@@ -91,27 +119,4 @@ Context *FakeCtxBackend::create(const QString &uri, const int)
 	addAttribute(dev, "counter", [counter]() { return QString::number(++*counter); });
 	addAttribute(dev, "uptime", []() { return QDateTime::currentDateTime().toString(Qt::ISODate); });
 	return ctx;
-}
-
-QVector<ScanResult> FakeCtxBackend::scan(const QString &) { return available(); }
-
-QVector<ScanResult> FakeCtxBackend::available() const
-{
-	QVector<ScanResult> results;
-	for(int i = 0; i < m_deviceCount; i++) {
-		const QString uri = QString("fake:%1").arg(i);
-		results.append({uri, "Fake device " + uri, ID});
-	}
-	if((QDateTime::currentSecsSinceEpoch() / HOTPLUG_PERIOD_S) % 2 == 0) {
-		results.append({HOTPLUG_URI, "Fake hotplug device", ID});
-	}
-	return results;
-}
-
-DeviceMonitor *FakeCtxBackend::monitor()
-{
-	if(!m_monitor) {
-		m_monitor = std::make_unique<PollingDeviceMonitor>(this, QString());
-	}
-	return m_monitor.get();
 }

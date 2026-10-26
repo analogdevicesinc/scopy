@@ -48,15 +48,17 @@ void FakeBackendPlugin::init()
 	if(FAKE_DEVICE_COUNT <= 0) {
 		return;
 	}
-	if(component::Controller::GetInstance()->registerBackend(std::make_shared<FakeCtxBackend>(FAKE_DEVICE_COUNT))) {
-		qInfo(CAT_FAKEBACKEND) << "registered backend" << FakeCtxBackend::ID << "with" << FAKE_DEVICE_COUNT
+	component::Controller *c = component::Controller::GetInstance();
+	if(c->registerProvider(std::make_shared<FakeProvider>(FAKE_DEVICE_COUNT)) &&
+	   c->registerBackend(std::make_shared<FakeCtxBackend>())) {
+		qInfo(CAT_FAKEBACKEND) << "registered provider" << FakeProvider::KIND << "with" << FAKE_DEVICE_COUNT
 				       << "devices";
 	}
 }
 
 bool FakeBackendPlugin::compatible(QString m_param, QString category)
 {
-	component::ContextHandle ctx = component::Controller::context(m_param);
+	component::ContextHandle ctx = component::Controller::context(m_param, FakeCtxBackend::ID);
 	return ctx && ctx->findChild<component::Device *>("fakedev", Qt::FindDirectChildrenOnly);
 }
 
@@ -67,7 +69,7 @@ void FakeBackendPlugin::loadToolList()
 
 void FakeBackendPlugin::refresh()
 {
-	component::ContextHandle ctx = component::Controller::context(m_param);
+	component::ContextHandle ctx = component::Controller::context(m_param, FakeCtxBackend::ID);
 	if(!ctx || !m_label) {
 		return;
 	}

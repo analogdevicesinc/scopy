@@ -31,13 +31,13 @@
 #include <QWidget>
 #include <animationpushbutton.h>
 
-#include <component/contextbackend.h>
+#include <component/connectionprovider.h>
 
 namespace scopy {
 
-// Add-page tab over every registered context backend: one filter checkbox per backend, one scan
-// merging their results, and a URI entry with a backend selector. The backend id is the device
-// category. Backends registered later (e.g. from Plugin::init()) are added as they appear.
+// Add-page tab over every registered connection provider: one filter checkbox per provider, one
+// scan merging their results, and a URI entry with a provider selector. The provider kind is the
+// device category. Providers registered later (e.g. from Plugin::init()) are added as they appear.
 class BackendsTabWidget : public QWidget
 {
 	Q_OBJECT
@@ -60,7 +60,6 @@ private Q_SLOTS:
 	void scanFinished();
 	void verifyBtnClicked();
 	void addBackend(const QString &id);
-	void removeBackend(const QString &id);
 	void updateUriHint(const QString &id);
 
 private:
@@ -71,7 +70,7 @@ private:
 	void selectResult(int idx);
 
 	QWidget *m_filterWidget;
-	QMap<component::BackendId, QCheckBox *> m_filters;
+	QMap<component::ConnectionKind, QCheckBox *> m_filters;
 	QComboBox *m_resultsCb;
 	AnimationPushButton *m_btnScan;
 	QLineEdit *m_uriEdit;

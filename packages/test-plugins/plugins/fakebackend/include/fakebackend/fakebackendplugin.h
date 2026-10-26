@@ -35,8 +35,9 @@ class QLabel;
 
 namespace scopy {
 
-// End-to-end check of runtime backend registration: init() registers FakeCtxBackend, auto-scan
-// finds its devices, they are created with category "fake", and this plugin is matched by category.
+// End-to-end check of runtime registration: init() registers FakeProvider + FakeCtxBackend,
+// auto-scan finds the devices, they are created with category "fake", and this plugin is matched
+// by category (which also names the view it uses).
 // The number of fake devices is FAKE_DEVICE_COUNT in fakebackendplugin.cpp (0 disables it).
 class SCOPY_FAKEBACKEND_EXPORT FakeBackendPlugin : public QObject, public PluginBase
 {

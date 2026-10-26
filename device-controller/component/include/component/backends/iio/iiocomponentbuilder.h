@@ -43,13 +43,14 @@ class IIOAttribute;
 class IIOContext;
 class IIODevice;
 
-// Builds the IIO component tree from a Context whose IIOContext handle is already
-// created and whose executor is set. Written as many small single-purpose methods.
+// Builds the IIO component tree of an open iio_context handle under an IIOContext. Written as
+// many small single-purpose methods.
 class COMPONENT_EXPORT IIOComponentBuilder : public ComponentBuilder
 {
 public:
-	explicit IIOComponentBuilder(scopy::iio::IBackend *backend)
+	IIOComponentBuilder(scopy::iio::IBackend *backend, scopy::iio::ContextHandle handle)
 		: m_backend(backend)
+		, m_handle(handle)
 	{}
 
 	bool build(Context *ctx, ICmdExecutor *executor) override;
@@ -57,7 +58,6 @@ public:
 private:
 	using AttrMap = QHash<QString, IIOAttribute *>;
 
-	void setContextIdentity(IIOContext *iioCtx);
 	void buildContextAttributes(IIOContext *iioCtx, ICmdExecutor *executor);
 	void buildDevices(IIOContext *iioCtx, ICmdExecutor *executor);
 	void buildOneDevice(IIOContext *iioCtx, scopy::iio::DeviceHandle dh, ICmdExecutor *executor);
@@ -78,6 +78,7 @@ private:
 	static bool isReadOnlyAttr(const QString &attrName);
 
 	scopy::iio::IBackend *m_backend;
+	scopy::iio::ContextHandle m_handle;
 	scopy::iio::IAttrOps *m_attrOps = nullptr;
 };
 

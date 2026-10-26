@@ -33,44 +33,33 @@ DeviceScanner::DeviceScanner(QObject *parent)
 	: QObject(parent)
 {
 	component::Controller *c = component::Controller::GetInstance();
-	connect(c, &component::Controller::backendRegistered, this, &DeviceScanner::attach);
-	connect(c, &component::Controller::backendUnregistered, this, &DeviceScanner::detach);
-	const QList<component::BackendId> ids = c->backends();
-	for(const component::BackendId &id : ids) {
-		attach(id);
+	connect(c, &component::Controller::providerRegistered, this, &DeviceScanner::attach);
+	const QList<component::ConnectionKind> kinds = c->providers();
+	for(const component::ConnectionKind &kind : kinds) {
+		attach(kind);
 	}
 }
 
 DeviceScanner::~DeviceScanner() { stop(); }
 
-void DeviceScanner::attach(const component::BackendId &id)
+void DeviceScanner::attach(const component::ConnectionKind &kind)
 {
-	if(m_monitors.contains(id)) {
+	if(m_monitors.contains(kind)) {
 		return;
 	}
-	component::DeviceMonitor *m = component::Controller::GetInstance()->monitor(id);
+	component::DeviceMonitor *m = component::Controller::GetInstance()->monitor(kind);
 	if(!m) {
 		return;
 	}
-	m_monitors.insert(id, m);
-	qInfo(CAT_DEVICESCANNER) << "monitoring backend" << id;
+	m_monitors.insert(kind, m);
+	qInfo(CAT_DEVICESCANNER) << "monitoring provider" << kind;
 
 	connect(m, &component::DeviceMonitor::found, this,
-		[this](const component::ScanResult &r) { Q_EMIT found(r.backend, r.uri); });
+		[this](const component::ScanResult &r) { Q_EMIT found(r.kind, r.uri); });
 	connect(m, &component::DeviceMonitor::lost, this,
-		[this](const component::ScanResult &r) { Q_EMIT lost(r.backend, r.uri); });
+		[this](const component::ScanResult &r) { Q_EMIT lost(r.kind, r.uri); });
 	if(m_running) {
 		m->start(m_periodMs);
-	}
-}
-
-void DeviceScanner::detach(const component::BackendId &id)
-{
-	// The monitor belongs to the backend and may already be gone (QPointer).
-	QPointer<component::DeviceMonitor> m = m_monitors.take(id);
-	if(m) {
-		m->stop();
-		disconnect(m, nullptr, this, nullptr);
 	}
 }
 
@@ -145,6 +134,6 @@ void DeviceScanner::forget(const QString &uri)
 	}
 }
 
-QList<component::BackendId> DeviceScanner::backends() const { return m_monitors.keys(); }
+QList<component::ConnectionKind> DeviceScanner::kinds() const { return m_monitors.keys(); }
 
 #include "moc_devicescanner.cpp"

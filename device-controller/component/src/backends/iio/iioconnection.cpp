@@ -19,26 +19,43 @@
  *
  */
 
-#include "component/backends/iio/iiocontext.h"
+#include "component/backends/iio/iioconnection.h"
 
+#include "component/backends/iio/iioping.h"
+#include "component/backends/iio/iioprovider.h"
 #include "iioutil/ibackend.h"
 #include "iioutil/icontextops.h"
 
 using namespace scopy::component::iio;
 
-IIOContext::~IIOContext()
+IIOConnection::IIOConnection(QString uri, scopy::iio::IBackend *backend, scopy::iio::ContextHandle handle,
+			     QObject *parent)
+	: Connection(std::move(uri), IIOProvider::KIND, parent)
+	, m_backend(backend)
+	, m_handle(handle)
 {
-	if(!m_backend) {
-		return;
-	}
+	auto *ops = m_backend->contextOps();
+	m_name = ops->name(m_handle);
+	m_description = ops->description(m_handle);
+	const scopy::iio::ContextVersion v = ops->getVersion(m_handle);
+	m_version = {v.major, v.minor, v.gitTag};
+}
 
+IIOConnection::~IIOConnection()
+{
+	// Leaves still alive reference the handle: drop them before the context.
 	const QObjectList kids = children();
 	for(QObject *child : kids) {
 		delete child;
-		child = nullptr;
 	}
-
 	if(m_handle.ptr) {
 		m_backend->contextOps()->destroyContext(m_handle);
 	}
+}
+
+void IIOConnection::start()
+{
+	auto *ping = new IIOPing(m_backend->contextOps(), m_handle, executor(), this);
+	connect(ping, &Ping::connectionLost, this, &Connection::lost);
+	ping->startMonitoring(2000);
 }
