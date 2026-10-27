@@ -413,6 +413,7 @@ build_scopy() {
 			-DIIO_LIBRARIES=$LIBIIO_V0_PREFIX/lib/libiio.so \
 			-DAD9361_INCLUDE_DIRS=$LIBIIO_V0_PREFIX/include \
 			-DAD9361_LIBRARIES=$LIBIIO_V0_PREFIX/lib/libad9361.so \
+			-Dlibm2k_DIR=$LIBIIO_V0_PREFIX/lib/cmake/libm2k \
 			"
 		export SCOPY_CROSS_LDFLAGS=$V0_LDFLAGS
 	fi
