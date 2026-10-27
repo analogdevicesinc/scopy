@@ -21,51 +21,33 @@
 
 #pragma once
 
+#include "component/backends/iio/iioconnection.h"
 #include "component/context.h"
-#include "iioutil/handles.h"
-#include "component/component_export.h"
 
-namespace scopy::iio {
-class IBackend;
-}
+#include "component/component_export.h"
 
 namespace scopy::component::iio {
 
-// IIO identity root. Carries the libiio context handle on top of the shared
-// Context identity (uri/name/description/executor).
+// Root of the generic IIO tree. Handle, backend and version live on the IIOConnection; the
+// accessors here forward to it once the view is attached.
 class COMPONENT_EXPORT IIOContext : public Context
 {
 	Q_OBJECT
 public:
+	using Version = IIOConnection::Version;
+
 	explicit IIOContext(QObject *parent = nullptr)
 		: Context(parent)
 	{}
+	~IIOContext() override = default;
 
-	~IIOContext() override;
-
-	scopy::iio::ContextHandle handle() const { return m_handle; }
-	void setHandle(scopy::iio::ContextHandle handle) { m_handle = handle; }
-
-	// libiio backend version, filled once by the builder. IIO-specific, so it lives here
-	// rather than on the backend-agnostic Context base.
-	struct Version
+	IIOConnection *iioConnection() const { return connection() ? connection()->as<IIOConnection>() : nullptr; }
+	scopy::iio::ContextHandle handle() const
 	{
-		unsigned int major = 0;
-		unsigned int minor = 0;
-		QString gitTag;
-	};
-	Version version() const { return m_version; }
-	void setVersion(const Version &v) { m_version = v; }
-
-	// The backend this context was built with. The loader keeps every backend
-	// resident for the whole process, so this is a non-owning pointer.
-	scopy::iio::IBackend *backend() const { return m_backend; }
-	void setBackend(scopy::iio::IBackend *backend) { m_backend = backend; }
-
-private:
-	scopy::iio::ContextHandle m_handle;
-	scopy::iio::IBackend *m_backend = nullptr;
-	Version m_version;
+		return iioConnection() ? iioConnection()->handle() : scopy::iio::ContextHandle{};
+	}
+	scopy::iio::IBackend *iioBackend() const { return iioConnection() ? iioConnection()->backend() : nullptr; }
+	Version version() const { return iioConnection() ? iioConnection()->version() : Version{}; }
 };
 
 } // namespace scopy::component::iio

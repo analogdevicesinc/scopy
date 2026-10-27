@@ -24,27 +24,42 @@
 #include <QJsonArray>
 
 namespace scopy {
-bool PluginFilter::pluginInCategory(Plugin *p, QString category)
-{			       // PluginFilter class (?)
-	if(category.isEmpty()) // no category selected
-		return true;
-	if(!p->metadata().contains("category")) // plugin metadata does not have category
-		return true;
-	QJsonValue categoryVal = p->metadata().value("category");
-	if(categoryVal.isString()) // single category
-		return category == p->metadata().value("category").toString();
-	if(categoryVal.isArray()) { // list category
-		for(auto v : categoryVal.toArray()) {
-			if(!v.isString()) {
-				continue;
+QStringList PluginFilter::pluginCategories(Plugin *p)
+{
+	QStringList list;
+	QJsonValue val = p->metadata().value("category");
+	if(val.isString()) {
+		list.append(val.toString());
+	} else if(val.isArray()) {
+		for(auto v : val.toArray()) {
+			if(v.isString()) {
+				list.append(v.toString());
 			}
-			if(v.toString() == category) {
-				return true;
-			}
+		}
+	}
+	return list;
+}
+
+bool PluginFilter::pluginInCategories(Plugin *p, const QStringList &accepted)
+{
+	QStringList wanted = accepted;
+	wanted.removeAll(QString());
+	if(wanted.isEmpty()) {
+		return true;
+	}
+	const QStringList categories = pluginCategories(p);
+	if(categories.isEmpty()) {
+		return true;
+	}
+	for(const QString &c : categories) {
+		if(wanted.contains(c)) {
+			return true;
 		}
 	}
 	return false;
 }
+
+bool PluginFilter::pluginInCategory(Plugin *p, QString category) { return pluginInCategories(p, {category}); }
 
 bool PluginFilter::pluginForcedInclusionList(QList<Plugin *> pl, Plugin *p)
 {

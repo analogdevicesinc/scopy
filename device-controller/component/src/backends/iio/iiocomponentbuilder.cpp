@@ -29,7 +29,6 @@
 #include "component/backends/iio/iiodevice.h"
 #include "component/backends/iio/iioinputstream.h"
 #include "component/backends/iio/iiooutputstream.h"
-#include "component/backends/iio/iioping.h"
 #include "component/backends/iio/iioregisterreader.h"
 #include "component/backends/iio/iioregisterwriter.h"
 #include "component/backends/iio/iiosamplecodec.h"
@@ -52,33 +51,21 @@ using namespace scopy::component::iio;
 bool IIOComponentBuilder::build(Context *ctx, ICmdExecutor *executor)
 {
 	auto *iioCtx = qobject_cast<IIOContext *>(ctx);
-	if(!iioCtx || !iioCtx->handle().ptr || !executor || !m_backend) {
+	if(!iioCtx || !m_handle.ptr || !executor || !m_backend) {
 		return false;
 	}
 
 	m_attrOps = m_backend->attrOps();
 
-	setContextIdentity(iioCtx);
-	new IIOPing(m_backend->contextOps(), iioCtx->handle(), executor, iioCtx);
 	buildContextAttributes(iioCtx, executor);
 	buildDevices(iioCtx, executor);
 	return true;
 }
 
-void IIOComponentBuilder::setContextIdentity(IIOContext *iioCtx)
-{
-	auto *ctxOps = m_backend->contextOps();
-	const auto handle = iioCtx->handle();
-	iioCtx->setName(ctxOps->name(handle));
-	iioCtx->setDescription(ctxOps->description(handle));
-	const scopy::iio::ContextVersion v = ctxOps->getVersion(handle);
-	iioCtx->setVersion({v.major, v.minor, v.gitTag});
-}
-
 void IIOComponentBuilder::buildContextAttributes(IIOContext *iioCtx, ICmdExecutor *executor)
 {
 	auto *ctxOps = m_backend->contextOps();
-	const auto handle = iioCtx->handle();
+	const auto handle = m_handle;
 	const unsigned int count = ctxOps->attrsCount(handle);
 	for(unsigned int i = 0; i < count; ++i) {
 		const QString name = ctxOps->attrName(handle, i);
@@ -97,7 +84,7 @@ void IIOComponentBuilder::buildContextAttributes(IIOContext *iioCtx, ICmdExecuto
 void IIOComponentBuilder::buildDevices(IIOContext *iioCtx, ICmdExecutor *executor)
 {
 	auto *ctxOps = m_backend->contextOps();
-	const auto handle = iioCtx->handle();
+	const auto handle = m_handle;
 	const unsigned int count = ctxOps->devicesCount(handle);
 	for(unsigned int d = 0; d < count; ++d) {
 		const scopy::iio::DeviceHandle dh = ctxOps->getDevice(handle, d);

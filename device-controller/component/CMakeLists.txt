@@ -18,8 +18,8 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-# component — identity/capability component tree (Context/Device/Channel/Attribute), the Controller + backend context
-# factories, and the IIO backend leaves. Depends on core and iio-utils.
+# component — identity/capability component tree (Context/Device/Channel/Attribute), the Controller + context backends,
+# and the IIO backend leaves. Depends on core and iio-utils.
 file(GLOB COMPONENT_HEADERS include/component/*.h include/component/backends/iio/*.h)
 file(GLOB COMPONENT_SOURCES src/*.cpp src/backends/iio/*.cpp)
 
@@ -45,7 +45,7 @@ target_link_libraries(
 	       Qt6::Core
 	       QCoro6::Core
 	       QCoro6::Coro
-	PRIVATE iio-backend-v${SCOPY_LIBIIO_VERSION} # provides createIIOBackend(), called by IIOContextFactory
+	PRIVATE iio-backend-v${SCOPY_LIBIIO_VERSION} # provides createIIOBackend(), called by IIOCtxBackend
 )
 
 install(

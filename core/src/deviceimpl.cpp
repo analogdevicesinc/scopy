@@ -36,9 +36,11 @@
 #include <QtConcurrent/QtConcurrent>
 #include <deviceiconbuilder.h>
 #include <pluginenablewidget.h>
+#include <pluginfilter.h>
 #include <pluginrepository.h>
 #include <style.h>
 
+#include <component/attribute.h>
 #include <common/debugtimer.h>
 #include <common/scopyconfig.h>
 #include <gui/widgets/hoverwidget.h>
@@ -49,11 +51,13 @@
 Q_LOGGING_CATEGORY(CAT_DEVICEIMPL, "Device")
 
 namespace scopy {
-DeviceImpl::DeviceImpl(QString param, QString category, QObject *parent)
+DeviceImpl::DeviceImpl(QString param, QString category, component::ConnectionKind kind, int maxThreads, QObject *parent)
 	: QObject{parent}
-	, m_param(param)
-	, m_category(category)
 	, m_reloadPluginsSet({})
+	, m_category(category)
+	, m_param(param)
+	, m_kind(kind)
+	, m_maxThreads(maxThreads)
 {
 	setState(DEV_INIT);
 	m_id = "dev_" + category + "_" + param + "_" + scopy::config::getUuid();
@@ -61,18 +65,96 @@ DeviceImpl::DeviceImpl(QString param, QString category, QObject *parent)
 
 	connect(
 		component::Controller::GetInstance(), &component::Controller::connectionLost, this,
-		[this](component::Context *ctx) {
-			if(m_state == DEV_CONNECTED && m_context && ctx == m_context.get()) {
+		[this](component::Connection *conn) {
+			if(m_state == DEV_CONNECTED && m_conn && conn == m_conn.get()) {
 				onConnectionLost();
 			}
 		},
 		Qt::QueuedConnection);
+
+	if(!m_kind.isEmpty()) {
+		acquireConnection();
+		if(m_conn) {
+			acquireViews(m_conn->backends());
+		}
+		connect(this, &DeviceImpl::stateChanged, this, &DeviceImpl::onStateChanged, Qt::DirectConnection);
+	}
+}
+
+void DeviceImpl::onStateChanged(DeviceState_t state)
+{
+	switch(state) {
+	case DEV_CONNECTING:
+		acquireConnection();
+		acquireViews(declaredBackends());
+		break;
+	case DEV_IDLE:
+		releaseContext();
+		break;
+	default:
+		break;
+	}
+}
+
+void DeviceImpl::acquireConnection()
+{
+	if(m_conn) {
+		return;
+	}
+	m_conn = component::Controller::open(m_param, m_kind, m_maxThreads);
+	if(!m_conn) {
+		qWarning(CAT_DEVICEIMPL) << "Failed to open" << m_param;
+	}
+}
+
+void DeviceImpl::acquireViews(const QStringList &backends)
+{
+	if(!m_conn) {
+		return;
+	}
+	for(const QString &id : backends) {
+		if(m_views.count(id)) {
+			continue;
+		}
+		component::ContextHandle h = component::Controller::connectCtx(m_param, id, m_maxThreads);
+		if(!h) {
+			qWarning(CAT_DEVICEIMPL) << "Failed to build view" << id << "for" << m_param;
+			continue;
+		}
+		m_views.emplace(id, std::move(h));
+	}
+}
+
+void DeviceImpl::releaseContext()
+{
+	m_views.clear();
+	m_conn = component::ConnectionHandle{};
+}
+
+// Views the loaded plugins declare through "category": the plugin categories that are compatible
+// backends of the connection. A plugin without a category gets the "iio" view when there is one.
+QStringList DeviceImpl::declaredBackends() const
+{
+	const QStringList available = backends();
+	QStringList ids;
+	for(Plugin *p : m_plugins) {
+		QStringList categories = PluginFilter::pluginCategories(p);
+		if(categories.isEmpty()) {
+			categories.append("iio");
+		}
+		for(const QString &id : std::as_const(categories)) {
+			if(available.contains(id) && !ids.contains(id)) {
+				ids.append(id);
+			}
+		}
+	}
+	return ids;
 }
 
 void DeviceImpl::init()
 {
 	DebugTimer benchmark;
-	m_plugins = PluginRepository::getCompatiblePlugins(m_param, m_category);
+	m_plugins = PluginRepository::getCompatiblePlugins(m_param, m_category, backends());
 	for(Plugin *p : std::as_const(m_plugins)) {
 		QObject *obj = dynamic_cast<QObject *>(p);
 		if(obj) {
@@ -140,12 +222,29 @@ void DeviceImpl::unloadPlugins()
 	DEBUGTIMER_LOG(benchmark, this->displayName() + " plugins unload took:");
 }
 
-bool DeviceImpl::verify() { return true; }
+bool DeviceImpl::verify() { return m_kind.isEmpty() || static_cast<bool>(m_conn); }
 
 QMap<QString, QString> DeviceImpl::readDeviceInfo()
 {
-	QMap<QString, QString> map;
-	return map;
+	QMap<QString, QString> contextAttributes;
+	if(m_kind.isEmpty()) {
+		return contextAttributes;
+	}
+	component::Context *ctx = context();
+	if(!ctx) {
+		qWarning(CAT_DEVICEIMPL) << "Cannot read the device info! (unavailable context)";
+		return contextAttributes;
+	}
+	const QList<component::Attribute *> attributes =
+		ctx->findChildren<component::Attribute *>(Qt::FindDirectChildrenOnly);
+	for(component::Attribute *attr : attributes) {
+		if(!attr->readCapability()) {
+			continue;
+		}
+		QCoro::waitFor(attr->readCapability()->readAsync());
+		contextAttributes[attr->name()] = attr->cachedValue();
+	}
+	return contextAttributes;
 }
 
 void DeviceImpl::removeDisabledPlugins()
@@ -299,7 +398,7 @@ void DeviceImpl::loadBadges()
 
 void DeviceImpl::loadCompatiblePluginsTab(QWidget *pluginsTab)
 {
-	QList<Plugin *> plugins = PluginRepository::getCompatiblePlugins(m_param, m_category);
+	QList<Plugin *> plugins = PluginRepository::getCompatiblePlugins(m_param, m_category, backends());
 	QStringList enabledPlugins = getPluginsName();
 	for(Plugin *p : std::as_const(plugins)) {
 		PluginEnableWidget *pluginDescription = new PluginEnableWidget(pluginsTab);
@@ -341,7 +440,21 @@ void DeviceImpl::setState(DeviceState_t state)
 	Q_EMIT stateChanged(m_state);
 }
 
-component::Context *DeviceImpl::context() const { return m_context.get(); }
+component::Connection *DeviceImpl::connection() const { return m_conn.get(); }
+
+QStringList DeviceImpl::backends() const { return m_conn ? m_conn->backends() : QStringList(); }
+
+component::Context *DeviceImpl::context(const component::BackendId &backend) const
+{
+	const component::BackendId id = backend.isEmpty() ? component::BackendId("iio") : backend;
+	if(auto it = m_views.find(id); it != m_views.end()) {
+		return it->second.get();
+	}
+	if(backend.isEmpty() && !m_views.empty()) {
+		return m_views.begin()->second.get();
+	}
+	return nullptr;
+}
 
 void DeviceImpl::onConnectionFailed()
 {

@@ -21,9 +21,11 @@
 
 #pragma once
 
-#include "component/contextfactory.h"
-#include "iioutil/handles.h"
+#include "component/connectionprovider.h"
+
 #include "component/component_export.h"
+
+#include <memory>
 
 namespace scopy::iio {
 class IBackend;
@@ -31,20 +33,30 @@ class IBackend;
 
 namespace scopy::component::iio {
 
-// Builds a libiio-backed Context: instantiates the libiio backend linked into this
-// build (SCOPY_LIBIIO_VERSION selects v0 or v1 at compile time), opens the context
-// handle, attaches a serial executor, and runs the IIO component builder.
-class COMPONENT_EXPORT IIOContextFactory : public ContextFactory
+// The libiio transport: opens iio_context handles with the libiio backend linked into this build
+// (SCOPY_LIBIIO_VERSION selects v0 or v1 at compile time) and scans through IScanOps; its monitor
+// polls "usb".
+class COMPONENT_EXPORT IIOProvider : public ConnectionProvider
 {
 public:
-	IIOContextFactory() = default;
+	static constexpr const char *KIND = "iio";
 
-	Context *create(const QString &uri, const int maxThreads) override;
+	IIOProvider();
+	~IIOProvider() override;
 
-	// The process-wide libiio backend linked into this build. Lets non-context clients
-	// (e.g. the device scanner via IBackend::scanOps()) reach the backend without opening
-	// a context. Kept resident for the whole process; never null.
+	ConnectionKind kind() const override { return KIND; }
+	Connection *open(const QString &uri) override;
+	QVector<ScanResult> scan(const QString &filter = QString()) override;
+	QStringList scanFilters() const override;
+	QString uriHint() const override { return "ip:192.168.2.1, usb:1.2.3, serial:/dev/ttyUSB0,115200,8n1"; }
+	DeviceMonitor *monitor() override;
+
+	// The process-wide libiio backend linked into this build. Never null, resident for the whole
+	// process.
 	static scopy::iio::IBackend *defaultBackend();
+
+private:
+	std::unique_ptr<DeviceMonitor> m_monitor;
 };
 
 } // namespace scopy::component::iio
