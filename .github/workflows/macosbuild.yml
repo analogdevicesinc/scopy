@@ -5,7 +5,6 @@ on:
 
 env:
   USERNAME: github-actions
-  CACHING_ENABLED: 'false'
 
 jobs:
   build:
@@ -40,10 +39,51 @@ jobs:
           with:
             fetch-depth: 0
 
+        # Cache keys: ImageOS/ImageVersion change with each runner image, the deps key also tracks upstream commits
+        - name: Compute cache keys
+          id: keys
+          run: |
+            : "${ImageOS:?}" "${ImageVersion:?}"
+            BREW_KEY="brew-${ImageOS}-${{ runner.arch }}-${ImageVersion}-${{ hashFiles('ci/macOS/install_macos_deps.sh') }}"
+            DEPS_SHA=$(bash ci/macOS/deps_cache_key.sh)
+            echo "brew=$BREW_KEY" >> "$GITHUB_OUTPUT"
+            echo "deps=deps-libiio${SCOPY_LIBIIO_VERSION}-${BREW_KEY}-${{ hashFiles('ci/macOS/macos_config.sh') }}-${DEPS_SHA}" >> "$GITHUB_OUTPUT"
+
+        - name: Restore Homebrew cache
+          id: brew-cache
+          uses: actions/cache/restore@v5
+          with:
+            path: ~/brew-kegs
+            key: ${{ steps.keys.outputs.brew }}
+
+        - name: Restore dependencies cache
+          id: deps-cache
+          uses: actions/cache/restore@v5
+          with:
+            path: staging/dependencies
+            key: ${{ steps.keys.outputs.deps }}
+
         - name: Build and Install Dependencies
+          env:
+            BREW_CACHE_HIT: ${{ steps.brew-cache.outputs.cache-hit }}
+            DEPS_CACHE_HIT: ${{ steps.deps-cache.outputs.cache-hit }}
           run: |
             chmod +x ci/macOS/macos_config.sh ci/macOS/install_macos_deps.sh ci/macOS/build_macos.sh ci/macOS/package_darwin.sh
             ./ci/macOS/install_macos_deps.sh
+
+        - name: Save Homebrew cache
+          if: steps.brew-cache.outputs.cache-hit != 'true'
+          uses: actions/cache/save@v5
+          with:
+            path: ~/brew-kegs
+            key: ${{ steps.keys.outputs.brew }}
+
+        - name: Save dependencies cache
+          if: steps.deps-cache.outputs.cache-hit != 'true'
+          uses: actions/cache/save@v5
+          with:
+            path: staging/dependencies
+            key: ${{ steps.keys.outputs.deps }}
 
         - name: Build Scopy
           run: |
