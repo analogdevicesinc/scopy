@@ -24,10 +24,14 @@
 #include "scopy-core_export.h"
 #include "idecodercatalog.h"
 
+#include <QFuture>
 #include <QHash>
 #include <QList>
+#include <QMutex>
 #include <QString>
 #include <QStringList>
+
+#include <atomic>
 
 namespace scopy {
 namespace decoder {
@@ -35,7 +39,8 @@ namespace decoder {
 class DecoderLogger;
 
 // IDecoderCatalog backed by `sigrok-cli`. Lazy in-memory cache; blocking
-// QProcess calls (call from a worker thread if latency matters).
+// QProcess calls (call from a worker thread if latency matters). Safe to call
+// from any thread.
 class SCOPY_CORE_EXPORT SigrokCliCatalog : public IDecoderCatalog
 {
 public:
@@ -46,6 +51,8 @@ public:
 	void setExecutableOverride(const QString &path);
 	QString resolveCli() const;
 
+	bool run(const QStringList &args, const QByteArray &input, QByteArray &out, QString &err) const;
+
 	void setLogger(DecoderLogger *lg) { m_logger = lg; }
 
 	// IDecoderCatalog
@@ -54,11 +61,11 @@ public:
 	QString shortDescription(const QString &decoderId) const override;
 	DecoderInfo info(const QString &decoderId) const override;
 
-	// Parallel eager cache prime via a small QProcess pool. Blocking.
+	// Fills the cache on a small thread pool in the background. The
+	// destructor waits for it.
 	void loadAll() const override;
 
 private:
-	QString runCli(const QStringList &args, bool *ok = nullptr) const;
 	static void parseListing(const QString &stdoutText, QList<QString> &orderOut, QHash<QString, QString> &descOut);
 	static DecoderInfo parseShow(const QString &stdoutText, const QString &decoderId);
 	static OptionInfo parseOptionLine(const QString &content);
@@ -66,8 +73,12 @@ private:
 	const char *m_kCatalogId;
 	int m_kMaxParallel;
 
+	mutable QMutex m_mutex;
 	mutable QString m_exeOverride;
 	mutable QString m_cachedExe;
+
+	mutable QFuture<void> m_prime;
+	std::atomic<bool> m_stopping{false};
 
 	mutable bool m_listedOnce{false};
 	mutable QList<QString> m_order;		     // decoder ids
