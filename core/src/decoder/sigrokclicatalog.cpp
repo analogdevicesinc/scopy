@@ -25,6 +25,7 @@
 #include "decoder/decoderlogger.h"
 #include "pluginbase/preferences.h"
 
+#include <QCoreApplication>
 #include <QDir>
 #include <QFile>
 #include <QProcess>
@@ -40,7 +41,17 @@ namespace decoder {
 SigrokCliCatalog::SigrokCliCatalog()
 	: m_kCatalogId("sigrok-cli-catalog")
 	, m_kMaxParallel(8)
-{}
+{
+#if defined __APPLE__
+	const QString decoders = QCoreApplication::applicationDirPath() + "/../Resources/decoders";
+#elif defined(__appimage__)
+	const QString decoders = QCoreApplication::applicationDirPath() + "/../lib/decoders";
+#else
+	const QString decoders = QCoreApplication::applicationDirPath() + "/decoders";
+#endif
+	if(!qEnvironmentVariableIsSet("SIGROKDECODE_DIR") && QDir(decoders).exists())
+		qputenv("SIGROKDECODE_DIR", QDir::cleanPath(decoders).toLocal8Bit());
+}
 
 SigrokCliCatalog::~SigrokCliCatalog() = default;
 
