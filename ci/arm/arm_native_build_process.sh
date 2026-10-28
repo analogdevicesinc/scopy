@@ -37,6 +37,9 @@ ECM_BRANCH=v6.8.0
 KARCHIVE_BRANCH=v6.8.0
 GENALYZER_BRANCH=main
 QCORO_BRANCH=v0.13.0
+LIBSIGROKDECODE_BRANCH=master
+LIBSIGROK_BRANCH=master
+SIGROKCLI_BRANCH=master
 
 STAGING_AREA=$SRC_SCRIPT/staging
 QT_INSTALL_PREFIX=/opt/Qt/6.8.3/gcc_${ARCH_SUFFIX}
@@ -143,7 +146,7 @@ install_packages() {
 		libxcb-icccm4-dev libxcb-image0-dev libxcb-render-util0-dev libxcb-sync-dev \
 		libxcb-randr0-dev libxcb-shm0-dev libxcb-util-dev libxcb-xkb-dev libxcb-ewmh-dev \
 		libx11-xcb-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev libxrender-dev \
-		libzip-dev \
+		libzip-dev libglib2.0-dev \
 		libgl1-mesa-dev libgl-dev libegl-dev libgles-dev \
 		libavahi-client-dev libavahi-common-dev \
 		libusb-1.0-0 libusb-1.0-0-dev libsndfile1-dev \
@@ -252,6 +255,9 @@ clone() {
 	[ -d 'karchive' ] || git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
 	[ -d 'genalyzer' ] || git clone --recursive https://github.com/analogdevicesinc/genalyzer.git -b $GENALYZER_BRANCH genalyzer
 	[ -d 'qcoro' ] || git clone --recursive https://github.com/qcoro/qcoro.git -b $QCORO_BRANCH qcoro
+	[ -d 'libsigrokdecode' ] || git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
+	[ -d 'libsigrok' ] || git clone --recursive https://github.com/sigrokproject/libsigrok.git -b $LIBSIGROK_BRANCH libsigrok
+	[ -d 'sigrok-cli' ] || git clone --recursive https://github.com/sigrokproject/sigrok-cli.git -b $SIGROKCLI_BRANCH sigrok-cli
 	popd
 }
 
@@ -289,6 +295,37 @@ build_libserialport() {
 	./configure
 	make $JOBS
 	[ "$1" == "ON" ] && sudo make install
+	popd
+}
+
+build_with_autotools() {
+	git clean -xdf
+	./autogen.sh
+	./configure $CURRENT_BUILD_CONFIGURE_OPTS
+	make $JOBS
+	[ "$1" == "ON" ] && sudo make install && sudo ldconfig
+	CURRENT_BUILD_CONFIGURE_OPTS=""
+}
+
+build_libsigrokdecode() {
+	echo "### Building libsigrokdecode - branch $LIBSIGROKDECODE_BRANCH"
+	pushd $STAGING_AREA/libsigrokdecode
+	build_with_autotools $1
+	popd
+}
+
+build_libsigrok() {
+	echo "### Building libsigrok - branch $LIBSIGROK_BRANCH"
+	pushd $STAGING_AREA/libsigrok
+	CURRENT_BUILD_CONFIGURE_OPTS="--disable-all-drivers --disable-bindings"
+	build_with_autotools $1
+	popd
+}
+
+build_sigrok-cli() {
+	echo "### Building sigrok-cli - branch $SIGROKCLI_BRANCH"
+	pushd $STAGING_AREA/sigrok-cli
+	build_with_autotools $1
 	popd
 }
 
@@ -474,6 +511,9 @@ build_scopy() {
 build_deps() {
 	clone
 	build_libserialport ON
+	build_libsigrokdecode ON
+	build_libsigrok ON
+	build_sigrok-cli ON
 	build_libiio ON
 	build_qwt ON
 	build_kddock ON
@@ -542,10 +582,13 @@ create_appdir() {
 		fi
 	fi
 
+	cp /usr/local/bin/sigrok-cli $APP_DIR/usr/bin
+
 	LIB_DIRS=/usr/local/lib:/usr/lib/$TOOLCHAIN_HOST:${BUILD_FOLDER}:${QT}/lib
 	# libiio v0: resolve libiio.so.0 (and libad9361, tinyiiod) from the v0 prefix, not the libiio v1 compat library.
 	[ "$SCOPY_LIBIIO_VERSION" == "0" ] && LIB_DIRS=$LIBIIO_V0_PREFIX/lib:$LIB_DIRS
 	$COPY_DEPS --lib-dir ${LIB_DIRS} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/scopy
+	$COPY_DEPS --lib-dir ${LIB_DIRS} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/sigrok-cli
 	[ -f $APP_DIR/usr/bin/$EMU_BIN ] && $COPY_DEPS --lib-dir ${LIB_DIRS} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/$EMU_BIN || true
 	$COPY_DEPS --lib-dir ${LIB_DIRS} --output-dir $APP_DIR/usr/lib "$(find $APP_DIR/usr -type f -name 'libscopy*.so')"
 
@@ -563,6 +606,7 @@ create_appdir() {
 	# exits 1 when it matches nothing, which the assignment inherits and which would abort the
 	# whole script here - before the check below could run.
 	FOUND_PYTHON_VERSION=$(grep 'PYTHON_VERSION' $SRC_DIR/build/CMakeCache.txt | awk -F= '{print $2}' | grep -o 'python[0-9]\+\.[0-9]\+' || true)
+	[ -z "$FOUND_PYTHON_VERSION" ] && FOUND_PYTHON_VERSION=$(readelf -d $APP_DIR/usr/lib/libsigrokdecode.so* 2>/dev/null | grep -o 'libpython3\.[0-9]\+' | head -1 | sed 's/^lib//' || true)
 	if [ -n "$FOUND_PYTHON_VERSION" ] && [ -d /usr/lib/$FOUND_PYTHON_VERSION ]; then
 		cp -r /usr/lib/$FOUND_PYTHON_VERSION $APP_DIR/usr/lib
 	else
