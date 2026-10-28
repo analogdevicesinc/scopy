@@ -1,0 +1,21 @@
+commit 1b13802e324f00f4e840eff7b0f3b6761fffa1a1
+Author: Bindea Cristian <cristian.bindea@analog.com>
+Date:   Thu Mar 2 16:07:15 2023 +0200
+
+    Subject: [PATCH] Update public functions visibility on Windows
+    
+    Signed-off-by: Bindea Cristian <cristian.bindea@analog.com>
+
+diff --git a/libsigrokdecode.h b/libsigrokdecode.h
+index ea17cb8..acc2cbc 100644
+--- a/libsigrokdecode.h
++++ b/libsigrokdecode.h
+@@ -112,6 +112,8 @@ enum srd_loglevel {
+ #  else
+ #    define SRD_API extern
+ #  endif
++#elif defined(LIBSIGROKDECODE_EXPORT)
++#  define SRD_API __declspec(dllexport)
+ #else
+ #  define SRD_API __attribute__((visibility("default")))
+ #endif

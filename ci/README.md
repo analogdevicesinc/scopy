@@ -59,6 +59,12 @@ Dependency versions (links used in source builds)
 	 - glibmm
 	 - sigcpp
 	 - python
+ - libsigrok - https://github.com/sigrokproject/libsigrok - master (--disable-all-drivers)
+	 - glib
+	 - libzip
+ - sigrok-cli - https://github.com/sigrokproject/sigrok-cli - master
+	 - libsigrok
+	 - libsigrokdecode
  - libtinyiiod - https://github.com/analogdevicesinc/libtinyiiod - master
 
 How to install Qt from qt.io : https://github.com/analogdevicesinc/scopy-android-deps/blob/master/docker/Dockerfile#L43-L49
@@ -86,4 +92,6 @@ How to install Qt from qt.io : https://github.com/analogdevicesinc/scopy-android
 | sigcpp | pacman | src | apt | src | src | src |
 | python | pacman | src | apt | src | brew | src |
 | libsigrokdecode | src | src | src | src | src | src |
+| libsigrok | src | src | src | src | src | - |
+| sigrok-cli | src | src | src | src | src | - |
 | libtinyiiod | src | src | src | src | src | src|
