@@ -47,7 +47,6 @@
 #include <QStyle>
 #include <QToolButton>
 #include <QVBoxLayout>
-#include <QtConcurrent/QtConcurrentRun>
 
 namespace scopy {
 namespace decoder {
@@ -735,8 +734,7 @@ DecoderPanel::DecoderPanel(DecoderManager *mgr, scopy::acq::DataStore *store, ID
 		addBtn->setEnabled(false);
 	} else {
 		// Prime the catalog cache off the main thread.
-		auto *cat = m_catalog;
-		(void)QtConcurrent::run([cat]() { cat->loadAll(); });
+		m_catalog->loadAll();
 	}
 }
 

@@ -28,7 +28,6 @@
 #include "sigrok/protocoldataencoder.h"
 
 #include <QByteArray>
-#include <QProcess>
 
 #include <algorithm>
 #include <cmath>
@@ -65,20 +64,10 @@ QStringList SigrokCliBackend::buildArgsWithInput(const DecoderConfig &cfg, const
 	args << "-I" << inputFormat;
 
 	// "<id>:role=chan:opt=val:..." (single stage; no leading "-P").
-	auto serializeStage = [](const DecoderStage &stage, const std::map<std::string, std::string> *rootChanOverrides,
-				 const std::map<std::string, std::string> &extraOpts) -> QString {
+	auto serializeStage = [](const DecoderStage &stage, const std::map<std::string, std::string> &extraOpts) {
 		QString spec = QString::fromStdString(stage.decoderId);
-		for(const auto &ch : stage.channels) {
-			QString value;
-			if(rootChanOverrides) {
-				auto it = rootChanOverrides->find(ch.role);
-				if(it != rootChanOverrides->end())
-					value = QString::fromStdString(it->second);
-			}
-			if(value.isEmpty())
-				value = QString::number(ch.bitIndex);
-			spec += QString(":%1=%2").arg(QString::fromStdString(ch.role)).arg(value);
-		}
+		for(const auto &ch : stage.channels)
+			spec += QString(":%1=%2").arg(QString::fromStdString(ch.role)).arg(ch.bitIndex);
 		// User options first, then backend overrides (last occurrence wins).
 		for(const auto &kv : stage.options) {
 			spec += QString(":%1=%2")
@@ -93,18 +82,15 @@ QStringList SigrokCliBackend::buildArgsWithInput(const DecoderConfig &cfg, const
 		return spec;
 	};
 
+	// One comma-joined -P arg: sigrok only wires OUTPUT_PYTHON between stacked
+	// PDs sharing a single -P. On the annotation-input path the synthetic root
+	// PD (from the upstream id) is prepended so sigrok sees a valid root+stacked
+	// chain (e.g. spi:sck=..,spiflash).
+	QStringList stageSpecs;
+	stageSpecs.reserve(static_cast<int>(cfg.stack.size()) + 1);
 	if(pdIn) {
-		// Annotation-input path: one comma-joined -P arg (sigrok only wires
-		// OUTPUT_PYTHON between stacked PDs sharing a single -P). The
-		// synthetic root PD (from the upstream id) is prepended so sigrok
-		// sees a valid root+stacked chain (e.g. spi:sck=..,spiflash).
-		QStringList stageSpecs;
-		stageSpecs.reserve(static_cast<int>(cfg.stack.size()) + 1);
-
 		const AnnInOptions opts = AnnInOptions::fromMeta(cfg.meta);
 		if(!opts.upstreamId.isEmpty()) {
-			// Root spec built from pdIn->rootChannelOverrides; no source
-			// stage exists (upstream PD is reconstructed on the fly).
 			QString rootSpec = opts.upstreamId;
 			for(const auto &kv : pdIn->rootChannelOverrides) {
 				rootSpec += QString(":%1=%2")
@@ -113,25 +99,41 @@ QStringList SigrokCliBackend::buildArgsWithInput(const DecoderConfig &cfg, const
 			}
 			stageSpecs << rootSpec;
 		}
-
-		for(const auto &stage : cfg.stack) {
-			const auto extra = sigrok::downstreamOptionOverrides(QString::fromStdString(stage.decoderId));
-			stageSpecs << serializeStage(stage, nullptr, extra);
-		}
-		args << "-P" << stageSpecs.join(',');
-	} else {
-		// Raw-decode path: same single-arg comma-joined -P for stacking.
-		QStringList stageSpecs;
-		stageSpecs.reserve(static_cast<int>(cfg.stack.size()));
-		for(const auto &stage : cfg.stack) {
-			stageSpecs << serializeStage(stage, nullptr, std::map<std::string, std::string>{});
-		}
-		args << "-P" << stageSpecs.join(',');
 	}
+	for(const auto &stage : cfg.stack) {
+		stageSpecs << serializeStage(
+			stage,
+			pdIn ? sigrok::downstreamOptionOverrides(QString::fromStdString(stage.decoderId))
+			     : std::map<std::string, std::string>{});
+	}
+	args << "-P" << stageSpecs.join(',');
 
 	args << "--protocol-decoder-samplenum"
 	     << "--protocol-decoder-ann-class";
 	return args;
+}
+
+bool SigrokCliBackend::runCli(const char *what, const QStringList &args, const QByteArray &input, QByteArray &stdoutBuf)
+{
+	const QString exe = m_catalog ? m_catalog->resolveCli() : QString{};
+	m_lastCmdLine = exe + " " + args.join(' ');
+	if(m_logger)
+		m_logger->info(m_kBackendId,
+			       QStringLiteral("%1: %2 stdinBytes=%3").arg(what, m_lastCmdLine).arg(input.size()));
+
+	QString err;
+	if(!m_catalog || !m_catalog->run(args, input, stdoutBuf, err)) {
+		m_lastError = m_catalog ? err.toStdString() : "sigrok-cli executable not found";
+		if(m_logger)
+			m_logger->critical(m_kBackendId,
+					   QStringLiteral("%1: %2").arg(what, QString::fromStdString(m_lastError)));
+		return false;
+	}
+	if(!err.isEmpty() && m_logger)
+		m_logger->warning(m_kBackendId, QStringLiteral("%1: stderr: %2").arg(what, err));
+	if(m_logger)
+		m_logger->info(m_kBackendId, QStringLiteral("%1: stdout=%2 bytes").arg(what).arg(stdoutBuf.size()));
+	return true;
 }
 
 void SigrokCliBackend::parseStdout(const QByteArray &buf, const std::vector<DecoderStage> &stack,
@@ -231,78 +233,13 @@ bool SigrokCliBackend::decode(const DecoderConfig &cfg, const uint8_t *data, std
 		return true;
 	}
 
-	const QString exe = m_catalog ? m_catalog->resolveCli() : QString{};
-	if(exe.isEmpty()) {
-		m_lastError = "sigrok-cli executable not found";
-		if(m_logger)
-			m_logger->critical(m_kBackendId, QString::fromStdString(m_lastError));
-		return false;
-	}
-
 	const int unitsize = std::max(1, static_cast<int>(std::ceil(cfg.numChannels / 8.0)));
 	const qint64 bytes = static_cast<qint64>(nSamples) * unitsize;
 
-	const QStringList args = buildArgs(cfg);
-	m_lastCmdLine = exe + " " + args.join(' ');
-	if(m_logger) {
-		m_logger->info(m_kBackendId,
-			       QStringLiteral("decode(): exe=%1 argv=%2 nSamples=%3 unitsize=%4 bytes=%5")
-				       .arg(exe, args.join(' '))
-				       .arg(nSamples)
-				       .arg(unitsize)
-				       .arg(bytes));
-	}
-
-	QProcess proc;
-	proc.setProcessChannelMode(QProcess::SeparateChannels);
-	proc.start(exe, args);
-	if(!proc.waitForStarted(2000)) {
-		m_lastError = "failed to start sigrok-cli: " + proc.errorString().toStdString();
-		if(m_logger)
-			m_logger->critical(m_kBackendId, QString::fromStdString(m_lastError));
+	QByteArray stdoutBuf;
+	if(!runCli("decode()", buildArgs(cfg), QByteArray::fromRawData(reinterpret_cast<const char *>(data), bytes),
+		   stdoutBuf))
 		return false;
-	}
-
-	const qint64 wrote = proc.write(reinterpret_cast<const char *>(data), bytes);
-	if(wrote != bytes && m_logger) {
-		m_logger->warning(m_kBackendId,
-				  QStringLiteral("decode(): write short: wrote=%1 wanted=%2").arg(wrote).arg(bytes));
-	}
-	proc.waitForBytesWritten(2000);
-	proc.closeWriteChannel();
-
-	if(!proc.waitForFinished(10000)) {
-		m_lastError = "sigrok-cli timed out";
-		if(m_logger)
-			m_logger->critical(m_kBackendId, QString::fromStdString(m_lastError));
-		proc.kill();
-		proc.waitForFinished(500);
-		return false;
-	}
-
-	const QByteArray stdoutBuf = proc.readAllStandardOutput();
-	const QByteArray stderrBuf = proc.readAllStandardError();
-
-	if(m_logger) {
-		m_logger->info(m_kBackendId,
-			       QStringLiteral("decode(): exit=%1 status=%2 stdout=%3 bytes stderr=%4 bytes")
-				       .arg(proc.exitCode())
-				       .arg(int(proc.exitStatus()))
-				       .arg(stdoutBuf.size())
-				       .arg(stderrBuf.size()));
-	}
-
-	if(!stderrBuf.isEmpty() && m_logger) {
-		m_logger->warning(m_kBackendId,
-				  QStringLiteral("decode(): stderr: ") + QString::fromUtf8(stderrBuf.trimmed()));
-	}
-
-	if(proc.exitStatus() != QProcess::NormalExit || proc.exitCode() != 0) {
-		m_lastError = stderrBuf.trimmed().toStdString();
-		if(m_lastError.empty())
-			m_lastError = "sigrok-cli exited with non-zero status";
-		return false;
-	}
 
 	parseStdout(stdoutBuf, cfg.stack, out);
 	if(m_logger)
@@ -416,78 +353,9 @@ bool SigrokCliBackend::decodeAnnotations(const DecoderConfig &cfg, const std::ve
 	}
 
 	// 3. Spawn sigrok-cli with the protocoldata input.
-	const QString exe = m_catalog ? m_catalog->resolveCli() : QString{};
-	if(exe.isEmpty()) {
-		m_lastError = "sigrok-cli executable not found";
-		if(m_logger)
-			m_logger->critical(m_kBackendId, QString::fromStdString(m_lastError));
+	QByteArray stdoutBuf;
+	if(!runCli("decodeAnnotations()", buildArgsWithInput(cfg, pdIn.inputOpts, &pdIn), pdIn.stdinBytes, stdoutBuf))
 		return false;
-	}
-
-	const QStringList args = buildArgsWithInput(cfg, pdIn.inputOpts, &pdIn);
-	m_lastCmdLine = exe + " " + args.join(' ');
-	if(m_logger) {
-		m_logger->info(m_kBackendId,
-			       QStringLiteral("decodeAnnotations(): exe=%1 argv=%2 upstreamAnns=%3 "
-					      "symbols=%4 stdinBytes=%5")
-				       .arg(exe, args.join(' '))
-				       .arg(in.size())
-				       .arg(symbols.size())
-				       .arg(pdIn.stdinBytes.size()));
-	}
-
-	QProcess proc;
-	proc.setProcessChannelMode(QProcess::SeparateChannels);
-	proc.start(exe, args);
-	if(!proc.waitForStarted(2000)) {
-		m_lastError = "failed to start sigrok-cli: " + proc.errorString().toStdString();
-		if(m_logger)
-			m_logger->critical(m_kBackendId, QString::fromStdString(m_lastError));
-		return false;
-	}
-
-	const qint64 wrote = proc.write(pdIn.stdinBytes);
-	if(wrote != pdIn.stdinBytes.size() && m_logger) {
-		m_logger->warning(m_kBackendId,
-				  QStringLiteral("decodeAnnotations(): write short: wrote=%1 wanted=%2")
-					  .arg(wrote)
-					  .arg(pdIn.stdinBytes.size()));
-	}
-	proc.waitForBytesWritten(2000);
-	proc.closeWriteChannel();
-
-	if(!proc.waitForFinished(10000)) {
-		m_lastError = "sigrok-cli timed out";
-		if(m_logger)
-			m_logger->critical(m_kBackendId, QString::fromStdString(m_lastError));
-		proc.kill();
-		proc.waitForFinished(500);
-		return false;
-	}
-
-	const QByteArray stdoutBuf = proc.readAllStandardOutput();
-	const QByteArray stderrBuf = proc.readAllStandardError();
-
-	if(m_logger) {
-		m_logger->info(m_kBackendId,
-			       QStringLiteral("decodeAnnotations(): exit=%1 status=%2 stdout=%3 "
-					      "bytes stderr=%4 bytes")
-				       .arg(proc.exitCode())
-				       .arg(int(proc.exitStatus()))
-				       .arg(stdoutBuf.size())
-				       .arg(stderrBuf.size()));
-	}
-	if(!stderrBuf.isEmpty() && m_logger) {
-		m_logger->warning(m_kBackendId,
-				  QStringLiteral("decodeAnnotations(): stderr: ") +
-					  QString::fromUtf8(stderrBuf.trimmed()));
-	}
-	if(proc.exitStatus() != QProcess::NormalExit || proc.exitCode() != 0) {
-		m_lastError = stderrBuf.trimmed().toStdString();
-		if(m_lastError.empty())
-			m_lastError = "sigrok-cli exited with non-zero status";
-		return false;
-	}
 
 	// 4. Parse stdout with an extended stack [synthetic-root, user...] so
 	//    parseStdout can resolve indices for both.

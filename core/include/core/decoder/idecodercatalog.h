@@ -91,8 +91,8 @@ public:
 	// Invalid DecoderInfo (isValid() == false) on error / unknown id.
 	virtual DecoderInfo info(const QString &decoderId) const = 0;
 
-	// Eagerly fill the metadata cache. Blocking; call from a worker thread
-	// if latency matters. Backends override to parallelize.
+	// Eagerly fill the metadata cache. Implementations may do it in the
+	// background and return before the cache is full.
 	virtual void loadAll() const
 	{
 		for(const QString &id : decoders())

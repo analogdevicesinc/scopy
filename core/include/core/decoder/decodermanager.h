@@ -129,6 +129,8 @@ Q_SIGNALS:
 	void stagesRemoved(const QString &uid, const QList<scopy::acq::DataKey> &keys);
 
 private:
+	QString createDecoder(const QString &decoderId, const DecoderConfig &cfg,
+			      std::unique_ptr<IDecoderBackend> backend, scopy::acq::DataKey annotationSource);
 	void claimWindowDepth(const DecoderInstance &d);
 
 	// QPointer, not raw: both are children of the instrument widget, which the plugin deletes
