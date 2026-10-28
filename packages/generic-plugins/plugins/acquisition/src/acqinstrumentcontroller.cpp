@@ -454,7 +454,9 @@ void AcqInstrumentController::setupAnalysisPanel()
 void AcqInstrumentController::single()
 {
 	if(!m_trigProc || !m_trigProc->isEnabled()) {
-		m_ui->single();
+		const std::size_t window = m_plots ? static_cast<std::size_t>(m_plots->plotSize()) : 0;
+		m_ui->single(static_cast<unsigned int>(
+			scopy::acq::DataStore::depthForWindow(window, m_ui->engine()->bufferSize())));
 		return;
 	}
 	// One cycle is wrong for a trigger: it may need many cycles to see its edge, and a
