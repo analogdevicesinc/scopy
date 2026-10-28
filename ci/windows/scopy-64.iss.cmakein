@@ -269,8 +269,10 @@ Name: "packages"; Description: "Packages"; Types: full packages compact custom; 
 Source: "{#DestFolder}\*.exe"; DestDir: "{app}"; Components: main; Flags: ignoreversion
 Source: "{#DestFolder}\qt.conf"; DestDir: "{app}"; Components: main; Flags: ignoreversion onlyifdoesntexist
 //Folders
+Source: "{#DestFolder}\decoders\*"; DestDir: "{app}\decoders"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "{#DestFolder}\drivers\*"; DestDir: "{app}\drivers"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "{#DestFolder}\iconengines\*"; DestDir: "{app}\iconengines"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "{#DestFolder}\lib\*"; DestDir: "{app}\lib"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "{#DestFolder}\imageformats\*"; DestDir: "{app}\imageformats"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "{#DestFolder}\platforms\*"; DestDir: "{app}\platforms"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "{#DestFolder}\printsupport\*"; DestDir: "{app}\printsupport"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist skipifsourcedoesntexist

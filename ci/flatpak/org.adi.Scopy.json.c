@@ -224,6 +224,45 @@
 			]
 		},
 		{
+			"name": "sigrokdecode",
+			"builddir": false,
+			"buildsystem": "autotools",
+			"config-opts": [ "--prefix=/app" ],
+			"sources": [
+				{
+					"type": "git",
+					"url": "https://github.com/sigrokproject/libsigrokdecode",
+					"branch" : "master"
+				}
+			]
+		},
+		{
+			"name": "sigrok",
+			"builddir": false,
+			"buildsystem": "autotools",
+			"config-opts": [ "--prefix=/app", "--disable-all-drivers", "--disable-bindings" ],
+			"sources": [
+				{
+					"type": "git",
+					"url": "https://github.com/sigrokproject/libsigrok",
+					"branch" : "master"
+				}
+			]
+		},
+		{
+			"name": "sigrok-cli",
+			"builddir": false,
+			"buildsystem": "autotools",
+			"config-opts": [ "--prefix=/app" ],
+			"sources": [
+				{
+					"type": "git",
+					"url": "https://github.com/sigrokproject/sigrok-cli",
+					"branch" : "master"
+				}
+			]
+		},
+		{
 			"name": "KDDockWidgets",
 			"builddir": true,
 			"buildsystem": "cmake",

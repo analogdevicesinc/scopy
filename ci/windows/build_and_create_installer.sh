@@ -183,6 +183,10 @@ deploy_app(){
 	# could not be found".
 	find $DEST_FOLDER/packages -name "*.dll" -exec $QT/bin/windeployqt6.exe --dir $DEST_FOLDER --no-translations --no-compiler-runtime {} +
 	cp -vr $INSTALL_FOLDER/resources $DEST_FOLDER
+	cp -v $STAGING_DIR/bin/sigrok-cli.exe $DEST_FOLDER/
+	cp -vr $STAGING_DIR/share/libsigrokdecode/decoders $DEST_FOLDER/
+	mkdir -p $DEST_FOLDER/lib
+	cp -r $STAGING_DIR/lib/python3.* $DEST_FOLDER/lib/
 	rm -vfr $(find $DEST_FOLDER -name "*.dll.a" -type f)
 
 	cp -vr  $QT/plugins/renderers $DEST_FOLDER/
