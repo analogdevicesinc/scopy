@@ -76,15 +76,12 @@ QString DecoderManager::addDecoder(const QString &decoderId)
 	if(decoderId.isEmpty())
 		return {};
 
-	const QString uid = QString("%1-%2").arg(decoderId).arg(m_uidCounter++);
-
 	auto backend = m_backendFactory->create();
 	if(!backend) {
 		if(m_logger)
 			m_logger->critical(kMgrId, QStringLiteral("addDecoder: backend factory returned null"));
 		return {};
 	}
-	auto *proc = new scopy::acq::ExternalDecoderProcessor(uid, std::move(backend), m_engine);
 
 	DecoderConfig cfg;
 	cfg.sampleRate = 1.0e6;
@@ -92,25 +89,8 @@ QString DecoderManager::addDecoder(const QString &decoderId)
 	DecoderStage stage;
 	stage.decoderId = decoderId.toStdString();
 	cfg.stack.push_back(stage);
-	proc->setConfig(cfg);
-	proc->setWindowSize(m_windowSize);
 
-	const scopy::acq::DataKey outKey =
-		scopy::acq::DataKey::withStage("decoder", uid + QStringLiteral("/0"), "annotations");
-	proc->setOutputKeys({outKey});
-
-	m_engine->addProcessor(proc);
-
-	DecoderInstance d;
-	d.uid = uid;
-	d.stageIds = {decoderId};
-	d.cfg = cfg;
-	d.proc = proc;
-	d.outKeys = {outKey};
-	m_decoders.append(d);
-
-	Q_EMIT decoderAdded(uid);
-	Q_EMIT outKeyAdded(outKey);
+	const QString uid = createDecoder(decoderId, cfg, std::move(backend), {});
 	if(m_logger)
 		m_logger->info(kMgrId, QStringLiteral("added decoder ") + uid);
 	return uid;
@@ -164,14 +144,14 @@ QString DecoderManager::addDecoderFromAnnotations(const QString &decoderId, cons
 		cfg.meta[std::string("annIn.") + it.key().toStdString()] = it.value().toStdString();
 	}
 
-	// Pre-check backend support before allocating.
-	auto probeBackend = m_backendFactory->create();
-	if(!probeBackend) {
+	auto backend = m_backendFactory->create();
+	if(!backend) {
 		if(m_logger)
-			m_logger->critical(kMgrId, QStringLiteral("addDecoderFromAnnotations: probe backend null"));
+			m_logger->critical(kMgrId,
+					   QStringLiteral("addDecoderFromAnnotations: backend factory returned null"));
 		return {};
 	}
-	if(!probeBackend->acceptsAnnotationInput(cfg)) {
+	if(!backend->acceptsAnnotationInput(cfg)) {
 		if(m_logger)
 			m_logger->warning(
 				kMgrId,
@@ -180,13 +160,21 @@ QString DecoderManager::addDecoderFromAnnotations(const QString &decoderId, cons
 					.arg(spec.upstreamId, decoderId));
 		return {};
 	}
-	probeBackend.reset();
 
+	const QString uid = createDecoder(decoderId, cfg, std::move(backend), src->outKeys[spec.sourceStageIndex]);
+	if(m_logger)
+		m_logger->info(kMgrId,
+			       QStringLiteral("added annotation-chained decoder %1 (source=%2 stage=%3 upstream=%4)")
+				       .arg(uid, spec.sourceUid)
+				       .arg(spec.sourceStageIndex)
+				       .arg(spec.upstreamId));
+	return uid;
+}
+
+QString DecoderManager::createDecoder(const QString &decoderId, const DecoderConfig &cfg,
+				      std::unique_ptr<IDecoderBackend> backend, scopy::acq::DataKey annotationSource)
+{
 	const QString uid = QString("%1-%2").arg(decoderId).arg(m_uidCounter++);
-
-	auto backend = m_backendFactory->create();
-	if(!backend)
-		return {};
 	auto *proc = new scopy::acq::ExternalDecoderProcessor(uid, std::move(backend), m_engine);
 	proc->setConfig(cfg);
 	proc->setWindowSize(m_windowSize);
@@ -196,9 +184,10 @@ QString DecoderManager::addDecoderFromAnnotations(const QString &decoderId, cons
 	proc->setOutputKeys({outKey});
 
 	// Watch the source outKey; engine schedules on writes to watched keys.
-	const scopy::acq::DataKey srcKey = src->outKeys[spec.sourceStageIndex];
-	proc->setAnnotationInputKey(srcKey);
-	proc->setWatchedKeys({srcKey});
+	if(cfg.rootInput == RootInput::Annotations) {
+		proc->setAnnotationInputKey(annotationSource);
+		proc->setWatchedKeys({annotationSource});
+	}
 
 	m_engine->addProcessor(proc);
 
@@ -212,12 +201,6 @@ QString DecoderManager::addDecoderFromAnnotations(const QString &decoderId, cons
 
 	Q_EMIT decoderAdded(uid);
 	Q_EMIT outKeyAdded(outKey);
-	if(m_logger)
-		m_logger->info(kMgrId,
-			       QStringLiteral("added annotation-chained decoder %1 (source=%2 stage=%3 upstream=%4)")
-				       .arg(uid, spec.sourceUid)
-				       .arg(spec.sourceStageIndex)
-				       .arg(spec.upstreamId));
 	return uid;
 }
 

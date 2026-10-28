@@ -83,6 +83,7 @@ private:
 	// sigrok::downstreamOptionOverrides().
 	QStringList buildArgsWithInput(const DecoderConfig &cfg, const QString &inputFormat,
 				       const sigrok::ProtocolDataInput *pdIn = nullptr) const;
+	bool runCli(const char *what, const QStringList &args, const QByteArray &input, QByteArray &stdoutBuf);
 	// Resolves each annotation's stage index from sigrok's "<id>-<n>" instance
 	// suffix, so a stack containing the same decoder twice does not collapse
 	// both instances onto the first stage.
