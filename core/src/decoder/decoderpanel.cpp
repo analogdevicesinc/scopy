@@ -727,9 +727,8 @@ DecoderPanel::DecoderPanel(DecoderManager *mgr, scopy::acq::DataStore *store, ID
 	}
 
 	if(!m_catalog || !m_catalog->isAvailable()) {
-		auto *hint = new QLabel("No decoder backend is available. Check that the "
-					"required tool/library is installed and configured.",
-					content);
+		auto *hint =
+			new QLabel("No decoder backend available. Check that it is installed and configured.", content);
 		hint->setWordWrap(true);
 		hint->setStyleSheet("color:#c88");
 		contentLay->insertWidget(1, hint);
