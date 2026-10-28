@@ -154,7 +154,7 @@ void AcqInstrument::start(unsigned int cycles)
 
 void AcqInstrument::run() { start(0); }
 
-void AcqInstrument::single() { start(1); }
+void AcqInstrument::single(unsigned int cycles) { start(qMax(1u, cycles)); }
 
 void AcqInstrument::stop() { m_engine->stop(); }
 
