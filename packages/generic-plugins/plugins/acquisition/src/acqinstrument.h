@@ -71,8 +71,8 @@ public:
 public Q_SLOTS:
 	// Safe in any state; ignored while running. The buttons follow the engine's own
 	// started/stopped signals, so a refused or self-terminated run cannot desync them.
-	void run();    // until stop()
-	void single(); // exactly one engine cycle
+	void run();			      // until stop()
+	void single(unsigned int cycles = 1); // exactly `cycles` engine cycles
 	void stop();
 
 Q_SIGNALS:
