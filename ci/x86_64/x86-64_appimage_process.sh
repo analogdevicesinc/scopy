@@ -39,6 +39,7 @@ LIBSERIALPORT_BRANCH=master
 LIBIIO_VERSION=v1.0.0
 LIBIIO_V0_VERSION=v0.26
 LIBAD9361_BRANCH=main
+LIBAD9361_V0_BRANCH=libad9361-iio-v0
 LIBM2K_BRANCH=main
 SPDLOG_BRANCH=v1.x
 VOLK_BRANCH=main
@@ -172,6 +173,7 @@ clone() {
 	[ -d 'libiio' ]		|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
 	[ -d 'libiio-v0' ]	|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_V0_VERSION libiio-v0
 	[ -d 'libad9361' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
+	[ -d 'libad9361-v0' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_V0_BRANCH libad9361-v0
 	[ -d 'libm2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
 	[ -d 'spdlog' ]		|| git clone --recursive https://github.com/gabime/spdlog.git -b $SPDLOG_BRANCH spdlog
 	[ -d 'gr-scopy' ]	|| git clone --recursive https://github.com/analogdevicesinc/gr-scopy.git -b $GRSCOPY_BRANCH gr-scopy
@@ -329,6 +331,13 @@ build_libiio_v0() {
 build_libad9361() {
 	echo "### Building libad9361 - branch $LIBAD9361_BRANCH"
 	pushd $STAGING_AREA/libad9361
+	build_with_cmake $1
+	popd
+}
+
+build_libad9361_v0() {
+	echo "### Building libad9361 - branch $LIBAD9361_V0_BRANCH (prefix $LIBIIO_V0_PREFIX)"
+	pushd $STAGING_AREA/libad9361-v0
 	build_with_cmake_v0 $1
 	popd
 }
@@ -701,6 +710,7 @@ build_deps(){
 	download_tools
 	build_libserialport ON
 	build_libiio ON
+	build_libad9361 ON
 	build_spdlog ON
 	build_volk ON
 	build_qwt ON
@@ -712,7 +722,7 @@ build_deps(){
 	build_qcoro ON
 	# libiio v0 and its consumers, installed into LIBIIO_V0_PREFIX
 	build_libiio_v0 ON
-	build_libad9361 ON
+	build_libad9361_v0 ON
 	build_libm2k ON
 	build_gnuradio ON
 	build_grscopy ON
