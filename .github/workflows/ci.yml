@@ -108,6 +108,14 @@ jobs:
       secrets:
         CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
 
+    android-qt6:
+      needs: docker_tag
+      uses: ./.github/workflows/android-qt6.yml
+      with:
+        docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
+      secrets:
+        CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+
     flatpak-qt6:
       needs: docker_tag
       uses: ./.github/workflows/linuxflatpakbuild.yml

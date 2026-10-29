@@ -64,7 +64,14 @@ file(GLOB UI_LIST ui/*.ui)
 qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
 
 if(ANDROID)
+	# All ABIs' libraries end up in one flat dir in the APK, so the Android qwt build carries an ABI suffix
+	# (ci/android/android_deps_build.sh build_qwt).
 	find_library(QWT_LIBRARIES REQUIRED NAMES qwt_scopy_${ANDROID_ABI})
+	# The library search alone is not enough: QWT_INCLUDE_DIRS is used below just like in the non-Android branch, so
+	# without this the qwt headers never resolve.
+	find_path(QWT_INCLUDE_DIRS NAMES qwt_global.h PATH_SUFFIXES qwt qwt6 REQUIRED)
+	message(STATUS "QWT LIBRARIES: " ${QWT_LIBRARIES})
+	message(STATUS "QWT INCLUDE DIRS: " ${QWT_INCLUDE_DIRS})
 else()
 	set(QWT_QT_VERSION qt6)
 	find_path(
