@@ -10,6 +10,8 @@ DLL_DEPS=(
     libgenalyzer.dll
     libKF6Archive.dll
     libkddockwidgets*.dll
+    libsigrok-*.dll
+    libsigrokdecode-*.dll
     # transitive
     libusb-*.dll
     libxml2-*.dll
@@ -36,6 +38,10 @@ DLL_DEPS=(
     libngtcp2-*.dll
     libngtcp2_*.dll
     libunistring-*.dll
+    # sigrok-cli
+    libglib-*.dll
+    libzip*.dll
+    libpython*.dll
 )
 
 # libiio v1 (STAGING_DIR/bin)

@@ -115,7 +115,7 @@ MACOS_MAJOR=$(echo "$OS_VERSION" | cut -d '.' -f 1)
 # Qt6 via aqtinstall -- no Homebrew Qt package needed
 # ghr is deliberately absent: it was never invoked (releases use actions/upload-artifact)
 # and it has no x86_64 bottle, so on Intel it source-builds its `go` build dependency.
-PACKAGES="pkg-config cmake fftw bison gettext autoconf automake libzip libusb doxygen wget gnu-sed dylibbundler libxml2 zstd"
+PACKAGES="pkg-config cmake fftw bison gettext autoconf automake libzip glib libusb doxygen wget gnu-sed dylibbundler libxml2 zstd"
 
 install_packages() {
 
@@ -256,7 +256,11 @@ clone() {
 		git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
 		git clone --recursive https://github.com/analogdevicesinc/genalyzer.git -b $GENALYZER_BRANCH genalyzer
 		git clone --recursive https://github.com/qcoro/qcoro.git -b $QCORO_BRANCH qcoro
-		DEPENDENCY_REPOS="libserialport libiio qwt KDDockWidgets extra-cmake-modules karchive genalyzer qcoro"
+		git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
+		git clone --recursive https://github.com/sigrokproject/libsigrok.git -b $LIBSIGROK_BRANCH libsigrok
+		git clone --recursive https://github.com/sigrokproject/sigrok-cli.git -b $SIGROKCLI_BRANCH sigrok-cli
+
+		DEPENDENCY_REPOS="libserialport libiio qwt KDDockWidgets extra-cmake-modules karchive genalyzer qcoro libsigrokdecode libsigrok sigrok-cli"
 		if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
 			git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_V0_VERSION libiio
 			git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
@@ -314,6 +318,40 @@ build_libserialport(){
 	./configure --prefix $STAGING_AREA_DEPS
 	make $JOBS
 	make install
+	popd
+}
+
+build_with_autotools() {
+	save_version_info
+	git clean -xdf
+	./autogen.sh
+	./configure --prefix $STAGING_AREA_DEPS $CURRENT_BUILD_CONFIGURE_OPTS
+	make $JOBS install
+	CURRENT_BUILD_CONFIGURE_OPTS=""
+}
+
+build_libsigrokdecode() {
+	echo "### Building libsigrokdecode - branch $LIBSIGROKDECODE_BRANCH"
+	CURRENT_BUILD=libsigrokdecode
+	pushd $STAGING_AREA/libsigrokdecode
+	build_with_autotools
+	popd
+}
+
+build_libsigrok() {
+	echo "### Building libsigrok - branch $LIBSIGROK_BRANCH"
+	CURRENT_BUILD=libsigrok
+	pushd $STAGING_AREA/libsigrok
+	CURRENT_BUILD_CONFIGURE_OPTS="--disable-all-drivers --disable-bindings"
+	build_with_autotools
+	popd
+}
+
+build_sigrok-cli() {
+	echo "### Building sigrok-cli - branch $SIGROKCLI_BRANCH"
+	CURRENT_BUILD=sigrok-cli
+	pushd $STAGING_AREA/sigrok-cli
+	build_with_autotools
 	popd
 }
 
@@ -577,6 +615,9 @@ build_deps(){
 	echo "Building all dependencies from source..."
 
 	build_libserialport
+	build_libsigrokdecode
+	build_libsigrok
+	build_sigrok-cli
 	if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
 		# libiio v0 and its consumers
 		build_libiio_v0

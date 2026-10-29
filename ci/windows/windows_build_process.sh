@@ -38,6 +38,7 @@ install_packages() {
 		mingw-w64-${ARCH}-fftw\
 		mingw-w64-${ARCH}-libxml2\
 		mingw-w64-${ARCH}-libzip\
+		mingw-w64-${ARCH}-glib2\
 		mingw-w64-${ARCH}-libffi\
 		mingw-w64-${ARCH}-doxygen\
 		mingw-w64-${ARCH}-zlib\
@@ -128,6 +129,9 @@ clone() {
 	[ -d 'karchive' ] || git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
 	[ -d 'genalyzer' ] || git clone --recursive https://github.com/analogdevicesinc/genalyzer.git -b $GENALYZER_BRANCH genalyzer
 	[ -d 'qcoro' ] || git clone --recursive https://github.com/qcoro/qcoro.git -b $QCORO_BRANCH qcoro
+	[ -d 'libsigrokdecode' ] || git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
+	[ -d 'libsigrok' ] || git clone --recursive https://github.com/sigrokproject/libsigrok.git -b $LIBSIGROK_BRANCH libsigrok
+	[ -d 'sigrok-cli' ] || git clone --recursive https://github.com/sigrokproject/sigrok-cli.git -b $SIGROKCLI_BRANCH sigrok-cli
 	popd
 }
 
@@ -216,6 +220,57 @@ build_libserialport(){
 
 	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
 	>> $BUILD_STATUS_FILE
+	popd
+}
+
+build_with_autotools() {
+	INSTALL=$1
+	[ -z $INSTALL ] && INSTALL=ON
+
+	./autogen.sh
+	if [ "$USE_STAGING" == "ON" ]
+	then
+		./configure --prefix $STAGING_AREA_DEPS ${AUTOCONF_OPTS} $CURRENT_BUILD_CONFIGURE_OPTS
+		LD_RUN_PATH=$STAGING_AREA_DEPS/lib make $JOBS
+	else
+		./configure ${AUTOCONF_OPTS} $CURRENT_BUILD_CONFIGURE_OPTS
+		make $JOBS
+	fi
+	[ "$INSTALL" == "ON" ] && make install
+	CURRENT_BUILD_CONFIGURE_OPTS=""
+
+	if [ "$INSTALL" == "ON" ] && [ "$CI_SCRIPT" == "ON" ];then
+		git clean -xdf
+	fi
+
+	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
+	>> $BUILD_STATUS_FILE
+}
+
+build_libsigrokdecode() {
+	echo "### Building libsigrokdecode - branch $LIBSIGROKDECODE_BRANCH"
+	pushd $STAGING_AREA/libsigrokdecode
+	git reset --hard
+	git clean -xdf
+	patch -p1 < ${WORKFOLDER}/sigrokdecode-windows-fix.patch
+	CPPFLAGS="-DLIBSIGROKDECODE_EXPORT=1" build_with_autotools $1
+	popd
+}
+
+build_libsigrok() {
+	echo "### Building libsigrok - branch $LIBSIGROK_BRANCH"
+	pushd $STAGING_AREA/libsigrok
+	git clean -xdf
+	CURRENT_BUILD_CONFIGURE_OPTS="--disable-all-drivers --disable-bindings"
+	build_with_autotools $1
+	popd
+}
+
+build_sigrok-cli() {
+	echo "### Building sigrok-cli - branch $SIGROKCLI_BRANCH"
+	pushd $STAGING_AREA/sigrok-cli
+	git clean -xdf
+	build_with_autotools $1
 	popd
 }
 
@@ -467,6 +522,9 @@ build_deps() {
 	clone
 
 	build_libserialport ON
+	build_libsigrokdecode ON
+	build_libsigrok ON
+	build_sigrok-cli ON
 	build_libiio ON
 	build_libsndfile ON
 	build_qwt ON

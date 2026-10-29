@@ -46,6 +46,8 @@ GNURADIO_BRANCH=scopy2-maint-3.10
 GRSCOPY_BRANCH=3.10
 GRM2K_BRANCH=main
 LIBSIGROKDECODE_BRANCH=master
+LIBSIGROK_BRANCH=master
+SIGROKCLI_BRANCH=master
 QWT_BRANCH=qwt-multiaxes-updated
 LIBTINYIIOD_BRANCH=master
 IIOEMU_BRANCH=main
@@ -180,6 +182,8 @@ clone() {
 	[ -d 'gnuradio' ]	|| git clone --recursive https://github.com/analogdevicesinc/gnuradio.git -b $GNURADIO_BRANCH gnuradio
 	[ -d 'qwt' ]		|| git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
 	[ -d 'libsigrokdecode' ] || git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
+	[ -d 'libsigrok' ] || git clone --recursive https://github.com/sigrokproject/libsigrok.git -b $LIBSIGROK_BRANCH libsigrok
+	[ -d 'sigrok-cli' ] || git clone --recursive https://github.com/sigrokproject/sigrok-cli.git -b $SIGROKCLI_BRANCH sigrok-cli
 	[ -d 'libtinyiiod' ]	|| git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
 	[ -d 'KDDockWidgets' ] || git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
 	[ -d 'extra-cmake-modules' ] || git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
@@ -257,7 +261,7 @@ install_packages() {
 	sudo apt-get update
 	sudo apt-get -y upgrade
 	sudo apt-get -y --no-install-recommends install \
-		$PYTHON_VERSION-full python3-pip lib$PYTHON_VERSION-dev python3-numpy python3-packaging python3-mako \
+		$PYTHON_VERSION-full python3-pip lib$PYTHON_VERSION-dev libpython3-dev python3-numpy python3-packaging python3-mako \
 		keyboard-configuration vim git wget unzip\
 		g++ build-essential cmake curl autogen autoconf autoconf-archive pkg-config flex bison swig \
 		subversion mesa-common-dev graphviz xserver-xorg gettext texinfo mm-common doxygen \
@@ -466,6 +470,62 @@ build_libsigrokdecode() {
 	popd
 }
 
+build_libsigrok() {
+	echo "### Building libsigrok - branch $LIBSIGROK_BRANCH"
+	pushd $STAGING_AREA/libsigrok
+	git clean -xdf
+	./autogen.sh
+
+	INSTALL=$1
+	[ -z $INSTALL ] && INSTALL=ON
+
+	if [ "$USE_STAGING" == "ON" ]
+	then
+		./configure --prefix $STAGING_AREA_DEPS --disable-all-drivers --disable-bindings
+		LD_RUN_PATH=$STAGING_AREA_DEPS/lib make $JOBS
+	else
+		./configure --disable-all-drivers --disable-bindings
+		make $JOBS
+	fi
+
+	if [ "$INSTALL" == "ON" ];then
+		if [ "$USE_STAGING" == "ON" ]; then make install; else sudo make install; fi
+	fi
+
+	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
+	>> $BUILD_STATUS_FILE
+
+	popd
+}
+
+build_sigrok-cli() {
+	echo "### Building sigrok-cli - branch $SIGROKCLI_BRANCH"
+	pushd $STAGING_AREA/sigrok-cli
+	git clean -xdf
+	./autogen.sh
+
+	INSTALL=$1
+	[ -z $INSTALL ] && INSTALL=ON
+
+	if [ "$USE_STAGING" == "ON" ]
+	then
+		PKG_CONFIG_PATH=$STAGING_AREA_DEPS/lib/pkgconfig ./configure --prefix $STAGING_AREA_DEPS
+		LD_RUN_PATH=$STAGING_AREA_DEPS/lib make $JOBS
+	else
+		./configure
+		make $JOBS
+	fi
+
+	if [ "$INSTALL" == "ON" ];then
+		if [ "$USE_STAGING" == "ON" ]; then make install; else sudo make install; fi
+	fi
+
+	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
+	>> $BUILD_STATUS_FILE
+
+	popd
+}
+
 build_libtinyiiod() {
 	echo "### Building libtinyiiod - branch $LIBTINYIIOD_BRANCH"
 	pushd $STAGING_AREA/libtinyiiod
@@ -618,6 +678,9 @@ create_appdir(){
 		$COPY_DEPS $APP_DIR/usr/bin/iiod-emu $APP_DIR/usr/lib
 	fi
 
+	cp $STAGING_AREA_DEPS/bin/sigrok-cli $APP_DIR/usr/bin
+	$COPY_DEPS $APP_DIR/usr/bin/sigrok-cli $APP_DIR/usr/lib
+
 	# Copy Python runtime. With WITH_PYTHON=OFF, PYTHON_VERSION is never written to the cache
 	# (core/CMakeLists.txt sets it inside the if(WITH_PYTHON) block), so the grep comes back empty.
 	# Guard it: an empty version would make python_path "/usr/lib/" and copy all of /usr/lib.
@@ -625,6 +688,7 @@ create_appdir(){
 	# exits 1 when it matches nothing, which the assignment inherits and which would abort the
 	# whole script here - before the check below could run.
 	FOUND_PYTHON_VERSION=$(grep 'PYTHON_VERSION' $SRC_DIR/build/CMakeCache.txt | awk -F= '{print $2}' | grep -o 'python[0-9]\+\.[0-9]\+' || true)
+	[ -z "$FOUND_PYTHON_VERSION" ] && FOUND_PYTHON_VERSION=$(ldd $APP_DIR/usr/bin/sigrok-cli | grep -o 'libpython3\.[0-9]\+' | head -1 | sed 's/^lib//' || true)
 	if [ -n "$FOUND_PYTHON_VERSION" ] && [ -d /usr/lib/$FOUND_PYTHON_VERSION ]; then
 		python_path=/usr/lib/$FOUND_PYTHON_VERSION
 		cp -r $python_path $APP_DIR/usr/lib
@@ -705,6 +769,8 @@ build_deps(){
 	build_volk ON
 	build_qwt ON
 	build_libsigrokdecode ON
+	build_libsigrok ON
+	build_sigrok-cli ON
 	build_kddock ON
 	build_ecm ON
 	build_karchive ON

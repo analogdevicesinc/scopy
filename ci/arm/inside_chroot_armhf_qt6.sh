@@ -69,12 +69,12 @@ apt-get -y install \
 #   libmatio-dev           - gnuradio
 #   liborc-0.4-dev         - libvolk
 #   libzmq3-dev            - no consumer anywhere, even before the rework
-#   python3-dev, libreadline-dev, libgdbm-dev, libdb5.3-dev - libsigrokdecode's embedded Python
+#   libreadline-dev, libgdbm-dev, libdb5.3-dev - libsigrokdecode's embedded Python
 # Kept deliberately: libgsl-dev (verdict undetermined, ARM-only, left installed rather than
 # guessed at) and libglib2.0-dev above (libinput-dev pulls it back transitively regardless).
 echo "=== Installing Scopy dependency libraries ==="
 apt-get -y install \
-	libfftw3-dev libzip-dev \
+	libfftw3-dev libzip-dev python3-dev \
 	libavahi-client-dev libavahi-common-dev \
 	libusb-1.0-0-dev libaio-dev libsndfile1-dev \
 	libncurses-dev libxml2-dev \

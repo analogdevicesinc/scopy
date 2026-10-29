@@ -116,6 +116,13 @@ dylibbundler -ns -of -b \
 	--install-path @executable_path/../Frameworks \
 	"${PREFIXED_SEARCH_PATHS[@]}"
 
+echo "### Fixing sigrok-cli"
+cp $STAGING_AREA_DEPS/bin/sigrok-cli ./Scopy.app/Contents/MacOS/
+dylibbundler -ns -of -b \
+	--fix-file $BUILDDIR/Scopy.app/Contents/MacOS/sigrok-cli \
+	--dest-dir $BUILDDIR/Scopy.app/Contents/Frameworks/ \
+	--install-path @executable_path/../Frameworks/ \
+	"${PREFIXED_SEARCH_PATHS[@]}"
 
 if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
 	echo "### Fixing the frameworks dylibbundler failed to copy"
@@ -235,6 +242,7 @@ if [ "$(uname -m)" = "arm64" ]; then
 	find Scopy.app -name "*.so" -exec codesign --force --sign - {} \;
 	find Scopy.app -name "*.framework" -exec codesign --force --sign - {} \;
 	codesign --force --sign - Scopy.app/Contents/MacOS/$EMU_BIN
+	codesign --force --sign - Scopy.app/Contents/MacOS/sigrok-cli
 	codesign --force --sign - Scopy.app/Contents/MacOS/Scopy
 fi
 

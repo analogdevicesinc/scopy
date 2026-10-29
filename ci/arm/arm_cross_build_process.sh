@@ -29,6 +29,9 @@ ECM_BRANCH=v6.8.0
 KARCHIVE_BRANCH=v6.8.0
 GENALYZER_BRANCH=main
 QCORO_BRANCH=v0.13.0
+LIBSIGROKDECODE_BRANCH=master
+LIBSIGROK_BRANCH=master
+SIGROKCLI_BRANCH=master
 
 export APPIMAGE=1
 
@@ -197,6 +200,9 @@ clone() {
 	[ -d 'karchive' ] || git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
 	[ -d 'genalyzer' ] || git clone --recursive https://github.com/analogdevicesinc/genalyzer.git -b $GENALYZER_BRANCH genalyzer
 	[ -d 'qcoro' ] || git clone --recursive https://github.com/qcoro/qcoro.git -b $QCORO_BRANCH qcoro
+	[ -d 'libsigrokdecode' ] || git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
+	[ -d 'libsigrok' ] || git clone --recursive https://github.com/sigrokproject/libsigrok.git -b $LIBSIGROK_BRANCH libsigrok
+	[ -d 'sigrok-cli' ] || git clone --recursive https://github.com/sigrokproject/sigrok-cli.git -b $SIGROKCLI_BRANCH sigrok-cli
 	popd
 }
 
@@ -233,6 +239,38 @@ build_libserialport() {
 	./configure "${CONFIG_OPTS[@]}"
 	make $JOBS
 	[ "$1" == "ON" ] && sudo make install
+	popd
+}
+
+build_with_autotools() {
+	set_config_opts
+	git clean -xdf
+	./autogen.sh
+	./configure "${CONFIG_OPTS[@]}" --prefix=/usr/local $CURRENT_BUILD_CONFIGURE_OPTS
+	make $JOBS
+	[ "$1" == "ON" ] && sudo make install DESTDIR=$SYSROOT
+	CURRENT_BUILD_CONFIGURE_OPTS=""
+}
+
+build_libsigrokdecode() {
+	echo "### Building libsigrokdecode - branch $LIBSIGROKDECODE_BRANCH"
+	pushd $STAGING_AREA/libsigrokdecode
+	build_with_autotools $1
+	popd
+}
+
+build_libsigrok() {
+	echo "### Building libsigrok - branch $LIBSIGROK_BRANCH"
+	pushd $STAGING_AREA/libsigrok
+	CURRENT_BUILD_CONFIGURE_OPTS="--disable-all-drivers --disable-bindings"
+	build_with_autotools $1
+	popd
+}
+
+build_sigrok-cli() {
+	echo "### Building sigrok-cli - branch $SIGROKCLI_BRANCH"
+	pushd $STAGING_AREA/sigrok-cli
+	build_with_autotools $1
 	popd
 }
 
@@ -423,6 +461,9 @@ build_scopy() {
 build_deps() {
 	clone
 	build_libserialport ON
+	build_libsigrokdecode ON
+	build_libsigrok ON
+	build_sigrok-cli ON
 	build_libiio ON
 	build_qwt ON
 	build_libtinyiiod ON
@@ -491,6 +532,8 @@ create_appdir() {
 		exit 1
 	fi
 
+	cp $SYSROOT/usr/local/bin/sigrok-cli $APP_DIR/usr/bin
+
 	# Remove system Qt libs that interfere with bundled ones
 	sudo rm -rfv ${SYSROOT}/usr/lib/arm-linux-gnueabihf/libQt6* 2>/dev/null || true
 
@@ -501,6 +544,7 @@ create_appdir() {
 	# The emulator is guaranteed present by the check above, so a "not found" from
 	# copy-deps here is a genuine resolution fault rather than a tolerable absence - do not guard it.
 	$COPY_DEPS --lib-dir ${LIB_DIRS} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/$EMU_BIN
+	$COPY_DEPS --lib-dir ${LIB_DIRS} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/sigrok-cli
 	find $APP_DIR/usr -type f -name 'libscopy*.so' | xargs $COPY_DEPS --lib-dir ${LIB_DIRS} --output-dir $APP_DIR/usr/lib
 
 	# Qt loads the platform plugins with dlopen, so nothing scanned above reaches them: libqxcb
@@ -517,6 +561,7 @@ create_appdir() {
 	# before the guard below could run, making it dead code. Guard on non-empty as well as -d: an
 	# empty version would make python_path "$SYSROOT/usr/lib/" and copy the entire sysroot libdir.
 	FOUND_PYTHON_VERSION=$(grep 'PYTHON_VERSION' $SRC_DIR/build/CMakeCache.txt | awk -F= '{print $2}' | grep -o 'python[0-9]\+\.[0-9]\+' || true)
+	[ -z "$FOUND_PYTHON_VERSION" ] && FOUND_PYTHON_VERSION=$(readelf -d $APP_DIR/usr/lib/libsigrokdecode.so* 2>/dev/null | grep -o 'libpython3\.[0-9]\+' | head -1 | sed 's/^lib//' || true)
 	python_path=${SYSROOT}/usr/lib/$FOUND_PYTHON_VERSION
 	if [ -n "$FOUND_PYTHON_VERSION" ] && [ -d "$python_path" ]; then
 		cp -r $python_path $APP_DIR/usr/lib

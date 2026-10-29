@@ -236,11 +236,14 @@ void PlotNavigator::addNavigators(QwtAxisId axisId)
 	connect(zoomer, &PlotZoomer::reset, this,
 		[this, zoomer]() { Q_EMIT rectChanged(zoomer->zoomBase(), navigationType::None); });
 
-	if(m_plotWidget) {
-		connect(m_plotWidget->plotAxisFromId(axisId), &PlotAxis::axisScaleUpdated, this, [this, axisId]() {
+	PlotAxis *plotAxis = m_plotWidget ? m_plotWidget->plotAxisFromId(axisId) : nullptr;
+	if(plotAxis) {
+		connect(plotAxis, &PlotAxis::axisScaleUpdated, this, [=]() {
 			if(m_autoBase) {
 				setBaseRect(axisId);
-				if(m_resetOnNewBase)
+				// reset() reaches every navigator and each one replots, so skip it when
+				// there is no zoom to undo — the axes already sit on their base.
+				if(m_resetOnNewBase && isZoomed())
 					Q_EMIT reset();
 			}
 		});
@@ -376,19 +379,28 @@ void PlotNavigator::addChannel(PlotChannel *channel)
 void PlotNavigator::addAxis(PlotAxis *axis)
 {
 	QwtAxisId axisId = axis->axisId();
-	if(!m_axes->contains(axisId)) {
-		m_axes->insert(axisId);
-		addNavigators(axisId);
-		setBaseRect(axisId);
+	// A repeat is a no-op: PlotWidget::addPlotAxis calls this for every axis and a caller
+	// may still call it itself.
+	if(m_axes->contains(axisId)) {
+		return;
 	}
-	// Connect axis scale updates for auto-base rect
-	connect(axis, &PlotAxis::axisScaleUpdated, this, [this, axisId]() {
-		if(m_autoBase) {
-			setBaseRect(axisId);
-			if(m_resetOnNewBase)
-				Q_EMIT reset();
-		}
-	});
+	m_axes->insert(axisId);
+	addNavigators(axisId);
+	setBaseRect(axisId);
+
+	// addNavigators() already follows the axis the plot widget knows by this id. Only an
+	// axis it does not (e.g. one a WaterfallPlotWidget tracks itself) needs its own wire.
+	if(!m_plotWidget || m_plotWidget->plotAxisFromId(axisId) != axis) {
+		connect(axis, &PlotAxis::axisScaleUpdated, this, [this, axisId]() {
+			if(m_autoBase) {
+				setBaseRect(axisId);
+				// reset() reaches every navigator and each one replots, so skip it when
+				// there is no zoom to undo — the axes already sit on their base.
+				if(m_resetOnNewBase && isZoomed())
+					Q_EMIT reset();
+			}
+		});
+	}
 	m_visibleZoomer->setEnabled(isZoomerEn());
 }
 

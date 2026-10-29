@@ -29,6 +29,9 @@ ECM_BRANCH=v6.8.0
 KARCHIVE_BRANCH=v6.8.0
 GENALYZER_BRANCH=main
 QCORO_BRANCH=v0.13.0
+LIBSIGROKDECODE_BRANCH=master
+LIBSIGROK_BRANCH=master
+SIGROKCLI_BRANCH=master
 
 STAGING_AREA=$SRC_SCRIPT/staging_ubuntu
 QT_INSTALL_LOCATION=/opt/Qt
@@ -151,6 +154,9 @@ clone() {
 	[ -d 'karchive' ] || git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
 	[ -d 'genalyzer' ] || git clone --recursive https://github.com/analogdevicesinc/genalyzer.git -b $GENALYZER_BRANCH genalyzer
 	[ -d 'qcoro' ] || git clone --recursive https://github.com/qcoro/qcoro.git -b $QCORO_BRANCH qcoro
+	[ -d 'libsigrokdecode' ] || git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
+	[ -d 'libsigrok' ] || git clone --recursive https://github.com/sigrokproject/libsigrok.git -b $LIBSIGROK_BRANCH libsigrok
+	[ -d 'sigrok-cli' ] || git clone --recursive https://github.com/sigrokproject/sigrok-cli.git -b $SIGROKCLI_BRANCH sigrok-cli
 	popd
 }
 
@@ -178,17 +184,35 @@ build_with_cmake_v0() {
 		build_with_cmake $1
 }
 
+build_with_autotools() {
+	INSTALL=$1
+	[ -z $INSTALL ] && INSTALL=ON
+	git clean -xdf
+	./autogen.sh
+	if [ "$USE_STAGING" == "ON" ]; then
+		PKG_CONFIG_PATH=$STAGING_AREA_DEPS/lib/pkgconfig ./configure --prefix $STAGING_AREA_DEPS $CURRENT_BUILD_CONFIGURE_OPTS
+		LD_RUN_PATH=$STAGING_AREA_DEPS/lib make $JOBS
+	else
+		./configure $CURRENT_BUILD_CONFIGURE_OPTS
+		make $JOBS
+	fi
+	if [ "$INSTALL" == "ON" ]; then
+		if [ "$USE_STAGING" == "ON" ]; then make install; else sudo make install && sudo ldconfig; fi
+	fi
+	CURRENT_BUILD_CONFIGURE_OPTS=""
+}
+
 install_packages() {
 	sudo apt update
 	sudo apt -y upgrade
 	sudo apt-get -y --no-install-recommends install \
-		$PYTHON_VERSION-full python3-pip lib$PYTHON_VERSION-dev python3-numpy python3-packaging python3-mako \
+		$PYTHON_VERSION-full python3-pip lib$PYTHON_VERSION-dev libpython3-dev python3-numpy python3-packaging python3-mako \
 		keyboard-configuration vim git wget unzip\
 		g++ build-essential cmake curl autogen autoconf autoconf-archive pkg-config \
 		flex bison \
 		subversion mesa-common-dev graphviz xserver-xorg gettext texinfo mm-common doxygen \
 		libfftw3-dev \
-		libxcb-xinerama0 libzip-dev \
+		libxcb-xinerama0 libzip-dev libglib2.0-dev \
 		${LIBCLANG_PKG:-libclang1} libgl1-mesa-dev libavahi-client* libavahi-common* \
 		libusb-1.0 libusb-1.0-0 libusb-1.0-0-dev libsndfile1-dev \
 		libxkbcommon-x11-0 libncurses-dev libtool libaio-dev libxml2-dev \
@@ -219,6 +243,28 @@ build_libserialport(){
 
 	make $JOBS
 	[ "$INSTALL" == "ON" ] && sudo make install
+	popd
+}
+
+build_libsigrokdecode() {
+	echo "### Building libsigrokdecode - branch $LIBSIGROKDECODE_BRANCH"
+	pushd $STAGING_AREA/libsigrokdecode
+	build_with_autotools $1
+	popd
+}
+
+build_libsigrok() {
+	echo "### Building libsigrok - branch $LIBSIGROK_BRANCH"
+	pushd $STAGING_AREA/libsigrok
+	CURRENT_BUILD_CONFIGURE_OPTS="--disable-all-drivers --disable-bindings"
+	build_with_autotools $1
+	popd
+}
+
+build_sigrok-cli() {
+	echo "### Building sigrok-cli - branch $SIGROKCLI_BRANCH"
+	pushd $STAGING_AREA/sigrok-cli
+	build_with_autotools $1
 	popd
 }
 
@@ -422,6 +468,9 @@ build_scopy() {
 build_deps(){
 	clone
 	build_libserialport ON
+	build_libsigrokdecode ON
+	build_libsigrok ON
+	build_sigrok-cli ON
 	build_libiio ON
 	build_qwt ON
 	build_kddock ON
