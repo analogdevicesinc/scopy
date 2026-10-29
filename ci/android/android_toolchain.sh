@@ -27,7 +27,9 @@ SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 # it on any platform.
 LIBSERIALPORT_BRANCH=master
 LIBXML2_BRANCH=v2.13.8
-LIBIIO_VERSION=v0.26
+LIBIIO_VERSION=v1.0.0
+LIBIIO_V0_VERSION=v0.26
+ZSTD_BRANCH=v1.5.7
 LIBAD9361_BRANCH=main
 QWT_BRANCH=qwt-multiaxes-rebased-qt6
 ECM_BRANCH=v6.8.0
@@ -89,6 +91,12 @@ QMAKE_BIN=$QT_ANDROID/bin/qmake6
 STAGING_AREA=${STAGING_AREA:-$SRC_SCRIPT/staging_android}
 STAGING_AREA_SRC=$STAGING_AREA/src
 STAGING_AREA_DEPS=$STAGING_AREA/$ABI/dependencies
+
+############### LIBIIO ###############
+# libiio API Scopy is built against: 1 (default) or 0. Same image serves both: libiio v0 and
+# libad9361 (built on v0) live in their own prefix, as in ci/x86_64/x86-64_appimage_process.sh.
+SCOPY_LIBIIO_VERSION=${SCOPY_LIBIIO_VERSION:-1}
+LIBIIO_V0_PREFIX=$STAGING_AREA_DEPS/libiio-v0
 
 ############### SIGNING ###############
 # An unsigned APK cannot be installed, so the build always signs. Defaults are Android's
@@ -252,6 +260,8 @@ print_config() {
 	QT_ANDROID          $QT_ANDROID
 	QT_HOST_PATH        $QT_HOST_PATH
 	STAGING_AREA_DEPS   $STAGING_AREA_DEPS
+	LIBIIO_V0_PREFIX    $LIBIIO_V0_PREFIX
+	SCOPY_LIBIIO        v$SCOPY_LIBIIO_VERSION
 	JOBS                $JOBS
 	-------------------------------
 	EOF

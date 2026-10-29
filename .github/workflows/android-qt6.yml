@@ -22,7 +22,12 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Android arm64-v8a Qt6
+    name: Android arm64-v8a Qt6 (libiio v${{ matrix.libiio }})
+    strategy:
+      fail-fast: false
+      matrix:
+        # libiio v1 is the default build; v0 uses the libiio v0 prefix shipped in the same image.
+        libiio: ['1', '0']
 
     steps:
         - name: check storage space
@@ -60,6 +65,7 @@ jobs:
               -e CI_SCRIPT=ON \
               -e GITHUB_WORKSPACE=$GITHUB_WORKSPACE \
               -e ABI=$ABI \
+              -e SCOPY_LIBIIO_VERSION=${{ matrix.libiio }} \
               -v $GITHUB_WORKSPACE:$GITHUB_WORKSPACE \
               -w $GITHUB_WORKSPACE \
               docker.cloudsmith.io/adi/scopy-dockers/scopy2-android-qt6:${{ inputs.docker_tag }} \
@@ -67,13 +73,15 @@ jobs:
 
         - name: Set short git commit SHA
           shell: bash
-          run: echo "commit_sha=$(git rev-parse --short ${{ github.sha }})" >> "$GITHUB_ENV"
+          run: |
+            echo "commit_sha=$(git rev-parse --short ${{ github.sha }})" >> "$GITHUB_ENV"
+            echo "libiio_suffix=$([ "${{ matrix.libiio }}" == "0" ] && echo "-libiio-v0" || true)" >> "$GITHUB_ENV"
 
         # Named explicitly: Gradle leaves a second identical copy under outputs/apk/release.
         - name: Upload APK
           uses: actions/upload-artifact@v7
           with:
-            name: scopy-android-arm64-v8a-qt6-apk-${{ env.commit_sha }}
+            name: scopy-android-arm64-v8a-qt6-apk${{ env.libiio_suffix }}-${{ env.commit_sha }}
             path: ${{ github.workspace }}/build-android-arm64-v8a/android-build/scopy.apk
             if-no-files-found: error
             retention-days: 30
