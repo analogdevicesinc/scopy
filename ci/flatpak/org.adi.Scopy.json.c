@@ -357,7 +357,7 @@
 				{
 					"type": "git",
 					"url": "https://github.com/analogdevicesinc/libad9361-iio",
-					"branch" : "main"
+					"branch" : "libad9361-iio-v0"
 				}
 			]
 		},
@@ -452,6 +452,19 @@
 					"type": "git",
 					"url": "https://github.com/analogdevicesinc/libiio",
 					"tag": "v1.0.0"
+				}
+			]
+		},
+		{
+			"name": "libad9361",
+			"builddir": true,
+			"buildsystem": "cmake",
+			"config-opts": [ "-DCMAKE_INSTALL_PREFIX:PATH=/app", "-DCMAKE_INSTALL_LIBDIR:STRING=lib" ],
+			"sources": [
+				{
+					"type": "git",
+					"url": "https://github.com/analogdevicesinc/libad9361-iio",
+					"branch" : "main"
 				}
 			]
 		},

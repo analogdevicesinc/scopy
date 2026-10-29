@@ -21,7 +21,8 @@ LIBSERIALPORT_BRANCH=master
 SCOPY_LIBIIO_VERSION=${SCOPY_LIBIIO_VERSION:-1}
 LIBIIO_VERSION=v1.0.0
 LIBIIO_V0_VERSION=v0.26
-LIBAD9361_BRANCH=main
+# libad9361-iio: the main branch targets libiio v1; only the v0 leg builds it here (v1 leg not yet added).
+LIBAD9361_BRANCH=libad9361-iio-v0
 LIBAD9166_BRANCH=libad9166-iio-v0
 LIBM2K_BRANCH=main
 QWT_BRANCH=qwt-multiaxes-updated

@@ -23,7 +23,11 @@
 #define FMCOMMS5CALIBRATION_H
 
 #include <QObject>
+#if SCOPY_LIBIIO_VERSION == 0
 #include <iio.h>
+#else
+#include <iio/iio.h>
+#endif
 
 namespace scopy {
 namespace component {

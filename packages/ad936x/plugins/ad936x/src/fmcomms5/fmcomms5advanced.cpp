@@ -34,7 +34,7 @@
 #include <component/device.h>
 #include <component/backends/iio/iiodevice.h>
 
-#if SCOPY_LIBIIO_VERSION == 0
+#if SCOPY_HAS_LIBAD9361
 #include <ad9361.h>
 #endif
 
@@ -159,8 +159,8 @@ Fmcomms5Advanced::Fmcomms5Advanced(component::Context *ctx, IIOWidgetGroup *grou
 		m_tool->addWidgetToTopContainerHelper(m_bistBtn, TTA_LEFT);
 		m_tool->addWidgetToTopContainerHelper(m_fmcomms5Btn, TTA_LEFT);
 
-#if SCOPY_LIBIIO_VERSION == 0
-		// MCS sync goes through libad9361 (libiio v0); only available in libiio v0 builds.
+#if SCOPY_HAS_LIBAD9361
+		// MCS sync goes through libad9361; only available when it was found at build time.
 		m_syncBtn = new QPushButton("MSC Sync", this);
 		Style::setStyle(m_syncBtn, style::properties::button::basicButton);
 		connect(m_syncBtn, &QPushButton::clicked, this, [this]() {

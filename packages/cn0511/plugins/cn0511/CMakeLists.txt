@@ -49,8 +49,12 @@ file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST})
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
 
-find_library(AD9166_LIBRARIES NAMES ad9166 libad9166 REQUIRED)
-find_path(AD9166_INCLUDE_DIRS ad9166.h REQUIRED)
+find_library(AD9166_LIBRARIES NAMES ad9166 libad9166)
+find_path(AD9166_INCLUDE_DIRS ad9166.h)
+if(NOT AD9166_LIBRARIES OR NOT AD9166_INCLUDE_DIRS)
+	message(WARNING "libad9166 not found: ${PROJECT_NAME} plugin is disabled")
+	return()
+endif()
 
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES})
 

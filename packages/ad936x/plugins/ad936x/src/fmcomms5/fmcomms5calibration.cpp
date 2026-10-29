@@ -36,6 +36,56 @@ Q_LOGGING_CATEGORY(CAT_FMCOMMS5_CALIBRATION, "CAT_FMCOMMS5_CALIBRATION")
 using namespace scopy;
 using namespace ad936x;
 
+// Attribute access for both libiio APIs; libiio v1 looks the attribute up first.
+#if SCOPY_LIBIIO_VERSION == 0
+static int chnWrite(iio_channel *ch, const char *attr, const char *val)
+{
+	return iio_channel_attr_write(ch, attr, val);
+}
+static int chnWriteLL(iio_channel *ch, const char *attr, long long val)
+{
+	return iio_channel_attr_write_longlong(ch, attr, val);
+}
+static int chnWriteDouble(iio_channel *ch, const char *attr, double val)
+{
+	return iio_channel_attr_write_double(ch, attr, val);
+}
+static int chnReadLL(iio_channel *ch, const char *attr, long long *val)
+{
+	return iio_channel_attr_read_longlong(ch, attr, val);
+}
+static int devWrite(iio_device *dev, const char *attr, const char *val)
+{
+	return iio_device_attr_write(dev, attr, val);
+}
+#else
+static int chnWrite(iio_channel *ch, const char *attr, const char *val)
+{
+	const iio_attr *a = iio_channel_find_attr(ch, attr);
+	return a ? iio_attr_write_string(a, val) : -ENOENT;
+}
+static int chnWriteLL(iio_channel *ch, const char *attr, long long val)
+{
+	const iio_attr *a = iio_channel_find_attr(ch, attr);
+	return a ? iio_attr_write_longlong(a, val) : -ENOENT;
+}
+static int chnWriteDouble(iio_channel *ch, const char *attr, double val)
+{
+	const iio_attr *a = iio_channel_find_attr(ch, attr);
+	return a ? iio_attr_write_double(a, val) : -ENOENT;
+}
+static int chnReadLL(iio_channel *ch, const char *attr, long long *val)
+{
+	const iio_attr *a = iio_channel_find_attr(ch, attr);
+	return a ? iio_attr_read_longlong(a, val) : -ENOENT;
+}
+static int devWrite(iio_device *dev, const char *attr, const char *val)
+{
+	const iio_attr *a = iio_device_find_attr(dev, attr);
+	return a ? iio_attr_write_string(a, val) : -ENOENT;
+}
+#endif
+
 // FMCOMMS5 calibration keeps a raw libiio path: the algorithm uses buffer
 // capture and register read/write that the component tree does not expose. We
 // recover the raw iio_context* from the DC context node's backend handle.
@@ -135,12 +185,12 @@ void Fmcomms5Calibration::doCalibbrationInThread()
 		calibrationFail(ret);
 		return;
 	}
-	iio_channel_attr_read_longlong(dds_ch, "frequency", &cal_tone);
-	iio_channel_attr_read_longlong(dds_ch, "sampling_frequency", &cal_freq);
+	chnReadLL(dds_ch, "frequency", &cal_tone);
+	chnReadLL(dds_ch, "sampling_frequency", &cal_freq);
 
 	// Turn off quadrature tracking
-	iio_channel_attr_write(in0, "quadrature_tracking_en", "0");
-	iio_channel_attr_write(in0B, "quadrature_tracking_en", "0");
+	chnWrite(in0, "quadrature_tracking_en", "0");
+	chnWrite(in0B, "quadrature_tracking_en", "0");
 
 	// Reset any Tx rotation to zero
 	trxPhaseRottation(m_cf_ad9361_lpc, 0.0);
@@ -212,8 +262,8 @@ void Fmcomms5Calibration::doCalibbrationInThread()
 	callSwitchPortsEnableCb(0);
 
 	// Re-enable quadrature tracking
-	iio_channel_attr_write(in0, "quadrature_tracking_en", "1");
-	iio_channel_attr_write(in0B, "quadrature_tracking_en", "1");
+	chnWrite(in0, "quadrature_tracking_en", "1");
+	chnWrite(in0B, "quadrature_tracking_en", "1");
 
 	Q_EMIT updateCalibrationProgress(100);
 }
@@ -224,13 +274,14 @@ void Fmcomms5Calibration::resetCalibration()
 	iio_channel *in0B = iio_device_find_channel(m_secondDevice, "voltage0", false);
 
 	// Reset calibration corrections to zero/default
-	iio_channel_attr_write(in0, "calibphase", "0");
-	iio_channel_attr_write(in0B, "calibphase", "0");
-	iio_channel_attr_write(in0, "calibscale", "0");
-	iio_channel_attr_write(in0B, "calibscale", "0");
+	chnWrite(in0, "calibphase", "0");
+	chnWrite(in0B, "calibphase", "0");
+	chnWrite(in0, "calibscale", "0");
+	chnWrite(in0B, "calibscale", "0");
 
 	// Reset calibration switch matrix as well
-	iio_device_attr_write(m_mainDevice, "calibration_switch_control", "0");
+	// TODO: needs hardware testing; upstream libad9361 writes this as a debug attribute.
+	devWrite(m_mainDevice, "calibration_switch_control", "0");
 }
 
 void Fmcomms5Calibration::calibrationFail(int ret)
@@ -242,9 +293,9 @@ void Fmcomms5Calibration::calibrationFail(int ret)
 	iio_channel *in0 = iio_device_find_channel(m_mainDevice, "voltage0", false);
 	iio_channel *in0B = iio_device_find_channel(m_secondDevice, "voltage0", false);
 	if(in0)
-		iio_channel_attr_write(in0, "quadrature_tracking_en", "1");
+		chnWrite(in0, "quadrature_tracking_en", "1");
 	if(in0B)
-		iio_channel_attr_write(in0B, "quadrature_tracking_en", "1");
+		chnWrite(in0B, "quadrature_tracking_en", "1");
 	// Reset progress
 	Q_EMIT updateCalibrationProgress(0);
 
@@ -325,7 +376,7 @@ std::vector<MarkerResult> Fmcomms5Calibration::getMarkersFromCrossCorrelation()
 		return results;
 	}
 
-	// Find and enable channels
+	// Find channels
 	std::vector<iio_channel *> channels;
 	for(const char *chname : channel_names) {
 		iio_channel *ch = iio_device_find_channel(dev, chname, false);
@@ -333,8 +384,13 @@ std::vector<MarkerResult> Fmcomms5Calibration::getMarkersFromCrossCorrelation()
 			qWarning() << "Channel" << chname << "not found!";
 			return results;
 		}
-		iio_channel_enable(ch);
 		channels.push_back(ch);
+	}
+
+	std::vector<std::vector<double>> data(4, std::vector<double>(BUFFER_SAMPLES));
+#if SCOPY_LIBIIO_VERSION == 0
+	for(iio_channel *ch : channels) {
+		iio_channel_enable(ch);
 	}
 
 	// Create buffer
@@ -353,7 +409,6 @@ std::vector<MarkerResult> Fmcomms5Calibration::getMarkersFromCrossCorrelation()
 	}
 
 	// Extract data for each channel
-	std::vector<std::vector<double>> data(4, std::vector<double>(BUFFER_SAMPLES));
 	for(int c = 0; c < 4; ++c) {
 		int16_t *samples = (int16_t *)iio_buffer_first(buf, channels[c]);
 		ptrdiff_t step = iio_buffer_step(buf) / sizeof(int16_t);
@@ -361,6 +416,53 @@ std::vector<MarkerResult> Fmcomms5Calibration::getMarkersFromCrossCorrelation()
 			data[c][i] = (double)samples[i * step];
 		}
 	}
+	iio_buffer_destroy(buf);
+#else
+	iio_channels_mask *mask = iio_create_channels_mask(iio_device_get_channels_count(dev));
+	if(!mask) {
+		qWarning() << "Failed to create channels mask";
+		return results;
+	}
+	for(iio_channel *ch : channels) {
+		iio_channel_enable(ch, mask);
+	}
+
+	// Create stream and get one block
+	iio_buffer *buf = iio_device_get_buffer(dev, 0);
+	int err = iio_err(buf);
+	if(err) {
+		qWarning() << "Failed to get buffer:" << strerror(-err) << "(err:" << err << ")";
+		iio_channels_mask_destroy(mask);
+		return results;
+	}
+	iio_stream *stream = iio_buffer_create_stream(buf, 4, BUFFER_SAMPLES, mask);
+	err = iio_err(stream);
+	if(err) {
+		qWarning() << "Failed to create stream:" << strerror(-err) << "(err:" << err << ")";
+		iio_channels_mask_destroy(mask);
+		return results;
+	}
+	const iio_block *block = iio_stream_get_next_block(stream);
+	err = iio_err(block);
+	ssize_t sampleSize = iio_device_get_sample_size(dev, mask);
+	if(err || sampleSize <= 0) {
+		qWarning() << "Block read failed:" << strerror(err ? -err : static_cast<int>(-sampleSize));
+		iio_stream_destroy(stream);
+		iio_channels_mask_destroy(mask);
+		return results;
+	}
+
+	// Extract data for each channel
+	ptrdiff_t step = sampleSize / sizeof(int16_t);
+	for(int c = 0; c < 4; ++c) {
+		int16_t *samples = (int16_t *)iio_block_first(block, channels[c]);
+		for(size_t i = 0; i < BUFFER_SAMPLES; ++i) {
+			data[c][i] = (double)samples[i * step];
+		}
+	}
+	iio_stream_destroy(stream);
+	iio_channels_mask_destroy(mask);
+#endif
 
 	// Compute cross-correlation for pairs: (0,1) and (2,3)
 	for(int pair = 0; pair < 2; ++pair) {
@@ -395,7 +497,6 @@ std::vector<MarkerResult> Fmcomms5Calibration::getMarkersFromCrossCorrelation()
 			<< "channels:" << channel_names[pair * 2] << "vs" << channel_names[pair * 2 + 1];
 	}
 
-	iio_buffer_destroy(buf);
 	return results;
 }
 
@@ -441,8 +542,8 @@ int Fmcomms5Calibration::defaultDds(long long freq, double scale)
 				ret |= -ENODEV;
 				continue;
 			}
-			ret |= iio_channel_attr_write_longlong(ch, "frequency", freq);
-			ret |= iio_channel_attr_write_double(ch, "scale", scale);
+			ret |= chnWriteLL(ch, "frequency", freq);
+			ret |= chnWriteDouble(ch, "scale", scale);
 		}
 		ddsTxPhaseRotation(dev, 0.0);
 		trxPhaseRottation(dev, 0.0);
@@ -463,9 +564,9 @@ void Fmcomms5Calibration::ddsTxPhaseRotation(iio_device *dev, double val)
 			continue;
 
 		if(j == 0 || j == 1 || j == 4 || j == 5) {
-			iio_channel_attr_write_longlong(ch, "phase", i);
+			chnWriteLL(ch, "phase", i);
 		} else {
-			iio_channel_attr_write_longlong(ch, "phase", q);
+			chnWriteLL(ch, "phase", q);
 		}
 	}
 }
@@ -493,10 +594,10 @@ void Fmcomms5Calibration::trxPhaseRottation(iio_device *dev, double val)
 		iio_channel *out1 = iio_device_find_channel(dev, offset == 2 ? "voltage3" : "voltage1", output);
 
 		if(out0 && out1) {
-			iio_channel_attr_write_double(out0, "calibscale", vcos);
-			iio_channel_attr_write_double(out0, "calibphase", -1.0 * vsin);
-			iio_channel_attr_write_double(out1, "calibscale", vcos);
-			iio_channel_attr_write_double(out1, "calibphase", vsin);
+			chnWriteDouble(out0, "calibscale", vcos);
+			chnWriteDouble(out0, "calibphase", -1.0 * vsin);
+			chnWriteDouble(out1, "calibscale", vcos);
+			chnWriteDouble(out1, "calibphase", vsin);
 		}
 	}
 }
@@ -566,24 +667,25 @@ void Fmcomms5Calibration::callSwitchPortsEnableCb(int val)
 	nearEndLoopbackCtrl(5, lp_master); // LPC
 
 	// Set calibration switch control
-	iio_device_attr_write(m_mainDevice, "calibration_switch_control", QString::number(sw).toUtf8().constData());
+	// TODO: needs hardware testing; upstream libad9361 writes this as a debug attribute.
+	devWrite(m_mainDevice, "calibration_switch_control", QString::number(sw).toUtf8().constData());
 
 	// Set RF port select for RX and TX on master device
 	iio_channel *rx_ch = iio_device_find_channel(m_mainDevice, "voltage0", false);
 	iio_channel *tx_ch = iio_device_find_channel(m_mainDevice, "voltage0", true);
 	if(rx_ch)
-		iio_channel_attr_write(rx_ch, "rf_port_select", rx_port.toUtf8().constData());
+		chnWrite(rx_ch, "rf_port_select", rx_port.toUtf8().constData());
 	if(tx_ch)
-		iio_channel_attr_write(tx_ch, "rf_port_select", tx_port.toUtf8().constData());
+		chnWrite(tx_ch, "rf_port_select", tx_port.toUtf8().constData());
 
 	// Set RF port select for RX and TX on slave device
 	if(m_secondDevice) {
 		iio_channel *rx_chB = iio_device_find_channel(m_secondDevice, "voltage0", false);
 		iio_channel *tx_chB = iio_device_find_channel(m_secondDevice, "voltage0", true);
 		if(rx_chB)
-			iio_channel_attr_write(rx_chB, "rf_port_select", rx_port.toUtf8().constData());
+			chnWrite(rx_chB, "rf_port_select", rx_port.toUtf8().constData());
 		if(tx_chB)
-			iio_channel_attr_write(tx_chB, "rf_port_select", tx_port.toUtf8().constData());
+			chnWrite(tx_chB, "rf_port_select", tx_port.toUtf8().constData());
 	}
 }
 
@@ -605,5 +707,6 @@ void Fmcomms5Calibration::nearEndLoopbackCtrl(unsigned int channel, bool enable)
 	else
 		tmp &= ~0xF;
 
-	iio_device_reg_write(dev, 0x80000418 + channel * 0x40, tmp);
+	if(iio_device_reg_write(dev, 0x80000418 + channel * 0x40, tmp))
+		qWarning(CAT_FMCOMMS5_CALIBRATION) << "Near-end loopback register write failed";
 }

@@ -9,6 +9,7 @@ LIBSERIALPORT_BRANCH=master
 LIBIIO_VERSION=v1.0.0
 LIBIIO_V0_VERSION=v0.26
 LIBAD9361_BRANCH=main
+LIBAD9361_V0_BRANCH=libad9361-iio-v0
 # libad9166-iio: the main branch targets libiio v1; it is built against libiio v0.26, so this pin is required.
 LIBAD9166_BRANCH=libad9166-iio-v0
 LIBM2K_BRANCH=main

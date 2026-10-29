@@ -118,6 +118,7 @@ clone() {
 	[ -d 'libiio' ]		|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
 	[ -d 'libiio-v0' ]	|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_V0_VERSION libiio-v0
 	[ -d 'libad9361' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
+	[ -d 'libad9361-v0' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_V0_BRANCH libad9361-v0
 	[ -d 'libad9166' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9166-iio.git -b $LIBAD9166_BRANCH libad9166
 	[ -d 'libm2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
 	[ -d 'libsndfile' ]	|| git clone --recursive https://github.com/libsndfile/libsndfile -b $LIBSNDFILE_BRANCH libsndfile
@@ -259,6 +260,14 @@ build_libiio_v0() {
 build_libad9361() {
 	echo "### Building libad9361 - branch $LIBAD9361_BRANCH"
 	CURRENT_BUILD=libad9361
+	# libiio v1 is libiio1.dll here, which find_library(iio) does not match.
+	CURRENT_BUILD_CMAKE_OPTS="-DLIBIIO_LIBRARIES=$STAGING_DIR_CMAKE/lib/libiio1.dll.a"
+	build_with_cmake $1
+}
+
+build_libad9361_v0() {
+	echo "### Building libad9361 - branch $LIBAD9361_V0_BRANCH (prefix $LIBIIO_V0_PREFIX)"
+	CURRENT_BUILD=libad9361-v0
 	build_with_cmake_v0 $1
 }
 
@@ -468,6 +477,7 @@ build_deps() {
 
 	build_libserialport ON
 	build_libiio ON
+	build_libad9361 ON
 	build_libsndfile ON
 	build_qwt ON
 	build_kddock ON
@@ -477,7 +487,7 @@ build_deps() {
 	build_qcoro ON
 	# libiio v0 and its consumers, installed into LIBIIO_V0_PREFIX
 	build_libiio_v0 ON
-	build_libad9361 ON
+	build_libad9361_v0 ON
 	build_libad9166 ON
 	build_libm2k ON
 	build_libtinyiiod ON

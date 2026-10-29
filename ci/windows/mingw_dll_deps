@@ -38,9 +38,10 @@ DLL_DEPS=(
     libunistring-*.dll
 )
 
-# libiio v1 (STAGING_DIR/bin)
+# libiio v1 and the libraries built on it (STAGING_DIR/bin)
 LIBIIO_V1_DLL_DEPS=(
     libiio1.dll
+    libad9361.dll
 )
 
 # libiio v0 and the libraries built on it (LIBIIO_V0_PREFIX/bin)
