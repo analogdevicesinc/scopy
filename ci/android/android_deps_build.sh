@@ -34,6 +34,16 @@ build_with_cmake() {
 	CURRENT_BUILD_CMAKE_OPTS=""
 }
 
+# Same as build_with_cmake, but builds against and installs into LIBIIO_V0_PREFIX. The later -D wins.
+build_with_cmake_v0() {
+	CURRENT_BUILD_CMAKE_OPTS="$CURRENT_BUILD_CMAKE_OPTS \
+		-DCMAKE_INSTALL_PREFIX=$LIBIIO_V0_PREFIX \
+		-DCMAKE_PREFIX_PATH=$LIBIIO_V0_PREFIX;$STAGING_AREA_DEPS;$QT_ANDROID \
+		-DCMAKE_FIND_ROOT_PATH=$LIBIIO_V0_PREFIX;$STAGING_AREA_DEPS;$QT_ANDROID;$SYSROOT \
+		"
+	build_with_cmake $1
+}
+
 build_with_configure() {
 	INSTALL=$1
 	[ -z $INSTALL ] && INSTALL=ON
@@ -80,7 +90,9 @@ clone() {
 	pushd $STAGING_AREA_SRC
 	[ -d 'libserialport' ]	|| git clone --recursive https://github.com/sigrokproject/libserialport -b $LIBSERIALPORT_BRANCH libserialport
 	[ -d 'libxml2' ]	|| git clone --recursive https://github.com/GNOME/libxml2.git -b $LIBXML2_BRANCH libxml2
+	[ -d 'zstd' ]		|| git clone --recursive https://github.com/facebook/zstd.git -b $ZSTD_BRANCH zstd
 	[ -d 'libiio' ]		|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
+	[ -d 'libiio-v0' ]	|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_V0_VERSION libiio-v0
 	[ -d 'libad9361' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
 	[ -d 'qwt' ]		|| git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
 	[ -d 'extra-cmake-modules' ] || git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
@@ -126,12 +138,49 @@ build_libxml2() {
 	popd
 }
 
+# libiio v1 requires ZSTD for its network/serial (iiod client) backends; the NDK has no libzstd.
+build_zstd() {
+	echo "### Building zstd - $ZSTD_BRANCH"
+	pushd $STAGING_AREA_SRC/zstd/build/cmake
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DZSTD_BUILD_SHARED=ON \
+		-DZSTD_BUILD_STATIC=OFF \
+		-DZSTD_BUILD_PROGRAMS=OFF \
+		-DZSTD_BUILD_TESTS=OFF \
+		"
+	build_with_cmake $1
+	popd
+}
+
+# The USB backend needs libusb plus the Android UsbManager file-descriptor
+# handoff (libusb_wrap_sys_device), which is a follow-up milestone. The serial
+# backend is on, matching every other platform.
 build_libiio() {
 	echo "### Building libiio - $LIBIIO_VERSION"
 	pushd $STAGING_AREA_SRC/libiio
-	# The USB backend needs libusb plus the Android UsbManager file-descriptor
-	# handoff (libusb_wrap_sys_device), which is a follow-up milestone. The serial
-	# backend is on, matching every other platform.
+	# LIBIIO_COMPAT is off: its libiio.so.0 suffix is forced, and an APK only loads lib*.so.
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DWITH_TESTS=OFF \
+		-DWITH_DOC=OFF \
+		-DWITH_UTILS=OFF \
+		-DCSHARP_BINDINGS=OFF \
+		-DPYTHON_BINDINGS=OFF \
+		-DLIBIIO_COMPAT=OFF \
+		-DWITH_ZSTD=ON \
+		-DHAVE_DNS_SD=OFF \
+		-DENABLE_IPV6=OFF \
+		-DWITH_SERIAL_BACKEND=ON \
+		-DWITH_USB_BACKEND=OFF \
+		-DWITH_LOCAL_BACKEND=OFF \
+		-DWITH_NETWORK_BACKEND=ON \
+		"
+	build_with_cmake $1
+	popd
+}
+
+build_libiio_v0() {
+	echo "### Building libiio - $LIBIIO_V0_VERSION (prefix $LIBIIO_V0_PREFIX)"
+	pushd $STAGING_AREA_SRC/libiio-v0
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DWITH_TESTS=OFF \
 		-DWITH_DOC=OFF \
@@ -146,14 +195,14 @@ build_libiio() {
 		-DWITH_LOCAL_BACKEND=OFF \
 		-DWITH_NETWORK_BACKEND=ON \
 		"
-	build_with_cmake $1
+	build_with_cmake_v0 $1
 	popd
 }
 
 build_libad9361() {
 	echo "### Building libad9361 - $LIBAD9361_BRANCH"
 	pushd $STAGING_AREA_SRC/libad9361
-	build_with_cmake $1
+	build_with_cmake_v0 $1
 	popd
 }
 
@@ -258,7 +307,9 @@ build_deps() {
 	mkdir -p $STAGING_AREA_DEPS
 	build_libserialport ON
 	build_libxml2 ON
+	build_zstd ON
 	build_libiio ON
+	build_libiio_v0 ON
 	build_libad9361 ON
 	build_qwt ON
 	build_ecm ON
@@ -282,7 +333,7 @@ verify_deps() {
 	x86_64)    expected=X86-64 ;;
 	esac
 
-	for so in $STAGING_AREA_DEPS/lib/*.so; do
+	for so in $STAGING_AREA_DEPS/lib/*.so $LIBIIO_V0_PREFIX/lib/*.so; do
 		[ -e "$so" ] || continue
 		local arch
 		arch=$($READELF -h "$so" | awk -F: '/Machine:/ {gsub(/^ +| +$/,"",$2); print $2}')
@@ -294,7 +345,7 @@ verify_deps() {
 
 	# Versioned or non-lib-prefixed files are unusable in an APK.
 	local bad
-	bad=$(find $STAGING_AREA_DEPS/lib -maxdepth 1 -name '*.so.*' -o -maxdepth 1 -name '*.so' -not -name 'lib*' 2>/dev/null)
+	bad=$(find $STAGING_AREA_DEPS/lib $LIBIIO_V0_PREFIX/lib -maxdepth 1 -name '*.so.*' -o -maxdepth 1 -name '*.so' -not -name 'lib*' 2>/dev/null)
 	if [ -n "$bad" ]; then
 		echo "FAIL: versioned or non-lib-prefixed libraries present:"
 		echo "$bad"
@@ -307,8 +358,14 @@ verify_deps() {
 
 # Emit the absolute .so paths for Scopy's QT_ANDROID_EXTRA_LIBS, which must list
 # every third-party native library to be flattened into the APK's lib/<abi>/.
+# The APK holds one libiio.so, so a v0 build swaps in the v0 prefix's libiio (and libad9361).
 collect_extra_libs() {
-	find $STAGING_AREA_DEPS/lib -maxdepth 1 -name 'lib*.so' | sort | paste -sd';' -
+	if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
+		{ find $STAGING_AREA_DEPS/lib -maxdepth 1 -name 'lib*.so' -not -name 'libiio.so'
+		  find $LIBIIO_V0_PREFIX/lib -maxdepth 1 -name 'lib*.so'; } | sort | paste -sd';' -
+	else
+		find $STAGING_AREA_DEPS/lib -maxdepth 1 -name 'lib*.so' | sort | paste -sd';' -
+	fi
 }
 
 # Reuses an existing keystore, else generates a debug one. A generated key differs per run, so
@@ -381,7 +438,17 @@ build_scopy() {
 		-DWITH_SIGROK=OFF
 		-DWITH_LIBSERIALPORT=ON
 		-DQT_ANDROID_SIGN_APK=ON
+		-DSCOPY_LIBIIO_VERSION="$SCOPY_LIBIIO_VERSION"
 	)
+	# v0: the v0 prefix is searched first so libiio v0 and libad9361 are picked over libiio v1.
+	if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
+		opts+=(
+			-DIIO_INCLUDE_DIRS="$LIBIIO_V0_PREFIX/include"
+			-DIIO_LIBRARIES="$LIBIIO_V0_PREFIX/lib/libiio.so"
+			-DCMAKE_PREFIX_PATH="$LIBIIO_V0_PREFIX;$STAGING_AREA_DEPS"
+			-DCMAKE_FIND_ROOT_PATH="$LIBIIO_V0_PREFIX;$STAGING_AREA_DEPS"
+		)
+	fi
 
 	pushd $build_dir
 	$CMAKE_BIN "${opts[@]}" $SRC_DIR
