@@ -42,6 +42,7 @@ DLL_DEPS=(
 LIBIIO_V1_DLL_DEPS=(
     libiio1.dll
     libad9361.dll
+    libm2k.dll
 )
 
 # libiio v0 and the libraries built on it (LIBIIO_V0_PREFIX/bin)

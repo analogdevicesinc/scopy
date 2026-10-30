@@ -468,6 +468,26 @@
 				}
 			]
 		},
+		{
+			"name": "libm2k",
+			"builddir": true,
+			"buildsystem": "cmake",
+			"config-opts": [
+				"-DCMAKE_INSTALL_PREFIX:PATH=/app",
+				"-DENABLE_PYTHON=OFF",
+				"-DENABLE_CSHARP=OFF",
+				"-DENABLE_TOOLS=OFF",
+				"-DBUILD_EXAMPLES=OFF",
+				"-DINSTALL_UDEV_RULES=OFF"
+			],
+			"sources": [
+				{
+					"type": "git",
+					"url": "https://github.com/analogdevicesinc/libm2k",
+					"branch": "libiio-v1"
+				}
+			]
+		},
 #endif
 	{
 		"name": "scopy",

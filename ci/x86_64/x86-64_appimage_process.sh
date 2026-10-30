@@ -40,7 +40,8 @@ LIBIIO_VERSION=v1.0.0
 LIBIIO_V0_VERSION=v0.26
 LIBAD9361_BRANCH=main
 LIBAD9361_V0_BRANCH=libad9361-iio-v0
-LIBM2K_BRANCH=main
+LIBM2K_BRANCH=libiio-v1
+LIBM2K_V0_BRANCH=main
 SPDLOG_BRANCH=v1.x
 VOLK_BRANCH=main
 GNURADIO_BRANCH=scopy2-maint-3.10
@@ -175,6 +176,7 @@ clone() {
 	[ -d 'libad9361' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
 	[ -d 'libad9361-v0' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_V0_BRANCH libad9361-v0
 	[ -d 'libm2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
+	[ -d 'libm2k-v0' ]	|| git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_V0_BRANCH libm2k-v0
 	[ -d 'spdlog' ]		|| git clone --recursive https://github.com/gabime/spdlog.git -b $SPDLOG_BRANCH spdlog
 	[ -d 'gr-scopy' ]	|| git clone --recursive https://github.com/analogdevicesinc/gr-scopy.git -b $GRSCOPY_BRANCH gr-scopy
 	[ -d 'gr-m2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/gr-m2k.git -b $GRM2K_BRANCH gr-m2k
@@ -353,6 +355,20 @@ build_spdlog() {
 build_libm2k() {
 	echo "### Building libm2k - branch $LIBM2K_BRANCH"
 	pushd $STAGING_AREA/libm2k
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DENABLE_PYTHON=OFF \
+		-DENABLE_CSHARP=OFF \
+		-DBUILD_EXAMPLES=OFF \
+		-DENABLE_TOOLS=OFF \
+		-DINSTALL_UDEV_RULES=OFF \
+		"
+	build_with_cmake $1
+	popd
+}
+
+build_libm2k_v0() {
+	echo "### Building libm2k - branch $LIBM2K_V0_BRANCH (prefix $LIBIIO_V0_PREFIX)"
+	pushd $STAGING_AREA/libm2k-v0
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DENABLE_PYTHON=OFF \
 		-DENABLE_CSHARP=OFF \
@@ -711,6 +727,7 @@ build_deps(){
 	build_libserialport ON
 	build_libiio ON
 	build_libad9361 ON
+	build_libm2k ON
 	build_spdlog ON
 	build_volk ON
 	build_qwt ON
@@ -723,7 +740,7 @@ build_deps(){
 	# libiio v0 and its consumers, installed into LIBIIO_V0_PREFIX
 	build_libiio_v0 ON
 	build_libad9361_v0 ON
-	build_libm2k ON
+	build_libm2k_v0 ON
 	build_gnuradio ON
 	build_grscopy ON
 	build_grm2k ON
