@@ -121,6 +121,7 @@ clone() {
 	[ -d 'libad9361-v0' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_V0_BRANCH libad9361-v0
 	[ -d 'libad9166' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9166-iio.git -b $LIBAD9166_BRANCH libad9166
 	[ -d 'libm2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
+	[ -d 'libm2k-v0' ]	|| git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_V0_BRANCH libm2k-v0
 	[ -d 'libsndfile' ]	|| git clone --recursive https://github.com/libsndfile/libsndfile -b $LIBSNDFILE_BRANCH libsndfile
 	[ -d 'qwt' ]		|| git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
 	[ -d 'libtinyiiod' ]	|| git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
@@ -280,6 +281,21 @@ build_libad9166() {
 build_libm2k() {
 	echo "### Building libm2k - branch $LIBM2K_BRANCH"
 	CURRENT_BUILD=libm2k
+	# libiio v1 is libiio1.dll here; libiio.pc still says -liio, so preset the library pkg-config looks up.
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DENABLE_PYTHON=OFF\
+		-DENABLE_CSHARP=OFF\
+		-DBUILD_EXAMPLES=OFF\
+		-DENABLE_TOOLS=OFF\
+		-DINSTALL_UDEV_RULES=OFF\
+		-Dpkgcfg_lib_IIO_iio=$STAGING_DIR_CMAKE/lib/libiio1.dll.a\
+		"
+	build_with_cmake $1
+}
+
+build_libm2k_v0() {
+	echo "### Building libm2k - branch $LIBM2K_V0_BRANCH (prefix $LIBIIO_V0_PREFIX)"
+	CURRENT_BUILD=libm2k-v0
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DENABLE_PYTHON=OFF\
 		-DENABLE_CSHARP=OFF\
@@ -478,6 +494,7 @@ build_deps() {
 	build_libserialport ON
 	build_libiio ON
 	build_libad9361 ON
+	build_libm2k ON
 	build_libsndfile ON
 	build_qwt ON
 	build_kddock ON
@@ -489,7 +506,7 @@ build_deps() {
 	build_libiio_v0 ON
 	build_libad9361_v0 ON
 	build_libad9166 ON
-	build_libm2k ON
+	build_libm2k_v0 ON
 	build_libtinyiiod ON
 }
 
