@@ -49,6 +49,8 @@ public:
 	QwtPlot *plot();
 	void setDivs(double);
 	void setInterval(double min, double max);
+	void setLogScale(bool on);
+	bool logScale() const;
 
 	const QwtAxisId &axisId() const;
 
@@ -108,6 +110,7 @@ private:
 	double m_divs;
 	// Set while setInterval() changes both ends, so the scale is applied once.
 	bool m_deferScaleUpdate{false};
+	bool m_logScale{false};
 	double m_min;
 	double m_max;
 

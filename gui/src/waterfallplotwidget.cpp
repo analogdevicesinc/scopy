@@ -47,6 +47,7 @@ WaterfallData::WaterfallData()
 	, m_maxRows(0)
 	, m_fftSize(0)
 	, m_antialiasing(true)
+	, m_rowPeriod(1.0)
 	, m_xInterval(0.0, 1.0)
 	, m_zInterval(-120.0, 0.0)
 {}
@@ -185,6 +186,14 @@ int WaterfallData::maxRows() const { return m_maxRows; }
 
 int WaterfallData::rowCount() const { return m_count; }
 
+void WaterfallData::setRowPeriod(double secs)
+{
+	if(secs > 0.0)
+		m_rowPeriod = secs;
+}
+
+double WaterfallData::rowPeriod() const { return m_rowPeriod; }
+
 void WaterfallData::setAntialiasing(bool enabled) { m_antialiasing = enabled; }
 
 QwtInterval WaterfallData::interval(Qt::Axis axis) const
@@ -193,7 +202,7 @@ QwtInterval WaterfallData::interval(Qt::Axis axis) const
 	case Qt::XAxis:
 		return m_xInterval;
 	case Qt::YAxis:
-		return QwtInterval(static_cast<double>(m_maxRows), 0.0);
+		return QwtInterval(m_maxRows * m_rowPeriod, 0.0);
 	case Qt::ZAxis:
 		return m_zInterval;
 	default:
@@ -212,7 +221,7 @@ double WaterfallData::value(double x, double y) const
 
 	const int nRows = m_count;
 
-	const double dataRowF = (m_maxRows - 1.0 - y) - (m_maxRows - nRows);
+	const double dataRowF = (m_maxRows - 1.0 - y / m_rowPeriod) - (m_maxRows - nRows);
 
 	if(dataRowF < 0.0 || dataRowF >= static_cast<double>(nRows))
 		return -DBL_MAX;
@@ -250,25 +259,6 @@ double WaterfallData::value(double x, double y) const
 }
 
 // =============================================================================
-// WaterfallTimeFormatter
-// =============================================================================
-
-WaterfallTimeFormatter::WaterfallTimeFormatter(QObject *parent)
-	: MetricPrefixFormatter(parent)
-	, m_secsPerRow(1.0)
-{
-	setTrimZeroes(true);
-	setTwoDecimalMode(false);
-}
-
-void WaterfallTimeFormatter::setSecsPerRow(double secs) { m_secsPerRow = secs; }
-
-QString WaterfallTimeFormatter::format(double value, QString unitType, int precision) const
-{
-	return MetricPrefixFormatter::format(value * m_secsPerRow, unitType, precision);
-}
-
-// =============================================================================
 // WaterfallPlotWidget
 // =============================================================================
 
@@ -276,6 +266,7 @@ WaterfallPlotWidget::WaterfallPlotWidget(QWidget *parent)
 	: PlotWidget(parent)
 	, m_secsPerRow(1.0 / Preferences::GetInstance()->get("general_plot_target_fps").toDouble())
 	, m_rowCount(0)
+	, m_pendingRows(0)
 	, m_waterfallEnabled(false)
 {
 	navigator()->addAxis(xAxis());
@@ -289,13 +280,11 @@ WaterfallPlotWidget::WaterfallPlotWidget(QWidget *parent)
 	m_spectrogram->setData(m_data);
 	m_spectrogram->setDisplayMode(QwtPlotSpectrogram::ImageMode, true);
 	m_spectrogram->setColorMap(new WaterfallColorMap());
+	// Its own axes, not Qwt's default XBottom/YLeft pair, which need not be them
+	m_spectrogram->setAxes(xAxis()->axisId(), yAxis()->axisId());
 	m_spectrogram->attach(plot());
 
-	yAxis()->setInterval(m_data->maxRows(), 0);
-
-	m_timeFormatter = new WaterfallTimeFormatter(this);
-	m_timeFormatter->setSecsPerRow(m_secsPerRow);
-	yAxis()->setFormatter(m_timeFormatter);
+	applyTimeAxis();
 	yAxis()->setUnits("s");
 	yAxis()->setUnitsVisible(true);
 
@@ -322,27 +311,29 @@ void WaterfallPlotWidget::addFFTData(const float *data, size_t size)
 
 void WaterfallPlotWidget::appendRowDeferred(const float *data, size_t size)
 {
-	if(m_rowTimer.isValid()) {
-		const double elapsed = m_rowTimer.elapsed() / 1000.0;
-		m_rowTimer.restart();
-		if(elapsed > 0.0) {
-			// EMA: slow enough to track steady-state load, fast enough to react to config changes.
-			static constexpr double alpha = 0.1;
-			m_secsPerRow = alpha * elapsed + (1.0 - alpha) * m_secsPerRow;
-			++m_rowCount;
-			if(m_rowCount % 20 == 0) {
-				m_timeFormatter->setSecsPerRow(m_secsPerRow);
-				yAxis()->scaleDraw()->invalidateCache();
-				plot()->axisWidget(yAxis()->axisId())->update();
-			}
-		}
-	}
-
+	++m_pendingRows;
 	m_data->appendRow(data, size);
 }
 
 void WaterfallPlotWidget::endAppend()
 {
+	if(!m_rowTimer.isValid()) {
+		m_rowTimer.start();
+	} else if(m_pendingRows > 0) {
+		const double secsPerRow = m_rowTimer.restart() / 1000.0 / m_pendingRows;
+		if(secsPerRow > 0.0) {
+			// EMA: slow enough to track steady-state load, fast enough to react to config changes.
+			static constexpr double alpha = 0.1;
+			m_secsPerRow = m_rowCount == 0 ? secsPerRow : alpha * secsPerRow + (1.0 - alpha) * m_secsPerRow;
+			const int before = m_rowCount;
+			m_rowCount += m_pendingRows;
+			if(before == 0 || before / 20 != m_rowCount / 20) {
+				applyTimeAxis();
+			}
+		}
+	}
+	m_pendingRows = 0;
+
 	m_spectrogram->invalidateCache();
 	m_spectrogram->itemChanged();
 	Q_EMIT newData();
@@ -361,6 +352,7 @@ void WaterfallPlotWidget::clearData()
 	m_data->reset();
 	m_rowTimer.invalidate();
 	m_rowCount = 0;
+	m_pendingRows = 0;
 	m_spectrogram->invalidateCache();
 	m_spectrogram->itemChanged();
 	replot();
@@ -368,8 +360,13 @@ void WaterfallPlotWidget::clearData()
 
 void WaterfallPlotWidget::setFrequencyRange(double startHz, double stopHz)
 {
-	m_data->setXInterval(startHz, stopHz);
+	setDataFrequencyRange(startHz, stopHz);
 	xAxis()->setInterval(startHz, stopHz);
+}
+
+void WaterfallPlotWidget::setDataFrequencyRange(double startHz, double stopHz)
+{
+	m_data->setXInterval(startHz, stopHz);
 	m_spectrogram->invalidateCache();
 	m_spectrogram->itemChanged();
 }
@@ -392,10 +389,16 @@ void WaterfallPlotWidget::setNumRows(int rows)
 	if(rows <= 0)
 		return;
 	m_data->setMaxRows(rows);
-	yAxis()->setInterval(rows, 0);
-	// The row count feeds interval(Qt::YAxis) and value()'s row mapping, so a stale
-	// raster cache here draws the old geometry until the next append happens to
-	// invalidate it.
+	applyTimeAxis();
+}
+
+void WaterfallPlotWidget::applyTimeAxis()
+{
+	// The axis and the data's row mapping change together, so a label always reads the
+	// time of the row drawn at it. Through setInterval(), so both the outside and the
+	// inside label draws relabel — a formatter swapped behind the scale's back did not.
+	m_data->setRowPeriod(m_secsPerRow);
+	yAxis()->setInterval(m_data->maxRows() * m_secsPerRow, 0.0);
 	m_spectrogram->invalidateCache();
 	m_spectrogram->itemChanged();
 }

@@ -24,6 +24,7 @@
 #include <QDebug>
 #include <QFontMetrics>
 #include <QwtPlotLayout>
+#include <qwt_scale_engine.h>
 #include <qwt_scale_widget.h>
 #include <edgelessplot.h>
 #include <pluginbase/preferences.h>
@@ -342,10 +343,28 @@ void PlotAxis::updateAxisScale()
 {
 	if(m_deferScaleUpdate)
 		return;
-	m_plot->setAxisScale(m_axisId, m_min, m_max, (m_max - m_min) / m_divs); // set Divs, limits
+	m_plot->setAxisScale(m_axisId, m_min, m_max, m_logScale ? 0.0 : (m_max - m_min) / m_divs); // set Divs, limits
 	m_plot->replot();
 	Q_EMIT axisScaleUpdated();
 }
+
+void PlotAxis::setLogScale(bool on)
+{
+	if(m_logScale == on)
+		return;
+	m_logScale = on;
+	if(on) {
+		m_scaleEngine = nullptr;
+		m_plot->setAxisScaleEngine(m_axisId, new QwtLogScaleEngine());
+	} else {
+		m_scaleEngine = new OscScaleEngine();
+		m_scaleEngine->setMajorTicksCount(m_divs);
+		m_plot->setAxisScaleEngine(m_axisId, m_scaleEngine);
+	}
+	updateAxisScale();
+}
+
+bool PlotAxis::logScale() const { return m_logScale; }
 
 void PlotAxis::setMin(double newMin)
 {

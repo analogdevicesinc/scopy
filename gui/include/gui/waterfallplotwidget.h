@@ -63,6 +63,11 @@ public:
 	int maxRows() const;
 	int rowCount() const;
 
+	// Seconds between rows. Y is time back from the newest row, which sits at 0, so
+	// the rows span 0..maxRows * period. 1 (the default) makes Y the row index.
+	void setRowPeriod(double secs);
+	double rowPeriod() const;
+
 	void setAntialiasing(bool enabled);
 
 	QwtInterval interval(Qt::Axis axis) const override;
@@ -107,6 +112,7 @@ private:
 	int m_maxRows;
 	size_t m_fftSize;
 	bool m_antialiasing;
+	double m_rowPeriod;
 
 	QwtInterval m_xInterval;
 	QwtInterval m_zInterval;
@@ -124,18 +130,6 @@ public:
 		addColorStop(0.66, QColor(255, 144, 0));  // scopy orange
 		addColorStop(0.83, Qt::white);
 	}
-};
-
-// Formatter that converts row indices to seconds for display on the Y axis.
-class SCOPY_GUI_EXPORT WaterfallTimeFormatter : public MetricPrefixFormatter
-{
-public:
-	explicit WaterfallTimeFormatter(QObject *parent = nullptr);
-	void setSecsPerRow(double secs);
-	QString format(double value, QString unitType, int precision) const override;
-
-private:
-	double m_secsPerRow;
 };
 
 class SCOPY_GUI_EXPORT WaterfallPlotWidget : public PlotWidget
@@ -161,7 +155,10 @@ public:
 
 	void setChannel(ChannelData *ch);
 
+	// The data's and the X axis's range
 	void setFrequencyRange(double startHz, double stopHz);
+	// The frequencies the rows span, leaving the X axis to its owner
+	void setDataFrequencyRange(double startHz, double stopHz);
 	void setIntensityRange(double minDb, double maxDb);
 	void setNumRows(int rows);
 	void setAntialiasing(bool enabled);
@@ -171,13 +168,17 @@ public Q_SLOTS:
 	void setWaterfallEnabled(bool enabled);
 
 private:
+	// The Y axis is the widget's own: seconds back from the newest row, from the row
+	// count and the measured row period. Nothing outside sets it.
+	void applyTimeAxis();
+
 	QwtPlotSpectrogram *m_spectrogram;
 	WaterfallData *m_data;
-	WaterfallTimeFormatter *m_timeFormatter;
 
 	QElapsedTimer m_rowTimer;
 	double m_secsPerRow;
 	int m_rowCount;
+	int m_pendingRows;
 	bool m_waterfallEnabled;
 	ChannelData *m_channel = nullptr;
 };
