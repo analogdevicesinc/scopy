@@ -75,8 +75,10 @@ QCoro::Task<void> IIOInputStream::applyEnabledChannels(const QList<int> &channel
 	}
 }
 
-QCoro::Task<CommandResponse<void>> IIOInputStream::openAsync(const StreamConfig &cfg)
+QCoro::Task<CommandResponse<void>> IIOInputStream::openAsync(const StreamConfig &config)
 {
+	// Coroutine frame copy: the caller's config may not outlive the first suspension.
+	const StreamConfig cfg = config;
 	co_await applyEnabledChannels(cfg.enabledChannels);
 
 	auto *cmd = new scopy::iio::BufferOpenCommand(m_bufOps, m_dev, m_bufferIndex, m_mask, cfg.samplesCount, false,
