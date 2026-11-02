@@ -26,6 +26,8 @@ setup_scopy_tests(
 	pluginmanager
 	pluginrepository
 	acqchanneldelete
+	spectrumprocessor
+	acqmarkercontroller
 	acquisitionerrors
 )
 
