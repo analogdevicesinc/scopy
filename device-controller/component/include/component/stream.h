@@ -54,6 +54,7 @@ public:
 	{}
 	~Stream() override = default;
 
+	// Implementations must copy cfg before their first suspension: callers may pass a temporary.
 	virtual QCoro::Task<CommandResponse<void>> openAsync(const StreamConfig &cfg) = 0;
 	virtual QCoro::Task<CommandResponse<void>> closeAsync() = 0;
 
