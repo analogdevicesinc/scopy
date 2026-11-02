@@ -193,9 +193,6 @@ void DCDebuggerTool::onCurrentChanged(const QModelIndex &proxyIndex)
 	}
 	const NodeKind kind = m_model->kindAt(src);
 	QObject *node = m_model->objectAt(src);
-	if(kind == NodeKind::Attribute) {
-		readAttributes({node});
-	}
 
 	const QString key = panelKey(src);
 	NodePanel *panel = m_panelCache.value(key);

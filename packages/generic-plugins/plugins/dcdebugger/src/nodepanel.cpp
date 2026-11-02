@@ -21,6 +21,8 @@
 
 #include "nodepanel.h"
 
+#include "attributessection.h"
+
 #include <QHeaderView>
 #include <QLabel>
 #include <QMetaProperty>
@@ -28,6 +30,7 @@
 #include <QTableWidget>
 #include <QVBoxLayout>
 
+#include <component/attribute.h>
 #include <menusectionwidget.h>
 #include <style.h>
 #include <widgets/animatedrefreshbtn.h>
@@ -71,15 +74,17 @@ void fitHeight(QTableWidget *t)
 	t->setFixedHeight(h);
 }
 
-MenuSectionCollapseWidget *makeSection(const QString &title, QWidget *parent)
+} // namespace
+
+MenuSectionCollapseWidget *scopy::dcdebugger::makeSection(const QString &title, QWidget *parent, bool collapsed)
 {
 	auto *section = new MenuSectionCollapseWidget(title, MenuCollapseSection::MHCW_ARROW,
 						      MenuCollapseSection::MHW_BASEWIDGET, parent);
 	section->contentLayout()->setSpacing(6);
 	Style::setStyle(section, style::properties::widget::border_interactive);
+	section->setCollapsed(collapsed);
 	return section;
 }
-} // namespace
 
 QString scopy::dcdebugger::variantToString(const QVariant &v)
 {
@@ -178,13 +183,13 @@ void NodePanel::showEvent(QShowEvent *event)
 	refresh();
 }
 
-PropertiesSection::PropertiesSection(QObject *node, QWidget *parent)
+PropertiesSection::PropertiesSection(QObject *node, bool collapsed, QWidget *parent)
 	: QWidget(parent)
 	, m_node(node)
 {
 	auto *lay = new QVBoxLayout(this);
 	lay->setContentsMargins(0, 0, 0, 0);
-	auto *section = makeSection("Properties", this);
+	auto *section = makeSection("General info", this, collapsed);
 	m_table = makeTable({"Property", "Value"}, section);
 	section->contentLayout()->addWidget(m_table);
 	lay->addWidget(section);
@@ -245,18 +250,58 @@ void ChildrenSection::refresh()
 	fitHeight(m_table);
 }
 
+namespace {
+QList<component::Attribute *> attributesOf(const QList<QObject *> &objects)
+{
+	QList<component::Attribute *> out;
+	for(QObject *o : objects) {
+		if(auto *a = qobject_cast<component::Attribute *>(o)) {
+			out.append(a);
+		}
+	}
+	return out;
+}
+
+void addAttributes(NodePanel *panel, const QString &title, const QList<component::Attribute *> &attrs)
+{
+	auto *section = new AttributesSection(title, attrs, panel);
+	QObject::connect(panel, &NodePanel::refreshRequested, section, &AttributesSection::refresh);
+	panel->addSection(section);
+}
+} // namespace
+
 NodePanel *scopy::dcdebugger::createNodePanel(QObject *node, NodeKind kind, const QString &title,
 					      const QList<PathTitle::Segment> &path, const QList<QObject *> &children,
 					      QWidget *parent)
 {
 	auto *panel = new NodePanel(node, kind, title, path, parent);
 	if(kind == NodeKind::Group) {
+		// A group of attributes is edited in place; any other group lists its members.
+		const QList<component::Attribute *> attrs = attributesOf(children);
+		if(!attrs.isEmpty() && attrs.size() == children.size()) {
+			addAttributes(panel, QStringLiteral("Attributes (%1)").arg(attrs.size()), attrs);
+			return panel;
+		}
 		auto *members = new ChildrenSection("Members", children, panel);
 		QObject::connect(panel, &NodePanel::refreshRequested, members, &ChildrenSection::refresh);
 		panel->addSection(members);
 		return panel;
 	}
-	auto *props = new PropertiesSection(node, panel);
+
+	// The direct attributes of the node (or the attribute itself), then its general info.
+	QList<component::Attribute *> attrs;
+	if(auto *attr = qobject_cast<component::Attribute *>(node)) {
+		attrs.append(attr);
+	} else {
+		attrs = node->findChildren<component::Attribute *>(QString(), Qt::FindDirectChildrenOnly);
+	}
+	if(!attrs.isEmpty()) {
+		addAttributes(panel,
+			      kind == NodeKind::Attribute ? QStringLiteral("Attribute")
+							  : QStringLiteral("Attributes (%1)").arg(attrs.size()),
+			      attrs);
+	}
+	auto *props = new PropertiesSection(node, kind != NodeKind::Attribute && !attrs.isEmpty(), panel);
 	QObject::connect(panel, &NodePanel::refreshRequested, props, &PropertiesSection::refresh);
 	panel->addSection(props);
 	return panel;

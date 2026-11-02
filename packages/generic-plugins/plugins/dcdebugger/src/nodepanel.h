@@ -73,7 +73,7 @@ class PropertiesSection : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit PropertiesSection(QObject *node, QWidget *parent = nullptr);
+	PropertiesSection(QObject *node, bool collapsed, QWidget *parent = nullptr);
 	void refresh();
 
 private:
@@ -99,6 +99,8 @@ NodePanel *createNodePanel(QObject *node, NodeKind kind, const QString &title, c
 			   const QList<QObject *> &children, QWidget *parent = nullptr);
 
 QString variantToString(const QVariant &v);
+
+MenuSectionCollapseWidget *makeSection(const QString &title, QWidget *parent, bool collapsed = false);
 
 } // namespace scopy::dcdebugger
 
