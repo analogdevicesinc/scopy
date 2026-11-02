@@ -20,6 +20,7 @@
  */
 
 #include "decoder/sigrokclibackend.h"
+#include "decoder/sigrokclibackendfactory.h"
 
 #include "decoder/annotationsymbols.h"
 #include "decoder/decoderlogger.h"
@@ -46,6 +47,8 @@ SigrokCliBackend::SigrokCliBackend(SigrokCliCatalog *catalog)
 }
 
 SigrokCliBackend::~SigrokCliBackend() = default;
+
+SigrokCliBackendFactory::~SigrokCliBackendFactory() = default;
 
 QStringList SigrokCliBackend::buildArgs(const DecoderConfig &cfg) const
 {
