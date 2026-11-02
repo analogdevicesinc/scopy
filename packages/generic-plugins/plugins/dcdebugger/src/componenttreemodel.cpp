@@ -1,0 +1,210 @@
+/*
+ * Copyright (c) 2026 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
+#include "componenttreemodel.h"
+
+#include <QMap>
+
+#include <component/attribute.h>
+#include <component/attributereader.h>
+#include <component/connection.h>
+#include <component/donglemanager.h>
+#include <component/stream.h>
+
+using namespace scopy;
+using namespace scopy::dcdebugger;
+using namespace scopy::component;
+
+ComponentTreeModel::ComponentTreeModel(QObject *parent)
+	: QStandardItemModel(parent)
+{
+	setColumnCount(ColumnCount);
+	setHorizontalHeaderLabels({"Name", "Value", "Info"});
+}
+
+ComponentTreeModel::~ComponentTreeModel() { delete m_watchers; }
+
+void ComponentTreeModel::setConnection(Connection *conn)
+{
+	m_conn = conn;
+	rebuild();
+}
+
+void ComponentTreeModel::clearTree()
+{
+	delete m_watchers;
+	m_watchers = nullptr;
+	m_objects.clear();
+	m_items.clear();
+	removeRows(0, rowCount());
+}
+
+void ComponentTreeModel::rebuild()
+{
+	clearTree();
+	if(m_conn) {
+		m_watchers = new QObject(this);
+		addNode(invisibleRootItem(), m_conn, NodeKind::Connection);
+	}
+	Q_EMIT rebuilt();
+}
+
+QList<QStandardItem *> ComponentTreeModel::makeRow(const QString &name, const QString &value, const QString &info) const
+{
+	QList<QStandardItem *> row = {new QStandardItem(name), new QStandardItem(value), new QStandardItem(info)};
+	for(QStandardItem *it : row) {
+		it->setEditable(false);
+	}
+	row[ValueColumn]->setToolTip(value);
+	return row;
+}
+
+void ComponentTreeModel::addNode(QStandardItem *parent, QObject *obj, NodeKind kind)
+{
+	QList<QStandardItem *> row = makeRow(ComponentNode::name(obj, kind), ComponentNode::value(obj, kind),
+					     ComponentNode::info(obj, kind));
+	row[NameColumn]->setData(int(kind), KindRole);
+	parent->appendRow(row);
+	m_objects.insert(row[NameColumn], obj);
+	m_items.insert(obj, row[NameColumn]);
+	watch(obj, kind, row[ValueColumn]);
+	addChildren(row[NameColumn], obj);
+}
+
+void ComponentTreeModel::addChildren(QStandardItem *item, QObject *obj)
+{
+	struct Group
+	{
+		QString name;
+		QList<QPair<QObject *, NodeKind>> members;
+	};
+	QList<Group> groups;
+	for(QObject *child : obj->children()) {
+		const NodeKind kind = ComponentNode::kindOf(child);
+		if(kind == NodeKind::Hidden) {
+			continue;
+		}
+		const QString name = ComponentNode::groupOf(child, kind);
+		auto it = std::find_if(groups.begin(), groups.end(), [&](const Group &g) { return g.name == name; });
+		if(it == groups.end()) {
+			groups.append({name, {}});
+			it = std::prev(groups.end());
+		}
+		it->members.append({child, kind});
+	}
+	std::stable_sort(groups.begin(), groups.end(), [](const Group &a, const Group &b) {
+		return ComponentNode::groupOrder(a.name) < ComponentNode::groupOrder(b.name);
+	});
+
+	for(const Group &g : std::as_const(groups)) {
+		QList<QStandardItem *> row = makeRow(QStringLiteral("%1 (%2)").arg(g.name).arg(g.members.size()),
+						     QString(), ComponentNode::kindName(NodeKind::Group));
+		row[NameColumn]->setData(int(NodeKind::Group), KindRole);
+		row[NameColumn]->setData(g.name, GroupNameRole);
+		item->appendRow(row);
+		for(const auto &m : g.members) {
+			addNode(row[NameColumn], m.first, m.second);
+		}
+	}
+}
+
+void ComponentTreeModel::watch(QObject *obj, NodeKind kind, QStandardItem *valueItem)
+{
+	auto refresh = [obj, kind, valueItem]() {
+		const QString v = ComponentNode::value(obj, kind);
+		valueItem->setText(v);
+		valueItem->setToolTip(v);
+	};
+	switch(kind) {
+	case NodeKind::Attribute: {
+		auto *attr = static_cast<Attribute *>(obj);
+		connect(attr, &Attribute::valueChanged, m_watchers, refresh);
+		if(AttributeReader *reader = attr->readCapability()) {
+			connect(reader, &AttributeReader::readFailed, m_watchers, [valueItem](const scopy::Error &e) {
+				valueItem->setText(QStringLiteral("read failed: ") + e.errorString());
+				valueItem->setToolTip(valueItem->text());
+			});
+		}
+		break;
+	}
+	case NodeKind::InputStream:
+	case NodeKind::OutputStream:
+		connect(static_cast<Stream *>(obj), &Stream::openedChanged, m_watchers, refresh);
+		break;
+	case NodeKind::DongleManager:
+		connect(static_cast<DongleManager *>(obj), &DongleManager::profileChanged, m_watchers, refresh);
+		break;
+	default:
+		break;
+	}
+}
+
+QObject *ComponentTreeModel::objectAt(const QModelIndex &index) const
+{
+	if(!index.isValid()) {
+		return nullptr;
+	}
+	return m_objects.value(itemFromIndex(index.siblingAtColumn(NameColumn))).data();
+}
+
+NodeKind ComponentTreeModel::kindAt(const QModelIndex &index) const
+{
+	if(!index.isValid()) {
+		return NodeKind::Hidden;
+	}
+	return NodeKind(index.siblingAtColumn(NameColumn).data(KindRole).toInt());
+}
+
+bool ComponentTreeModel::isGroup(const QModelIndex &index) const { return kindAt(index) == NodeKind::Group; }
+
+QList<QPair<QString, QObject *>> ComponentTreeModel::pathOf(const QModelIndex &index) const
+{
+	QList<QPair<QString, QObject *>> parts;
+	for(QModelIndex i = index.siblingAtColumn(NameColumn); i.isValid(); i = i.parent()) {
+		if(!isGroup(i)) {
+			parts.prepend({i.data().toString(), objectAt(i)});
+		}
+	}
+	return parts;
+}
+
+QList<QObject *> ComponentTreeModel::childObjects(const QModelIndex &index) const
+{
+	QList<QObject *> out;
+	const QModelIndex idx = index.siblingAtColumn(NameColumn);
+	for(int r = 0; r < rowCount(idx); ++r) {
+		const QModelIndex child = this->index(r, NameColumn, idx);
+		if(isGroup(child)) {
+			out.append(childObjects(child));
+		} else if(QObject *obj = objectAt(child)) {
+			out.append(obj);
+		}
+	}
+	return out;
+}
+
+QModelIndex ComponentTreeModel::indexOf(const QObject *obj) const
+{
+	QStandardItem *item = m_items.value(obj);
+	return item ? item->index() : QModelIndex();
+}
+
+#include "moc_componenttreemodel.cpp"
