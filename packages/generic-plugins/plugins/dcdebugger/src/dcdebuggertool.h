@@ -22,6 +22,8 @@
 #ifndef DCDEBUGGERTOOL_H
 #define DCDEBUGGERTOOL_H
 
+#include "scopy-dcdebugger_export.h"
+
 #include <QHash>
 #include <QPointer>
 #include <QWidget>
@@ -45,7 +47,7 @@ class ComponentTreeModel;
 class NodePanel;
 
 // Tree of every component of the connection (left) + the control panel of the selected node (right).
-class DCDebuggerTool : public QWidget
+class SCOPY_DCDEBUGGER_EXPORT DCDebuggerTool : public QWidget
 {
 	Q_OBJECT
 public:

@@ -51,6 +51,8 @@ public:
 	QObject *node() const { return m_node; }
 	NodeKind kind() const { return m_kind; }
 	void addSection(QWidget *section);
+	// Puts `view` in a first tab; the sections move to a second "Attributes" tab.
+	void setMainView(const QString &title, QWidget *view);
 
 public Q_SLOTS:
 	virtual void refresh();
@@ -65,6 +67,8 @@ protected:
 private:
 	QPointer<QObject> m_node;
 	NodeKind m_kind;
+	QVBoxLayout *m_layout;
+	QWidget *m_sectionsArea;
 	QVBoxLayout *m_sections;
 };
 

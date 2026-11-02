@@ -21,16 +21,19 @@
 
 #include "nodepanel.h"
 
+#include "acquisition/acquisitionview.h"
 #include "attributessection.h"
 
 #include <QHeaderView>
 #include <QLabel>
 #include <QMetaProperty>
 #include <QScrollArea>
+#include <QTabWidget>
 #include <QTableWidget>
 #include <QVBoxLayout>
 
 #include <component/attribute.h>
+#include <component/inputstream.h>
 #include <menusectionwidget.h>
 #include <style.h>
 #include <widgets/animatedrefreshbtn.h>
@@ -132,9 +135,10 @@ NodePanel::NodePanel(QObject *node, NodeKind kind, const QString &title, const Q
 	, m_node(node)
 	, m_kind(kind)
 {
-	auto *lay = new QVBoxLayout(this);
-	lay->setContentsMargins(0, 0, 0, 0);
-	lay->setSpacing(6);
+	m_layout = new QVBoxLayout(this);
+	m_layout->setContentsMargins(0, 0, 0, 0);
+	m_layout->setSpacing(6);
+	QVBoxLayout *lay = m_layout;
 
 	auto *header = new QWidget(this);
 	auto *headerLay = new QHBoxLayout(header);
@@ -171,9 +175,19 @@ NodePanel::NodePanel(QObject *node, NodeKind kind, const QString &title, const Q
 	m_sections->addStretch();
 	scroll->setWidget(content);
 	lay->addWidget(scroll, 1);
+	m_sectionsArea = scroll;
 }
 
 void NodePanel::addSection(QWidget *section) { m_sections->insertWidget(m_sections->count() - 1, section); }
+
+void NodePanel::setMainView(const QString &title, QWidget *view)
+{
+	m_layout->removeWidget(m_sectionsArea);
+	auto *tabs = new QTabWidget(this);
+	tabs->addTab(view, title);
+	tabs->addTab(m_sectionsArea, "Attributes");
+	m_layout->addWidget(tabs, 1);
+}
 
 void NodePanel::refresh() { Q_EMIT refreshRequested(); }
 
@@ -304,6 +318,10 @@ NodePanel *scopy::dcdebugger::createNodePanel(QObject *node, NodeKind kind, cons
 	auto *props = new PropertiesSection(node, kind != NodeKind::Attribute && !attrs.isEmpty(), panel);
 	QObject::connect(panel, &NodePanel::refreshRequested, props, &PropertiesSection::refresh);
 	panel->addSection(props);
+
+	if(auto *in = qobject_cast<component::InputStream *>(node)) {
+		panel->setMainView("Acquisition", new AcquisitionView(in, panel));
+	}
 	return panel;
 }
 
