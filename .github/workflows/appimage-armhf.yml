@@ -87,16 +87,14 @@ jobs:
           run: |
             IGNORE_PATH=$(printf '%s\n' '${{ env.APPIMAGE_NAME }}.AppImage' 'shared-actions' 'build*' 'ci/arm/staging')
             docker run --rm --platform linux/arm/v7 \
-              -e VERSION=${{ steps.version.outputs.version }} \
-              -e WORKING_DIRECTORY=/scopy \
+              -w /scopy \
+              -e VERSION="${{ steps.version.outputs.version }}" \
               -e CONTROL_PATH=ci/packaging/debian \
               -e IGNORE_PATH="$IGNORE_PATH" \
-              -e GITHUB_WORKSPACE=/scopy \
               -e DEB_APPIMAGE_PATH=/scopy/${{ env.APPIMAGE_NAME }}.AppImage \
               -v "$GITHUB_WORKSPACE:/scopy" \
-              -v "$GITHUB_WORKSPACE/shared-actions:/shared-actions:ro" \
-              arm32v7/debian:bookworm \
-              bash -c "apt-get update && apt-get install -y --no-install-recommends curl ca-certificates && bash /shared-actions/deb-generator-action/build-deb.sh"
+              arm32v7/debian:trixie \
+              bash -c "apt-get update && apt-get install -y --no-install-recommends curl ca-certificates && bash /scopy/shared-actions/deb-generator-action/build-deb.sh"
             echo "artifact-dir=$GITHUB_WORKSPACE/artifacts" >> "$GITHUB_OUTPUT"
 
         - name: Upload deb package
