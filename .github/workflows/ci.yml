@@ -32,17 +32,14 @@ on:
     workflow_dispatch:
       inputs:
         docker_tag:
-          # "latest" is deliberately absent: it exists on only one of the seven images, so
-          # selecting it fails at docker pull. Add it back when the retag to :latest happens.
           description: 'Docker image tag ("auto" resolves from the branch name)'
           required: true
           default: 'auto'
           type: choice
           options:
             - auto
-            - slim
+            - latest
             - testing
-            - qcoro-test
 
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
@@ -57,8 +54,7 @@ permissions:
   id-token: write
 
 jobs:
-    # Always runs, for every trigger. A dispatch passes its choice through as an override rather
-    # than skipping this job, which is what previously let a dispatch select a nonexistent :latest.
+    # Always runs, for every trigger. A dispatch passes its choice through as an override.
     docker_tag:
       uses: ./.github/workflows/get_docker_tag.yml
       with:

@@ -29,23 +29,16 @@ jobs:
         run: |
           # Tag policy - the single source of truth for every job in ci.yml.
           #
-          #   :slim    - the reduced dependency set. What main and every ordinary branch build
-          #              against TODAY. This is an interim state agreed deliberately: :slim will
-          #              later be retagged to :latest and the default here flipped, at which point
-          #              :slim retires. Until that happens :slim IS the production tag.
+          #   :latest  - production. What main and every ordinary branch build against.
           #   :testing - staging. Where a freshly built image lands to be validated, and what ci_*
           #              branches build against, so work ON the images cannot break main.
-          #   :latest  - NOT IN USE YET. Present on only 1 of the 7 images (scopy-windows-qt6, and
-          #              there it holds pre-slim content), so selecting it fails at docker pull for
-          #              the other six. Deliberately not offered until the retag happens.
           #
           # A branch opts into :testing with the ci_ prefix CLAUDE.md documents - the prefix for work
           # on the images and workflows themselves. Everything else, main and ordinary dev_/exp_
           # feature branches included, gets whatever main gets.
           #
           # The resolver always runs, so a workflow_dispatch cannot bypass this policy - it passes
-          # its choice in as `override` instead. It previously defaulted to "latest" while skipping
-          # this job entirely, which selected a tag six of the seven images do not have.
+          # its choice in as `override` instead.
           #
           # Deliberately NOT implemented: falling back to another tag when the chosen one is missing.
           # That would silently build against different content and mask a failed promotion.
@@ -71,9 +64,7 @@ jobs:
                   TAG="testing"
                   ;;
               *)
-                  # Step 2 of the agreed migration flips this to "latest" once :qcoro-test (or :slim) has been
-                  # retagged for all seven images. One line, and :qcoro-test (or :slim) retires.
-                  TAG="qcoro-test"
+                  TAG="latest"
                   ;;
             esac
           fi
