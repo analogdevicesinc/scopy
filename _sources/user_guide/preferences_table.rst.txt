@@ -80,6 +80,15 @@
    * - general_plot_target_fps
      - Plot target FPS
      - Select the Frames per second value for rendering plots in the entire application.
+   * - plugins_use_debugger_v2
+     - Use Debugger V2 plugin
+     - Switch between the old style debugger instrument, having     just basic controls over attributes or the new instrument     type, IIO Explorer, having a tree-like structure.
+   * - debugger_v2_include_debugfs
+     - Include debug attributes in IIO Explorer
+     - Enable/disable the use of advanced debug attributes in the instrument.
+   * - regmap_color_by_value
+     - Use color to reflect value
+     - Select from various configurations available which elements in the Register Map  are color coded for better visual interpretation.
    * - adc_plot_labels
      - Default state for plot labels
      - Sets plot labels to be visible/hidden by default. Plot labels may be      enabled/disabled within the ADC plot settings, overwriting this setting 
@@ -110,9 +119,6 @@
    * - adc_default_y_mode
      - ADC Default Y-Mode
      - Select the Y-Axis default mode, can be either ADC Counts or %Full Scale. This is also controllable while running, from the instrument settings. Only applied after restart.
-   * - regmap_color_by_value
-     - Use color to reflect value
-     - Select from various configurations available which elements in the Register Map  are color coded for better visual interpretation.
    * - dac_reset_dds_on_connect
      - Reset DDS on connect
      - Reset all DDS settings when connecting to the device.    Disable if another application is actively using the DDS.
@@ -122,12 +128,6 @@
    * - dataloggerplugin_data_storage_size
      - Maximum data stored for each monitor
      - Select the maximum data storage size for each monitor in the datalogger.
-   * - plugins_use_debugger_v2
-     - Use Debugger V2 plugin
-     - Switch between the old style debugger instrument, having     just basic controls over attributes or the new instrument     type, IIO Explorer, having a tree-like structure.
-   * - debugger_v2_include_debugfs
-     - Include debug attributes in IIO Explorer
-     - Enable/disable the use of advanced debug attributes in the instrument.
    * - m2k_instrument_notes_active
      - Instrument Notes
      - Enable or disable a text section at the bottom of each ADALM2000 instrument, allowing the user to take notes. Disabled by default.
