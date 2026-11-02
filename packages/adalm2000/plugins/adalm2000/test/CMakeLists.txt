@@ -39,6 +39,7 @@ macro(add_adalm2000_unit_test name)
 			${CMAKE_CURRENT_SOURCE_DIR}/../include/${SCOPY_MODULE}/voltmeter
 			${CMAKE_CURRENT_SOURCE_DIR}/../include/${SCOPY_MODULE}/powersupply
 			${CMAKE_CURRENT_SOURCE_DIR}/../include/${SCOPY_MODULE}/digitalio
+			${CMAKE_CURRENT_SOURCE_DIR}/../include/${SCOPY_MODULE}/spectrum
 	)
 	target_link_libraries(
 		${_t}
@@ -69,4 +70,16 @@ add_adalm2000_unit_test(digitaliomath)
 
 add_adalm2000_unit_test(m2kstreamformat ../include/adalm2000/m2kBackend/m2kstreamformat.h)
 
+add_adalm2000_unit_test(spectrumsweep)
+
 setup_scopy_tests(pluginloader)
+
+# End-to-end Spectrum Analyzer pipeline against a board or iio-emu; skipped unless M2K_URI is set. The backend and
+# spectrum sources are compiled in for the same hidden-visibility reason as above.
+file(GLOB SPECTRUM_HW_SRC ../src/m2kBackend/*.cpp ../src/spectrum/*.cpp)
+file(GLOB SPECTRUM_HW_HDR ../include/${SCOPY_MODULE}/m2kBackend/*.h ../include/${SCOPY_MODULE}/spectrum/*.h)
+add_adalm2000_unit_test(spectrumhw ${SPECTRUM_HW_SRC} ${SPECTRUM_HW_HDR})
+target_link_libraries(
+	${PROJECT_NAME}_test_spectrumhw PRIVATE Qt${QT_VERSION_MAJOR}::Widgets scopy-core scopy-gui scopy-pluginbase
+						libm2k::libm2k
+)
