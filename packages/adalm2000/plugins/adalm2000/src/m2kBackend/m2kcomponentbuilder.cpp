@@ -40,10 +40,12 @@
 #include <libm2k/analog/m2kpowersupply.hpp>
 #include <libm2k/digital/m2kdigital.hpp>
 #include <libm2k/m2k.hpp>
+#include <libm2k/m2khardwaretrigger.hpp>
 
 #include <QLoggingCategory>
 #include <QString>
 
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <utility>
@@ -71,6 +73,25 @@ QByteArray rangeToLabel(M2K_RANGE r) { return r == PLUS_MINUS_2_5V ? QByteArray(
 M2K_RANGE labelToRange(const QString &label)
 {
 	return label == QLatin1String(PLUS_2_5V) ? PLUS_MINUS_2_5V : PLUS_MINUS_25V;
+}
+
+const QStringList TRIGGER_MODE_OPTIONS = {
+	QStringLiteral("always"),
+	QStringLiteral("analog"),
+	QStringLiteral("external"),
+	QStringLiteral("digital_or_analog"),
+	QStringLiteral("digital_and_analog"),
+	QStringLiteral("digital_xor_analog"),
+	QStringLiteral("n_digital_or_analog"),
+	QStringLiteral("n_digital_and_analog"),
+	QStringLiteral("n_digital_xor_analog"),
+};
+
+QByteArray triggerModeToLabel(libm2k::M2K_TRIGGER_MODE m) { return TRIGGER_MODE_OPTIONS.value(m).toUtf8(); }
+
+libm2k::M2K_TRIGGER_MODE labelToTriggerMode(const QString &label)
+{
+	return static_cast<libm2k::M2K_TRIGGER_MODE>(std::max<qsizetype>(0, TRIGGER_MODE_OPTIONS.indexOf(label)));
 }
 
 component::Attribute *addAttr(QObject *owner, const QString &name, const QString &unit)
@@ -184,6 +205,15 @@ void buildAnalogInChannel(component::Device *analogIn, M2kAnalogIn *ain, void *r
 	addReadOnlyAttr(
 		chn, QStringLiteral("enabled"), QString(), resource,
 		[ain, chIdx]() { return QByteArray::number(ain->isChannelEnabled(chIdx) ? 1 : 0); }, executor);
+
+	if(libm2k::M2kHardwareTrigger *trigger = ain->getTrigger()) {
+		component::Attribute *triggerMode = addReadWriteAttr(
+			chn, QStringLiteral("trigger_mode"), QString(), resource,
+			[trigger, chIdx]() { return triggerModeToLabel(trigger->getAnalogMode(chIdx)); },
+			[trigger, chIdx](const QString &v) { trigger->setAnalogMode(chIdx, labelToTriggerMode(v)); },
+			executor);
+		triggerMode->setOptions(TRIGGER_MODE_OPTIONS);
+	}
 }
 
 void buildAnalogInDeviceAttrs(component::Device *analogIn, M2kAnalogIn *ain, void *resource, ICmdExecutor *executor)

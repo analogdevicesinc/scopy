@@ -54,6 +54,7 @@ public:
 	QCoro::Task<CommandResponse<void>> openAsync(const component::StreamConfig &cfg) override;
 	QCoro::Task<CommandResponse<void>> closeAsync() override;
 	QCoro::Task<CommandResponse<void>> refillAsync() override;
+	void cancel();
 
 	const component::StreamFormat &readFormat() const override { return m_format; }
 
