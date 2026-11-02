@@ -40,7 +40,6 @@ class COMPONENT_EXPORT IIOOutputStream : public OutputStream
 {
 	Q_OBJECT
 	Q_PROPERTY(unsigned kernelBuffers READ kernelBuffers CONSTANT)
-	Q_PROPERTY(bool cyclic READ cyclic CONSTANT)
 public:
 	IIOOutputStream(scopy::iio::IBufferOps *bufOps, scopy::iio::IChannelOps *chOps, scopy::iio::DeviceHandle dev,
 			int nbChannels, unsigned bufferIndex, scopy::ICmdExecutor *executor, QObject *parent = nullptr);
@@ -48,9 +47,10 @@ public:
 
 	scopy::iio::ChannelsMaskHandle mask() const { return m_mask; }
 	unsigned kernelBuffers() const { return m_kernelBuffers; }
-	bool cyclic() const { return m_cyclic; }
+	bool supportsCyclic() const override { return true; }
+	bool cyclic() const override { return m_cyclic; }
 	Result<void> setKernelBuffers(unsigned n);
-	Result<void> setCyclic(bool cyclic);
+	Result<void> setCyclic(bool cyclic) override;
 
 	QCoro::Task<CommandResponse<void>> openAsync(const StreamConfig &cfg) override;
 	QCoro::Task<CommandResponse<void>> closeAsync() override;

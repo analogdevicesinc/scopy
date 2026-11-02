@@ -24,6 +24,7 @@
 #include "component/backends/iio/iioscanelement.h"
 #include "component/stream.h"
 #include "component/streamview.h"
+#include "component/streamwriter.h"
 #include "core/pooledcmdexecutor.h"
 #include "fakebufferops.h"
 
@@ -63,6 +64,9 @@ private Q_SLOTS:
 	void outputPushEmits();
 	void multiBufferSelector();
 	void flattenDoubles();
+	void writerRoundTripsThroughView();
+	void writerNormalizedScale();
+	void cyclicIsAnOutputStreamProperty();
 };
 
 void TstComponentStream::openEnablesRefillDecodes()
@@ -251,6 +255,74 @@ void TstComponentStream::flattenDoubles()
 
 	// Channel-major: [c0s0, c0s1, c0s2, c1s0, c1s1, c1s2].
 	QCOMPARE(view.toConcatenatedDoubles(), (QVector<double>{2.0, 4.0, 6.0, 20.0, 40.0, 60.0}));
+}
+
+void TstComponentStream::writerRoundTripsThroughView()
+{
+	// Two interleaved channels: 12-bit signed shifted by 4 in 16-bit, and 8-bit unsigned.
+	QByteArray storage(4 * 3, 0);
+	StreamFormat f;
+	f.data = storage.data();
+	f.sampleCount = 4;
+	ChannelFormat a;
+	a.offset = 0;
+	a.stride = 3;
+	a.type = DataType::S16;
+	a.validBits = 12;
+	a.shift = 4;
+	ChannelFormat b;
+	b.offset = 2;
+	b.stride = 3;
+	b.type = DataType::U8;
+	b.validBits = 8;
+	f.channels = {a, b};
+
+	StreamWriter w(f);
+	const int64_t as[] = {-2048, -1, 0, 2047};
+	const int64_t bs[] = {0, 1, 128, 255};
+	for(size_t s = 0; s < 4; ++s) {
+		w.setRaw(0, s, as[s]);
+		w.setRaw(1, s, bs[s]);
+	}
+	StreamView v(f);
+	for(size_t s = 0; s < 4; ++s) {
+		QCOMPARE(v.rawSample(0, s), as[s]);
+		QCOMPARE(v.rawSample(1, s), bs[s]);
+	}
+	// The low (shifted-out) bits stay clear.
+	QCOMPARE(uint8_t(storage[0]) & 0x0f, 0);
+}
+
+void TstComponentStream::writerNormalizedScale()
+{
+	ChannelFormat s16;
+	s16.type = DataType::S16;
+	s16.validBits = 16;
+	QCOMPARE(StreamWriter::normalizedToRaw(s16, 1.0), int64_t(32767));
+	QCOMPARE(StreamWriter::normalizedToRaw(s16, -1.0), int64_t(-32767));
+	QCOMPARE(StreamWriter::normalizedToRaw(s16, 0.0), int64_t(0));
+	QCOMPARE(StreamWriter::normalizedToRaw(s16, 5.0), int64_t(32767)); // clamped
+	ChannelFormat u8;
+	u8.type = DataType::U8;
+	u8.validBits = 8;
+	QCOMPARE(StreamWriter::normalizedToRaw(u8, -1.0), int64_t(0));
+	QCOMPARE(StreamWriter::normalizedToRaw(u8, 1.0), int64_t(255));
+}
+
+void TstComponentStream::cyclicIsAnOutputStreamProperty()
+{
+	PooledCmdExecutor exec(1);
+	dctest::FakeChannelOps chOps;
+	dctest::FakeBufferOps bufOps;
+	IIOOutputStream stream(&bufOps, &chOps, {reinterpret_cast<void *>(0x1)}, 1, 0, &exec);
+	OutputStream *out = &stream;
+	QVERIFY(out->supportsCyclic());
+	QVERIFY(!out->cyclic());
+	QVERIFY(out->setCyclic(true));
+	QVERIFY(out->property("cyclic").toBool());
+	QVERIFY(QCoro::waitFor(out->openAsync({{}, 4})));
+	QVERIFY(!out->setCyclic(false)); // refused while open
+	QVERIFY(out->cyclic());
 }
 
 QTEST_MAIN(TstComponentStream)

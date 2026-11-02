@@ -25,6 +25,7 @@
 #include "component/streamformat.h"
 
 #include <QUuid>
+#include <cerrno>
 #include "component/component_export.h"
 
 namespace scopy::component {
@@ -32,10 +33,24 @@ namespace scopy::component {
 class COMPONENT_EXPORT OutputStream : public Stream
 {
 	Q_OBJECT
+	Q_PROPERTY(bool supportsCyclic READ supportsCyclic CONSTANT)
+	Q_PROPERTY(bool cyclic READ cyclic)
 public:
 	explicit OutputStream(QObject *parent = nullptr)
 		: Stream(parent)
 	{}
+
+	// Cyclic: the single pushed buffer replays on the device until close. Set it while closed;
+	// it applies from the next open. Streams that cannot replay keep the default (not cyclic).
+	virtual bool supportsCyclic() const { return false; }
+	virtual bool cyclic() const { return false; }
+	virtual Result<void> setCyclic(bool cyclic)
+	{
+		if(!cyclic) {
+			return Result<void>();
+		}
+		return Result<void>(Unexpected{Error{-ENOTSUP, QStringLiteral("cyclic buffers not supported")}});
+	}
 
 	// Writable view of the internal buffer; valid after open(), up to push().
 	virtual StreamFormat &writeFormat() = 0;
