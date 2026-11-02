@@ -22,7 +22,9 @@
 
 #include "digitalio/adalm2000digitaliotool.h"
 #include "powersupply/adalm2000powersupplytool.h"
+#include "spectrum/m2kspectrumcontroller.h"
 #include "voltmeter/adalm2000voltmetertool.h"
+#include <core/acq_ui/acqinstrument.h>
 #include "m2kcalibration.h"
 #include "m2kcontext.h"
 #include "m2kcontextfactory.h"
@@ -39,7 +41,7 @@ Q_LOGGING_CATEGORY(CAT_ADALM2000PLUGIN, "Adalm2000Plugin")
 
 // The Power Supply is absent on purpose: its rails are enabled individually from its
 // settings menu, so it has no run button for a ToolMenuEntry run state to mirror.
-static const QStringList RUN_CAPABLE_TOOL_IDS = {"adalm2000_dmm", "adalm2000_dio"};
+static const QStringList RUN_CAPABLE_TOOL_IDS = {"adalm2000_dmm", "adalm2000_dio", "adalm2000_spectrum"};
 
 using namespace scopy;
 using namespace scopy::adalm2000;
@@ -81,6 +83,9 @@ void Adalm2000Plugin::loadToolList()
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("adalm2000_dio", "Digital I/O",
 						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
 							  "/icons/tool_io.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("adalm2000_spectrum", "Spectrum Analyzer",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_spectrum_analyzer.svg"));
 }
 
 void Adalm2000Plugin::unload() {}
@@ -112,6 +117,11 @@ bool Adalm2000Plugin::onConnect()
 
 	auto *dioTool = new Adalm2000DigitalIoTool(m_toolList[2], m_context.get(), m_widgetGroup);
 	m_toolList[2]->setTool(dioTool);
+
+	m_spectrum =
+		new M2kSpectrumController(m_toolList[3], qobject_cast<M2kContext *>(m_context.get()), m_param, this);
+	m_toolList[3]->setTool(m_spectrum->ui());
+	m_spectrum->init(m_context.get());
 
 	for(auto &entry : m_toolList) {
 		entry->setEnabled(true);
@@ -150,6 +160,13 @@ void Adalm2000Plugin::setToolsRunLocked(bool locked)
 
 bool Adalm2000Plugin::onDisconnect()
 {
+	if(m_spectrum) {
+		// Owns its instrument widget: unhook it so the loop below does not delete it too.
+		m_toolList[3]->setTool(nullptr);
+		delete m_spectrum;
+		m_spectrum = nullptr;
+	}
+
 	for(auto &tool : m_toolList) {
 		tool->setEnabled(false);
 		tool->setRunning(false);
