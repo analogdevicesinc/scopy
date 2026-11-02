@@ -24,6 +24,7 @@
 #include "fakestream.h"
 
 #include <QComboBox>
+#include <QDoubleSpinBox>
 #include <QLabel>
 #include <QMainWindow>
 #include <QTableWidget>
@@ -52,15 +53,18 @@ private Q_SLOTS:
 	void runAfterFailedOpen();
 	void disconnectWhileRunning();
 	void viewModesFillTheMeasurements();
+	void generatorStartsAndReappliesEdits();
 
 private:
 	QPushButton *button(const char *className) const;
 	QComboBox *comboStartingWith(const QString &firstItem) const;
 	QTableWidget *measurements() const;
 	void selectStream();
+	void selectNode(QObject *node);
 
 	Connection *m_conn = nullptr;
 	FakeInputStream *m_stream = nullptr;
+	FakeOutputStream *m_out = nullptr;
 	QMainWindow *m_win = nullptr;
 	DCDebuggerTool *m_tool = nullptr;
 };
@@ -75,6 +79,8 @@ void TST_AcquisitionUi::init()
 	dev->setName("adc");
 	m_stream = new FakeInputStream(2);
 	m_stream->setParent(dev);
+	m_out = new FakeOutputStream(2);
+	m_out->setParent(dev);
 
 	m_win = new QMainWindow();
 	m_win->resize(1400, 900);
@@ -104,12 +110,14 @@ QPushButton *TST_AcquisitionUi::button(const char *className) const
 	return nullptr;
 }
 
-void TST_AcquisitionUi::selectStream()
+void TST_AcquisitionUi::selectStream() { selectNode(m_stream); }
+
+void TST_AcquisitionUi::selectNode(QObject *node)
 {
 	auto *tree = m_tool->findChild<QTreeView *>();
 	auto *model = m_tool->findChild<ComponentTreeModel *>();
 	QVERIFY(tree && model);
-	const QModelIndex src = model->indexOf(m_stream);
+	const QModelIndex src = model->indexOf(node);
 	QVERIFY(src.isValid());
 	auto *proxy = qobject_cast<QAbstractProxyModel *>(tree->model());
 	tree->scrollTo(proxy->mapFromSource(src));
@@ -221,6 +229,34 @@ void TST_AcquisitionUi::viewModesFillTheMeasurements()
 	QCOMPARE(table->item(0, 8)->text(), table->item(1, 8)->text());
 	mode->setCurrentIndex(0);
 	QVERIFY(!iq->isEnabled());
+}
+
+void TST_AcquisitionUi::generatorStartsAndReappliesEdits()
+{
+	selectNode(m_out);
+	QPushButton *start = button("scopy::RunBtn");
+	QVERIFY(start);
+	QCOMPARE(start->text(), QString("Start"));
+	start->setChecked(true);
+	QTRY_COMPARE(m_out->pushes, 1);
+	QVERIFY(m_out->lastPushCyclic);
+	QCOMPARE(start->text(), QString("Stop"));
+
+	// Editing a tone while running pushes a new cyclic buffer.
+	QDoubleSpinBox *amplitude = nullptr;
+	for(QDoubleSpinBox *sb : m_tool->findChildren<QDoubleSpinBox *>()) {
+		if(sb->isVisible() && sb->maximum() == 1.0 && sb->minimum() == 0.0) {
+			amplitude = sb;
+			break;
+		}
+	}
+	QVERIFY(amplitude);
+	amplitude->setValue(0.25);
+	QTRY_COMPARE(m_out->pushes, 2);
+
+	start->setChecked(false);
+	QTRY_VERIFY(!m_out->isOpen());
+	QCOMPARE(start->text(), QString("Start"));
 }
 
 QTEST_MAIN(TST_AcquisitionUi)

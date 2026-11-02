@@ -23,6 +23,7 @@
 
 #include "measurementstable.h"
 #include "nodepanel.h"
+#include "streamutils.h"
 
 #include <QCheckBox>
 #include <algorithm>
@@ -70,43 +71,6 @@ using namespace scopy::component;
 
 namespace {
 const char *const SETTINGS_KEY = "settings";
-
-// Sample-rate attribute of a stream: tagged on the stream, its device or one of the device's
-// input channels; the conventional name as fallback.
-Attribute *findSampleRate(InputStream *stream)
-{
-	QObject *dev = stream->parent();
-	for(QObject *scope : {static_cast<QObject *>(stream), dev}) {
-		const QList<Attribute *> tagged = findByTag<Attribute>(scope, tags::SampleRate, false);
-		if(!tagged.isEmpty()) {
-			return tagged.first();
-		}
-	}
-	if(dev) {
-		for(Channel *ch : dev->findChildren<Channel *>(QString(), Qt::FindDirectChildrenOnly)) {
-			const QList<Attribute *> tagged = findByTag<Attribute>(ch, tags::SampleRate, false);
-			if(!ch->isOutput() && !tagged.isEmpty()) {
-				return tagged.first();
-			}
-		}
-	}
-	for(QObject *scope : {static_cast<QObject *>(stream), dev}) {
-		if(Attribute *a = attributeByName(scope, QStringLiteral("sampling_frequency"))) {
-			return a;
-		}
-	}
-	return nullptr;
-}
-
-Context *contextOf(QObject *obj)
-{
-	for(QObject *o = obj; o; o = o->parent()) {
-		if(auto *ctx = qobject_cast<Context *>(o)) {
-			return ctx;
-		}
-	}
-	return nullptr;
-}
 } // namespace
 
 AcquisitionView::AcquisitionView(InputStream *stream, QWidget *parent)
@@ -114,7 +78,7 @@ AcquisitionView::AcquisitionView(InputStream *stream, QWidget *parent)
 	, m_stream(stream)
 	, m_acq(new StreamAcquisition(stream, this))
 {
-	m_sampleRateAttr = findSampleRate(stream);
+	m_sampleRateAttr = findSampleRate(stream, false);
 	if(stream->parent()) {
 		m_triggerable = stream->parent()->findChild<Triggerable *>(QString(), Qt::FindDirectChildrenOnly);
 	}
@@ -388,22 +352,12 @@ void AcquisitionView::applyChannelSelection()
 double AcquisitionView::sampleRate() const
 {
 	if(m_sampleRateAttr) {
-		bool ok = false;
-		const double v = m_sampleRateAttr->cachedValue().section(' ', 0, 0).toDouble(&ok);
-		return ok ? v : 0;
+		return sampleRateOf(m_sampleRateAttr);
 	}
 	return m_manualRate ? m_manualRate->value() : 0;
 }
 
-QString AcquisitionView::displayName(const QString &id) const
-{
-	Channel *ch = channelById(m_stream ? m_stream->parent() : nullptr, id, false);
-	if(!ch) {
-		return id;
-	}
-	const QString label = ch->label().isEmpty() ? ch->name() : ch->label();
-	return label.isEmpty() || label == id ? id : id + " (" + label + ")";
-}
+QString AcquisitionView::displayName(const QString &id) const { return scanElementName(m_stream, id, false); }
 
 void AcquisitionView::onFrame(const AcquiredFrame &frame)
 {

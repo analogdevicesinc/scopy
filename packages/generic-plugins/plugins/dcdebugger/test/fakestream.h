@@ -25,6 +25,7 @@
 #include <QVector>
 
 #include <component/inputstream.h>
+#include <component/outputstream.h>
 #include <component/scanelement.h>
 #include <qcoro/qcorotask.h>
 
@@ -122,6 +123,88 @@ private:
 	QVector<int16_t> m_buffer;
 	StreamFormat m_format;
 };
+// Int16 interleaved write buffer; records what each push carried.
+class FakeOutputStream : public OutputStream
+{
+public:
+	explicit FakeOutputStream(int elements, bool canCycle = true)
+		: m_canCycle(canCycle)
+	{
+		for(int e = 0; e < elements; ++e) {
+			auto *el = new FakeScanElement(this);
+			el->setIndex(e);
+			el->setId(QStringLiteral("voltage%1").arg(e));
+			el->setIsOutput(true);
+		}
+	}
+	QList<FakeScanElement *> elements() const
+	{
+		QList<FakeScanElement *> out;
+		for(ScanElement *el : findChildren<ScanElement *>()) {
+			out.append(static_cast<FakeScanElement *>(el));
+		}
+		return out;
+	}
+	bool supportsCyclic() const override { return m_canCycle; }
+	bool cyclic() const override { return m_cyclic; }
+	Result<void> setCyclic(bool c) override
+	{
+		if(c && !m_canCycle) {
+			return Result<void>(Unexpected<Error>{Error{-ENOTSUP, "no"}});
+		}
+		m_cyclic = c;
+		return Result<void>();
+	}
+	QCoro::Task<CommandResponse<void>> openAsync(const StreamConfig &cfg) override
+	{
+		int on = 0;
+		for(auto *el : elements()) {
+			el->m_on = cfg.enabledChannels.contains(int(el->index()));
+			on += el->m_on ? 1 : 0;
+		}
+		m_config = cfg;
+		m_buffer.fill(0, int(cfg.samplesCount) * on);
+		m_format = StreamFormat{};
+		m_format.data = m_buffer.data();
+		m_format.sampleCount = cfg.samplesCount;
+		for(int c = 0; c < on; ++c) {
+			ChannelFormat cf;
+			cf.offset = ptrdiff_t(c * sizeof(int16_t));
+			cf.stride = ptrdiff_t(on * sizeof(int16_t));
+			m_format.channels.append(cf);
+		}
+		m_open = true;
+		opens++;
+		Q_EMIT openedChanged(true);
+		co_return CommandResponse<void>(QUuid());
+	}
+	QCoro::Task<CommandResponse<void>> closeAsync() override
+	{
+		m_open = false;
+		Q_EMIT openedChanged(false);
+		co_return CommandResponse<void>(QUuid());
+	}
+	StreamFormat &writeFormat() override { return m_format; }
+	QCoro::Task<CommandResponse<void>> pushAsync() override
+	{
+		pushes++;
+		lastPush = m_buffer;
+		lastPushCyclic = m_cyclic;
+		co_return CommandResponse<void>(QUuid());
+	}
+
+	int opens = 0;
+	int pushes = 0;
+	QVector<int16_t> lastPush;
+	bool lastPushCyclic = false;
+
+private:
+	bool m_canCycle;
+	bool m_cyclic = false;
+	QVector<int16_t> m_buffer;
+	StreamFormat m_format;
+};
+
 } // namespace scopy::dcdebugger::test
 
 #endif // DCDEBUGGER_TEST_FAKESTREAM_H

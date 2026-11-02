@@ -23,6 +23,7 @@
 
 #include "acquisition/acquisitionview.h"
 #include "attributessection.h"
+#include "generation/generatorview.h"
 
 #include <QHeaderView>
 #include <QLabel>
@@ -34,6 +35,7 @@
 
 #include <component/attribute.h>
 #include <component/inputstream.h>
+#include <component/outputstream.h>
 #include <menusectionwidget.h>
 #include <style.h>
 #include <widgets/animatedrefreshbtn.h>
@@ -321,6 +323,8 @@ NodePanel *scopy::dcdebugger::createNodePanel(QObject *node, NodeKind kind, cons
 
 	if(auto *in = qobject_cast<component::InputStream *>(node)) {
 		panel->setMainView("Acquisition", new AcquisitionView(in, panel));
+	} else if(auto *out = qobject_cast<component::OutputStream *>(node)) {
+		panel->setMainView("Generator", new GeneratorView(out, panel));
 	}
 	return panel;
 }

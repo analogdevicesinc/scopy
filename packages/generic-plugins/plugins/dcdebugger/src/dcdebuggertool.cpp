@@ -22,6 +22,7 @@
 #include "dcdebuggertool.h"
 
 #include "acquisition/streamacquisition.h"
+#include "generation/streamgeneration.h"
 #include "componenttreemodel.h"
 #include "nodepanel.h"
 
@@ -151,6 +152,9 @@ void DCDebuggerTool::clearPanels()
 		// Running acquisitions close their streams before the tree can go away.
 		for(StreamAcquisition *acq : p->findChildren<StreamAcquisition *>()) {
 			acq->shutdown();
+		}
+		for(StreamGeneration *gen : p->findChildren<StreamGeneration *>()) {
+			gen->shutdown();
 		}
 		m_panels->removeWidget(p);
 		delete p;
