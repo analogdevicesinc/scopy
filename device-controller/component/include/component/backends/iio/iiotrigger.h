@@ -26,6 +26,7 @@
 #include <QObject>
 #include <QString>
 #include "component/component_export.h"
+#include "component/trigger.h"
 
 namespace scopy::iio {
 class IDeviceOps;
@@ -33,18 +34,17 @@ class IDeviceOps;
 
 namespace scopy::component::iio {
 
-// Trigger SOURCE marker: an IIO device where iio_device_is_trigger is true.
-// IIO-only, no generic base — pure metadata (name()), no I/O. Carries the device
-// handle so an IIOTriggerable can pass it to iio_device_set_trigger. Parented to
-// its IIODevice; discovered via findChild<IIOTrigger*>().
-class COMPONENT_EXPORT IIOTrigger : public QObject
+// Trigger SOURCE marker: an IIO device where iio_device_is_trigger is true. Pure
+// metadata (name()), no I/O. Carries the device handle so an IIOTriggerable can pass
+// it to iio_device_set_trigger. Parented to its IIODevice; discovered via
+// findChild<Trigger*>() / findChild<IIOTrigger*>().
+class COMPONENT_EXPORT IIOTrigger : public Trigger
 {
 	Q_OBJECT
-	Q_PROPERTY(QString name READ name CONSTANT)
 public:
 	IIOTrigger(scopy::iio::IDeviceOps *ops, scopy::iio::DeviceHandle dev, QObject *parent = nullptr);
 
-	QString name() const;
+	QString name() const override;
 	scopy::iio::DeviceHandle handle() const { return m_dev; }
 
 private:

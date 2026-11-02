@@ -30,6 +30,7 @@
 
 #include <qcoro/qcorotask.h>
 #include "component/component_export.h"
+#include "component/trigger.h"
 
 namespace scopy {
 class ICmdExecutor;
@@ -43,28 +44,23 @@ namespace scopy::component::iio {
 
 class IIOTrigger;
 
-// Consumer side of the trigger relationship over one libiio device. IIO-only, no
-// generic base. hasTrigger/assignedTriggerName are metadata (direct, no I/O);
-// setTrigger/clearTrigger go through the executor via SetTriggerCommand. A null
-// source (or clearTrigger) assigns no trigger. Parented to its IIODevice;
-// discovered via findChild<IIOTriggerable*>().
-class COMPONENT_EXPORT IIOTriggerable : public QObject
+// Consumer side of the trigger relationship over one libiio device.
+// hasTrigger/assignedTriggerName are metadata (direct, no I/O); setTrigger/clearTrigger
+// go through the executor via SetTriggerCommand. Only an IIOTrigger source is accepted;
+// a null source (or clearTrigger) assigns no trigger. Parented to its IIODevice;
+// discovered via findChild<Triggerable*>() / findChild<IIOTriggerable*>().
+class COMPONENT_EXPORT IIOTriggerable : public Triggerable
 {
 	Q_OBJECT
-	Q_PROPERTY(bool hasTrigger READ hasTrigger NOTIFY triggerSucceeded)
 public:
 	IIOTriggerable(scopy::iio::IDeviceOps *ops, scopy::iio::DeviceHandle dev, scopy::ICmdExecutor *executor,
 		       QObject *parent = nullptr);
 
-	bool hasTrigger() const;
-	QString assignedTriggerName() const;
+	bool hasTrigger() const override;
+	QString assignedTriggerName() const override;
 
-	Q_INVOKABLE QCoro::Task<CommandResponse<void>> setTriggerAsync(IIOTrigger *source);
-	Q_INVOKABLE QCoro::Task<CommandResponse<void>> clearTriggerAsync();
-
-Q_SIGNALS:
-	void triggerSucceeded();
-	void triggerFailed(const scopy::Error &error);
+	QCoro::Task<CommandResponse<void>> setTriggerAsync(Trigger *source) override;
+	QCoro::Task<CommandResponse<void>> clearTriggerAsync() override;
 
 private:
 	QCoro::Task<CommandResponse<void>> setInternal(scopy::iio::SetTriggerCommand *cmd);

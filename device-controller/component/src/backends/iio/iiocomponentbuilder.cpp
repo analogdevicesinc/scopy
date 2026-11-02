@@ -272,6 +272,9 @@ IIOAttribute *IIOComponentBuilder::makeAttribute(QObject *parent, const QString 
 	auto *attr = new IIOAttribute(parent);
 	attr->setHandle(handle);
 	attr->setName(attrName);
+	if(attrName == QLatin1String("sampling_frequency")) {
+		addTag(attr, tags::SampleRate);
+	}
 
 	attr->addReadCapability(new IIOAttributeReader(m_attrOps, handle, executor));
 	if(!(forceReadOnly || isReadOnlyAttr(attrName))) {

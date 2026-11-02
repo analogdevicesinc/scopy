@@ -27,6 +27,9 @@
 #include "iioutil/commands/settriggercommand.h"
 #include "iioutil/ideviceops.h"
 
+#include <QUuid>
+#include <cerrno>
+
 #include <qcoro/qcorofuture.h>
 
 using namespace scopy;
@@ -34,7 +37,7 @@ using namespace scopy::component::iio;
 
 IIOTriggerable::IIOTriggerable(scopy::iio::IDeviceOps *ops, scopy::iio::DeviceHandle dev, scopy::ICmdExecutor *executor,
 			       QObject *parent)
-	: QObject(parent)
+	: Triggerable(parent)
 	, m_ops(ops)
 	, m_dev(dev)
 	, m_executor(executor)
@@ -55,16 +58,21 @@ QCoro::Task<CommandResponse<void>> IIOTriggerable::setInternal(scopy::iio::SetTr
 		[this](const scopy::Error &error) { Q_EMIT triggerFailed(error); });
 }
 
-// Only an IIOTrigger (an is_trigger device) can back an assignment; a null source
-// clears it.
-static scopy::iio::DeviceHandle handleOf(IIOTrigger *source)
+static QCoro::Task<CommandResponse<void>> rejectForeignTrigger()
 {
-	return source ? source->handle() : scopy::iio::DeviceHandle{};
+	co_return CommandResponse<void>(QUuid(), Unexpected<Error>{Error{-EINVAL, "not an IIO trigger"}});
 }
 
-QCoro::Task<CommandResponse<void>> IIOTriggerable::setTriggerAsync(IIOTrigger *source)
+// Only an IIOTrigger (an is_trigger device) can back an assignment; a null source
+// clears it.
+QCoro::Task<CommandResponse<void>> IIOTriggerable::setTriggerAsync(Trigger *source)
 {
-	return setInternal(new scopy::iio::SetTriggerCommand(m_ops, m_dev, handleOf(source)));
+	auto *iioSource = qobject_cast<IIOTrigger *>(source);
+	if(source && !iioSource) {
+		return rejectForeignTrigger();
+	}
+	const scopy::iio::DeviceHandle handle = iioSource ? iioSource->handle() : scopy::iio::DeviceHandle{};
+	return setInternal(new scopy::iio::SetTriggerCommand(m_ops, m_dev, handle));
 }
 
 QCoro::Task<CommandResponse<void>> IIOTriggerable::clearTriggerAsync()
