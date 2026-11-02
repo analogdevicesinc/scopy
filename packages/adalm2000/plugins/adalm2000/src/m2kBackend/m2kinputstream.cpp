@@ -63,6 +63,15 @@ M2kInputStream::~M2kInputStream()
 	}
 }
 
+void M2kInputStream::cancel()
+{
+	try {
+		m_ain->cancelAcquisition();
+	} catch(const std::exception &e) {
+		qWarning(CAT_M2K_INPUT_STREAM) << "cancel failed:" << e.what();
+	}
+}
+
 Result<void> M2kInputStream::setKernelBuffers(unsigned n)
 {
 	if(m_open) {
@@ -147,17 +156,15 @@ QCoro::Task<CommandResponse<void>> M2kInputStream::closeAsync()
 		co_return CommandResponse<void>(QUuid());
 	}
 
-	// Invalidate up front: cancelAcquisition unblocks an in-flight refill, and the
-	// co_await below pumps the event loop, so a refill completing mid-close must not
-	// decode a buffer that is being torn down. Same fencing as IIOInputStream::closeAsync.
+	// Invalidate up front: cancel() unblocks an in-flight refill, and the co_await
+	// below pumps the event loop, so a refill completing mid-close must not decode a
+	// buffer that is being torn down. Same fencing as IIOInputStream::closeAsync.
 	m_open = false;
 	m_format = component::StreamFormat{};
+	cancel();
 
 	M2kAnalogIn *ain = m_ain;
-	auto *cmd = new M2kCallCommand<void>(m_resource, [ain]() {
-		ain->cancelAcquisition();
-		ain->stopAcquisition();
-	});
+	auto *cmd = new M2kCallCommand<void>(m_resource, [ain]() { ain->stopAcquisition(); });
 
 	auto result = co_await component::runCommand(
 		m_executor, cmd, [](const Result<void> &) {}, [this](const Error &e) { Q_EMIT streamError(e); });
