@@ -43,6 +43,7 @@ public:
 	{
 		m_extractors.registerBuiltins();
 	}
+	~SigrokCliBackendFactory() override;
 
 	void setLogger(DecoderLogger *lg) { m_logger = lg; }
 
