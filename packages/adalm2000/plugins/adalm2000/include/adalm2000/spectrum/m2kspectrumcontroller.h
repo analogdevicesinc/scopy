@@ -96,6 +96,8 @@ protected:
 	void setupAnalysisPanel() override {}
 
 private:
+	friend class Adalm2000Spectrum_API;
+
 	struct Reference
 	{
 		MenuControlButton *row{nullptr};

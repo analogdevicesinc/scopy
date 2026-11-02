@@ -22,6 +22,7 @@
 
 #include "digitalio/adalm2000digitaliotool.h"
 #include "powersupply/adalm2000powersupplytool.h"
+#include "spectrum/adalm2000spectrum_api.h"
 #include "spectrum/m2kspectrumcontroller.h"
 #include "voltmeter/adalm2000voltmetertool.h"
 #include <core/acq_ui/acqinstrument.h>
@@ -31,6 +32,7 @@
 
 #include <component/device.h>
 #include <iio-widgets/iiowidgetgroup.h>
+#include <pluginbase/scopyjs.h>
 #include <pluginbase/statusbarmanager.h>
 #include <style.h>
 
@@ -122,6 +124,9 @@ bool Adalm2000Plugin::onConnect()
 		new M2kSpectrumController(m_toolList[3], qobject_cast<M2kContext *>(m_context.get()), m_param, this);
 	m_toolList[3]->setTool(m_spectrum->ui());
 	m_spectrum->init(m_context.get());
+	m_spectrumApi = new Adalm2000Spectrum_API(m_spectrum);
+	m_spectrumApi->setObjectName("spectrum");
+	ScopyJS::GetInstance()->registerApi(m_spectrumApi);
 
 	for(auto &entry : m_toolList) {
 		entry->setEnabled(true);
@@ -160,6 +165,11 @@ void Adalm2000Plugin::setToolsRunLocked(bool locked)
 
 bool Adalm2000Plugin::onDisconnect()
 {
+	if(m_spectrumApi) {
+		ScopyJS::GetInstance()->unregisterApi(m_spectrumApi);
+		delete m_spectrumApi;
+		m_spectrumApi = nullptr;
+	}
 	if(m_spectrum) {
 		// Owns its instrument widget: unhook it so the loop below does not delete it too.
 		m_toolList[3]->setTool(nullptr);
@@ -185,6 +195,20 @@ bool Adalm2000Plugin::onDisconnect()
 
 	m_context = {};
 	return true;
+}
+
+void Adalm2000Plugin::saveSettings(QSettings &s)
+{
+	if(m_spectrumApi) {
+		m_spectrumApi->save(s);
+	}
+}
+
+void Adalm2000Plugin::loadSettings(QSettings &s)
+{
+	if(m_spectrumApi) {
+		m_spectrumApi->load(s);
+	}
 }
 
 void Adalm2000Plugin::initMetadata()
