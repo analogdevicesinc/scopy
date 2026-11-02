@@ -24,6 +24,7 @@
 //   M2K_URI=ip:127.0.0.1 ./scopy-adalm2000_test_spectrumhw
 // Skipped when M2K_URI is unset, so a plain ctest run never waits on a network timeout.
 
+#include "adalm2000spectrum_api.h"
 #include "m2kspectrumcontroller.h"
 #include "m2kanaloginsource.h"
 #include "m2kcontext.h"
@@ -44,6 +45,7 @@
 #include <component/navigation.h>
 
 #include <QDir>
+#include <QSettings>
 #include <QTemporaryFile>
 #include <QTest>
 
@@ -140,6 +142,45 @@ private Q_SLOTS:
 			QVERIFY(value);
 			QCOMPARE(QString::fromUtf8(value.value()), QStringLiteral("always"));
 		}
+	}
+
+	void apiSettingsRoundTrip()
+	{
+		QTemporaryFile file;
+		QVERIFY(file.open());
+		QSettings settings(file.fileName(), QSettings::IniFormat);
+		{
+			M2kSpectrumController tool(nullptr, m_ctx.get(), m_uri);
+			tool.init(m_ctx.get());
+			Adalm2000Spectrum_API api(&tool);
+			api.setObjectName(QStringLiteral("spectrum"));
+			api.setStopFreq(1e6);
+			api.setLogFreq(true);
+			api.setUnits(1);
+			api.setWindow({1, 2});
+			api.setMarkerType(2);
+			api.save(settings);
+		}
+		M2kSpectrumController tool(nullptr, m_ctx.get(), m_uri);
+		tool.init(m_ctx.get());
+		Adalm2000Spectrum_API api(&tool);
+		api.setObjectName(QStringLiteral("spectrum"));
+		api.load(settings);
+		QCOMPARE(api.stopFreq(), 1e6);
+		QVERIFY(api.logFreq());
+		QCOMPARE(api.units(), 1);
+		QCOMPARE(api.window(), (QList<int>{1, 2}));
+		QCOMPARE(api.markerType(), 2);
+	}
+
+	void fixedMarkerFrequencyFromTheApi()
+	{
+		M2kSpectrumController tool(nullptr, m_ctx.get(), m_uri);
+		tool.init(m_ctx.get());
+		Adalm2000Spectrum_API api(&tool);
+		api.setMarkerType(2);
+		api.setMarkerFrequency(0, 1, 1e6);
+		QCOMPARE(api.markers(0).at(1).toMap().value("frequency").toDouble(), 1e6);
 	}
 
 	void importedFileIsAReference()

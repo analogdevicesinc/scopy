@@ -36,6 +36,7 @@ class IIOWidgetGroup;
 }
 
 namespace scopy::adalm2000 {
+class Adalm2000Spectrum_API;
 class M2kSpectrumController;
 
 class SCOPY_ADALM2000_EXPORT Adalm2000Plugin : public QObject, public PluginBase
@@ -52,6 +53,8 @@ public:
 	void unload() override;
 	void initMetadata() override;
 	QString description() override;
+	void saveSettings(QSettings &s) override;
+	void loadSettings(QSettings &s) override;
 
 public Q_SLOTS:
 	bool onConnect() override;
@@ -62,6 +65,7 @@ private:
 
 	IIOWidgetGroup *m_widgetGroup = nullptr;
 	M2kSpectrumController *m_spectrum = nullptr;
+	Adalm2000Spectrum_API *m_spectrumApi = nullptr;
 	component::ContextHandle m_context;
 };
 
