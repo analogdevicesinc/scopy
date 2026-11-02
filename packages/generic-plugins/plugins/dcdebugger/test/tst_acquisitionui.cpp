@@ -36,6 +36,8 @@
 #include <component/context.h>
 #include <component/device.h>
 #include <menucombo.h>
+#include <menucontrolbutton.h>
+#include <menuspinbox.h>
 #include <menuonoffswitch.h>
 
 using namespace scopy;
@@ -243,9 +245,9 @@ void TST_AcquisitionUi::generatorStartsAndReappliesEdits()
 	QCOMPARE(start->text(), QString("Stop"));
 
 	// Editing a tone while running pushes a new cyclic buffer.
-	QDoubleSpinBox *amplitude = nullptr;
-	for(QDoubleSpinBox *sb : m_tool->findChildren<QDoubleSpinBox *>()) {
-		if(sb->isVisible() && sb->maximum() == 1.0 && sb->minimum() == 0.0) {
+	gui::MenuSpinbox *amplitude = nullptr;
+	for(gui::MenuSpinbox *sb : m_tool->findChildren<gui::MenuSpinbox *>()) {
+		if(sb->name() == "Amplitude") {
 			amplitude = sb;
 			break;
 		}
@@ -253,6 +255,19 @@ void TST_AcquisitionUi::generatorStartsAndReappliesEdits()
 	QVERIFY(amplitude);
 	amplitude->setValue(0.25);
 	QTRY_COMPARE(m_out->pushes, 2);
+
+	// Unchecking a channel's checkbox in the channel list drops it from the stream.
+	MenuControlButton *ch1 = nullptr;
+	for(MenuControlButton *b : m_tool->findChildren<MenuControlButton *>()) {
+		for(QLabel *l : b->findChildren<QLabel *>()) {
+			if(l->text() == "voltage1" && b->isVisible()) {
+				ch1 = b;
+			}
+		}
+	}
+	QVERIFY(ch1);
+	ch1->checkBox()->setChecked(false);
+	QTRY_COMPARE(m_out->enabledChannels(), QList<int>({0}));
 
 	start->setChecked(false);
 	QTRY_VERIFY(!m_out->isOpen());

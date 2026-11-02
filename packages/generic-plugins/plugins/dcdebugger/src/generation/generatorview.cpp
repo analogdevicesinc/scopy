@@ -24,17 +24,13 @@
 #include "nodepanel.h"
 #include "streamutils.h"
 
+#include <QButtonGroup>
 #include <QCheckBox>
 #include <QComboBox>
-#include <QDoubleSpinBox>
-#include <QHBoxLayout>
-#include <QHeaderView>
 #include <QLabel>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QSignalBlocker>
-#include <QSplitter>
-#include <QTableWidget>
 #include <QTimer>
 #include <QVBoxLayout>
 
@@ -48,9 +44,12 @@
 #include <component/scanelement.h>
 #include <iiowidget.h>
 #include <iiowidgetbuilder.h>
+#include <menucombo.h>
+#include <menucontrolbutton.h>
 #include <menuonoffswitch.h>
 #include <menusectionwidget.h>
 #include <menuspinbox.h>
+#include <menuwidget.h>
 #include <mousewheelwidgetguard.h>
 #include <plot_utils.hpp>
 #include <plotaxis.h>
@@ -62,6 +61,7 @@
 #include <stylehelper.h>
 #include <toolbuttons.h>
 #include <tooltemplate.h>
+#include <verticalchannelmanager.h>
 
 using namespace scopy;
 using namespace scopy::dcdebugger;
@@ -69,39 +69,20 @@ using namespace scopy::component;
 
 namespace {
 const char *const SETTINGS_KEY = "settings";
+const char *const CHANNELS_KEY = "channels";
 
-enum Column
-{
-	ColOn = 0,
-	ColChannel,
-	ColWaveform,
-	ColFrequency,
-	ColAmplitude,
-	ColOffset,
-	ColPhase,
-	ColumnCount
-};
+QString channelMenuKey(const QString &id) { return "channel:" + id; }
 
-QDoubleSpinBox *makeSpin(double min, double max, double step, int decimals, double value, QWidget *parent)
+gui::MenuSpinbox *makeSpin(const QString &name, double value, const QString &unit, double min, double max, double step,
+			   QWidget *parent)
 {
-	auto *sb = new QDoubleSpinBox(parent);
-	sb->setRange(min, max);
-	sb->setSingleStep(step);
-	sb->setDecimals(decimals);
-	sb->setValue(value);
-	sb->setKeyboardTracking(false); // apply on enter / focus out / arrows, not per keystroke
-	sb->setFrame(false);
+	auto *sb = new gui::MenuSpinbox(name, value, unit, min, max, true, false, false, parent);
+	sb->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
+	if(auto *fixed = dynamic_cast<gui::IncrementStrategyFixed *>(sb->incrementStrategy())) {
+		fixed->setK(step);
+	}
+	sb->setScalingEnabled(false);
 	return sb;
-}
-
-// Centers a checkbox in its table cell.
-QWidget *centered(QWidget *w, QWidget *parent)
-{
-	auto *holder = new QWidget(parent);
-	auto *lay = new QHBoxLayout(holder);
-	lay->setContentsMargins(0, 0, 0, 0);
-	lay->addWidget(w, 0, Qt::AlignCenter);
-	return holder;
 }
 } // namespace
 
@@ -124,8 +105,10 @@ GeneratorView::GeneratorView(OutputStream *stream, QWidget *parent)
 	m_tool->topContainer()->setVisible(true);
 	m_tool->centralContainer()->setVisible(true);
 	m_tool->rightContainer()->setVisible(true);
+	m_tool->leftContainer()->setVisible(true);
 	m_tool->topContainerMenuControl()->setVisible(false);
 	m_tool->setRightContainerWidth(300);
+	m_tool->setLeftContainerWidth(200);
 	lay->addWidget(m_tool);
 
 	m_status = new QLabel("Stopped", this);
@@ -144,14 +127,10 @@ GeneratorView::GeneratorView(OutputStream *stream, QWidget *parent)
 	m_tool->openRightContainerHelper(true);
 	connect(gearBtn, &QPushButton::toggled, m_tool, &ToolTemplate::openRightContainerHelper);
 
-	auto *splitter = new QSplitter(Qt::Vertical, this);
-	splitter->setChildrenCollapsible(false);
-	splitter->addWidget(buildTable(splitter));
 	buildPreview();
-	splitter->addWidget(m_plot);
-	splitter->setStretchFactor(0, 1);
-	splitter->setStretchFactor(1, 3);
-	m_tool->addWidgetToCentralContainerHelper(splitter);
+	buildChannels();
+	m_tool->openLeftContainerHelper(true);
+	m_tool->addWidgetToCentralContainerHelper(m_plot);
 
 	connect(m_runBtn, &QPushButton::toggled, this, [this](bool on) {
 		if(on) {
@@ -239,78 +218,88 @@ QWidget *GeneratorView::buildSettings(QWidget *parent)
 	return scroll;
 }
 
-QWidget *GeneratorView::buildTable(QWidget *parent)
+void GeneratorView::buildChannels()
 {
-	auto *holder = new QWidget(parent);
-	auto *lay = new QVBoxLayout(holder);
-	lay->setContentsMargins(0, 0, 0, 0);
-	lay->setSpacing(6);
+	// Left: "Output" (general settings) on top, then one button per scan element. Selecting a
+	// button shows its menu on the right; its checkbox enables the channel.
+	auto *vcm = new VerticalChannelManager(this);
+	m_menuGroup = new QButtonGroup(this);
+	m_menuGroup->setExclusive(true);
 
-	m_table = new QTableWidget(holder);
-	m_table->setColumnCount(ColumnCount);
-	m_table->setHorizontalHeaderLabels(
-		{"On", "Channel", "Waveform", "Frequency (Hz)", "Amplitude (FS)", "Offset (FS)", "Phase (°)"});
-	m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-	m_table->horizontalHeader()->setSectionResizeMode(ColOn, QHeaderView::ResizeToContents);
-	m_table->horizontalHeader()->setSectionResizeMode(ColChannel, QHeaderView::ResizeToContents);
-	m_table->verticalHeader()->setVisible(false);
-	m_table->setSelectionMode(QAbstractItemView::NoSelection);
-	m_table->setFocusPolicy(Qt::NoFocus);
-	Style::setStyle(m_table, style::properties::widget::tableViewWidget);
+	auto *settingsBtn = new MenuControlButton(vcm);
+	settingsBtn->setName("Output");
+	settingsBtn->setOpenMenuChecksThis(true);
+	settingsBtn->setDoubleClickToOpenMenu(false);
+	settingsBtn->checkBox()->setVisible(false);
+	settingsBtn->button()->setVisible(false);
+	settingsBtn->setCheckable(true);
+	settingsBtn->setChecked(true);
+	vcm->addTop(settingsBtn);
+	m_menuGroup->addButton(settingsBtn);
+	connect(settingsBtn, &QAbstractButton::clicked, this, [this]() { m_tool->rightStack()->show(SETTINGS_KEY); });
 
 	const QList<ScanElement *> elems = m_gen->scanElements();
 	const QHash<QString, ToneSpec> tones = m_gen->tones();
-	m_table->setRowCount(elems.size());
-	for(int r = 0; r < elems.size(); ++r) {
-		const QString id = elems[r]->id();
-		const ToneSpec t = tones.value(id);
-		Row row{id,
-			new QCheckBox(m_table),
-			new QComboBox(m_table),
-			makeSpin(0, 1e12, 100, 3, t.frequency, m_table),
-			makeSpin(0, 1, 0.05, 3, t.amplitude, m_table),
-			makeSpin(-1, 1, 0.05, 3, t.offset, m_table),
-			makeSpin(-360, 360, 15, 1, t.phase, m_table)};
-		row.on->setChecked(t.enabled);
-		row.waveform->addItems(waveformNames());
-		row.waveform->setCurrentIndex(int(t.waveform));
-		row.frequency->setSuffix(" Hz");
+	for(int i = 0; i < elems.size(); ++i) {
+		const QString id = elems[i]->id();
+		const ToneSpec tone = tones.value(id);
+		ChannelControls ctrl;
+		ctrl.id = id;
+		ctrl.button = new MenuControlButton(vcm);
+		ctrl.button->setName(scanElementName(m_stream, id, true));
+		ctrl.button->setCheckBoxStyle(MenuControlButton::CS_CIRCLE);
+		ctrl.button->setColor(QColor(StyleHelper::getChannelColor(i)));
+		ctrl.button->setOpenMenuChecksThis(true);
+		ctrl.button->setDoubleClickToOpenMenu(true);
+		ctrl.button->button()->setVisible(false);
+		ctrl.button->setCheckable(true);
+		ctrl.button->checkBox()->setChecked(tone.enabled);
+		ctrl.button->enableToolTip(true);
+		vcm->add(ctrl.button);
+		m_menuGroup->addButton(ctrl.button);
 
-		QPixmap swatch(10, 10);
-		swatch.fill(QColor(StyleHelper::getChannelColor(r)));
-		m_table->setItem(r, ColChannel,
-				 new QTableWidgetItem(QIcon(swatch), scanElementName(m_stream, id, true)));
-		m_table->item(r, ColChannel)->setFlags(Qt::ItemIsEnabled);
-		m_table->setCellWidget(r, ColOn, centered(row.on, m_table));
-		m_table->setCellWidget(r, ColWaveform, row.waveform);
-		m_table->setCellWidget(r, ColFrequency, row.frequency);
-		m_table->setCellWidget(r, ColAmplitude, row.amplitude);
-		m_table->setCellWidget(r, ColOffset, row.offset);
-		m_table->setCellWidget(r, ColPhase, row.phase);
-
-		connect(row.on, &QCheckBox::toggled, this, &GeneratorView::scheduleApply);
-		connect(row.waveform, qOverload<int>(&QComboBox::currentIndexChanged), this,
-			&GeneratorView::scheduleApply);
-		for(QDoubleSpinBox *sb : {row.frequency, row.amplitude, row.offset, row.phase}) {
-			connect(sb, qOverload<double>(&QDoubleSpinBox::valueChanged), this,
-				&GeneratorView::scheduleApply);
-		}
-		m_rows.append(row);
+		m_tool->rightStack()->add(channelMenuKey(id), buildChannelMenu(ctrl, i, tone));
+		connect(ctrl.button, &QAbstractButton::clicked, this,
+			[this, id]() { m_tool->rightStack()->show(channelMenuKey(id)); });
+		connect(ctrl.button->checkBox(), &QCheckBox::toggled, this, &GeneratorView::scheduleApply);
+		m_channels.append(ctrl);
 	}
-	lay->addWidget(m_table);
+	m_tool->leftStack()->add(CHANNELS_KEY, vcm);
+	m_tool->rightStack()->show(SETTINGS_KEY);
+}
 
-	auto *note = new QLabel("Frequencies are snapped so a whole number of periods fits the buffer, otherwise the "
-				"replay would glitch at the wrap-around. Default phases 0° / 90° give an I/Q pair "
-				"for quadrature DACs.",
-				holder);
-	note->setWordWrap(true);
-	Style::setStyle(note, style::properties::label::subtle);
-	lay->addWidget(note);
+QWidget *GeneratorView::buildChannelMenu(ChannelControls &ctrl, int index, const ToneSpec &tone)
+{
+	auto *menu = new gui::MenuWidget(scanElementName(m_stream, ctrl.id, true),
+					 QPen(QColor(StyleHelper::getChannelColor(index))), this);
 
-	// Scrolling the table must not change the values under the cursor.
-	auto *guard = new MouseWheelWidgetGuard(this);
-	guard->installEventRecursively(m_table);
-	return holder;
+	auto *signal = new MenuSectionCollapseWidget("SIGNAL", MenuCollapseSection::MHCW_NONE,
+						     MenuCollapseSection::MHW_BASEWIDGET, menu);
+	signal->contentLayout()->setSpacing(8);
+	ctrl.waveform = new MenuCombo("Waveform", signal);
+	ctrl.waveform->combo()->addItems(waveformNames());
+	ctrl.waveform->combo()->setCurrentIndex(int(tone.waveform));
+	ctrl.frequency = new gui::MenuSpinbox("Frequency", tone.frequency, "Hz", 0, 1e12, true, false, false, signal);
+	ctrl.frequency->setIncrementMode(gui::MenuSpinbox::IS_125);
+	ctrl.amplitude = makeSpin("Amplitude", tone.amplitude, "FS", 0, 1, 0.05, signal);
+	ctrl.offset = makeSpin("Offset", tone.offset, "FS", -1, 1, 0.05, signal);
+	ctrl.phase = makeSpin("Phase", tone.phase, "°", -360, 360, 15, signal);
+	for(QWidget *w :
+	    std::initializer_list<QWidget *>{ctrl.waveform, ctrl.frequency, ctrl.amplitude, ctrl.offset, ctrl.phase}) {
+		signal->contentLayout()->addWidget(w);
+	}
+	menu->add(signal, "signal", gui::MenuWidget::MA_TOPLAST);
+
+	connect(ctrl.waveform->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this,
+		&GeneratorView::scheduleApply);
+	for(gui::MenuSpinbox *sb : {ctrl.frequency, ctrl.amplitude, ctrl.offset, ctrl.phase}) {
+		connect(sb, &gui::MenuSpinbox::valueChanged, this, &GeneratorView::scheduleApply);
+	}
+
+	// Scrolling the menu must not change the values under the cursor.
+	auto *guard = new MouseWheelWidgetGuard(menu);
+	guard->installEventRecursively(menu);
+	return menu;
 }
 
 void GeneratorView::buildPreview()
@@ -349,15 +338,15 @@ void GeneratorView::apply()
 {
 	m_applyTimer->stop();
 	QHash<QString, ToneSpec> tones;
-	for(const Row &row : std::as_const(m_rows)) {
+	for(const ChannelControls &ctrl : std::as_const(m_channels)) {
 		ToneSpec t;
-		t.enabled = row.on->isChecked();
-		t.waveform = Waveform(row.waveform->currentIndex());
-		t.frequency = row.frequency->value();
-		t.amplitude = row.amplitude->value();
-		t.offset = row.offset->value();
-		t.phase = row.phase->value();
-		tones.insert(row.id, t);
+		t.enabled = ctrl.button->checkBox()->isChecked();
+		t.waveform = Waveform(ctrl.waveform->combo()->currentIndex());
+		t.frequency = ctrl.frequency->value();
+		t.amplitude = ctrl.amplitude->value();
+		t.offset = ctrl.offset->value();
+		t.phase = ctrl.phase->value();
+		tones.insert(ctrl.id, t);
 	}
 	m_gen->setSampleRate(sampleRate());
 	m_gen->setSamples(size_t(std::max(2.0, m_samples->value())));
@@ -366,13 +355,13 @@ void GeneratorView::apply()
 
 	// Show the frequency that is actually generated.
 	const QHash<QString, ToneSpec> snapped = m_gen->snappedTones();
-	for(const Row &row : std::as_const(m_rows)) {
-		const double f = snapped.value(row.id).frequency;
-		if(std::abs(f - row.frequency->value()) > 1e-9) {
-			QSignalBlocker blocker(row.frequency);
-			row.frequency->setValue(f);
+	for(const ChannelControls &ctrl : std::as_const(m_channels)) {
+		const double f = snapped.value(ctrl.id).frequency;
+		if(std::abs(f - ctrl.frequency->value()) > 1e-9) {
+			ctrl.frequency->setValueSilent(f);
 		}
-		row.frequency->setToolTip(QStringLiteral("Generated: %1 Hz").arg(f, 0, 'f', 3));
+		ctrl.frequency->setToolTip(
+			QStringLiteral("Generated: %1 Hz (whole periods in the buffer)").arg(f, 0, 'f', 3));
 	}
 	updatePreview();
 }

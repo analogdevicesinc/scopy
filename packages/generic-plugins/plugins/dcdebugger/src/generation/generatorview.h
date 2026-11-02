@@ -28,15 +28,14 @@
 #include <QPointer>
 #include <QWidget>
 
-class QCheckBox;
-class QComboBox;
-class QDoubleSpinBox;
+class QButtonGroup;
 class QLabel;
 class QPushButton;
-class QTableWidget;
 class QTimer;
 
 namespace scopy {
+class MenuCombo;
+class MenuControlButton;
 class MenuOnOffSwitch;
 class PlotChannel;
 class PlotWidget;
@@ -53,8 +52,9 @@ class OutputStream;
 
 namespace scopy::dcdebugger {
 
-// Generator tab of an OutputStream: per scan element waveform / frequency / amplitude / offset /
-// phase, samples, sample rate, cyclic, start / stop and a preview of the encoded buffer.
+// Generator tab of an OutputStream, laid out like the Scopy instruments: a channel list on the
+// left (enable + select), the selected channel's menu (waveform / frequency / amplitude / offset /
+// phase) or the general Output settings on the right, start / stop and a buffer preview.
 class GeneratorView : public QWidget
 {
 	Q_OBJECT
@@ -65,19 +65,20 @@ public:
 	StreamGeneration *generation() const { return m_gen; }
 
 private:
-	struct Row
+	struct ChannelControls
 	{
 		QString id;
-		QCheckBox *on;
-		QComboBox *waveform;
-		QDoubleSpinBox *frequency;
-		QDoubleSpinBox *amplitude;
-		QDoubleSpinBox *offset;
-		QDoubleSpinBox *phase;
+		MenuControlButton *button; // its checkbox enables the channel
+		MenuCombo *waveform;
+		gui::MenuSpinbox *frequency;
+		gui::MenuSpinbox *amplitude;
+		gui::MenuSpinbox *offset;
+		gui::MenuSpinbox *phase;
 	};
 
 	QWidget *buildSettings(QWidget *parent);
-	QWidget *buildTable(QWidget *parent);
+	void buildChannels();
+	QWidget *buildChannelMenu(ChannelControls &ctrl, int index, const ToneSpec &tone);
 	void buildPreview();
 	void scheduleApply();
 	void apply();
@@ -96,8 +97,8 @@ private:
 	gui::MenuSpinbox *m_samples;
 	gui::MenuSpinbox *m_manualRate = nullptr;
 	MenuOnOffSwitch *m_cyclic;
-	QTableWidget *m_table;
-	QList<Row> m_rows;
+	QButtonGroup *m_menuGroup;
+	QList<ChannelControls> m_channels;
 	PlotWidget *m_plot;
 	QMap<QString, PlotChannel *> m_plotChannels;
 	QTimer *m_applyTimer;
