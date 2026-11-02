@@ -30,6 +30,7 @@
 
 #include <qcoro/qcorotask.h>
 #include "component/component_export.h"
+#include "component/scanelement.h"
 
 namespace scopy {
 class Command;
@@ -41,37 +42,18 @@ class IChannelOps;
 
 namespace scopy::component::iio {
 
-// Scan/enable aspect of one streamable channel. Single source of truth for a
-// channel's membership in its stream's mask. Concrete IIO-only (no base yet).
-class COMPONENT_EXPORT IIOScanElement : public QObject
+// IIO scan element: the channel's bit in its stream's libiio channels mask.
+class COMPONENT_EXPORT IIOScanElement : public ScanElement
 {
 	Q_OBJECT
-	Q_PROPERTY(long index READ index CONSTANT)
-	Q_PROPERTY(QString id READ id CONSTANT)
-	Q_PROPERTY(bool isOutput READ isOutput CONSTANT)
 public:
 	IIOScanElement(scopy::iio::IChannelOps *ops, scopy::iio::ChannelHandle handle,
 		       scopy::iio::ChannelsMaskHandle mask, scopy::ICmdExecutor *executor, QObject *parent = nullptr);
 
-	long index() const { return m_index; }
-	QString id() const { return m_id; }
-	bool isOutput() const { return m_isOutput; }
 	scopy::iio::ChannelHandle channelHandle() const { return m_handle; }
 
-	void setIndex(long index)
-	{
-		m_index = index;
-		setObjectName("Scan element " + QString::number(m_index));
-	}
-	void setId(const QString &id) { m_id = id; }
-	void setIsOutput(bool isOutput) { m_isOutput = isOutput; }
-
-	Q_INVOKABLE QCoro::Task<CommandResponse<void>> enableAsync(bool en);
-	bool isEnabled() const;
-
-Q_SIGNALS:
-	void enabledChanged(bool en);
-	void enableFailed(const scopy::Error &error);
+	QCoro::Task<CommandResponse<void>> enableAsync(bool en) override;
+	bool isEnabled() const override;
 
 private:
 	scopy::Command *makeCommand(bool en);
@@ -80,9 +62,6 @@ private:
 	scopy::iio::ChannelHandle m_handle;
 	scopy::iio::ChannelsMaskHandle m_mask;
 	scopy::ICmdExecutor *m_executor;
-	long m_index = -1;
-	QString m_id;
-	bool m_isOutput = false;
 };
 
 } // namespace scopy::component::iio

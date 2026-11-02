@@ -26,7 +26,7 @@
 using namespace scopy::component::iio;
 
 IIOTrigger::IIOTrigger(scopy::iio::IDeviceOps *ops, scopy::iio::DeviceHandle dev, QObject *parent)
-	: QObject(parent)
+	: Trigger(parent)
 	, m_ops(ops)
 	, m_dev(dev)
 {
