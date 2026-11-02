@@ -276,6 +276,7 @@ WaterfallPlotWidget::WaterfallPlotWidget(QWidget *parent)
 	: PlotWidget(parent)
 	, m_secsPerRow(1.0 / Preferences::GetInstance()->get("general_plot_target_fps").toDouble())
 	, m_rowCount(0)
+	, m_pendingRows(0)
 	, m_waterfallEnabled(false)
 {
 	navigator()->addAxis(xAxis());
@@ -322,27 +323,31 @@ void WaterfallPlotWidget::addFFTData(const float *data, size_t size)
 
 void WaterfallPlotWidget::appendRowDeferred(const float *data, size_t size)
 {
-	if(m_rowTimer.isValid()) {
-		const double elapsed = m_rowTimer.elapsed() / 1000.0;
-		m_rowTimer.restart();
-		if(elapsed > 0.0) {
-			// EMA: slow enough to track steady-state load, fast enough to react to config changes.
-			static constexpr double alpha = 0.1;
-			m_secsPerRow = alpha * elapsed + (1.0 - alpha) * m_secsPerRow;
-			++m_rowCount;
-			if(m_rowCount % 20 == 0) {
-				m_timeFormatter->setSecsPerRow(m_secsPerRow);
-				yAxis()->scaleDraw()->invalidateCache();
-				plot()->axisWidget(yAxis()->axisId())->update();
-			}
-		}
-	}
-
+	++m_pendingRows;
 	m_data->appendRow(data, size);
 }
 
 void WaterfallPlotWidget::endAppend()
 {
+	if(!m_rowTimer.isValid()) {
+		m_rowTimer.start();
+	} else if(m_pendingRows > 0) {
+		const double secsPerRow = m_rowTimer.restart() / 1000.0 / m_pendingRows;
+		if(secsPerRow > 0.0) {
+			// EMA: slow enough to track steady-state load, fast enough to react to config changes.
+			static constexpr double alpha = 0.1;
+			m_secsPerRow = m_rowCount == 0 ? secsPerRow : alpha * secsPerRow + (1.0 - alpha) * m_secsPerRow;
+			const int before = m_rowCount;
+			m_rowCount += m_pendingRows;
+			if(before == 0 || before / 20 != m_rowCount / 20) {
+				m_timeFormatter->setSecsPerRow(m_secsPerRow);
+				yAxis()->scaleDraw()->invalidateCache();
+				plot()->updateLayout();
+			}
+		}
+	}
+	m_pendingRows = 0;
+
 	m_spectrogram->invalidateCache();
 	m_spectrogram->itemChanged();
 	Q_EMIT newData();
@@ -361,6 +366,7 @@ void WaterfallPlotWidget::clearData()
 	m_data->reset();
 	m_rowTimer.invalidate();
 	m_rowCount = 0;
+	m_pendingRows = 0;
 	m_spectrogram->invalidateCache();
 	m_spectrogram->itemChanged();
 	replot();
