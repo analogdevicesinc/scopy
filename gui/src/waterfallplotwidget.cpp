@@ -333,7 +333,7 @@ void WaterfallPlotWidget::appendRowDeferred(const float *data, size_t size)
 			if(m_rowCount % 20 == 0) {
 				m_timeFormatter->setSecsPerRow(m_secsPerRow);
 				yAxis()->scaleDraw()->invalidateCache();
-				plot()->axisWidget(yAxis()->axisId())->update();
+				plot()->updateLayout();
 			}
 		}
 	}
