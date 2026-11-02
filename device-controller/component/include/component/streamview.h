@@ -58,6 +58,20 @@ public:
 		return double(rawInt) * cf.scale + cf.offsetPhys;
 	}
 
+	// The decoded integer (shift, mask, sign extension applied) before scale / offset.
+	int64_t rawSample(int ch, size_t sample) const { return rawInteger(m_format.channels.at(ch), ch, sample); }
+
+	// One channel as decoded integers, materialized as owned doubles (no scale / offset).
+	QVector<double> toRawDoubles(int ch) const
+	{
+		QVector<double> out;
+		out.reserve(int(m_format.sampleCount));
+		for(size_t s = 0; s < m_format.sampleCount; ++s) {
+			out.append(double(rawSample(ch, s)));
+		}
+		return out;
+	}
+
 	// One channel, materialized as owned doubles.
 	QVector<double> toDoubles(int ch) const
 	{
