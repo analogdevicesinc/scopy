@@ -57,6 +57,7 @@ class TstComponentStream : public QObject
 	Q_OBJECT
 private Q_SLOTS:
 	void openEnablesRefillDecodes();
+	void openCopiesConfigBeforeSuspending();
 	void setKernelBuffersRefusedWhenOpen();
 	void maskFreedOnDelete();
 	void outputPushEmits();
@@ -113,6 +114,30 @@ void TstComponentStream::openEnablesRefillDecodes()
 	delete stream;
 	QCOMPARE(bufOps.masksAlive, 0);
 	QVERIFY(bufOps.cancels >= 1);
+}
+
+// The caller's config is not required to outlive the first suspension of openAsync.
+void TstComponentStream::openCopiesConfigBeforeSuspending()
+{
+	PooledCmdExecutor exec(1);
+	dctest::FakeChannelOps chOps;
+	dctest::FakeBufferOps bufOps;
+	bufOps.step = 2;
+	dctest::FakeChannel c0{0, "voltage0", false, true, s16Format()};
+
+	auto *stream = new IIOInputStream(&bufOps, &chOps, {reinterpret_cast<void *>(0x1)}, 1, 0, &exec);
+	auto *e0 = new IIOScanElement(&chOps, {&c0}, stream->mask(), &exec, stream);
+	e0->setIndex(0);
+
+	StreamConfig cfg{{0}, 3};
+	auto task = stream->openAsync(cfg);
+	// Suspended on the executor: the caller's object changes (or dies) meanwhile.
+	cfg.samplesCount = 999;
+	cfg.enabledChannels = {7};
+	QVERIFY(QCoro::waitFor(std::move(task)));
+	QCOMPARE(stream->samplesCount(), size_t(3));
+	QCOMPARE(stream->enabledChannels(), QList<int>({0}));
+	delete stream;
 }
 
 void TstComponentStream::setKernelBuffersRefusedWhenOpen()
