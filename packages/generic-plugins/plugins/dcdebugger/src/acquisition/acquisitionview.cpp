@@ -21,16 +21,22 @@
 
 #include "acquisitionview.h"
 
+#include "measurementstable.h"
 #include "nodepanel.h"
 
 #include <QCheckBox>
 #include <algorithm>
+#include <cmath>
+#include <limits>
 #include <QLabel>
+#include <QPushButton>
 #include <QScrollArea>
+#include <QSplitter>
 #include <QSignalBlocker>
 #include <QVBoxLayout>
 
 #include <component/attribute.h>
+#include <dcdebugger/style_properties.h>
 #include <component/channel.h>
 #include <component/context.h>
 #include <component/device.h>
@@ -39,9 +45,11 @@
 #include <component/scanelement.h>
 #include <component/tags.h>
 #include <component/trigger.h>
+#include <filemanager.h>
 #include <iiowidget.h>
 #include <iiowidgetbuilder.h>
 #include <menucombo.h>
+#include <menuonoffswitch.h>
 #include <menusectionwidget.h>
 #include <menuspinbox.h>
 #include <plot_utils.hpp>
@@ -132,6 +140,13 @@ AcquisitionView::AcquisitionView(InputStream *stream, QWidget *parent)
 	m_tool->addWidgetToTopContainerHelper(m_status, TTA_LEFT);
 	m_tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	m_tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
+	m_exportBtn = new QPushButton("Export...", this);
+	m_exportBtn->setToolTip("Save what the plot shows as CSV");
+	// basicButton look at the Run / Single height.
+	Style::setStyle(m_exportBtn, style::properties::dcdebugger::exportButton);
+	m_exportBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	m_tool->addWidgetToTopContainerHelper(m_exportBtn, TTA_RIGHT);
+	connect(m_exportBtn, &QPushButton::clicked, this, &AcquisitionView::exportData);
 	m_tool->addWidgetToTopContainerHelper(gearBtn, TTA_RIGHT);
 
 	m_tool->rightStack()->add(SETTINGS_KEY, buildSettings(this));
@@ -176,6 +191,7 @@ QWidget *AcquisitionView::buildSettings(QWidget *parent)
 	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(10);
 	lay->addWidget(buildAcquisitionSection(content));
+	lay->addWidget(buildViewSection(content));
 	lay->addWidget(buildSoftwareTriggerSection(content));
 	lay->addStretch();
 	scroll->setWidget(content);
@@ -338,7 +354,15 @@ void AcquisitionView::buildPlot()
 		m_plotChannels.insert(elems[c]->id(), ch);
 	}
 	m_plot->replot();
-	m_tool->addWidgetToCentralContainerHelper(m_plot);
+
+	m_table = new MeasurementsTable(this);
+	auto *splitter = new QSplitter(Qt::Vertical, this);
+	splitter->setChildrenCollapsible(false);
+	splitter->addWidget(m_plot);
+	splitter->addWidget(m_table);
+	splitter->setStretchFactor(0, 4);
+	splitter->setStretchFactor(1, 1);
+	m_tool->addWidgetToCentralContainerHelper(splitter);
 }
 
 void AcquisitionView::applyChannelSelection()
@@ -354,7 +378,11 @@ void AcquisitionView::applyChannelSelection()
 		}
 	}
 	m_acq->setEnabledChannels(indices);
-	m_plot->replot();
+	if(m_hasFrame) {
+		render();
+	} else {
+		m_plot->replot();
+	}
 }
 
 double AcquisitionView::sampleRate() const
@@ -426,42 +454,11 @@ void AcquisitionView::onFrame(const AcquiredFrame &frame)
 		}
 	}
 
-	const double fs = sampleRate();
-	QVector<float> x(count);
-	for(int i = 0; i < count; ++i) {
-		x[i] = fs > 0 ? float(i / fs) : float(i);
-	}
-	// While the user is zoomed / panned the axes are theirs; right click (undo) gives them back.
-	const bool zoomed = m_plot->navigator()->isZoomed();
-	m_plot->xAxis()->scaleDraw()->setUnitType(fs > 0 ? "s" : "");
-	const double xmax = x.last() > 0 ? x.last() : 1;
-	if(!zoomed && (m_plot->xAxis()->min() != 0 || m_plot->xAxis()->max() != xmax)) {
-		m_plot->xAxis()->setInterval(0, xmax);
-	}
-
-	double ymin = std::numeric_limits<double>::max();
-	double ymax = std::numeric_limits<double>::lowest();
-	for(auto it = m_plotChannels.cbegin(); it != m_plotChannels.cend(); ++it) {
-		const int c = frame.ids.indexOf(it.key());
-		if(c < 0 || !it.value()->isEnabled()) {
-			it.value()->curve()->setSamples(QVector<QPointF>());
-			continue;
-		}
-		const QVector<double> &d = frame.data[c];
-		const int n = std::min(count, int(d.size()) - start);
-		QVector<float> y(std::max(0, n));
-		for(int i = 0; i < n; ++i) {
-			y[i] = float(d[start + i]);
-			ymin = std::min(ymin, d[start + i]);
-			ymax = std::max(ymax, d[start + i]);
-		}
-		it.value()->setSamples(x.data(), y.data(), size_t(y.size()), true);
-	}
-	if(!zoomed && ymin <= ymax) {
-		const double span = ymax > ymin ? ymax - ymin : std::max(1.0, std::abs(ymax));
-		m_plot->yAxis()->setInterval(ymin - span * 0.1, ymax + span * 0.1);
-	}
-	m_plot->replot();
+	m_frame = frame;
+	m_hasFrame = true;
+	m_start = start;
+	m_count = count;
+	render();
 
 	QString text = QStringLiteral("Buffer %1 · %2 samples · %3 channel(s)")
 			       .arg(frame.index)
@@ -471,6 +468,414 @@ void AcquisitionView::onFrame(const AcquiredFrame &frame)
 		text += triggered ? QStringLiteral(" · triggered") : QStringLiteral(" · not triggered: ") + why;
 	}
 	setStatus(text);
+}
+
+QWidget *AcquisitionView::buildViewSection(QWidget *parent)
+{
+	MenuSectionCollapseWidget *section = makeSection("View", parent);
+	QVBoxLayout *lay = section->contentLayout();
+	lay->setSpacing(8);
+
+	m_mode = new MenuCombo("Mode", section);
+	m_mode->combo()->addItems({"Time", "Spectrum", "XY"});
+	m_units = new MenuCombo("Units", section);
+	m_units->combo()->addItems({"Scaled", "Raw"});
+	m_units->setToolTip("Scaled: the stream's scale / offset applied. Raw: decoded integers; the spectrum "
+			    "is then in dBFS.");
+	m_window = new MenuCombo("Window", section);
+	m_window->combo()->addItems(windowNames());
+	m_window->combo()->setCurrentIndex(int(WindowType::BlackmanHarris));
+	m_averages = new gui::MenuSpinbox("Averages", 1, "", 1, 1000, true, false, false, section);
+	m_averages->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
+	m_averages->setScalingEnabled(false);
+	m_complexIQ = new MenuOnOffSwitch("Complex I/Q (pair channels)", section);
+	m_complexIQ->setToolTip("Spectrum of consecutive enabled channels taken as I + jQ (1st + 2nd, 3rd + 4th, "
+				"...), from -fs/2 to +fs/2.");
+	m_complexIQ->onOffswitch()->setChecked(false);
+	m_xySource = new MenuCombo("X channel", section);
+	m_xySourceY = new MenuCombo("Y channel", section);
+	for(ScanElement *el : m_acq->scanElements()) {
+		m_xySource->combo()->addItem(displayName(el->id()), el->id());
+		m_xySourceY->combo()->addItem(displayName(el->id()), el->id());
+	}
+	m_xySourceY->combo()->setCurrentIndex(m_xySourceY->combo()->count() > 1 ? 1 : 0);
+
+	m_autoscale = new MenuOnOffSwitch("Y autoscale", section);
+	m_autoscale->onOffswitch()->setChecked(true);
+	m_yMin = new gui::MenuSpinbox("Y min", -1, "", -1e12, 1e12, true, false, false, section);
+	m_yMax = new gui::MenuSpinbox("Y max", 1, "", -1e12, 1e12, true, false, false, section);
+	for(gui::MenuSpinbox *sb : {m_yMin, m_yMax}) {
+		sb->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
+		sb->setEnabled(false);
+	}
+
+	lay->addWidget(m_mode);
+	lay->addWidget(m_xySource);
+	lay->addWidget(m_xySourceY);
+	lay->addWidget(m_units);
+	lay->addWidget(m_window);
+	lay->addWidget(m_averages);
+	lay->addWidget(m_complexIQ);
+	lay->addWidget(m_autoscale);
+	lay->addWidget(m_yMin);
+	lay->addWidget(m_yMax);
+
+	for(MenuCombo *c : {m_mode, m_units, m_window, m_xySource, m_xySourceY}) {
+		connect(c->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this,
+			&AcquisitionView::onViewChanged);
+	}
+	connect(m_averages, &gui::MenuSpinbox::valueChanged, this, &AcquisitionView::onViewChanged);
+	connect(m_complexIQ->onOffswitch(), &QAbstractButton::toggled, this, &AcquisitionView::onViewChanged);
+	connect(m_autoscale->onOffswitch(), &QAbstractButton::toggled, this, [this](bool on) {
+		m_yMin->setEnabled(!on);
+		m_yMax->setEnabled(!on);
+		if(on) {
+			render();
+		} else {
+			applyFixedYRange();
+		}
+	});
+	for(gui::MenuSpinbox *sb : {m_yMin, m_yMax}) {
+		connect(sb, &gui::MenuSpinbox::valueChanged, this, [this]() {
+			if(!m_autoscale->onOffswitch()->isChecked()) {
+				applyFixedYRange();
+			}
+		});
+	}
+	onViewChanged();
+	return section;
+}
+
+void AcquisitionView::onViewChanged()
+{
+	const int mode = m_mode->combo()->currentIndex();
+	m_window->setEnabled(mode == SpectrumMode);
+	m_averages->setEnabled(mode == SpectrumMode);
+	m_complexIQ->setEnabled(mode == SpectrumMode);
+	m_xySource->setVisible(mode == XYMode);
+	m_xySourceY->setVisible(mode == XYMode);
+
+	// Each mode keeps its own fixed Y range (a dB range makes no sense in time mode).
+	m_yRange[m_lastMode] = {m_yMin->value(), m_yMax->value()};
+	if(mode != m_lastMode) {
+		const auto range =
+			m_yRange.value(mode, mode == SpectrumMode ? qMakePair(-140.0, 0.0) : qMakePair(-1.0, 1.0));
+		m_yMin->setValueSilent(range.first);
+		m_yMax->setValueSilent(range.second);
+		for(PlotChannel *ch : std::as_const(m_plotChannels)) {
+			ch->setStyle(mode == XYMode ? PlotChannel::PCS_DOTS : PlotChannel::PCS_LINES);
+		}
+		m_lastMode = mode;
+	}
+
+	m_averager.setCount(int(m_averages->value()));
+	m_averager.reset();
+	if(m_hasFrame) {
+		render();
+	}
+}
+
+void AcquisitionView::render()
+{
+	if(!m_hasFrame) {
+		return;
+	}
+	const AcquiredFrame &f = m_frame;
+	const bool raw = m_units->combo()->currentIndex() == 1;
+	const QVector<QVector<double>> &src = raw ? f.raw : f.data;
+	const int mode = m_mode->combo()->currentIndex();
+	const double fs = sampleRate();
+	const WindowType window = WindowType(m_window->combo()->currentIndex());
+
+	m_shownX.clear();
+	m_shownNames.clear();
+	m_shownY.clear();
+	double xlo = 0;
+	double xhi = 1;
+	double ylo = std::numeric_limits<double>::max();
+	double yhi = std::numeric_limits<double>::lowest();
+	QList<MeasurementRow> rows;
+
+	int xChannel = -1;
+	int yChannel = -1;
+	if(mode == XYMode) {
+		xChannel = f.ids.indexOf(m_xySource->combo()->currentData().toString());
+		yChannel = f.ids.indexOf(m_xySourceY->combo()->currentData().toString());
+		m_shownXLabel = m_xySource->combo()->currentText();
+		if(xChannel >= 0) {
+			m_shownX = src[xChannel].mid(m_start, m_count);
+			const auto [lo, hi] = std::minmax_element(m_shownX.cbegin(), m_shownX.cend());
+			if(lo != m_shownX.cend()) {
+				xlo = *lo;
+				xhi = *hi;
+			}
+		}
+	} else if(mode == TimeMode) {
+		m_shownXLabel = fs > 0 ? "time [s]" : "sample";
+		m_shownX.resize(m_count);
+		for(int i = 0; i < m_count; ++i) {
+			m_shownX[i] = fs > 0 ? i / fs : i;
+		}
+		xhi = m_count > 1 ? m_shownX.last() : 1;
+	}
+
+	const QList<ScanElement *> elems = m_acq->scanElements();
+	const bool iq = mode == SpectrumMode && m_complexIQ->onOffswitch()->isChecked();
+	if(iq) {
+		const auto xr = renderIQSpectrum(raw, fs, rows, ylo, yhi);
+		xlo = xr.first;
+		xhi = xr.second;
+	}
+	for(int e = 0; !iq && e < elems.size(); ++e) {
+		const QString id = elems[e]->id();
+		PlotChannel *pc = m_plotChannels.value(id);
+		const int c = f.ids.indexOf(id);
+		QCheckBox *box = m_channelBoxes.value(id);
+		// XY: only the selected X and Y channels take part (both must be acquired).
+		const bool xyMember = c >= 0 && (c == xChannel || c == yChannel) && xChannel >= 0 && yChannel >= 0;
+		if(!pc || c < 0 || (mode == XYMode ? !xyMember : (!box || !box->isChecked()))) {
+			if(pc) {
+				pc->curve()->setSamples(QVector<QPointF>());
+			}
+			continue;
+		}
+
+		const QVector<double> &d = src[c];
+		MeasurementRow row;
+		row.channel = displayName(id);
+		row.color = QColor(StyleHelper::getChannelColor(e));
+		// Statistics follow what the plot shows: the (triggered) window, or the whole buffer.
+		row.values = mode == SpectrumMode ? measure(d, 0, d.size(), fs) : measure(d, m_start, m_count, fs);
+
+		QVector<double> y;
+		if(mode == SpectrumMode) {
+			QVector<double> amp =
+				m_averager.push(id + (raw ? ":raw" : ":scaled"), amplitudeSpectrum(d, window));
+			const int n = floorPow2(int(d.size()));
+			const double ref = raw && f.bits.value(c) > 1 ? std::ldexp(1.0, f.bits.value(c) - 1) : 1.0;
+			y.resize(amp.size());
+			if(m_shownX.size() != amp.size()) {
+				m_shownX.resize(amp.size());
+				for(int k = 0; k < amp.size(); ++k) {
+					m_shownX[k] = fs > 0 ? k * fs / n : k;
+				}
+			}
+			int peak = amp.size() > 1 ? 1 : 0;
+			for(int k = 0; k < amp.size(); ++k) {
+				y[k] = toDb(amp[k], ref);
+				if(k >= 1 && amp[k] > amp[peak]) {
+					peak = k;
+				}
+			}
+			if(!y.isEmpty()) {
+				row.peak = QStringLiteral("%1 %2 @ %3")
+						   .arg(y[peak], 0, 'f', 1)
+						   .arg(raw ? "dBFS" : "dB")
+						   .arg(fs > 0 ? siFormat(m_shownX[peak], "Hz")
+							       : QStringLiteral("bin %1").arg(peak));
+			}
+			m_shownXLabel = fs > 0 ? "frequency [Hz]" : "bin";
+			xhi = m_shownX.isEmpty() ? 1 : m_shownX.last();
+		} else {
+			y = d.mid(m_start, m_count);
+		}
+		rows.append(row);
+
+		if(mode == XYMode && c != yChannel) {
+			pc->curve()->setSamples(QVector<QPointF>());
+			continue; // the X channel: in the table, not plotted
+		}
+		const int n = std::min(int(y.size()), int(m_shownX.size()));
+		QVector<float> xf(n);
+		QVector<float> yf(n);
+		for(int i = 0; i < n; ++i) {
+			xf[i] = float(m_shownX[i]);
+			yf[i] = float(y[i]);
+			ylo = std::min(ylo, y[i]);
+			yhi = std::max(yhi, y[i]);
+		}
+		pc->setSamples(xf.data(), yf.data(), size_t(n), true);
+		m_shownNames.append(row.channel);
+		m_shownY.append(y);
+	}
+
+	m_table->setRows(rows, QString());
+	m_plot->xAxis()->scaleDraw()->setUnitType(mode == SpectrumMode ? (fs > 0 ? "Hz" : "")
+								       : (mode == TimeMode && fs > 0 ? "s" : ""));
+	m_plot->yAxis()->scaleDraw()->setUnitType(mode == SpectrumMode ? (raw ? "dBFS" : "dB") : "");
+	if(mode == SpectrumMode && ylo <= yhi) {
+		ylo = std::max(ylo, yhi - 200); // empty bins sit at -300 dB
+	}
+	applyAxes(xlo, xhi, ylo, yhi);
+	m_plot->replot();
+}
+
+QPair<double, double> AcquisitionView::renderIQSpectrum(bool raw, double fs, QList<MeasurementRow> &rows, double &ylo,
+							double &yhi)
+{
+	const AcquiredFrame &f = m_frame;
+	const QVector<QVector<double>> &src = raw ? f.raw : f.data;
+	const WindowType window = WindowType(m_window->combo()->currentIndex());
+	const QList<ScanElement *> elems = m_acq->scanElements();
+
+	struct On
+	{
+		int element; // color / order
+		int column;  // in the frame
+		QString id;
+	};
+	QList<On> on;
+	for(int e = 0; e < elems.size(); ++e) {
+		const QString id = elems[e]->id();
+		if(PlotChannel *pc = m_plotChannels.value(id)) {
+			pc->curve()->setSamples(QVector<QPointF>());
+		}
+		const int c = f.ids.indexOf(id);
+		QCheckBox *box = m_channelBoxes.value(id);
+		if(c >= 0 && box && box->isChecked()) {
+			on.append({e, c, id});
+		}
+	}
+
+	double xlo = 0;
+	double xhi = 1;
+	m_shownXLabel = fs > 0 ? "frequency [Hz]" : "bin";
+	for(int p = 0; p < on.size(); p += 2) {
+		const On &i = on[p];
+		const On *q = p + 1 < on.size() ? &on[p + 1] : nullptr; // an odd one out stays real
+		const QString key = "iq:" + i.id + "+" + (q ? q->id : QString()) + (raw ? ":raw" : ":scaled");
+		const QVector<double> amp = m_averager.push(
+			key, complexAmplitudeSpectrum(src[i.column], q ? src[q->column] : QVector<double>(), window));
+		const int n = int(amp.size());
+		if(n < 2) {
+			continue;
+		}
+		const double ref =
+			raw && f.bits.value(i.column) > 1 ? std::ldexp(1.0, f.bits.value(i.column) - 1) : 1.0;
+		QVector<double> y(n);
+		if(m_shownX.size() != n) {
+			m_shownX.resize(n);
+			for(int k = 0; k < n; ++k) {
+				m_shownX[k] = fs > 0 ? (k - n / 2) * fs / n : k - n / 2;
+			}
+		}
+		int peak = -1;
+		for(int k = 0; k < n; ++k) {
+			y[k] = toDb(amp[k], ref);
+			if(k != n / 2 && (peak < 0 || amp[k] > amp[peak])) { // DC excluded
+				peak = k;
+			}
+		}
+		const QString peakText = QStringLiteral("%1 %2 @ %3")
+						 .arg(y[peak], 0, 'f', 1)
+						 .arg(raw ? "dBFS" : "dB")
+						 .arg(fs > 0 ? siFormat(m_shownX[peak], "Hz")
+							     : QStringLiteral("bin %1").arg(int(m_shownX[peak])));
+
+		const QString name = q ? displayName(i.id) + " + j·" + displayName(q->id) : displayName(i.id);
+		QVector<float> xf(n);
+		QVector<float> yf(n);
+		for(int k = 0; k < n; ++k) {
+			xf[k] = float(m_shownX[k]);
+			yf[k] = float(y[k]);
+			ylo = std::min(ylo, y[k]);
+			yhi = std::max(yhi, y[k]);
+		}
+		m_plotChannels.value(i.id)->setSamples(xf.data(), yf.data(), size_t(n), true);
+		m_shownNames.append(name);
+		m_shownY.append(y);
+
+		for(const On *member : {&i, q}) {
+			if(!member) {
+				continue;
+			}
+			const QVector<double> &d = src[member->column];
+			MeasurementRow row;
+			row.channel = displayName(member->id);
+			row.color = QColor(StyleHelper::getChannelColor(member->element));
+			row.values = measure(d, 0, d.size(), fs);
+			row.peak = peakText + (q ? " (I/Q)" : QString());
+			rows.append(row);
+		}
+		xlo = m_shownX.first();
+		xhi = m_shownX.last();
+	}
+	return {xlo, xhi};
+}
+
+void AcquisitionView::applyAxes(double xlo, double xhi, double ylo, double yhi)
+{
+	// While the user is zoomed / panned the axes are theirs; right click (undo) gives them back.
+	if(m_plot->navigator()->isZoomed()) {
+		return;
+	}
+	const bool autoscale = m_autoscale->onOffswitch()->isChecked();
+	if(autoscale && ylo <= yhi) {
+		const double span = yhi > ylo ? yhi - ylo : std::max(1.0, std::abs(yhi));
+		ylo -= span * 0.1;
+		yhi += span * 0.1;
+		m_yMin->setValueSilent(ylo);
+		m_yMax->setValueSilent(yhi);
+	} else {
+		ylo = m_yMin->value();
+		yhi = m_yMax->value();
+	}
+	if(m_mode->combo()->currentIndex() == XYMode) {
+		if(autoscale && xhi > xlo) {
+			const double span = xhi - xlo;
+			xlo -= span * 0.1;
+			xhi += span * 0.1;
+		} else {
+			xlo = ylo; // fixed range: square view
+			xhi = yhi;
+		}
+	}
+	if(xhi <= xlo) {
+		xhi = xlo + 1;
+	}
+	if(yhi <= ylo) {
+		yhi = ylo + 1;
+	}
+	if(m_plot->xAxis()->min() != xlo || m_plot->xAxis()->max() != xhi) {
+		m_plot->xAxis()->setInterval(xlo, xhi);
+	}
+	if(m_plot->yAxis()->min() != ylo || m_plot->yAxis()->max() != yhi) {
+		m_plot->yAxis()->setInterval(ylo, yhi);
+	}
+}
+
+void AcquisitionView::applyFixedYRange()
+{
+	const double lo = m_yMin->value();
+	const double hi = std::max(m_yMax->value(), lo + 1e-12);
+	m_plot->yAxis()->setInterval(lo, hi);
+	if(m_mode->combo()->currentIndex() == XYMode) {
+		m_plot->xAxis()->setInterval(lo, hi);
+	}
+	m_plot->replot();
+}
+
+void AcquisitionView::exportData()
+{
+	if(m_shownY.isEmpty()) {
+		setStatus("Nothing to export: acquire a buffer first", true);
+		return;
+	}
+	QString csv = m_shownXLabel;
+	for(const QString &name : std::as_const(m_shownNames)) {
+		csv += "," + name;
+	}
+	csv += "\n";
+	for(int i = 0; i < m_shownX.size(); ++i) {
+		csv += QString::number(m_shownX[i], 'g', 12);
+		for(const QVector<double> &y : std::as_const(m_shownY)) {
+			csv += "," + (i < y.size() ? QString::number(y[i], 'g', 12) : QString());
+		}
+		csv += "\n";
+	}
+	if(FileManagerHelper::saveDataToFile(this, csv, "Export plot data")) {
+		setStatus("Exported " + QString::number(m_shownX.size()) + " rows");
+	}
 }
 
 void AcquisitionView::onRunningChanged(bool running)

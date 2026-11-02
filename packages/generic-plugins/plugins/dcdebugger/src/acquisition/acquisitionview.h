@@ -22,6 +22,7 @@
 #ifndef ACQUISITIONVIEW_H
 #define ACQUISITIONVIEW_H
 
+#include "signalmath.h"
 #include "streamacquisition.h"
 
 #include <QMap>
@@ -34,6 +35,7 @@ class QPushButton;
 
 namespace scopy {
 class MenuCombo;
+class MenuOnOffSwitch;
 class MenuSectionCollapseWidget;
 class PlotChannel;
 class PlotWidget;
@@ -50,9 +52,12 @@ class Triggerable;
 } // namespace scopy::component
 
 namespace scopy::dcdebugger {
+class MeasurementsTable;
+struct MeasurementRow;
 
 // Acquisition tab of an InputStream: run / single, scan-element selection, samples, sample
-// rate, hardware trigger assignment, software edge trigger and a time plot.
+// rate, hardware trigger assignment, software edge trigger; time / spectrum / XY plot with
+// scaled or raw units, Y axis control, a measurements table and CSV export.
 class AcquisitionView : public QWidget
 {
 	Q_OBJECT
@@ -62,8 +67,24 @@ public:
 
 	StreamAcquisition *acquisition() const { return m_acq; }
 
+	enum PlotMode
+	{
+		TimeMode = 0,
+		SpectrumMode,
+		XYMode
+	};
+
 private:
 	QWidget *buildSettings(QWidget *parent);
+	QWidget *buildViewSection(QWidget *parent);
+	void onViewChanged();
+	void render();
+	// Spectrum of consecutive enabled channels paired as I + jQ; returns the x range.
+	QPair<double, double> renderIQSpectrum(bool raw, double fs, QList<MeasurementRow> &rows, double &ylo,
+					       double &yhi);
+	void applyAxes(double xlo, double xhi, double ylo, double yhi);
+	void applyFixedYRange();
+	void exportData();
 	QWidget *buildAcquisitionSection(QWidget *parent);
 	QWidget *buildSoftwareTriggerSection(QWidget *parent);
 	QWidget *buildHardwareTrigger(QWidget *parent);
@@ -97,6 +118,36 @@ private:
 	MenuCombo *m_swEdge;
 	MenuCombo *m_swMode;
 	gui::MenuSpinbox *m_swLevel;
+
+	// View
+	MenuCombo *m_mode;
+	MenuCombo *m_units;
+	MenuCombo *m_window;
+	gui::MenuSpinbox *m_averages;
+	MenuOnOffSwitch *m_complexIQ;
+	MenuCombo *m_xySource;
+	MenuCombo *m_xySourceY;
+	MenuOnOffSwitch *m_autoscale;
+	gui::MenuSpinbox *m_yMin;
+	gui::MenuSpinbox *m_yMax;
+	QMap<int, QPair<double, double>> m_yRange; // per PlotMode
+	int m_lastMode = TimeMode;
+
+	MeasurementsTable *m_table;
+	QPushButton *m_exportBtn;
+	SpectrumAverager m_averager;
+
+	// Last shown buffer (re-rendered when the view changes while stopped).
+	AcquiredFrame m_frame;
+	bool m_hasFrame = false;
+	int m_start = 0;
+	int m_count = 0;
+
+	// What the plot currently shows, for export: one shared x column.
+	QString m_shownXLabel;
+	QVector<double> m_shownX;
+	QStringList m_shownNames;
+	QVector<QVector<double>> m_shownY;
 };
 
 } // namespace scopy::dcdebugger

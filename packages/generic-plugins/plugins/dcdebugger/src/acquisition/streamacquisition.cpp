@@ -259,6 +259,8 @@ AcquiredFrame StreamAcquisition::decode(InputStream *stream)
 	for(int c = 0; c < view.channelCount(); ++c) {
 		frame.ids.append(c < ids.size() ? ids[c] : QStringLiteral("channel %1").arg(c));
 		frame.data.append(view.toDoubles(c));
+		frame.raw.append(view.toRawDoubles(c));
+		frame.bits.append(fmt.channels.at(c).validBits);
 	}
 	return frame;
 }

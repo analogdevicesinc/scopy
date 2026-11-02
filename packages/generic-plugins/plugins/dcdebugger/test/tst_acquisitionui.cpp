@@ -23,7 +23,10 @@
 #include "dcdebuggertool.h"
 #include "fakestream.h"
 
+#include <QComboBox>
+#include <QLabel>
 #include <QMainWindow>
+#include <QTableWidget>
 #include <QPushButton>
 #include <QTreeView>
 #include <QtTest>
@@ -31,6 +34,8 @@
 #include <component/connection.h>
 #include <component/context.h>
 #include <component/device.h>
+#include <menucombo.h>
+#include <menuonoffswitch.h>
 
 using namespace scopy;
 using namespace scopy::component;
@@ -46,9 +51,12 @@ private Q_SLOTS:
 	void cleanup();
 	void runAfterFailedOpen();
 	void disconnectWhileRunning();
+	void viewModesFillTheMeasurements();
 
 private:
 	QPushButton *button(const char *className) const;
+	QComboBox *comboStartingWith(const QString &firstItem) const;
+	QTableWidget *measurements() const;
 	void selectStream();
 
 	Connection *m_conn = nullptr;
@@ -135,6 +143,84 @@ void TST_AcquisitionUi::disconnectWhileRunning()
 	QTRY_VERIFY(m_stream->refills >= 2);
 	m_tool->clear();
 	QVERIFY(!m_stream->isOpen());
+}
+
+QComboBox *TST_AcquisitionUi::comboStartingWith(const QString &firstItem) const
+{
+	for(QComboBox *c : m_tool->findChildren<QComboBox *>()) {
+		if(c->count() > 0 && c->itemText(0) == firstItem) {
+			return c;
+		}
+	}
+	return nullptr;
+}
+
+QTableWidget *TST_AcquisitionUi::measurements() const
+{
+	for(QTableWidget *t : m_tool->findChildren<QTableWidget *>()) {
+		if(t->columnCount() == 9 && t->isVisible()) {
+			return t;
+		}
+	}
+	return nullptr;
+}
+
+void TST_AcquisitionUi::viewModesFillTheMeasurements()
+{
+	selectStream();
+	QPushButton *single = button("scopy::SingleShotBtn");
+	QVERIFY(single);
+	single->setChecked(true);
+	QTRY_VERIFY(!single->isChecked());
+
+	QTableWidget *table = measurements();
+	QVERIFY(table);
+	QCOMPARE(table->rowCount(), 2);
+	QCOMPARE(table->item(0, 8)->text(), QString("—")); // peak only in spectrum mode
+
+	QComboBox *mode = comboStartingWith("Time");
+	QVERIFY(mode);
+	mode->setCurrentIndex(1); // spectrum, re-rendered from the last buffer
+	QCOMPARE(table->rowCount(), 2);
+	QVERIFY(table->item(0, 8)->text().contains("@"));
+
+	mode->setCurrentIndex(2); // XY: voltage1 (Y) against voltage0 (X), both in the table
+	QCOMPARE(table->rowCount(), 2);
+	QComboBox *xCh = nullptr;
+	QComboBox *yCh = nullptr;
+	for(MenuCombo *c : m_tool->findChildren<MenuCombo *>()) {
+		if(c->title() == "X channel") {
+			xCh = c->combo();
+		} else if(c->title() == "Y channel") {
+			yCh = c->combo();
+		}
+	}
+	QVERIFY(xCh && yCh);
+	QCOMPARE(xCh->currentIndex(), 0);
+	QCOMPARE(yCh->currentIndex(), 1);
+	yCh->setCurrentIndex(0); // same channel on both axes: one row
+	QCOMPARE(table->rowCount(), 1);
+	yCh->setCurrentIndex(1);
+
+	QComboBox *units = comboStartingWith("Scaled");
+	QVERIFY(units);
+	units->setCurrentIndex(1);
+	mode->setCurrentIndex(1);
+	QVERIFY(table->item(0, 8)->text().contains("dBFS"));
+
+	MenuOnOffSwitch *iq = nullptr;
+	for(MenuOnOffSwitch *s : m_tool->findChildren<MenuOnOffSwitch *>()) {
+		if(s->label()->text().startsWith("Complex I/Q")) {
+			iq = s;
+		}
+	}
+	QVERIFY(iq && iq->isEnabled());
+	iq->onOffswitch()->setChecked(true); // voltage0 + j voltage1: one curve, both rows share the peak
+	QCOMPARE(table->rowCount(), 2);
+	QVERIFY(table->item(0, 8)->text().contains("(I/Q)"));
+	QCOMPARE(table->item(0, 8)->text(), table->item(1, 8)->text());
+	mode->setCurrentIndex(0);
+	QVERIFY(!iq->isEnabled());
 }
 
 QTEST_MAIN(TST_AcquisitionUi)

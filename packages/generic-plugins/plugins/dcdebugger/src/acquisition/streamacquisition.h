@@ -40,11 +40,14 @@ class ScanElement;
 
 namespace scopy::dcdebugger {
 
-// One refilled buffer, de-interleaved and scaled: data[i] belongs to the scan element ids[i].
+// One refilled buffer, de-interleaved: data[i] (scaled) and raw[i] (decoded integers) belong
+// to the scan element ids[i]; bits[i] is its valid bit count (full scale = 2^(bits - 1)).
 struct AcquiredFrame
 {
 	QStringList ids;
 	QVector<QVector<double>> data;
+	QVector<QVector<double>> raw;
+	QVector<int> bits;
 	quint64 index = 0;
 };
 
