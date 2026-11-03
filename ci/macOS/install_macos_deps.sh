@@ -263,17 +263,16 @@ clone() {
 		DEPENDENCY_REPOS="libserialport libiio qwt KDDockWidgets extra-cmake-modules karchive genalyzer qcoro libsigrokdecode libsigrok sigrok-cli"
 		if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
 			git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_V0_VERSION libiio
-			git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
+			git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_V0_BRANCH libad9361
 			git clone --recursive https://github.com/analogdevicesinc/libad9166-iio.git -b $LIBAD9166_BRANCH libad9166
-			git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
+			git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_V0_BRANCH libm2k
 			git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
 			DEPENDENCY_REPOS="$DEPENDENCY_REPOS libad9361 libad9166 libm2k libtinyiiod"
 		else
 			git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
 			git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
-			git clone --recursive https://github.com/analogdevicesinc/libad9166-iio.git -b $LIBAD9166_BRANCH libad9166
 			git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
-			DEPENDENCY_REPOS="$DEPENDENCY_REPOS libad9361 libad9166 libm2k"
+			DEPENDENCY_REPOS="$DEPENDENCY_REPOS libad9361 libm2k"
 		fi
 
 		# Save to cache for next time
@@ -416,26 +415,31 @@ build_libiio_v0() {
 }
 
 
+# plain dylib, bundled by dylibbundler like libiio v1
 build_libad9361() {
 	echo "### Building libad9361 - branch $LIBAD9361_BRANCH"
 	CURRENT_BUILD=libad9361-iio
 	pushd $STAGING_AREA/libad9361
 	save_version_info
-	if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
-		build_with_cmake
+	CURRENT_BUILD_CMAKE_OPTS="-DOSX_FRAMEWORK=OFF"
+	build_with_cmake
+	make install
+	popd
+}
 
-		# manually install framework
-		mkdir -p $STAGING_AREA_DEPS/include
-		mkdir -p $STAGING_AREA_DEPS/lib/pkgconfig
-		cp -v $STAGING_AREA/libad9361/ad9361.h $STAGING_AREA_DEPS/include
-		cp -avR $STAGING_AREA/libad9361/build/ad9361.framework $STAGING_AREA_DEPS/lib
-		cp -v $STAGING_AREA/libad9361/build/libad9361.pc $STAGING_AREA_DEPS/lib/pkgconfig
-	else
-		# plain dylib, bundled by dylibbundler like libiio v1
-		CURRENT_BUILD_CMAKE_OPTS="-DOSX_FRAMEWORK=OFF"
-		build_with_cmake
-		make install
-	fi
+build_libad9361_v0() {
+	echo "### Building libad9361 - branch $LIBAD9361_V0_BRANCH"
+	CURRENT_BUILD=libad9361-iio
+	pushd $STAGING_AREA/libad9361
+	save_version_info
+	build_with_cmake
+
+	# manually install framework
+	mkdir -p $STAGING_AREA_DEPS/include
+	mkdir -p $STAGING_AREA_DEPS/lib/pkgconfig
+	cp -v $STAGING_AREA/libad9361/ad9361.h $STAGING_AREA_DEPS/include
+	cp -avR $STAGING_AREA/libad9361/build/ad9361.framework $STAGING_AREA_DEPS/lib
+	cp -v $STAGING_AREA/libad9361/build/libad9361.pc $STAGING_AREA_DEPS/lib/pkgconfig
 	popd
 }
 
@@ -503,6 +507,15 @@ EOF
 
 build_libm2k() {
 	echo "### Building libm2k - branch $LIBM2K_BRANCH"
+	build_libm2k_common
+}
+
+build_libm2k_v0() {
+	echo "### Building libm2k - branch $LIBM2K_V0_BRANCH"
+	build_libm2k_common
+}
+
+build_libm2k_common() {
 	pushd $STAGING_AREA/libm2k
 	CURRENT_BUILD=libm2k
 	save_version_info
@@ -632,14 +645,13 @@ build_deps(){
 	if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
 		# libiio v0 and its consumers
 		build_libiio_v0
-		build_libad9361
+		build_libad9361_v0
 		build_libad9166
-		build_libm2k
+		build_libm2k_v0
 		build_libtinyiiod
 	else
 		build_libiio
 		build_libad9361
-		build_libad9166
 		build_libm2k
 	fi
 	build_qwt
