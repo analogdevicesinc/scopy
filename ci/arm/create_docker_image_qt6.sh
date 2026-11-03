@@ -55,7 +55,7 @@ armhf_cross(){
 	mkdir -p docker/tarballs
 
 	# package-name:version:local-filename
-	for entry in "sysroot-armhf:1.0.0:sysroot-armhf.tar.gz" \
+	for entry in "sysroot-armhf:1.1.0:sysroot-armhf.tar.gz" \
 		     "qt6-armhf-host:6.8.3:qt6-host-installed.tar.gz" \
 		     "qt6-armhf-cross:6.8.3:qt6-armhf-cross-installed.tar.gz"; do
 		name=${entry%%:*}
