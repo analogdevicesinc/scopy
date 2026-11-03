@@ -93,6 +93,11 @@ else()
 	set(AD9361_INCLUDE_DIRS "")
 endif()
 
+# FMCOMMS5 calibration calls libiio directly; link it on v1 (macOS/Windows linkers need it resolved)
+if(SCOPY_HAS_LIBAD9361 AND SCOPY_LIBIIO_VERSION STREQUAL "1")
+	list(APPEND AD9361_LIBRARIES ${IIO_V1_LIBRARY})
+endif()
+
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
 
