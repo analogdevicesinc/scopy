@@ -17,14 +17,20 @@ export LD_LIBRARY_PATH="$LD_LIBRARY_PATH;$STAGING_AREA_DEPS;$STAGING_AREA_DEPS/l
 
 LIBSERIALPORT_BRANCH=master
 # libiio API Scopy is built against: 1 (default) or 0. Each CI job builds its dependencies from source, so only
-# the selected libiio (and, for v0, the libraries built on it) is built - no separate v0 prefix is needed.
+# the selected libiio and the libraries built on it are built - no separate v0 prefix is needed.
 SCOPY_LIBIIO_VERSION=${SCOPY_LIBIIO_VERSION:-1}
 LIBIIO_VERSION=v1.0.0
 LIBIIO_V0_VERSION=v0.26
-# libad9361-iio: the main branch targets libiio v1; only the v0 leg builds it here (v1 leg not yet added).
-LIBAD9361_BRANCH=libad9361-iio-v0
-LIBAD9166_BRANCH=libad9166-iio-v0
-LIBM2K_BRANCH=main
+# ADI libraries built on libiio: branch matching the selected libiio
+if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
+	LIBAD9361_BRANCH=libad9361-iio-v0
+	LIBAD9166_BRANCH=libad9166-iio-v0
+	LIBM2K_BRANCH=main
+else
+	LIBAD9361_BRANCH=main
+	LIBAD9166_BRANCH=main
+	LIBM2K_BRANCH=libiio-v1
+fi
 QWT_BRANCH=qwt-multiaxes-updated
 LIBTINYIIOD_BRANCH=master
 KDDOCK_BRANCH=2.2
