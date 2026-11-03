@@ -270,6 +270,10 @@ clone() {
 			DEPENDENCY_REPOS="$DEPENDENCY_REPOS libad9361 libad9166 libm2k libtinyiiod"
 		else
 			git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
+			git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
+			git clone --recursive https://github.com/analogdevicesinc/libad9166-iio.git -b $LIBAD9166_BRANCH libad9166
+			git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
+			DEPENDENCY_REPOS="$DEPENDENCY_REPOS libad9361 libad9166 libm2k"
 		fi
 
 		# Save to cache for next time
@@ -417,14 +421,21 @@ build_libad9361() {
 	CURRENT_BUILD=libad9361-iio
 	pushd $STAGING_AREA/libad9361
 	save_version_info
-	build_with_cmake
+	if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
+		build_with_cmake
 
-	# manually install framework
-	mkdir -p $STAGING_AREA_DEPS/include
-	mkdir -p $STAGING_AREA_DEPS/lib/pkgconfig
-	cp -v $STAGING_AREA/libad9361/ad9361.h $STAGING_AREA_DEPS/include
-	cp -avR $STAGING_AREA/libad9361/build/ad9361.framework $STAGING_AREA_DEPS/lib
-	cp -v $STAGING_AREA/libad9361/build/libad9361.pc $STAGING_AREA_DEPS/lib/pkgconfig
+		# manually install framework
+		mkdir -p $STAGING_AREA_DEPS/include
+		mkdir -p $STAGING_AREA_DEPS/lib/pkgconfig
+		cp -v $STAGING_AREA/libad9361/ad9361.h $STAGING_AREA_DEPS/include
+		cp -avR $STAGING_AREA/libad9361/build/ad9361.framework $STAGING_AREA_DEPS/lib
+		cp -v $STAGING_AREA/libad9361/build/libad9361.pc $STAGING_AREA_DEPS/lib/pkgconfig
+	else
+		# plain dylib, bundled by dylibbundler like libiio v1
+		CURRENT_BUILD_CMAKE_OPTS="-DOSX_FRAMEWORK=OFF"
+		build_with_cmake
+		make install
+	fi
 	popd
 }
 
@@ -627,6 +638,9 @@ build_deps(){
 		build_libtinyiiod
 	else
 		build_libiio
+		build_libad9361
+		build_libad9166
+		build_libm2k
 	fi
 	build_qwt
 	build_kddock

@@ -31,6 +31,7 @@ if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
 	cp -avR $STAGING_AREA_DEPS/lib/ad9361.framework Scopy.app/Contents/Frameworks/
 fi
 cp -avR $STAGING_AREA_DEPS/lib/genalyzer.framework Scopy.app/Contents/Frameworks/
+cp -avR $STAGING_AREA_DEPS/lib/ad9166.framework Scopy.app/Contents/Frameworks/
 mkdir -p $BUILDDIR/Scopy.app/Contents/MacOS/plugins/resources
 
 libqwtpath=${STAGING_AREA_DEPS}/lib/libqwt_scopy.6.4.0.dylib #hardcoded
@@ -107,6 +108,16 @@ echo $STAGING_AREA_DEPS/lib | dylibbundler --no-codesign --overwrite-files --bun
 	--dest-dir $BUILDDIR/Scopy.app/Contents/Frameworks/ \
 	--install-path @executable_path/../Frameworks/ \
 	--search-path $BUILDDIR/Scopy.app/Contents/Frameworks/
+
+# libiio v1 is a plain dylib, so the copied ad9166.framework needs its @rpath/libiio reference fixed like the plugins
+if [ "$SCOPY_LIBIIO_VERSION" != "0" ]; then
+	echo "### Fixing ad9166"
+	dylibbundler --no-codesign --overwrite-files --bundle-deps --create-dir \
+		--fix-file $BUILDDIR/Scopy.app/Contents/Frameworks/ad9166.framework/ad9166 \
+		--dest-dir $BUILDDIR/Scopy.app/Contents/Frameworks/ \
+		--install-path @executable_path/../Frameworks/ \
+		"${PREFIXED_SEARCH_PATHS[@]}"
+fi
 
 
 echo "### Fixing Scopy binary"
