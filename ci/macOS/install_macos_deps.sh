@@ -422,7 +422,9 @@ build_libad9361() {
 	pushd $STAGING_AREA/libad9361
 	save_version_info
 	CURRENT_BUILD_CMAKE_OPTS="-DOSX_FRAMEWORK=OFF"
-	build_with_cmake
+	# CPATH puts the libiio v1 headers on the compiler's default include path: the libad9361 tests include
+	# <iio/iio.h> without adding the libiio include directory themselves (same as build_with_cmake_v0 on Linux).
+	CPATH=$STAGING_AREA_DEPS/include${CPATH:+:$CPATH} build_with_cmake
 	make install
 	popd
 }
