@@ -3,12 +3,11 @@
 # Create Docker Image for Ubuntu Build (Qt6)
 # ===========================
 # Usage: ./create_docker_image.sh ubuntu22 ubuntu24 ubuntu26
-#        TAG=slim ./create_docker_image.sh ubuntu24
+#        TAG=latest ./create_docker_image.sh ubuntu24
 #
 # TAG defaults to "testing", the staging tag a freshly built image lands on. It is an environment
 # variable rather than $1 because $1 is the target function name consumed by the dispatch loop at
-# the bottom - same convention as ci/arm/create_docker_image_qt6.sh. main currently builds against
-# :slim, so that tag is still live and must remain buildable.
+# the bottom - same convention as ci/arm/create_docker_image_qt6.sh. main builds against :latest.
 
 SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 

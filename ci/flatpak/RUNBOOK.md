@@ -29,16 +29,15 @@ This is the long step (~30–60 min).
 ```bash
 cd ci/flatpak
 ./create_docker_image.sh          # → ...scopy2-flatpak-qt6:testing
-./create_docker_image.sh slim     # → ...scopy2-flatpak-qt6:slim
+./create_docker_image.sh latest   # → ...scopy2-flatpak-qt6:latest
 cd ../..
 
 docker images | grep scopy2-flatpak-qt6   # confirm it exists
 ```
 
 The tag argument defaults to `testing`, the staging tag a freshly built image lands on. `main` and
-ordinary branches currently build against `:slim`, by agreement, until `:slim` is retagged to
-`:latest` and `get_docker_tag.yml`'s default is flipped — so rebuild to `:slim` if `main` depends on
-it. Retagging never changes the image name, so every pull URL keeps working.
+ordinary branches build against `:latest`, so rebuild to `:latest` if `main` depends on it.
+Retagging never changes the image name, so every pull URL keeps working.
 
 > This step is now **faster** — boost and gnuradio, the two longest modules, are gone from the
 > manifest. Expect a full cache miss the first time regardless: removing modules changes the cache key

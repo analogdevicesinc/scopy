@@ -3,11 +3,10 @@
 # Create Docker Image for Windows Build (MinGW, Qt6)
 # ===========================
 # Usage: ./create_docker_image.sh windows
-#        TAG=slim ./create_docker_image.sh windows
+#        TAG=latest ./create_docker_image.sh windows
 #
-# TAG defaults to "testing", the staging tag a freshly built image lands on; main currently builds
-# against :slim, so that tag is still live and must remain buildable. Same convention as
-# ci/arm/create_docker_image_qt6.sh and ci/ubuntu/create_docker_image.sh.
+# TAG defaults to "testing", the staging tag a freshly built image lands on; main builds against
+# :latest. Same convention as ci/arm/create_docker_image_qt6.sh and ci/ubuntu/create_docker_image.sh.
 #
 # Requires Docker Desktop switched to WINDOWS CONTAINERS. The image is a servercore base with
 # MSYS2 + MinGW64 inside, so it cannot be built from a Linux daemon. hyperv isolation and a

@@ -5,9 +5,8 @@
 # Usage: ./create_docker_image.sh [tag]
 #
 # The tag defaults to "testing", the staging tag a freshly built image lands on. main and
-# ordinary branches currently build against ":slim" (the reduced dependency set), by agreement,
-# until :slim is retagged to ":latest" and get_docker_tag.yml's default is flipped:
-#   ./create_docker_image.sh slim
+# ordinary branches build against ":latest":
+#   ./create_docker_image.sh latest
 
 SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || \
 SRC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && cd ../../ && pwd )

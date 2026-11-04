@@ -73,28 +73,12 @@ if(ENABLE_TESTING)
 endif()
 
 # FMCOMMS5 calibration and the MCS sync use the raw libiio API and libad9361, which must be built against the same
-# libiio version as Scopy. Required for libiio v0; optional for libiio v1 (not built on every platform yet).
-if(SCOPY_LIBIIO_VERSION STREQUAL "0")
-	find_library(AD9361_LIBRARIES NAMES ad9361 libad9361 REQUIRED)
-	find_path(AD9361_INCLUDE_DIRS ad9361.h REQUIRED)
-else()
-	find_library(AD9361_LIBRARIES NAMES ad9361 libad9361)
-	find_path(AD9361_INCLUDE_DIRS ad9361.h)
-endif()
-
-if(AD9361_LIBRARIES AND AD9361_INCLUDE_DIRS)
-	set(SCOPY_HAS_LIBAD9361 1)
-else()
-	message(WARNING "libad9361 not found: FMCOMMS5 calibration and MCS sync are disabled")
-	list(REMOVE_ITEM SRC_LIST ${CMAKE_CURRENT_SOURCE_DIR}/src/fmcomms5/fmcomms5calibration.cpp)
-	list(REMOVE_ITEM HEADER_LIST ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/fmcomms5/fmcomms5calibration.h)
-	set(SCOPY_HAS_LIBAD9361 0)
-	set(AD9361_LIBRARIES "")
-	set(AD9361_INCLUDE_DIRS "")
-endif()
+# libiio version as Scopy.
+find_library(AD9361_LIBRARIES NAMES ad9361 libad9361 REQUIRED)
+find_path(AD9361_INCLUDE_DIRS ad9361.h REQUIRED)
 
 # FMCOMMS5 calibration calls libiio directly; link it on v1 (macOS/Windows linkers need it resolved)
-if(SCOPY_HAS_LIBAD9361 AND SCOPY_LIBIIO_VERSION STREQUAL "1")
+if(SCOPY_LIBIIO_VERSION STREQUAL "1")
 	list(APPEND AD9361_LIBRARIES ${IIO_V1_LIBRARY})
 endif()
 
@@ -129,9 +113,7 @@ configure_file(
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 target_include_directories(${PROJECT_NAME} PRIVATE ${AD9361_INCLUDE_DIRS})
-target_compile_definitions(
-	${PROJECT_NAME} PRIVATE SCOPY_LIBIIO_VERSION=${SCOPY_LIBIIO_VERSION} SCOPY_HAS_LIBAD9361=${SCOPY_HAS_LIBAD9361}
-)
+target_compile_definitions(${PROJECT_NAME} PRIVATE SCOPY_LIBIIO_VERSION=${SCOPY_LIBIIO_VERSION})
 
 target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui scopy-pkg-manager)
 

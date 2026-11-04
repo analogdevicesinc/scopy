@@ -6,10 +6,8 @@
 #        ./create_docker_image_qt6.sh armhf_cross
 #
 # TAG defaults to "testing", the staging tag a freshly built image lands on. main and ordinary
-# branches currently build against ":slim" (the reduced dependency set), by agreement, until :slim
-# is retagged to ":latest" and get_docker_tag.yml's default is flipped. So :slim is live and must
-# stay buildable; ":latest" is not in use yet and exists on only one of the seven images.
-#   TAG=slim ./create_docker_image_qt6.sh arm64
+# branches build against ":latest":
+#   TAG=latest ./create_docker_image_qt6.sh arm64
 # The tag is an environment variable rather than $1 because $1 is the target function name
 # consumed by the dispatch loop at the bottom.
 
