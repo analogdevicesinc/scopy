@@ -133,8 +133,8 @@ run_all() {
 	echo "  2. sudo docker login docker.cloudsmith.io -u token"
 	echo "  3. sudo docker push docker.cloudsmith.io/adi/scopy-dockers/scopy2-arm64-native-qt6:testing"
 	echo ""
-	echo "NOTE: main currently builds against :slim, not :latest. To replace the image main uses,"
-	echo "      run step 1 as 'sudo TAG=slim ...' and push :slim instead."
+	echo "NOTE: main builds against :latest. To replace the image main uses,"
+	echo "      run step 1 as 'sudo TAG=latest ...' and push :latest instead."
 }
 
 if [ $# -eq 0 ]; then

@@ -88,9 +88,7 @@ Finally, after the development is done use this to clean the system
 ### Building the Docker Image
 
 The tag defaults to `testing`, the staging tag a freshly built image lands on. `main` and ordinary
-branches currently build against `:slim` (the reduced dependency set), by agreement, until `:slim` is
-retagged to `:latest` and `get_docker_tag.yml`'s default is flipped — so pass `TAG=slim` when
-rebuilding an image `main` depends on. `:latest` is not in use yet.
+branches build against `:latest`, so pass `TAG=latest` when rebuilding an image `main` depends on.
 
 The **armhf cross image** builds on any x86_64 host and downloads its prebuilt tarballs from
 Cloudsmith:
