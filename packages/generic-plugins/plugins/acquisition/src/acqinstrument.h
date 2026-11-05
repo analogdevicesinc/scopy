@@ -22,6 +22,8 @@
 #ifndef ACQINSTRUMENT_H
 #define ACQINSTRUMENT_H
 
+#include "scopy-acquisition_export.h"
+
 #include <QWidget>
 
 namespace scopy {
@@ -48,7 +50,7 @@ class LogView;
 //
 // Every engine signal arrives from the worker thread, so every connection to one here is
 // queued; the signals below re-emit them on the GUI thread.
-class AcqInstrument : public QWidget
+class SCOPY_ACQUISITION_EXPORT AcqInstrument : public QWidget
 {
 	Q_OBJECT
 public:
