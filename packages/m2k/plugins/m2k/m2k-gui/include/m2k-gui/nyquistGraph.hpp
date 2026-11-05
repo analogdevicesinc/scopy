@@ -79,7 +79,7 @@ public Q_SLOTS:
 
 	void mousePressEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
-	void enterEvent(QEvent *event);
+	void enterEvent(QEnterEvent *event);
 	void leaveEvent(QEvent *event);
 
 private:

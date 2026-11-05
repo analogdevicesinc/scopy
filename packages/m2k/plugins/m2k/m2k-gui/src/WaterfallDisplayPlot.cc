@@ -170,7 +170,7 @@ WaterfallDisplayPlot::WaterfallDisplayPlot(int nplots, QWidget *parent)
 
 	QFont font;
 	font.setPointSize(10);
-	font.setWeight(75);
+	font.setWeight(QFont::Bold);
 	d_zoomer[0]->setTrackerFont(font);
 
 	d_magnifier.push_back(new PlotMagnifier(this));

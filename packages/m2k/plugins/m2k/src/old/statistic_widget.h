@@ -35,6 +35,8 @@ class Formatter;
 
 class StatisticWidget : public QWidget
 {
+	// Qt6 requires it of a class passed to findChildren().
+	Q_OBJECT
 public:
 	explicit StatisticWidget(QWidget *parent = nullptr);
 	~StatisticWidget();

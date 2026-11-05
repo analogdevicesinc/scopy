@@ -183,7 +183,7 @@ void DropdownSwitchList::mouseReleaseEvent(QMouseEvent *event)
 	}
 }
 
-void DropdownSwitchList::enterEvent(QEvent *event) { m_mouseInside = true; }
+void DropdownSwitchList::enterEvent(QEnterEvent *event) { m_mouseInside = true; }
 
 void DropdownSwitchList::leaveEvent(QEvent *event) { m_mouseInside = false; }
 
