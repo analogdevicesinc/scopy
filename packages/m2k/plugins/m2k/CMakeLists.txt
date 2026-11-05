@@ -49,12 +49,6 @@ file(
 	GLOB
 	OLD_SCOPY_FILES
 	src/old/*.cpp
-	src/old/logicanalyzer/*.cpp
-	src/old/logicanalyzer/*.hpp
-	src/old/patterngenerator/*.cpp
-	src/old/patterngenerator/*.hpp
-	src/old/patterngenerator/patterns/*.cpp
-	src/old/patterngenerator/patterns/*.hpp
 	src/old/*.hpp
 	src/old/*.cc
 	src/old/*.hh
@@ -62,13 +56,16 @@ file(
 	src/old/*.h
 )
 
-file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
-file(GLOB UI_LIST ui/*.ui ui/patterns/*.ui)
+# The spectrum, network and logic analyzers and the pattern generator do not build against this tree
+# yet, so they and the sinks only they use are left out. The oscilloscope is in, without its mixed
+# signal view (M2K_WITH_LOGIC).
+list(FILTER OLD_SCOPY_FILES EXCLUDE REGEX
+     "src/old/(spectrum_analyzer|network_analyzer|networkanalyzerbufferviewer|logic_analyzer_sink|mixed_signal_sink)"
+)
 
-set(ENABLE_TESTING ON)
-if(ENABLE_TESTING)
-	add_subdirectory(test)
-endif()
+file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
+file(GLOB UI_LIST ui/*.ui)
+
 add_subdirectory(m2k-gui)
 
 set(PROJECT_SOURCES ${SRC_LIST} ${OLD_SCOPY_FILES} ${HEADER_LIST} ${UI_LIST})
@@ -143,6 +140,7 @@ target_link_libraries(
 	       scopy-gr-gui
 	       scopy-sigrok-gui
 	       libm2k::libm2k
+	       component
 	       gnuradio::gnuradio-runtime
 	       gnuradio::gnuradio-analog
 	       gnuradio::gnuradio-blocks

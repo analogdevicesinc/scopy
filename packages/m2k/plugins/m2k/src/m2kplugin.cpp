@@ -25,19 +25,20 @@
 #include "digitalio.hpp"
 #include "dmm.hpp"
 #include "filter.hpp"
-#include "iioutil/connectionprovider.h"
 #include "m2kcommon.h"
 #include "manualcalibration.h"
-#include "network_analyzer.hpp"
 #include "oscilloscope.hpp"
-#include "patterngenerator/pattern_generator.h"
 #include "power_controller.hpp"
 #include "qtextbrowser.h"
 #include "scopy-m2k_config.h"
 #include "signal_generator.hpp"
-#include "spectrum_analyzer.hpp"
 
 #include <iio.h>
+
+#include <component/attribute.h>
+#include <component/context.h>
+#include <component/controller.h>
+#include <component/device.h>
 
 #include <QBoxLayout>
 #include <QJsonDocument>
@@ -65,23 +66,17 @@ Q_LOGGING_CATEGORY(CAT_BENCHMARK, "Benchmark")
 bool M2kPlugin::compatible(QString m_param, QString category)
 {
 	qDebug(CAT_M2KPLUGIN) << "compatible";
-	bool ret = false;
-	ConnectionProvider *c = ConnectionProvider::GetInstance();
-	Connection *conn = c->open(m_param);
-
-	if(!conn)
+	// Asked of the device-controller context Scopy already holds: no connection of our own.
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx) {
 		return false;
-
-	//	ret = !!iio_context_find_device(ctx,"m2k-adc");
-	//	ret = ret && !!iio_context_find_device(ctx,"m2k-dac-a");
-	//	ret = ret && !!iio_context_find_device(ctx,"m2k-dac-b");
-
-	Filter *f = new Filter(conn->context());
-	ret = (f->hw_name().compare("M2K") == 0);
-	delete(f);
-
-	c->close(m_param);
-	return ret;
+	}
+	for(const char *dev : {"m2k-adc", "m2k-dac-a", "m2k-dac-b", "m2k-fabric"}) {
+		if(!ctx->findChild<component::Device *>(dev, Qt::FindDirectChildrenOnly)) {
+			return false;
+		}
+	}
+	return true;
 }
 
 void M2kPlugin::preload()
@@ -96,21 +91,9 @@ void M2kPlugin::loadToolList()
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kosc", tr("Oscilloscope"),
 						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
 							  "/icons/tool_oscilloscope.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kspec", tr("Spectrum Analyzer"),
-						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
-							  "/icons/tool_spectrum_analyzer.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2knet", tr("Network Analyzer"),
-						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
-							  "/icons/tool_network_analyzer.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2ksiggen", tr("Signal Generator"),
 						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
 							  "/icons/tool_signal_generator.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2klogic", tr("Logic Analyzer"),
-						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
-							  "/icons/tool_logic_analyzer.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kpattern", tr("Pattern Generator"),
-						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
-							  "/icons/tool_pattern_generator.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kdio", tr("Digital I/O"),
 						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
 							  "/icons/tool_io.svg"));
@@ -146,18 +129,14 @@ bool M2kPlugin::loadPage()
 	lay->addWidget(textBrowser);
 
 	m_m2kInfoPage->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	ConnectionProvider *c = ConnectionProvider::GetInstance();
-	Connection *conn = c->open(m_param);
-	for(int i = 0; i < iio_context_get_attrs_count(conn->context()); i++) {
-		const char *name;
-		const char *value;
-		int ret = iio_context_get_attr(conn->context(), i, &name, &value);
-		if(ret != 0)
-			continue;
-
-		m_m2kInfoPage->update(name, value);
+	// The context attributes, cached by the device controller when it built the context.
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(ctx) {
+		for(component::Attribute *a :
+		    ctx->findChildren<component::Attribute *>(QString(), Qt::FindDirectChildrenOnly)) {
+			m_m2kInfoPage->update(a->name(), a->cachedValue());
+		}
 	}
-	c->close(m_param);
 
 	return true;
 }
@@ -199,6 +178,10 @@ void M2kPlugin::calibrationStarted()
 	storeToolState(calibrationToolNames);
 	for(const QString &tool : calibrationToolNames) {
 		auto tme = ToolMenuEntry::findToolMenuEntryByName(m_toolList, tool);
+		// Not every tool is in every build.
+		if(!tme) {
+			continue;
+		}
 		tme->setName("Calibrating ... ");
 		tme->setEnabled(false);
 		tme->setRunning(false);
@@ -216,6 +199,9 @@ void M2kPlugin::storeToolState(QStringList tools)
 {
 	for(const QString &tool : calibrationToolNames) {
 		auto tme = ToolMenuEntry::findToolMenuEntryByName(m_toolList, tool);
+		if(!tme) {
+			continue;
+		}
 		toolMenuEntryCalibrationCache[tool] = new ToolMenuEntry(*tme); // save tool state
 	}
 }
@@ -229,6 +215,10 @@ void M2kPlugin::restoreToolState(QStringList tools)
 		ToolMenuEntry *cachedTme = toolMenuEntryCalibrationCache.take(tool);
 		auto id = cachedTme->id();
 		auto tme = ToolMenuEntry::findToolMenuEntryById(m_toolList, id);
+		if(!tme) {
+			delete cachedTme;
+			continue;
+		}
 		tme->setName(cachedTme->name());
 		tme->setEnabled(cachedTme->enabled());
 		tme->setRunning(cachedTme->running());
@@ -431,9 +421,6 @@ void M2kPlugin::cleanup()
 		}
 		m_m2k = nullptr;
 	}
-
-	ConnectionProvider *c = ConnectionProvider::GetInstance();
-	c->close(m_param);
 }
 
 void M2kPlugin::clearPingTask()
@@ -442,29 +429,23 @@ void M2kPlugin::clearPingTask()
 		m_cyclicalTask->deleteLater();
 		m_cyclicalTask = nullptr;
 	}
-	if(m_pingTask) {
-		m_pingTask->deleteLater();
-		m_pingTask = nullptr;
-	}
 }
 
 bool M2kPlugin::onConnect()
 {
-	ConnectionProvider *c = ConnectionProvider::GetInstance();
-	Connection *conn = c->open(m_param);
-
-	if(!conn) {
-		return false;
-	}
-	struct iio_context *ctx = conn->context();
+	// libm2k opens its own libiio v0 context: this build's device controller is on libiio v1,
+	// and the two never share a context.
+	struct iio_context *ctx = nullptr;
 	try {
-		m_m2k = m2kOpen(ctx, m_param.toUtf8());
+		m_m2k = m2kOpen(m2kV0Uri(m_param).constData());
+		if(!m_m2k) {
+			return false;
+		}
+		ctx = m_m2k->getIioContext();
 		m2k_man = new m2k_iio_manager();
 		m_btnCalibrate->setDisabled(false);
 
 		m_m2kController->connectM2k(m_m2k);
-		m_pingTask = new IIOPingTask(ctx, this);
-		m_cyclicalTask = new CyclicalTask(m_pingTask);
 
 		Filter *f = new Filter(ctx);
 		QJSEngine *js = ScopyJS::GetInstance()->engine();
@@ -477,11 +458,7 @@ bool M2kPlugin::onConnect()
 		auto dioTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "m2kdio");
 		auto pwrTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "m2kpower");
 		auto siggenTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "m2ksiggen");
-		auto specTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "m2kspec");
 		auto oscTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "m2kosc");
-		auto netTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "m2knet");
-		auto laTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "m2klogic");
-		auto pgTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "m2kpattern");
 		m_adcBtnGrp = new QButtonGroup(this);
 
 		tools.insert("m2kdmm", new DMM(m_m2k, m_param, f, dmmTme, m2k_man));
@@ -494,48 +471,10 @@ bool M2kPlugin::onConnect()
 		pwrTme->setTool(tools["m2kpower"]);
 		tools.insert("m2ksiggen", new SignalGenerator(m_m2k, m_param, f, siggenTme, js, nullptr));
 		siggenTme->setTool(tools["m2ksiggen"]);
-		tools.insert("m2kspec", new SpectrumAnalyzer(m_m2k, m_param, f, specTme, m2k_man, js, nullptr));
-		specTme->setTool(tools["m2kspec"]);
 		tools.insert("m2kosc", new Oscilloscope(m_m2k, m_param, f, oscTme, m2k_man, js, nullptr));
 		oscTme->setTool(tools["m2kosc"]);
-		tools.insert("m2knet", new NetworkAnalyzer(m_m2k, m_param, f, netTme, m2k_man, js, nullptr));
-		netTme->setTool(tools["m2knet"]);
-		tools.insert("m2klogic", new logic::LogicAnalyzer(m_m2k, f, laTme, js, nullptr));
-		laTme->setTool(tools["m2klogic"]);
-
-		logic::LogicAnalyzer *logic_analyzer = dynamic_cast<logic::LogicAnalyzer *>(tools["m2klogic"]);
-		Oscilloscope *oscilloscope = dynamic_cast<Oscilloscope *>(tools["m2kosc"]);
-		NetworkAnalyzer *network_analyzer = dynamic_cast<NetworkAnalyzer *>(tools["m2knet"]);
-
-		oscilloscope->setLogicAnalyzer(logic_analyzer);
-		network_analyzer->setOscilloscope(oscilloscope);
-
-		tools.insert("m2kpattern", new logic::PatternGenerator(m_m2k, f, pgTme, js, diom, nullptr));
-		pgTme->setTool(tools["m2kpattern"]);
-		connect(dynamic_cast<SignalGenerator *>(siggenTme->tool())->getRunButton(), &QPushButton::toggled, this,
-			[=](bool en) {
-				if(en) {
-					if(dynamic_cast<NetworkAnalyzer *>(netTme->tool())->getRunButton()->isChecked())
-						dynamic_cast<NetworkAnalyzer *>(netTme->tool())
-							->getRunButton()
-							->setChecked(false);
-				}
-			});
-
-		connect(dynamic_cast<NetworkAnalyzer *>(netTme->tool())->getRunButton(), &QPushButton::toggled, this,
-			[=](bool en) {
-				if(en) {
-					if(dynamic_cast<SignalGenerator *>(siggenTme->tool())
-						   ->getRunButton()
-						   ->isChecked())
-						dynamic_cast<SignalGenerator *>(siggenTme->tool())
-							->getRunButton()
-							->setChecked(false);
-				}
-			});
-
-		//	m_dacBtnGrp->addButton(dynamic_cast<NetworkAnalyzer*>(netTme->tool())->getRunButton());
-		//	m_dacBtnGrp->addButton(dynamic_cast<SignalGenerator*>(siggenTme->tool())->getRunButton());
+		// This build leaves out the spectrum, network and logic analyzers and the pattern
+		// generator: they do not build against this tree yet.
 
 		connect(m_m2kController, SIGNAL(calibrationStarted()), this, SLOT(calibrationStarted()));
 		connect(m_m2kController, SIGNAL(calibrationSuccess()), this, SLOT(calibrationSuccess()));

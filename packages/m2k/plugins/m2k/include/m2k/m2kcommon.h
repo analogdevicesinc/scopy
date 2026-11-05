@@ -22,7 +22,17 @@
 #ifndef M2KCOMMON_H
 #define M2KCOMMON_H
 #include <QLoggingCategory>
+#include <QString>
 
 Q_DECLARE_LOGGING_CATEGORY(CAT_M2KPLUGIN);
+
+// The URI this plugin's own libiio v0 connections (libm2k, identify, temperature) use. Scopy's
+// device controller (libiio v1) already holds the board's USB interface, and a second USB
+// connection makes libiio v0 crash in usb_create_context(). Over USB an M2K is also reachable
+// through its USB network link, so those connections go there instead.
+inline QByteArray m2kV0Uri(const QString &uri)
+{
+	return (uri.startsWith("usb:") ? QStringLiteral("ip:192.168.2.1") : uri).toUtf8();
+}
 
 #endif // M2KCOMMON_H

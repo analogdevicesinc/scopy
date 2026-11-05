@@ -20,7 +20,7 @@ set -ex
 # Staging configuration
 # OFF: Use system libraries where possible
 # ON: Use isolated dependency tree
-USE_STAGING=OFF
+USE_STAGING=${USE_STAGING:-OFF}
 
 # Determine source directories
 SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || \
@@ -90,7 +90,7 @@ QT=$QT_INSTALL_LOCATION/6.8.3/gcc_64
 STAGING_AREA=$SRC_SCRIPT/staging
 QMAKE_BIN=$QT/bin/qmake6
 CMAKE_BIN=${STAGING_AREA}/cmake/bin/cmake
-JOBS=-j14 # Parallel build jobs
+JOBS=${JOBS:--j14} # Parallel build jobs
 
 # AppImage structure
 # =================
@@ -653,7 +653,10 @@ create_appdir(){
 	export PATH=$QT:$PATH
 	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$STAGING_AREA_DEPS/lib:$QT/lib:$APP_DIR/usr/lib
 	# libiio v0: resolve libiio.so.0 (and libad9361) from the v0 prefix, not the libiio v1 compat library.
-	[ "$SCOPY_LIBIIO_VERSION" == "0" ] && LD_LIBRARY_PATH=$LIBIIO_V0_PREFIX/lib:$LD_LIBRARY_PATH
+	# Hybrid build (libiio v1 device controller + the M2K plugin on libm2k): also for libiio v1, so libm2k and
+	# gnuradio get the real libiio v0 they were built on rather than libiio v1's compat libiio.so.0. libiio.so.1
+	# only exists in the default prefix, so the device controller still gets v1.
+	LD_LIBRARY_PATH=$LIBIIO_V0_PREFIX/lib:$LD_LIBRARY_PATH
 	sudo ldconfig
 	export APPIMAGE_EXTRACT_AND_RUN=1
 

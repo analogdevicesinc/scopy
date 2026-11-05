@@ -190,6 +190,15 @@ Plugin *PluginManager::loadPlugin(QString file)
 	}
 
 	qp.setFileName(file);
+#ifdef Q_OS_LINUX
+	// The M2K plugin runs on libm2k, which is built on libiio v0, in a process whose device
+	// controller already loaded libiio v1. The two export the same unversioned names, so without
+	// this libiio v0 and libm2k bind their own calls to libiio v1 and crash. Deep binding makes the
+	// plugin's dependency tree, where libiio.so.0 comes first, win over the global scope.
+	if(QFileInfo(file).fileName().startsWith("libscopy-m2k.")) {
+		qp.setLoadHints(QLibrary::DeepBindHint);
+	}
+#endif
 	qInfo(CAT_PLUGINMANAGER) << "Loading plugin library:" << file;
 	ret = qp.load();
 	if(!ret) {

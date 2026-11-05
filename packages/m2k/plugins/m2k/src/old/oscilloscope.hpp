@@ -58,7 +58,9 @@
 #include "gui/spinbox_a.hpp"
 #include "histogram_sink_f.h"
 #include "iio_manager.hpp"
+#ifdef M2K_WITH_LOGIC
 #include "logicanalyzer/logic_analyzer.h"
+#endif
 #include "m2ktool.hpp"
 #include "math.hpp"
 #include "mousewheelwidgetguard.h"
@@ -75,8 +77,10 @@
 #include <libm2k/m2k.hpp>
 
 /* gr-m2k includes */
+#ifdef M2K_WITH_LOGIC
 #include "logic_analyzer_sink.h"
 #include "mixed_signal_sink.h"
+#endif
 
 #include <gnuradio/m2k/digital_in_source.h>
 
@@ -137,7 +141,9 @@ public:
 	void add_ref_waveform(QString name, QVector<double> xData, QVector<double> yData, unsigned int sampleRate);
 	void remove_ref_waveform(QString name);
 
+#ifdef M2K_WITH_LOGIC
 	void setLogicAnalyzer(logic::LogicAnalyzer *la);
+#endif
 
 Q_SIGNALS:
 	void triggerALevelChanged(double);
@@ -246,8 +252,10 @@ private Q_SLOTS:
 	void toolDetached(bool);
 	void setFilteringEnabled(bool set);
 
+#ifdef M2K_WITH_LOGIC
 	void enableMixedSignalView(ChannelWidget *cw);
 	void disableMixedSignalView();
+#endif
 	void setDigitalPlotCurvesParams();
 
 	void selectChannel(int index, bool checked);
@@ -486,18 +494,24 @@ private:
 	void setSampleRate(double sample_rate);
 	double getSampleRate();
 
+#ifdef M2K_WITH_LOGIC
 	logic::LogicAnalyzer *m_logicAnalyzer;
+#endif
 	bool m_mixedSignalViewEnabled;
 	gr::m2k::digital_in_source::sptr logic_source;
 	gr::top_block_sptr logic_top_block;
+#ifdef M2K_WITH_LOGIC
 	logic_analyzer_sink::sptr logic_sink;
+#endif
 	gr::blocks::short_to_float::sptr s2f;
 	gr::blocks::add_ff::sptr add;
 	gr::blocks::null_sink::sptr nullSink;
 	std::vector<QWidget *> m_mixedSignalViewMenu;
 
 	gr::m2k::mixed_signal_source::sptr mixed_source;
+#ifdef M2K_WITH_LOGIC
 	mixed_signal_sink::sptr mixed_sink;
+#endif
 	QMetaObject::Connection showLogicAnalyzerTriggerConnection;
 
 	QThreadPool hwSettingsThreadPool;

@@ -56,7 +56,9 @@
 #include "m2kmeasurement_gui.h"
 #include "m2kpluginExceptionHandler.h"
 #include "measure_settings.h"
+#ifdef M2K_WITH_LOGIC
 #include "mixed_signal_sink.h"
+#endif
 #include "osc_capture_params.hpp"
 #include "oscilloscope.hpp"
 #include "oscilloscope_api.hpp"
@@ -159,7 +161,9 @@ Oscilloscope::Oscilloscope(libm2k::context::M2k *m2k, QString uri, Filter *filt,
 	, miniHistogram(true)
 	, gatingEnabled(false)
 	, m_filtering_enabled(true)
+#ifdef M2K_WITH_LOGIC
 	, m_logicAnalyzer(nullptr)
+#endif
 	, m_mixedSignalViewEnabled(false)
 	, logic_top_block(nullptr)
 	, m_uri(uri)
@@ -990,11 +994,13 @@ void Oscilloscope::remove_ref_waveform(QString name)
 	}
 }
 
+#ifdef M2K_WITH_LOGIC
 void Oscilloscope::setLogicAnalyzer(logic::LogicAnalyzer *la)
 {
 	qDebug() << "Logic Analyzer: " << la;
 	m_logicAnalyzer = la;
 }
+#endif
 
 void Oscilloscope::add_ref_waveform(QString name, QVector<double> xData, QVector<double> yData, unsigned int sampleRate)
 {
@@ -1209,9 +1215,11 @@ void Oscilloscope::updateTriggerLevelValue(std::vector<float> value)
 Oscilloscope::~Oscilloscope()
 {
 
+#ifdef M2K_WITH_LOGIC
 	if(m_mixedSignalViewEnabled) {
 		disableMixedSignalView();
 	}
+#endif
 
 	ui->runSingleWidget->toggle(false);
 	//	setDynamicProperty(runButton(), "disabled", false);
@@ -1337,6 +1345,7 @@ void Oscilloscope::setFilteringEnabled(bool set)
 	setSampleRate(active_sample_rate);
 }
 
+#ifdef M2K_WITH_LOGIC
 void Oscilloscope::enableMixedSignalView(ChannelWidget *cw)
 {
 	const bool iioStarted = isIioManagerStarted();
@@ -1442,6 +1451,7 @@ void Oscilloscope::disableMixedSignalView()
 
 	trigger_settings.disableMixedSignalView();
 }
+#endif
 
 void Oscilloscope::setDigitalPlotCurvesParams()
 {
@@ -2096,6 +2106,7 @@ void Oscilloscope::create_add_channel_panel()
 
 	tabWidget->addTab(ref, tr("Reference"));
 
+#ifdef M2K_WITH_LOGIC
 	tabWidget->addTab(logic, tr("Logic"));
 
 	Style::setStyle(ui->mixedSignalBtn, style::properties::button::basicButtonBig, true, true);
@@ -2114,6 +2125,10 @@ void Oscilloscope::create_add_channel_panel()
 			}
 		}
 	});
+#else
+	// No logic analyzer in this build, so no mixed signal view either.
+	ui->mixedSignalBtn->setVisible(false);
+#endif
 
 	connect(btnOpenFile, &QPushButton::clicked, this, &Oscilloscope::import);
 
@@ -2139,6 +2154,7 @@ void Oscilloscope::create_add_channel_panel()
 	});
 
 	connect(btn, &QPushButton::clicked, [=]() {
+#ifdef M2K_WITH_LOGIC
 		if(tabWidget->currentIndex() == 2) {
 
 			qDebug() << "Enable mixed signal view!";
@@ -2198,6 +2214,7 @@ void Oscilloscope::create_add_channel_panel()
 
 			return;
 		}
+#endif
 
 		if(tabWidget->currentIndex() != 0) {
 			QMap<int, bool> import_map = importSettings->getExportConfig();
@@ -2651,6 +2668,7 @@ void Oscilloscope::toggle_blockchain_flow(bool en)
 {
 	if(en) {
 
+#ifdef M2K_WITH_LOGIC
 		if(m_mixedSignalViewEnabled) {
 			// enable the mixed_source in the iio_manager
 			iio->enableMixedSignal(mixed_source);
@@ -2673,6 +2691,7 @@ void Oscilloscope::toggle_blockchain_flow(bool en)
 			mixed_sink->clean_buffers();
 			mixed_sink->set_nsamps(active_sample_count);
 		}
+#endif
 
 		if(autosetRequested) {
 			iio->start(autoset_id[0]);
@@ -2692,6 +2711,7 @@ void Oscilloscope::toggle_blockchain_flow(bool en)
 			iio->stop(autoset_id[0]);
 		}
 
+#ifdef M2K_WITH_LOGIC
 		if(m_mixedSignalViewEnabled) {
 			iio->disableMixedSignal(mixed_source);
 
@@ -2707,6 +2727,7 @@ void Oscilloscope::toggle_blockchain_flow(bool en)
 			// disconnect digital
 			iio->disconnect(mixed_source, 2, mixed_sink, 2);
 		}
+#endif
 	}
 }
 
@@ -3438,9 +3459,11 @@ void Oscilloscope::setSinksDisplayOneBuffer(bool val)
 	d_displayOneBuffer = val;
 	qt_time_block->set_displayOneBuffer(val);
 
+#ifdef M2K_WITH_LOGIC
 	if(mixed_sink) {
 		mixed_sink->set_displayOneBuffer(val);
 	}
+#endif
 
 	auto it = math_sinks.constBegin();
 	while(it != math_sinks.constEnd()) {
@@ -4803,9 +4826,11 @@ void Oscilloscope::cleanBuffersAllSinks()
 {
 	this->qt_time_block->clean_buffers();
 
+#ifdef M2K_WITH_LOGIC
 	if(mixed_sink) {
 		mixed_sink->clean_buffers();
 	}
+#endif
 
 	auto it = math_sinks.constBegin();
 	while(it != math_sinks.constEnd()) {
@@ -5004,9 +5029,11 @@ void Oscilloscope::setAllSinksSampleCount(unsigned long sample_count)
 	this->qt_xy_block->set_nsamps(sample_count);
 	this->qt_hist_block->set_nsamps(sample_count);
 
+#ifdef M2K_WITH_LOGIC
 	if(mixed_sink) {
 		mixed_sink->set_nsamps(sample_count);
 	}
+#endif
 
 	auto it = math_sinks.constBegin();
 	while(it != math_sinks.constEnd()) {
