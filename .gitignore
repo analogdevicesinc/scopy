@@ -27,7 +27,7 @@ android-build
 android*.sh
 *.apk
 *.aab
-!CI/android/*
+!ci/android/*
 html/
 build_arm64-v8a/
 !doc/Doxyfile
@@ -38,6 +38,7 @@ build/*
 ci/general/gh-actions.envs
 ci/ubuntu/staging
 ci/ubuntu/staging_ubuntu
+ci/android/staging_android
 ci/macOS/staging
 ci/arm/staging
 ci/arm/docker/sysroot*
