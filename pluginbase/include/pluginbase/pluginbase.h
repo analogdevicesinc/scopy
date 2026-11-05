@@ -72,6 +72,7 @@ public:
 	virtual QWidget *preferencesPage() override;
 	virtual QList<QAbstractButton *> extraButtons() override;
 	virtual QList<ToolMenuEntry *> toolList() override;
+	virtual QList<ToolMenuEntry *> globalToolList() override;
 	virtual QJsonObject metadata() override;
 
 	virtual QString about() override;

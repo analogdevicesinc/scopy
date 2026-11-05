@@ -62,6 +62,7 @@ public:
 	~ScopyMainWindow();
 	void initAboutPage();
 	void initPreferencesPage();
+	void initGlobalTools();
 	void initPreferences();
 	void initStyle();
 	void setupPreferences();

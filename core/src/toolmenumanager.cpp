@@ -62,6 +62,18 @@ void ToolMenuManager::addMenuItem(DeviceInfo dInfo, int itemIndex)
 	qDebug(CAT_TOOLMENUMANAGER) << "Menu item with id" << id << "has been added";
 }
 
+void ToolMenuManager::addGlobalItem(ToolMenuEntry *tme)
+{
+	ToolMenuItem *toolMenuItem = createToolMenuItem(tme, m_toolMenu);
+	m_toolMenu->btnGroup()->addButton(toolMenuItem);
+	connect(tme, &ToolMenuEntry::updateTool, this, &ToolMenuManager::updateTool);
+	connect(tme, &ToolMenuEntry::updateToolAttached, this,
+		[this, toolMenuItem](bool oldAttach) { updateToolAttached(oldAttach, toolMenuItem); });
+	m_toolMenu->add(-1, tme->uuid(), toolMenuItem);
+	Q_EMIT tme->updateToolEntry();
+	qDebug(CAT_TOOLMENUMANAGER) << "Global menu item" << tme->name() << "has been added";
+}
+
 void ToolMenuManager::removeMenuItem(QString deviceId)
 {
 	if(!m_itemMap.contains(deviceId)) {

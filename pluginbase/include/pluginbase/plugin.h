@@ -326,6 +326,15 @@ public:
 	virtual QList<scopy::ToolMenuEntry *> toolList() = 0;
 
 	/**
+	 * @brief globalToolList
+	 * @return tools that belong to no device, shown in the tool menu even with no device
+	 * connected. Called once at scopy init on the original plugin instance; each entry
+	 * should already hold its tool.
+	 * Default implementation in PluginBase (no global tools) - can be overriden
+	 */
+	virtual QList<scopy::ToolMenuEntry *> globalToolList() = 0;
+
+	/**
 	 * @brief metadata
 	 * @return plugin m_metadata getter
 	 * Default implementation in PluginBase - override not recommended

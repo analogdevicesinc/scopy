@@ -170,6 +170,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	ts->add("preferences", prefPage);
 	ts->add("package", pkgWidget);
 	ts->add("scripting", m_scriptingTool);
+	initGlobalTools();
 
 	connect(scanTask, &DcIioScanTask::scanFinished, scc, &ScannedIIOContextCollector::update, Qt::QueuedConnection);
 
@@ -422,6 +423,23 @@ void ScopyMainWindow::initPreferencesPage()
 		p->initPreferences();
 		if(p->loadPreferencesPage()) {
 			prefPage->addHorizontalTab(p->preferencesPage(), p->name());
+		}
+	}
+}
+
+void ScopyMainWindow::initGlobalTools()
+{
+	if(!PluginRepository::GetInstance()) {
+		return;
+	}
+
+	const QList<Plugin *> plugins = PluginRepository::getOriginalPlugins();
+	for(Plugin *p : plugins) {
+		const QList<ToolMenuEntry *> tools = p->globalToolList();
+		for(ToolMenuEntry *tme : tools) {
+			m_toolMenuManager->addGlobalItem(tme);
+			// The tool was set before the manager was listening, so replay it.
+			Q_EMIT tme->updateTool(nullptr);
 		}
 	}
 }

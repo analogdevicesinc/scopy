@@ -106,6 +106,7 @@ QWidget *PluginBase::preferencesPage() { return m_preferencesPage; }
 QList<QAbstractButton *> PluginBase::extraButtons() { return m_extraButtons; }
 
 QList<ToolMenuEntry *> PluginBase::toolList() { return m_toolList; }
+QList<ToolMenuEntry *> PluginBase::globalToolList() { return {}; }
 void PluginBase::showPageCallback() { qDebug(CAT_PLUGIN) << m_name << "showpage callback"; }
 void PluginBase::hidePageCallback() { qDebug(CAT_PLUGIN) << m_name << "hidepage callback"; }
 

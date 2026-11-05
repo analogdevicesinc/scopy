@@ -53,6 +53,8 @@ public:
 	~ToolMenuManager();
 
 	void addMenuItem(DeviceInfo dInfo, int itemIndex = -1);
+	// A tool that belongs to no device: a plain item in the menu, always shown.
+	void addGlobalItem(ToolMenuEntry *tme);
 	void removeMenuItem(QString deviceId);
 	void changeToolListContents(QString deviceId, QList<ToolMenuEntry *> tools);
 
