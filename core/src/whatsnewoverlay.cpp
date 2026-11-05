@@ -60,14 +60,15 @@ WhatsNewOverlay::WhatsNewOverlay(QWidget *parent)
 	optionsControlLayout->addWidget(showAgain);
 
 	Preferences *p = Preferences::GetInstance();
+	showAgain->setChecked(p->get("general_dont_show_whats_new").toBool());
+
 	connect(showAgain, &QCheckBox::toggled, this, [p](bool en) {
 		p->set("general_dont_show_whats_new", en);
 		if(en) {
 			p->set("scopy_git_version", QString(SCOPY_VERSION_GIT));
 		}
+		p->save();
 	});
-
-	showAgain->setChecked(p->get("general_dont_show_whats_new").toBool());
 
 	// version picker
 	m_versionCb = new QComboBox(optionsoverlayControlWidget);
