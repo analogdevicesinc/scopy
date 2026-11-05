@@ -367,6 +367,18 @@ BasicScaleDraw *PlotAxis::scaleDraw() const { return m_scaleDraw; }
 
 OscScaleEngine *PlotAxis::scaleEngine() const { return m_scaleEngine; }
 
+void PlotAxis::setScaleEngine(OscScaleEngine *engine)
+{
+	if(!engine || engine == m_scaleEngine) {
+		return;
+	}
+	engine->setMajorTicksCount(m_divs);
+	m_scaleEngine = engine;
+	// Deletes the previous engine.
+	m_plot->setAxisScaleEngine(m_axisId, (QwtScaleEngine *)m_scaleEngine);
+	updateAxisScale();
+}
+
 double PlotAxis::max() const { return m_max; }
 
 double PlotAxis::visibleMin() const { return m_plot->axisScaleDiv(axisId()).lowerBound(); }

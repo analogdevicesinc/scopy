@@ -59,6 +59,8 @@ public:
 
 	QwtPlotZoomer *zoomer() const;
 	OscScaleEngine *scaleEngine() const;
+	// Takes ownership; the previous engine is deleted.
+	void setScaleEngine(OscScaleEngine *engine);
 
 	BasicScaleDraw *scaleDraw() const;
 
