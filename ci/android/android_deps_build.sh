@@ -41,7 +41,8 @@ build_with_cmake_v0() {
 		-DCMAKE_PREFIX_PATH=$LIBIIO_V0_PREFIX;$STAGING_AREA_DEPS;$QT_ANDROID \
 		-DCMAKE_FIND_ROOT_PATH=$LIBIIO_V0_PREFIX;$STAGING_AREA_DEPS;$QT_ANDROID;$SYSROOT \
 		"
-	build_with_cmake $1
+	# CPATH: libad9361 tests include <iio.h> without the libiio include dir, as on Linux.
+	CPATH=$LIBIIO_V0_PREFIX/include${CPATH:+:$CPATH} build_with_cmake $1
 }
 
 build_with_configure() {
@@ -94,6 +95,8 @@ clone() {
 	[ -d 'libiio' ]		|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
 	[ -d 'libiio-v0' ]	|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_V0_VERSION libiio-v0
 	[ -d 'libad9361' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
+	[ -d 'libad9361-v0' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_V0_BRANCH libad9361-v0
+	[ -d 'libad9166' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9166-iio.git -b $LIBAD9166_BRANCH libad9166
 	[ -d 'qwt' ]		|| git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
 	[ -d 'extra-cmake-modules' ] || git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
 	[ -d 'karchive' ]	|| git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
@@ -202,6 +205,20 @@ build_libiio_v0() {
 build_libad9361() {
 	echo "### Building libad9361 - $LIBAD9361_BRANCH"
 	pushd $STAGING_AREA_SRC/libad9361
+	build_with_cmake $1
+	popd
+}
+
+build_libad9361_v0() {
+	echo "### Building libad9361 - $LIBAD9361_V0_BRANCH (prefix $LIBIIO_V0_PREFIX)"
+	pushd $STAGING_AREA_SRC/libad9361-v0
+	build_with_cmake_v0 $1
+	popd
+}
+
+build_libad9166() {
+	echo "### Building libad9166 - $LIBAD9166_BRANCH (prefix $LIBIIO_V0_PREFIX)"
+	pushd $STAGING_AREA_SRC/libad9166
 	build_with_cmake_v0 $1
 	popd
 }
@@ -309,8 +326,10 @@ build_deps() {
 	build_libxml2 ON
 	build_zstd ON
 	build_libiio ON
-	build_libiio_v0 ON
 	build_libad9361 ON
+	build_libiio_v0 ON
+	build_libad9361_v0 ON
+	build_libad9166 ON
 	build_qwt ON
 	build_ecm ON
 	build_karchive ON
@@ -361,7 +380,7 @@ verify_deps() {
 # The APK holds one libiio.so, so a v0 build swaps in the v0 prefix's libiio (and libad9361).
 collect_extra_libs() {
 	if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
-		{ find $STAGING_AREA_DEPS/lib -maxdepth 1 -name 'lib*.so' -not -name 'libiio.so'
+		{ find $STAGING_AREA_DEPS/lib -maxdepth 1 -name 'lib*.so' -not -name 'libiio.so' -not -name 'libad9361.so'
 		  find $LIBIIO_V0_PREFIX/lib -maxdepth 1 -name 'lib*.so'; } | sort | paste -sd';' -
 	else
 		find $STAGING_AREA_DEPS/lib -maxdepth 1 -name 'lib*.so' | sort | paste -sd';' -
@@ -441,12 +460,15 @@ build_scopy() {
 		-DSCOPY_LIBIIO_VERSION="$SCOPY_LIBIIO_VERSION"
 	)
 	# v0: the v0 prefix is searched first so libiio v0 and libad9361 are picked over libiio v1.
+	# QT_NO_COLLECT_IMPORTED_TARGET_APK_DEPS: else androiddeployqt resolves libiio.so from the
+	# imported targets' dir (libiio v1) before the prefixes.
 	if [ "$SCOPY_LIBIIO_VERSION" == "0" ]; then
 		opts+=(
 			-DIIO_INCLUDE_DIRS="$LIBIIO_V0_PREFIX/include"
 			-DIIO_LIBRARIES="$LIBIIO_V0_PREFIX/lib/libiio.so"
 			-DCMAKE_PREFIX_PATH="$LIBIIO_V0_PREFIX;$STAGING_AREA_DEPS"
 			-DCMAKE_FIND_ROOT_PATH="$LIBIIO_V0_PREFIX;$STAGING_AREA_DEPS"
+			-DQT_NO_COLLECT_IMPORTED_TARGET_APK_DEPS=ON
 		)
 	fi
 

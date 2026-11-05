@@ -31,6 +31,8 @@ LIBIIO_VERSION=v1.0.0
 LIBIIO_V0_VERSION=v0.26
 ZSTD_BRANCH=v1.5.7
 LIBAD9361_BRANCH=main
+LIBAD9361_V0_BRANCH=libad9361-iio-v0
+LIBAD9166_BRANCH=libad9166-iio-v0
 QWT_BRANCH=qwt-multiaxes-rebased-qt6
 ECM_BRANCH=v6.8.0
 KARCHIVE_BRANCH=v6.8.0
@@ -93,8 +95,8 @@ STAGING_AREA_SRC=$STAGING_AREA/src
 STAGING_AREA_DEPS=$STAGING_AREA/$ABI/dependencies
 
 ############### LIBIIO ###############
-# libiio API Scopy is built against: 1 (default) or 0. Same image serves both: libiio v0 and
-# libad9361 (built on v0) live in their own prefix, as in ci/x86_64/x86-64_appimage_process.sh.
+# libiio API Scopy is built against: 1 (default) or 0. Same image serves both: libiio v0,
+# libad9361 v0 and libad9166 live in their own prefix, as in ci/x86_64/x86-64_appimage_process.sh.
 SCOPY_LIBIIO_VERSION=${SCOPY_LIBIIO_VERSION:-1}
 LIBIIO_V0_PREFIX=$STAGING_AREA_DEPS/libiio-v0
 
@@ -130,8 +132,8 @@ export LDFLAGS="-L${STAGING_AREA_DEPS}/lib -Wl,--undefined-version"
 # option only controls whether zstd is *required*, not whether it is used.
 # PKG_CONFIG_LIBDIR *replaces* the default search path; PKG_CONFIG_PATH only
 # prepends to it, which would leave the host .pc files visible.
+# No PKG_CONFIG_SYSROOT_DIR: the staging .pc files hold absolute paths, so it would break them.
 export PKG_CONFIG_LIBDIR=$STAGING_AREA_DEPS/lib/pkgconfig:$SYSROOT/usr/lib/pkgconfig
-export PKG_CONFIG_SYSROOT_DIR=$SYSROOT
 
 CC=$TOOLCHAIN_BIN/${ANDROID_TARGET}${API}-clang
 CXX=$TOOLCHAIN_BIN/${ANDROID_TARGET}${API}-clang++
@@ -182,7 +184,6 @@ set_configure_opts() {
 		"--prefix=$STAGING_AREA_DEPS"
 		"PKG_CONFIG_ALLOW_CROSS=1"
 		"PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR"
-		"PKG_CONFIG_SYSROOT_DIR=$SYSROOT"
 		"CFLAGS=$CFLAGS"
 		"CPPFLAGS=$CPPFLAGS"
 		"LDFLAGS=$LDFLAGS"
