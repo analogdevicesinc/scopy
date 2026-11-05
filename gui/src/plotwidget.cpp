@@ -321,8 +321,17 @@ void PlotWidget::setupAxes()
 	m_plot->setAxisVisible(QwtAxis::YLeft, false);
 	m_plot->setAxisVisible(QwtAxis::XBottom, false);
 
-	m_xPosition = Preferences::get("adc_plot_xaxis_label_position").toInt();
-	m_yPosition = Preferences::get("adc_plot_yaxis_label_position").toInt();
+	// The ADC plugin initializes these; without it they read back invalid, which toInt()
+	// would turn into 0 - YLeft for both.
+	bool ok = false;
+	m_xPosition = Preferences::get("adc_plot_xaxis_label_position").toInt(&ok);
+	if(!ok) {
+		m_xPosition = QwtAxis::XBottom;
+	}
+	m_yPosition = Preferences::get("adc_plot_yaxis_label_position").toInt(&ok);
+	if(!ok) {
+		m_yPosition = QwtAxis::YLeft;
+	}
 	QPen pen(QColor(Style::getAttribute(json::theme::content_subtle)));
 	m_xAxis = new PlotAxis(m_xPosition, this, pen, this);
 	m_yAxis = new PlotAxis(m_yPosition, this, pen, this);
