@@ -31,6 +31,7 @@
 
 class QLabel;
 class QTableWidget;
+class QTabWidget;
 class QVBoxLayout;
 
 namespace scopy {
@@ -52,6 +53,7 @@ public:
 	NodeKind kind() const { return m_kind; }
 	void addSection(QWidget *section);
 	// Puts `view` in a first tab; the sections move to a second "Attributes" tab.
+	// Tabs before "Attributes"; may be called once per view.
 	void setMainView(const QString &title, QWidget *view);
 
 public Q_SLOTS:
@@ -69,6 +71,7 @@ private:
 	NodeKind m_kind;
 	QVBoxLayout *m_layout;
 	QWidget *m_sectionsArea;
+	QTabWidget *m_tabs = nullptr;
 	QVBoxLayout *m_sections;
 };
 
@@ -105,6 +108,7 @@ NodePanel *createNodePanel(QObject *node, NodeKind kind, const QString &title, c
 QString variantToString(const QVariant &v);
 
 MenuSectionCollapseWidget *makeSection(const QString &title, QWidget *parent, bool collapsed = false);
+QTableWidget *makeTable(const QStringList &headers, QWidget *parent);
 
 } // namespace scopy::dcdebugger
 

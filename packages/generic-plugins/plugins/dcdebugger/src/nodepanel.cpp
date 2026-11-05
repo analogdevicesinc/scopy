@@ -24,6 +24,7 @@
 #include "acquisition/acquisitionview.h"
 #include "attributessection.h"
 #include "generation/generatorview.h"
+#include "registers/registerview.h"
 
 #include <QHeaderView>
 #include <QLabel>
@@ -43,8 +44,7 @@
 using namespace scopy;
 using namespace scopy::dcdebugger;
 
-namespace {
-QTableWidget *makeTable(const QStringList &headers, QWidget *parent)
+QTableWidget *scopy::dcdebugger::makeTable(const QStringList &headers, QWidget *parent)
 {
 	auto *t = new QTableWidget(parent);
 	t->setColumnCount(headers.size());
@@ -59,6 +59,8 @@ QTableWidget *makeTable(const QStringList &headers, QWidget *parent)
 	Style::setStyle(t, style::properties::widget::tableViewWidget);
 	return t;
 }
+
+namespace {
 
 void setRow(QTableWidget *t, int row, const QStringList &cells)
 {
@@ -184,11 +186,14 @@ void NodePanel::addSection(QWidget *section) { m_sections->insertWidget(m_sectio
 
 void NodePanel::setMainView(const QString &title, QWidget *view)
 {
-	m_layout->removeWidget(m_sectionsArea);
-	auto *tabs = new QTabWidget(this);
-	tabs->addTab(view, title);
-	tabs->addTab(m_sectionsArea, "Attributes");
-	m_layout->addWidget(tabs, 1);
+	if(!m_tabs) {
+		m_layout->removeWidget(m_sectionsArea);
+		m_tabs = new QTabWidget(this);
+		m_tabs->addTab(m_sectionsArea, "Attributes");
+		m_layout->addWidget(m_tabs, 1);
+	}
+	m_tabs->insertTab(m_tabs->count() - 1, view, title);
+	m_tabs->setCurrentIndex(0);
 }
 
 void NodePanel::refresh() { Q_EMIT refreshRequested(); }
@@ -325,6 +330,9 @@ NodePanel *scopy::dcdebugger::createNodePanel(QObject *node, NodeKind kind, cons
 		panel->setMainView("Acquisition", new AcquisitionView(in, panel));
 	} else if(auto *out = qobject_cast<component::OutputStream *>(node)) {
 		panel->setMainView("Generator", new GeneratorView(out, panel));
+	}
+	if((kind == NodeKind::Context || kind == NodeKind::Device) && !RegisterView::targetsOf(node).isEmpty()) {
+		panel->setMainView("Registers", new RegisterView(node, panel));
 	}
 	return panel;
 }
