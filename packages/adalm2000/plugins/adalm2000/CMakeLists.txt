@@ -119,4 +119,8 @@ target_link_libraries(
 	       libm2k::libm2k
 )
 
+if(SCOPY_LIBIIO_VERSION STREQUAL "1")
+	target_compile_definitions(${PROJECT_NAME} PRIVATE LIBIIO_V1)
+endif()
+
 set(ADALM2000_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)
