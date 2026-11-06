@@ -59,6 +59,9 @@ public:
 	QCoro::Task<CommandResponse<void>> closeAsync() override;
 	QCoro::Task<CommandResponse<void>> refillAsync() override;
 
+	void cancel();
+	void invalidate();
+
 	const component::StreamFormat &readFormat() const override { return m_format; }
 
 private:
@@ -66,6 +69,8 @@ private:
 	libm2k::digital::M2kDigital *m_digital;
 	scopy::ICmdExecutor *m_executor;
 	unsigned m_kernelBuffers = 4;
+	bool m_cancelRequested = false;
+	bool m_stale = false;
 	component::StreamFormat m_format;
 };
 
@@ -92,6 +97,8 @@ public:
 	QCoro::Task<CommandResponse<void>> closeAsync() override;
 	QCoro::Task<CommandResponse<void>> pushAsync() override;
 
+	void cancel();
+
 	component::StreamFormat &writeFormat() override { return m_format; }
 
 private:
@@ -99,6 +106,7 @@ private:
 	libm2k::digital::M2kDigital *m_digital;
 	scopy::ICmdExecutor *m_executor;
 	bool m_cyclic = true;
+	bool m_cancelRequested = false;
 	QVector<uint16_t> m_buffer;
 	component::StreamFormat m_format;
 };

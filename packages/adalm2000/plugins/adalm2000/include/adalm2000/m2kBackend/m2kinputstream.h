@@ -55,6 +55,11 @@ public:
 	QCoro::Task<CommandResponse<void>> closeAsync() override;
 	QCoro::Task<CommandResponse<void>> refillAsync() override;
 
+	void cancel();
+	void invalidate();
+
+	QCoro::Task<CommandResponse<short>> convertVoltsToRawAsync(unsigned channel, double volts);
+
 	const component::StreamFormat &readFormat() const override { return m_format; }
 
 private:
@@ -62,6 +67,8 @@ private:
 	libm2k::analog::M2kAnalogIn *m_ain;
 	scopy::ICmdExecutor *m_executor;
 	unsigned m_kernelBuffers = 4;
+	bool m_cancelRequested = false;
+	bool m_stale = false;
 	QVector<stream::ChannelScale> m_scales;
 	component::StreamFormat m_format;
 };

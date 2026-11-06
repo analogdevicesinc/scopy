@@ -135,6 +135,7 @@ QCoro::Task<CommandResponse<void>> M2kInputStream::openAsync(const component::St
 	if(result) {
 		m_scales = *scales;
 		m_config = effective;
+		m_stale = false;
 		m_open = true;
 		Q_EMIT openedChanged(true);
 	}
@@ -152,12 +153,15 @@ QCoro::Task<CommandResponse<void>> M2kInputStream::closeAsync()
 	// decode a buffer that is being torn down. Same fencing as IIOInputStream::closeAsync.
 	m_open = false;
 	m_format = component::StreamFormat{};
+	m_cancelRequested = false;
+	try {
+		m_ain->cancelAcquisition();
+	} catch(const std::exception &e) {
+		qWarning(CAT_M2K_INPUT_STREAM) << "cancelAcquisition failed:" << e.what();
+	}
 
 	M2kAnalogIn *ain = m_ain;
-	auto *cmd = new M2kCallCommand<void>(m_resource, [ain]() {
-		ain->cancelAcquisition();
-		ain->stopAcquisition();
-	});
+	auto *cmd = new M2kCallCommand<void>(m_resource, [ain]() { ain->stopAcquisition(); });
 
 	auto result = co_await component::runCommand(
 		m_executor, cmd, [](const Result<void> &) {}, [this](const Error &e) { Q_EMIT streamError(e); });
@@ -174,15 +178,32 @@ QCoro::Task<CommandResponse<void>> M2kInputStream::refillAsync()
 
 	M2kAnalogIn *ain = m_ain;
 	const unsigned samples = static_cast<unsigned>(m_config.samplesCount);
+	const unsigned kernelBuffers = m_kernelBuffers;
+	const bool restart = m_stale;
+	m_stale = false;
 	auto samplePtr = std::make_shared<const short *>(nullptr);
 
-	auto *cmd = new M2kCallCommand<void>(
-		m_resource, [ain, samples, samplePtr]() { *samplePtr = ain->getSamplesRawInterleaved(samples); });
+	auto *cmd = new M2kCallCommand<void>(m_resource, [ain, samples, kernelBuffers, restart, samplePtr]() {
+		if(restart) {
+			ain->stopAcquisition();
+			ain->setKernelBuffersCount(kernelBuffers);
+			ain->startAcquisition(samples);
+		}
+		*samplePtr = ain->getSamplesRawInterleaved(samples);
+	});
 
 	auto result = co_await component::runCommand(
-		m_executor, cmd, [](const Result<void> &) {}, [this](const Error &e) { Q_EMIT refillFailed(e); });
+		m_executor, cmd, [](const Result<void> &) {}, [](const Error &) {});
 
+	const bool cancelled = m_cancelRequested || !m_open;
+	m_cancelRequested = false;
 	if(!result) {
+		if(cancelled) {
+			const Error error{-ECANCELED, QStringLiteral("refill cancelled")};
+			Q_EMIT refillFailed(error);
+			co_return CommandResponse<void>(result.commandId(), Unexpected{error});
+		}
+		Q_EMIT refillFailed(result.error());
 		co_return result;
 	}
 	// close() may have run while the refill was in flight.
@@ -196,4 +217,37 @@ QCoro::Task<CommandResponse<void>> M2kInputStream::refillAsync()
 						  m_config.enabledChannels, m_scales);
 	Q_EMIT refillSucceeded();
 	co_return result;
+}
+
+void M2kInputStream::invalidate()
+{
+	if(m_open) {
+		m_stale = true;
+	}
+}
+
+void M2kInputStream::cancel()
+{
+	if(!m_open) {
+		return;
+	}
+	m_cancelRequested = true;
+	try {
+		m_ain->cancelAcquisition();
+	} catch(const std::exception &e) {
+		qWarning(CAT_M2K_INPUT_STREAM) << "cancelAcquisition failed:" << e.what();
+	}
+}
+
+QCoro::Task<CommandResponse<short>> M2kInputStream::convertVoltsToRawAsync(unsigned channel, double volts)
+{
+	if(channel >= static_cast<unsigned>(HW_CHANNELS)) {
+		co_return CommandResponse<short>(QUuid(),
+						 Unexpected{Error{-EINVAL, QStringLiteral("no such channel")}});
+	}
+	M2kAnalogIn *ain = m_ain;
+	auto *cmd = new M2kCallCommand<short>(
+		m_resource, [ain, channel, volts]() { return ain->convertVoltsToRaw(channel, volts); });
+	co_return co_await component::runCommand(
+		m_executor, cmd, [](const Result<short> &) {}, [](const Error &) {});
 }

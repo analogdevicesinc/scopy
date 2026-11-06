@@ -28,6 +28,7 @@
 
 #include <QLoggingCategory>
 
+#include <algorithm>
 #include <cerrno>
 #include <cmath>
 #include <memory>
@@ -89,10 +90,11 @@ QCoro::Task<CommandResponse<void>> M2kOutputStream::openAsync(const component::S
 	}
 
 	component::StreamConfig effective = cfg;
-	effective.samplesCount = stream::alignSamplesCount(cfg.samplesCount);
+	effective.samplesCount = stream::alignOutputSamplesCount(cfg.samplesCount, m_cyclic);
 	if(effective.samplesCount != cfg.samplesCount) {
 		qWarning(CAT_M2K_OUTPUT_STREAM) << "samplesCount" << cfg.samplesCount
-						<< "must be a multiple of 4 above 16; using" << effective.samplesCount;
+						<< "must be a multiple of 4 above 16 (at least 1024 when cyclic); using"
+						<< effective.samplesCount;
 	}
 
 	QList<int> channels;
@@ -104,6 +106,7 @@ QCoro::Task<CommandResponse<void>> M2kOutputStream::openAsync(const component::S
 	if(channels.isEmpty()) {
 		channels = {0};
 	}
+	std::sort(channels.begin(), channels.end());
 	effective.enabledChannels = channels;
 
 	M2kAnalogOut *aout = m_aout;
@@ -172,12 +175,15 @@ QCoro::Task<CommandResponse<void>> M2kOutputStream::closeAsync()
 	// unblocks a push in flight, and nothing may then touch the retired buffer.
 	m_open = false;
 	m_format = component::StreamFormat{};
+	m_cancelRequested = false;
+	try {
+		m_aout->cancelBuffer();
+	} catch(const std::exception &e) {
+		qWarning(CAT_M2K_OUTPUT_STREAM) << "cancelBuffer failed:" << e.what();
+	}
 
 	M2kAnalogOut *aout = m_aout;
-	auto *cmd = new M2kCallCommand<void>(m_resource, [aout]() {
-		aout->cancelBuffer();
-		aout->stop();
-	});
+	auto *cmd = new M2kCallCommand<void>(m_resource, [aout]() { aout->stop(); });
 
 	auto result = co_await component::runCommand(
 		m_executor, cmd, [](const Result<void> &) {}, [this](const Error &e) { Q_EMIT streamError(e); });
@@ -206,14 +212,86 @@ QCoro::Task<CommandResponse<void>> M2kOutputStream::pushAsync()
 			aout->pushRaw(static_cast<unsigned>(channels.first()), *payload);
 			return;
 		}
-		aout->pushRawInterleaved(payload->data(), static_cast<unsigned>(channels.size()), samples);
+		const unsigned nbChannels = static_cast<unsigned>(channels.size());
+		aout->pushRawInterleaved(payload->data(), nbChannels, samples * nbChannels);
 	});
 
-	auto result = co_await component::runCommand(
-		m_executor, cmd, [](const Result<void> &) {}, [this](const Error &e) { Q_EMIT pushFailed(e); });
+	co_return co_await finishPush(cmd);
+}
 
-	if(result) {
-		Q_EMIT pushSucceeded();
+QCoro::Task<CommandResponse<void>> M2kOutputStream::pushAsync(std::vector<std::vector<double>> perDac)
+{
+	if(!m_open) {
+		co_return CommandResponse<void>(QUuid(), Unexpected{Error{-EIO, QStringLiteral("stream not open")}});
 	}
+	if(perDac.size() > static_cast<size_t>(HW_CHANNELS)) {
+		co_return CommandResponse<void>(
+			QUuid(), Unexpected{Error{-EINVAL, QStringLiteral("more buffers than DAC channels")}});
+	}
+
+	std::vector<size_t> lengths;
+	QList<int> pushed;
+	for(size_t i = 0; i < perDac.size(); ++i) {
+		lengths.push_back(perDac[i].size());
+		if(perDac[i].empty()) {
+			continue;
+		}
+		if(!m_config.enabledChannels.contains(static_cast<int>(i))) {
+			co_return CommandResponse<void>(
+				QUuid(),
+				Unexpected{Error{-EINVAL, QStringLiteral("DAC %1 was not enabled at open").arg(i)}});
+		}
+		pushed.append(static_cast<int>(i));
+	}
+	const QString invalid = stream::validatePerChannelLengths(lengths, m_cyclic);
+	if(!invalid.isEmpty()) {
+		co_return CommandResponse<void>(QUuid(), Unexpected{Error{-EINVAL, invalid}});
+	}
+
+	M2kAnalogOut *aout = m_aout;
+	auto payload = std::make_shared<std::vector<std::vector<double>>>(std::move(perDac));
+
+	auto *cmd = new M2kCallCommand<void>(m_resource, [aout, payload, pushed]() {
+		if(pushed.size() == 1) {
+			const unsigned ch = static_cast<unsigned>(pushed.first());
+			aout->push(ch, payload->at(ch));
+			return;
+		}
+		aout->push(*payload);
+	});
+
+	co_return co_await finishPush(cmd);
+}
+
+QCoro::Task<CommandResponse<void>> M2kOutputStream::finishPush(M2kCallCommand<void> *cmd)
+{
+	auto result = co_await component::runCommand(
+		m_executor, cmd, [](const Result<void> &) {}, [](const Error &) {});
+
+	const bool cancelled = m_cancelRequested || !m_open;
+	m_cancelRequested = false;
+	if(!result) {
+		if(cancelled) {
+			const Error error{-ECANCELED, QStringLiteral("push cancelled")};
+			Q_EMIT pushFailed(error);
+			co_return CommandResponse<void>(result.commandId(), Unexpected{error});
+		}
+		Q_EMIT pushFailed(result.error());
+		co_return result;
+	}
+	Q_EMIT pushSucceeded();
 	co_return result;
+}
+
+void M2kOutputStream::cancel()
+{
+	if(!m_open) {
+		return;
+	}
+	m_cancelRequested = true;
+	try {
+		m_aout->cancelBuffer();
+	} catch(const std::exception &e) {
+		qWarning(CAT_M2K_OUTPUT_STREAM) << "cancelBuffer failed:" << e.what();
+	}
 }
