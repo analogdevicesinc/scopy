@@ -73,10 +73,8 @@ DeviceImpl::DeviceImpl(QString param, QString category, component::ConnectionKin
 		Qt::QueuedConnection);
 
 	if(!m_kind.isEmpty()) {
-		acquireConnection();
-		if(m_conn) {
-			acquireViews(m_conn->backends());
-		}
+		// The connection is opened in verify(), which runs off the GUI thread (add page,
+		// DeviceLoader::asyncInit); a blocking open here would stall the UI.
 		connect(this, &DeviceImpl::stateChanged, this, &DeviceImpl::onStateChanged, Qt::DirectConnection);
 	}
 }
@@ -154,6 +152,7 @@ QStringList DeviceImpl::declaredBackends() const
 void DeviceImpl::init()
 {
 	DebugTimer benchmark;
+	verify();
 	m_plugins = PluginRepository::getCompatiblePlugins(m_param, m_category, backends());
 	for(Plugin *p : std::as_const(m_plugins)) {
 		QObject *obj = dynamic_cast<QObject *>(p);
@@ -222,7 +221,21 @@ void DeviceImpl::unloadPlugins()
 	DEBUGTIMER_LOG(benchmark, this->displayName() + " plugins unload took:");
 }
 
-bool DeviceImpl::verify() { return m_kind.isEmpty() || static_cast<bool>(m_conn); }
+// Opens the connection and every compatible view (so plugins can inspect the trees in
+// compatible()). Idempotent; blocking, call it off the GUI thread.
+bool DeviceImpl::verify()
+{
+	if(m_kind.isEmpty()) {
+		return true;
+	}
+	if(!m_conn) {
+		acquireConnection();
+		if(m_conn) {
+			acquireViews(m_conn->backends());
+		}
+	}
+	return static_cast<bool>(m_conn);
+}
 
 QMap<QString, QString> DeviceImpl::readDeviceInfo()
 {

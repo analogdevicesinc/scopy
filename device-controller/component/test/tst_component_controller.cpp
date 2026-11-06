@@ -32,6 +32,7 @@
 #include <QPointer>
 #include <QSignalSpy>
 #include <QTest>
+#include <QThread>
 
 using namespace scopy;
 using namespace scopy::component;
@@ -133,6 +134,8 @@ private Q_SLOTS:
 	void serialBackendForcesSerialExecutor();
 	void lateBackendJoinsOpenConnection();
 	void otherKindOnOpenUriFails();
+	void openFromWorkerThreadMovesConnection();
+	void viewBuiltOnWorkerIsParentedToConnection();
 };
 
 void TstComponentController::initTestCase()
@@ -392,6 +395,42 @@ void TstComponentController::otherKindOnOpenUriFails()
 	QVERIFY(!Controller::connectCtx("fake:kind", "other-view"));
 	conn.reset();
 	QVERIFY(c->unregisterBackend("other-view"));
+}
+
+// DeviceImpl::verify() opens on a worker thread: the connection must end up on the Controller's
+// thread, parented to it, started, and its pings must be able to run there.
+void TstComponentController::openFromWorkerThreadMovesConnection()
+{
+	Controller *c = Controller::GetInstance();
+	ConnectionHandle conn;
+	QThread *th = QThread::create([&conn]() { conn = Controller::open("fake:worker", "fake"); });
+	th->start();
+	QVERIFY(th->wait(5000));
+	delete th;
+	QVERIFY(conn);
+	QCOMPARE(conn->thread(), c->thread());
+	QTRY_COMPARE(conn->parent(), c);
+	QTRY_VERIFY(conn->as<FakeConnection>()->started);
+	conn.reset();
+}
+
+void TstComponentController::viewBuiltOnWorkerIsParentedToConnection()
+{
+	Controller *c = Controller::GetInstance();
+	QVERIFY(c->registerBackend(std::make_shared<FakeBackend>("worker-view")));
+	ContextHandle ctx;
+	QThread *th = QThread::create([&ctx]() { ctx = Controller::connectCtx("fake:worker2", "worker-view"); });
+	th->start();
+	QVERIFY(th->wait(5000));
+	delete th;
+	QVERIFY(ctx);
+	QCOMPARE(ctx->thread(), c->thread());
+	QCOMPARE(ctx->parent(), ctx.connection());
+	auto *dev = ctx->findChild<Device *>();
+	QVERIFY(dev);
+	QCOMPARE(dev->thread(), c->thread());
+	ctx.reset();
+	QVERIFY(c->unregisterBackend("worker-view"));
 }
 
 QTEST_MAIN(TstComponentController)
