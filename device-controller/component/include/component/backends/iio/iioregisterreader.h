@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "component/registerreader.h"
 #include "core/result.h"
 #include "iioutil/handles.h"
 
@@ -41,21 +42,16 @@ class RegReadCommand;
 
 namespace scopy::component::iio {
 
-// Register-read capability of a device (debug register access). IIO-only, no
-// generic base — a register is addressed by number, so it attaches straight to
-// the IIODevice (discovered via findChild<IIORegisterReader*>()).
-class COMPONENT_EXPORT IIORegisterReader : public QObject
+// Register-read capability of an IIO device (debug register access), 32-bit address and value.
+// Attaches to the IIODevice; discovered via findChild<RegisterReader*>() (or the IIO type).
+class COMPONENT_EXPORT IIORegisterReader : public RegisterReader
 {
 	Q_OBJECT
 public:
 	IIORegisterReader(scopy::iio::IDeviceOps *ops, scopy::iio::DeviceHandle handle, scopy::ICmdExecutor *executor,
 			  QObject *parent = nullptr);
 
-	Q_INVOKABLE QCoro::Task<CommandResponse<uint32_t>> readAsync(uint32_t addr);
-
-Q_SIGNALS:
-	void readSucceeded(uint32_t addr, uint32_t value);
-	void readFailed(const scopy::Error &error);
+	QCoro::Task<CommandResponse<uint32_t>> readAsync(uint32_t addr) override;
 
 private:
 	scopy::iio::IDeviceOps *m_ops;

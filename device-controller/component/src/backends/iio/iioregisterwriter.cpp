@@ -32,7 +32,7 @@ using namespace scopy::component::iio;
 
 IIORegisterWriter::IIORegisterWriter(scopy::iio::IDeviceOps *ops, scopy::iio::DeviceHandle handle,
 				     scopy::ICmdExecutor *executor, QObject *parent)
-	: QObject(parent)
+	: RegisterWriter(parent)
 	, m_ops(ops)
 	, m_handle(handle)
 	, m_executor(executor)
