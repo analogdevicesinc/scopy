@@ -96,11 +96,11 @@ jobs:
               bash -c "apt-get update && apt-get install -y --no-install-recommends curl ca-certificates && bash /scopy/shared-actions/deb-generator-action/build-deb.sh"
             echo "artifact-dir=$GITHUB_WORKSPACE/artifacts" >> "$GITHUB_OUTPUT"
 
-        - name: Upload deb package
+        - name: Upload deb package and sources
           uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
           with:
             name: scopy-deb-arm64${{ matrix.libiio == '0' && '-libiio-v0' || '' }}
-            path: ${{ steps.deb.outputs.artifact-dir }}/*.deb
+            path: ${{ steps.deb.outputs.artifact-dir }}
         - name: Set short git commit SHA
           shell: bash
           run: echo "commit_sha=$(git rev-parse --short ${{ github.sha }})" >> "$GITHUB_ENV"

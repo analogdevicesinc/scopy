@@ -102,11 +102,11 @@ jobs:
               build*
               ci/x86_64/staging
 
-        - name: Upload deb package
+        - name: Upload deb package and sources
           uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
           with:
             name: scopy-deb-x86_64-ubuntu${{ matrix.ubuntu_version }}${{ matrix.libiio == '0' && '-libiio-v0' || '' }}
-            path: ${{ steps.deb.outputs.artifact-dir }}/*.deb
+            path: ${{ steps.deb.outputs.artifact-dir }}
 
         - name: Set short git commit SHA
           shell: bash
