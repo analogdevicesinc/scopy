@@ -23,10 +23,12 @@
 #include "component/streamformat.h"
 
 #include <QList>
+#include <QString>
 #include <QVector>
 
 #include <cstddef>
 #include <cstdint>
+#include <vector>
 
 namespace scopy::adalm2000::stream {
 
@@ -49,6 +51,37 @@ inline size_t alignSamplesCount(size_t requested)
 		n += SAMPLES_MULTIPLE - remainder;
 	}
 	return n;
+}
+
+inline constexpr size_t CYCLIC_SAMPLES_MIN = 1024;
+
+inline size_t alignOutputSamplesCount(size_t requested, bool cyclic)
+{
+	const size_t n = alignSamplesCount(requested);
+	return (cyclic && n < CYCLIC_SAMPLES_MIN) ? CYCLIC_SAMPLES_MIN : n;
+}
+
+inline QString validatePerChannelLengths(const std::vector<size_t> &lengths, bool cyclic)
+{
+	const size_t minimum = cyclic ? CYCLIC_SAMPLES_MIN : SAMPLES_MIN;
+	bool any = false;
+	for(size_t i = 0; i < lengths.size(); ++i) {
+		const size_t n = lengths[i];
+		if(n == 0) {
+			continue;
+		}
+		any = true;
+		if(n < minimum) {
+			return QStringLiteral("channel %1: %2 samples, minimum is %3").arg(i).arg(n).arg(minimum);
+		}
+		if(n % SAMPLES_MULTIPLE != 0) {
+			return QStringLiteral("channel %1: %2 samples is not a multiple of %3")
+				.arg(i)
+				.arg(n)
+				.arg(SAMPLES_MULTIPLE);
+		}
+	}
+	return any ? QString() : QStringLiteral("no channel has samples");
 }
 
 // Describe an interleaved raw-int16 buffer.

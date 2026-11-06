@@ -27,6 +27,7 @@
 #include <QVector>
 
 #include <cstdint>
+#include <vector>
 
 namespace libm2k::analog {
 class M2kAnalogOut;
@@ -37,6 +38,9 @@ class ICmdExecutor;
 }
 
 namespace scopy::adalm2000 {
+
+template <typename T>
+class M2kCallCommand;
 
 // Buffered DAC playback over libm2k. Parented to the "analog-out"
 // component::Device; reach it with component::streamAt<component::OutputStream>().
@@ -63,17 +67,24 @@ public:
 	QCoro::Task<CommandResponse<void>> closeAsync() override;
 	QCoro::Task<CommandResponse<void>> pushAsync() override;
 
+	QCoro::Task<CommandResponse<void>> pushAsync(std::vector<std::vector<double>> perDac);
+
+	void cancel();
+
 	component::StreamFormat &writeFormat() override { return m_format; }
 
-	// Per-channel raw -> volts maps, in the order the channels were requested.
+	// Per-channel raw -> volts maps, in ascending DAC order (the order of enabledChannels()).
 	const QVector<stream::ChannelScale> &scales() const { return m_scales; }
 
 private:
+	QCoro::Task<CommandResponse<void>> finishPush(M2kCallCommand<void> *cmd);
+
 	void *m_resource;
 	libm2k::analog::M2kAnalogOut *m_aout;
 	scopy::ICmdExecutor *m_executor;
 	bool m_cyclic = true;
 	unsigned m_kernelBuffers = 4;
+	bool m_cancelRequested = false;
 	QVector<int16_t> m_buffer;
 	QVector<stream::ChannelScale> m_scales;
 	component::StreamFormat m_format;
