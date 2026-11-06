@@ -125,6 +125,7 @@ QCoro::Task<CommandResponse<void>> M2kDigitalInputStream::openAsync(const compon
 
 	if(result) {
 		m_config = effective;
+		m_stale = false;
 		m_open = true;
 		Q_EMIT openedChanged(true);
 	}
@@ -139,12 +140,15 @@ QCoro::Task<CommandResponse<void>> M2kDigitalInputStream::closeAsync()
 
 	m_open = false;
 	m_format = component::StreamFormat{};
+	m_cancelRequested = false;
+	try {
+		m_digital->cancelAcquisition();
+	} catch(const std::exception &e) {
+		qWarning(CAT_M2K_DIGITAL_STREAMS) << "cancelAcquisition failed:" << e.what();
+	}
 
 	M2kDigital *digital = m_digital;
-	auto *cmd = new M2kCallCommand<void>(m_resource, [digital]() {
-		digital->cancelAcquisition();
-		digital->stopAcquisition();
-	});
+	auto *cmd = new M2kCallCommand<void>(m_resource, [digital]() { digital->stopAcquisition(); });
 
 	auto result = co_await component::runCommand(
 		m_executor, cmd, [](const Result<void> &) {}, [this](const Error &e) { Q_EMIT streamError(e); });
@@ -161,15 +165,32 @@ QCoro::Task<CommandResponse<void>> M2kDigitalInputStream::refillAsync()
 
 	M2kDigital *digital = m_digital;
 	const unsigned samples = static_cast<unsigned>(m_config.samplesCount);
+	const unsigned kernelBuffers = m_kernelBuffers;
+	const bool restart = m_stale;
+	m_stale = false;
 	auto samplePtr = std::make_shared<const unsigned short *>(nullptr);
 
-	auto *cmd = new M2kCallCommand<void>(
-		m_resource, [digital, samples, samplePtr]() { *samplePtr = digital->getSamplesP(samples); });
+	auto *cmd = new M2kCallCommand<void>(m_resource, [digital, samples, kernelBuffers, restart, samplePtr]() {
+		if(restart) {
+			digital->stopAcquisition();
+			digital->setKernelBuffersCountIn(kernelBuffers);
+			digital->startAcquisition(samples);
+		}
+		*samplePtr = digital->getSamplesP(samples);
+	});
 
 	auto result = co_await component::runCommand(
-		m_executor, cmd, [](const Result<void> &) {}, [this](const Error &e) { Q_EMIT refillFailed(e); });
+		m_executor, cmd, [](const Result<void> &) {}, [](const Error &) {});
 
+	const bool cancelled = m_cancelRequested || !m_open;
+	m_cancelRequested = false;
 	if(!result) {
+		if(cancelled) {
+			const Error error{-ECANCELED, QStringLiteral("refill cancelled")};
+			Q_EMIT refillFailed(error);
+			co_return CommandResponse<void>(result.commandId(), Unexpected{error});
+		}
+		Q_EMIT refillFailed(result.error());
 		co_return result;
 	}
 	if(!m_open || *samplePtr == nullptr) {
@@ -264,12 +285,15 @@ QCoro::Task<CommandResponse<void>> M2kDigitalOutputStream::closeAsync()
 
 	m_open = false;
 	m_format = component::StreamFormat{};
+	m_cancelRequested = false;
+	try {
+		m_digital->cancelBufferOut();
+	} catch(const std::exception &e) {
+		qWarning(CAT_M2K_DIGITAL_STREAMS) << "cancelBufferOut failed:" << e.what();
+	}
 
 	M2kDigital *digital = m_digital;
-	auto *cmd = new M2kCallCommand<void>(m_resource, [digital]() {
-		digital->cancelBufferOut();
-		digital->stopBufferOut();
-	});
+	auto *cmd = new M2kCallCommand<void>(m_resource, [digital]() { digital->stopBufferOut(); });
 
 	auto result = co_await component::runCommand(
 		m_executor, cmd, [](const Result<void> &) {}, [this](const Error &e) { Q_EMIT streamError(e); });
@@ -291,10 +315,52 @@ QCoro::Task<CommandResponse<void>> M2kDigitalOutputStream::pushAsync()
 	auto *cmd = new M2kCallCommand<void>(m_resource, [digital, payload]() { digital->push(*payload); });
 
 	auto result = co_await component::runCommand(
-		m_executor, cmd, [](const Result<void> &) {}, [this](const Error &e) { Q_EMIT pushFailed(e); });
+		m_executor, cmd, [](const Result<void> &) {}, [](const Error &) {});
 
-	if(result) {
-		Q_EMIT pushSucceeded();
+	const bool cancelled = m_cancelRequested || !m_open;
+	m_cancelRequested = false;
+	if(!result) {
+		if(cancelled) {
+			const Error error{-ECANCELED, QStringLiteral("push cancelled")};
+			Q_EMIT pushFailed(error);
+			co_return CommandResponse<void>(result.commandId(), Unexpected{error});
+		}
+		Q_EMIT pushFailed(result.error());
+		co_return result;
 	}
+	Q_EMIT pushSucceeded();
 	co_return result;
+}
+
+void M2kDigitalInputStream::cancel()
+{
+	if(!m_open) {
+		return;
+	}
+	m_cancelRequested = true;
+	try {
+		m_digital->cancelAcquisition();
+	} catch(const std::exception &e) {
+		qWarning(CAT_M2K_DIGITAL_STREAMS) << "cancelAcquisition failed:" << e.what();
+	}
+}
+
+void M2kDigitalInputStream::invalidate()
+{
+	if(m_open) {
+		m_stale = true;
+	}
+}
+
+void M2kDigitalOutputStream::cancel()
+{
+	if(!m_open) {
+		return;
+	}
+	m_cancelRequested = true;
+	try {
+		m_digital->cancelBufferOut();
+	} catch(const std::exception &e) {
+		qWarning(CAT_M2K_DIGITAL_STREAMS) << "cancelBufferOut failed:" << e.what();
+	}
 }

@@ -33,18 +33,23 @@
 #include "component/device.h"
 
 #include "digitaliomath.h"
+#include "m2ktriggermath.h"
 #include "powersupplymath.h"
 
+#include <libm2k/analog/dmm.hpp>
 #include <libm2k/analog/m2kanalogin.hpp>
 #include <libm2k/analog/m2kanalogout.hpp>
 #include <libm2k/analog/m2kpowersupply.hpp>
 #include <libm2k/digital/m2kdigital.hpp>
 #include <libm2k/m2k.hpp>
+#include <libm2k/m2khardwaretrigger.hpp>
 
 #include <QLoggingCategory>
+#include <QSet>
 #include <QString>
 
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
@@ -141,8 +146,174 @@ QStringList ratesToOptions(const std::vector<double> &rates)
 	return out;
 }
 
-void buildAnalogInChannel(component::Device *analogIn, M2kAnalogIn *ain, void *resource, int index,
-			  ICmdExecutor *executor)
+using libm2k::M2kHardwareTrigger;
+
+static_assert(trigger::optionCount(trigger::MODE_OPTIONS) == libm2k::N_DIGITAL_XOR_ANALOG + 1);
+static_assert(trigger::optionCount(trigger::ANALOG_CONDITION_OPTIONS) == libm2k::HIGH_LEVEL_ANALOG + 1);
+static_assert(trigger::optionCount(trigger::DIGITAL_CONDITION_OPTIONS) == libm2k::NO_TRIGGER_DIGITAL + 1);
+static_assert(trigger::DIGITAL_CONDITION_NONE == libm2k::NO_TRIGGER_DIGITAL);
+static_assert(trigger::optionCount(trigger::ANALOG_SOURCE_OPTIONS) == libm2k::NO_SOURCE + 1);
+static_assert(trigger::optionCount(trigger::DIGITAL_SOURCE_OPTIONS) == libm2k::SRC_DISABLED + 1);
+static_assert(trigger::optionCount(trigger::OUT_SELECT_OPTIONS) == libm2k::SELECT_DIGITAL_IN + 1);
+static_assert(trigger::optionCount(trigger::DIGITAL_MODE_OPTIONS) == libm2k::digital::DIO_AND + 1);
+
+template <typename Enum, size_t N>
+Enum enumFromName(const char *const (&table)[N], const QString &name)
+{
+	const int value = trigger::fromName(table, name);
+	if(value < 0) {
+		throw std::invalid_argument("unknown trigger option: " + name.toStdString());
+	}
+	return static_cast<Enum>(value);
+}
+
+template <size_t N>
+QByteArray nameBytes(const char *const (&table)[N], int value)
+{
+	return trigger::toName(table, value).toLatin1();
+}
+
+M2kHardwareTrigger *triggerOf(M2kAnalogIn *ain)
+{
+	try {
+		return ain->getTrigger();
+	} catch(const std::exception &e) {
+		qWarning(CAT_M2K_BUILDER) << "M2kAnalogIn::getTrigger failed:" << e.what();
+	}
+	return nullptr;
+}
+
+M2kHardwareTrigger *triggerOf(libm2k::digital::M2kDigital *dig)
+{
+	try {
+		return dig->getTrigger();
+	} catch(const std::exception &e) {
+		qWarning(CAT_M2K_BUILDER) << "M2kDigital::getTrigger failed:" << e.what();
+	}
+	return nullptr;
+}
+
+struct TriggerCaps
+{
+	bool externalIn = false;
+	bool externalOut = false;
+	bool crossInstrument = false;
+};
+
+TriggerCaps probeTriggerCaps(M2kHardwareTrigger *trig)
+{
+	TriggerCaps caps;
+	try {
+		caps.externalIn = trig->hasExternalTriggerIn();
+		caps.externalOut = trig->hasExternalTriggerOut();
+		caps.crossInstrument = trig->hasCrossInstrumentTrigger();
+	} catch(const std::exception &e) {
+		qWarning(CAT_M2K_BUILDER) << "trigger capability probe failed:" << e.what();
+	}
+	return caps;
+}
+
+void addAnalogTriggerChannelAttrs(component::Channel *chn, M2kHardwareTrigger *trig, void *resource, unsigned int chIdx,
+				  ICmdExecutor *exec)
+{
+	using namespace trigger;
+
+	component::Attribute *mode = addReadWriteAttr(
+		chn, QStringLiteral("trigger_mode"), QString(), resource,
+		[trig, chIdx]() { return nameBytes(MODE_OPTIONS, trig->getAnalogMode(chIdx)); },
+		[trig, chIdx](const QString &v) {
+			trig->setAnalogMode(chIdx, enumFromName<libm2k::M2K_TRIGGER_MODE>(MODE_OPTIONS, v));
+		},
+		exec);
+	mode->setOptions(toOptions(MODE_OPTIONS));
+
+	addReadWriteAttr(
+		chn, QStringLiteral("trigger_level"), QStringLiteral("V"), resource,
+		[trig, chIdx]() { return QByteArray::number(trig->getAnalogLevel(chIdx), 'g', 12); },
+		[trig, chIdx](const QString &v) { trig->setAnalogLevel(chIdx, v.toDouble()); }, exec);
+
+	addReadWriteAttr(
+		chn, QStringLiteral("trigger_hysteresis"), QStringLiteral("V"), resource,
+		[trig, chIdx]() { return QByteArray::number(trig->getAnalogHysteresis(chIdx), 'g', 12); },
+		[trig, chIdx](const QString &v) { trig->setAnalogHysteresis(chIdx, v.toDouble()); }, exec);
+
+	component::Attribute *condition = addReadWriteAttr(
+		chn, QStringLiteral("trigger_condition"), QString(), resource,
+		[trig, chIdx]() { return nameBytes(ANALOG_CONDITION_OPTIONS, trig->getAnalogCondition(chIdx)); },
+		[trig, chIdx](const QString &v) {
+			trig->setAnalogCondition(
+				chIdx, enumFromName<libm2k::M2K_TRIGGER_CONDITION_ANALOG>(ANALOG_CONDITION_OPTIONS, v));
+		},
+		exec);
+	condition->setOptions(toOptions(ANALOG_CONDITION_OPTIONS));
+
+	component::Attribute *externalCondition = addReadWriteAttr(
+		chn, QStringLiteral("trigger_external_condition"), QString(), resource,
+		[trig, chIdx]() {
+			return nameBytes(DIGITAL_CONDITION_OPTIONS, trig->getAnalogExternalCondition(chIdx));
+		},
+		[trig, chIdx](const QString &v) {
+			trig->setAnalogExternalCondition(
+				chIdx,
+				enumFromName<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>(DIGITAL_CONDITION_OPTIONS, v));
+		},
+		exec);
+	externalCondition->setOptions(toOptions(DIGITAL_CONDITION_OPTIONS, DIGITAL_CONDITION_NONE));
+}
+
+void addAnalogTriggerDeviceAttrs(component::Device *dev, M2kHardwareTrigger *trig, const TriggerCaps &caps,
+				 void *resource, ICmdExecutor *exec)
+{
+	using namespace trigger;
+
+	component::Attribute *source = addReadWriteAttr(
+		dev, QStringLiteral("trigger_source"), QString(), resource,
+		[trig]() { return nameBytes(ANALOG_SOURCE_OPTIONS, trig->getAnalogSource()); },
+		[trig](const QString &v) {
+			trig->setAnalogSource(
+				enumFromName<libm2k::M2K_TRIGGER_SOURCE_ANALOG>(ANALOG_SOURCE_OPTIONS, v));
+		},
+		exec);
+	source->setOptions(caps.crossInstrument ? toOptions(ANALOG_SOURCE_OPTIONS)
+						: toOptions(ANALOG_SOURCE_OPTIONS, libm2k::SRC_DIGITAL_IN));
+
+	component::Attribute *delay = addReadWriteAttr(
+		dev, QStringLiteral("trigger_delay"), QStringLiteral("samples"), resource,
+		[trig]() { return QByteArray::number(trig->getAnalogDelay()); },
+		[trig](const QString &v) { trig->setAnalogDelay(v.toInt()); }, exec);
+	delay->setRange({static_cast<double>(DELAY_MIN), 1.0, static_cast<double>(-DELAY_MIN)});
+
+	component::Attribute *streaming = addReadWriteAttr(
+		dev, QStringLiteral("trigger_streaming_flag"), QString(), resource,
+		[trig]() { return QByteArray::number(trig->getAnalogStreamingFlag() ? 1 : 0); },
+		[trig](const QString &v) { trig->setAnalogStreamingFlag(v.toInt() != 0); }, exec);
+	streaming->setOptions({QStringLiteral("0"), QStringLiteral("1")});
+
+	if(caps.externalOut) {
+		component::Attribute *outSelect = addReadWriteAttr(
+			dev, QStringLiteral("trigger_external_out_select"), QString(), resource,
+			[trig]() { return nameBytes(OUT_SELECT_OPTIONS, trig->getAnalogExternalOutSelect()); },
+			[trig](const QString &v) {
+				trig->setAnalogExternalOutSelect(
+					enumFromName<libm2k::M2K_TRIGGER_OUT_SELECT>(OUT_SELECT_OPTIONS, v));
+			},
+			exec);
+		outSelect->setOptions(toOptions(OUT_SELECT_OPTIONS));
+	}
+
+	addReadOnlyAttr(
+		dev, QStringLiteral("has_external_trigger_in"), QString(), resource,
+		[trig]() { return QByteArray::number(trig->hasExternalTriggerIn() ? 1 : 0); }, exec);
+	addReadOnlyAttr(
+		dev, QStringLiteral("has_external_trigger_out"), QString(), resource,
+		[trig]() { return QByteArray::number(trig->hasExternalTriggerOut() ? 1 : 0); }, exec);
+	addReadOnlyAttr(
+		dev, QStringLiteral("has_cross_instrument_trigger"), QString(), resource,
+		[trig]() { return QByteArray::number(trig->hasCrossInstrumentTrigger() ? 1 : 0); }, exec);
+}
+
+component::Channel *buildAnalogInChannel(component::Device *analogIn, M2kAnalogIn *ain, void *resource, int index,
+					 ICmdExecutor *executor)
 {
 	const ANALOG_IN_CHANNEL ch = (index == 0) ? ANALOG_IN_CHANNEL_1 : ANALOG_IN_CHANNEL_2;
 	const unsigned int chIdx = static_cast<unsigned int>(index);
@@ -184,6 +355,7 @@ void buildAnalogInChannel(component::Device *analogIn, M2kAnalogIn *ain, void *r
 	addReadOnlyAttr(
 		chn, QStringLiteral("enabled"), QString(), resource,
 		[ain, chIdx]() { return QByteArray::number(ain->isChannelEnabled(chIdx) ? 1 : 0); }, executor);
+	return chn;
 }
 
 void buildAnalogInDeviceAttrs(component::Device *analogIn, M2kAnalogIn *ain, void *resource, ICmdExecutor *executor)
@@ -249,10 +421,17 @@ bool buildAnalogIn(component::Context *ctx, libm2k::context::M2k *m2k, ICmdExecu
 		return false;
 	}
 
+	M2kHardwareTrigger *trig = triggerOf(ain);
 	for(int i = 0; i < 2; ++i) {
-		buildAnalogInChannel(analogIn, ain, m2k, i, executor);
+		component::Channel *chn = buildAnalogInChannel(analogIn, ain, m2k, i, executor);
+		if(trig) {
+			addAnalogTriggerChannelAttrs(chn, trig, m2k, static_cast<unsigned int>(i), executor);
+		}
 	}
 	buildAnalogInDeviceAttrs(analogIn, ain, m2k, executor);
+	if(trig) {
+		addAnalogTriggerDeviceAttrs(analogIn, trig, probeTriggerCaps(trig), m2k, executor);
+	}
 
 	new M2kInputStream(m2k, ain, executor, analogIn);
 	return true;
@@ -459,7 +638,80 @@ void writePinValue(M2kDigital *dig, const dio::PinState &state, int pin)
 	dig->setValueRaw(static_cast<DIO_CHANNEL>(pin), dio::bit(state.gpo, pin) ? DIO_LEVEL::HIGH : DIO_LEVEL::LOW);
 }
 
-void addPin(component::Device *dev, M2kDigital *dig, void *resource, int pin, DioStatePtr state, ICmdExecutor *exec)
+void addDigitalTriggerPinAttr(component::Channel *chn, M2kHardwareTrigger *trig, void *resource, int pin,
+			      ICmdExecutor *exec)
+{
+	using namespace trigger;
+	const DIO_CHANNEL dioPin = static_cast<DIO_CHANNEL>(pin);
+
+	component::Attribute *condition = addReadWriteAttr(
+		chn, QStringLiteral("trigger_condition"), QString(), resource,
+		[trig, dioPin]() { return nameBytes(DIGITAL_CONDITION_OPTIONS, trig->getDigitalCondition(dioPin)); },
+		[trig, dioPin](const QString &v) {
+			trig->setDigitalCondition(
+				dioPin,
+				enumFromName<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>(DIGITAL_CONDITION_OPTIONS, v));
+		},
+		exec);
+	condition->setOptions(toOptions(DIGITAL_CONDITION_OPTIONS));
+}
+
+void addDigitalTriggerDeviceAttrs(component::Device *dev, M2kHardwareTrigger *trig, const TriggerCaps &caps,
+				  void *resource, ICmdExecutor *exec)
+{
+	using namespace trigger;
+
+	component::Attribute *mode = addReadWriteAttr(
+		dev, QStringLiteral("trigger_mode"), QString(), resource,
+		[trig]() { return nameBytes(DIGITAL_MODE_OPTIONS, trig->getDigitalMode()); },
+		[trig](const QString &v) {
+			trig->setDigitalMode(enumFromName<libm2k::digital::DIO_TRIGGER_MODE>(DIGITAL_MODE_OPTIONS, v));
+		},
+		exec);
+	mode->setOptions(toOptions(DIGITAL_MODE_OPTIONS));
+
+	component::Attribute *delay = addReadWriteAttr(
+		dev, QStringLiteral("trigger_delay"), QStringLiteral("samples"), resource,
+		[trig]() { return QByteArray::number(trig->getDigitalDelay()); },
+		[trig](const QString &v) { trig->setDigitalDelay(v.toInt()); }, exec);
+	delay->setRange({static_cast<double>(DELAY_MIN), 1.0, static_cast<double>(-DELAY_MIN)});
+
+	try {
+		trig->setDigitalStreamingFlag(false);
+	} catch(const std::exception &e) {
+		qWarning(CAT_M2K_BUILDER) << "setDigitalStreamingFlag(false) failed:" << e.what();
+	}
+	component::Attribute *streaming = addReadWriteAttr(
+		dev, QStringLiteral("trigger_streaming_flag"), QString(), resource,
+		[trig]() { return QByteArray::number(trig->getDigitalStreamingFlag() ? 1 : 0); },
+		[trig](const QString &v) { trig->setDigitalStreamingFlag(v.toInt() != 0); }, exec);
+	streaming->setOptions({QStringLiteral("0"), QStringLiteral("1")});
+
+	if(caps.crossInstrument) {
+		component::Attribute *source = addReadWriteAttr(
+			dev, QStringLiteral("trigger_source"), QString(), resource,
+			[trig]() { return nameBytes(DIGITAL_SOURCE_OPTIONS, trig->getDigitalSource()); },
+			[trig](const QString &v) {
+				trig->setDigitalSource(
+					enumFromName<libm2k::M2K_TRIGGER_SOURCE_DIGITAL>(DIGITAL_SOURCE_OPTIONS, v));
+			},
+			exec);
+		source->setOptions(toOptions(DIGITAL_SOURCE_OPTIONS));
+	}
+
+	component::Attribute *externalCondition = addReadWriteAttr(
+		dev, QStringLiteral("trigger_external_condition"), QString(), resource,
+		[trig]() { return nameBytes(DIGITAL_CONDITION_OPTIONS, trig->getDigitalExternalCondition()); },
+		[trig](const QString &v) {
+			trig->setDigitalExternalCondition(
+				enumFromName<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>(DIGITAL_CONDITION_OPTIONS, v));
+		},
+		exec);
+	externalCondition->setOptions(toOptions(DIGITAL_CONDITION_OPTIONS));
+}
+
+component::Channel *addPin(component::Device *dev, M2kDigital *dig, void *resource, int pin, DioStatePtr state,
+			   ICmdExecutor *exec)
 {
 	auto *chn = new component::Channel(dev);
 	chn->setId(QStringLiteral("voltage%1").arg(pin));
@@ -522,6 +774,7 @@ void addPin(component::Device *dev, M2kDigital *dig, void *resource, int pin, Di
 		chn, QStringLiteral("channel_enabled"), QString(), resource,
 		[dig, pin](const QString &v) { dig->enableChannel(static_cast<DIO_CHANNEL>(pin), v.toInt() != 0); },
 		exec);
+	return chn;
 }
 
 void addGroup(component::Device *dev, M2kDigital *dig, void *resource, int group, DioStatePtr state, ICmdExecutor *exec)
@@ -651,18 +904,138 @@ void buildDigital(component::Context *ctx, libm2k::context::M2k *m2k, ICmdExecut
 		return;
 	}
 
+	M2kHardwareTrigger *trig = triggerOf(digital);
 	auto state = std::make_shared<dio::PinState>();
 	for(int pin = 0; pin < dio::PIN_COUNT; ++pin) {
-		addPin(digitalDev, digital, m2k, pin, state, executor);
+		component::Channel *chn = addPin(digitalDev, digital, m2k, pin, state, executor);
+		if(trig) {
+			addDigitalTriggerPinAttr(chn, trig, m2k, pin, executor);
+		}
 	}
 	for(int group = 0; group < dio::GROUP_COUNT; ++group) {
 		addGroup(digitalDev, digital, m2k, group, state, executor);
 	}
 	addDigitalDeviceAttrs(digitalDev, digital, m2k, state, executor);
 	addDigitalBufferAttrs(digitalDev, digital, m2k, executor);
+	if(trig) {
+		addDigitalTriggerDeviceAttrs(digitalDev, trig, probeTriggerCaps(trig), m2k, executor);
+	}
 
 	new M2kDigitalInputStream(m2k, digital, executor, digitalDev);
 	new M2kDigitalOutputStream(m2k, digital, executor, digitalDev);
+}
+
+void buildContextDevice(component::Context *ctx, libm2k::context::M2k *m2k, ICmdExecutor *executor)
+{
+	component::Device *contextDev = addDevice(ctx, QStringLiteral("context"));
+
+	std::vector<std::string> names;
+	try {
+		names = m2k->getAvailableContextAttributes();
+	} catch(const std::exception &e) {
+		qWarning(CAT_M2K_BUILDER) << "getAvailableContextAttributes failed:" << e.what();
+	}
+	for(const std::string &name : names) {
+		addReadOnlyAttr(
+			contextDev, QString::fromStdString(name), QString(), m2k,
+			[m2k, name]() { return QByteArray::fromStdString(m2k->getContextAttributeValue(name)); },
+			executor);
+	}
+
+	addWriteOnlyAttr(
+		contextDev, QStringLiteral("timeout_ms"), QStringLiteral("ms"), m2k,
+		[m2k](const QString &v) { m2k->setTimeout(v.toUInt()); }, executor);
+}
+
+void buildDmm(component::Context *ctx, DMM *dmm, const QString &id, void *resource, ICmdExecutor *executor)
+{
+	component::Device *dmmDev = addDevice(ctx, id);
+
+	std::vector<std::string> channels;
+	try {
+		channels = dmm->getAllChannels();
+	} catch(const std::exception &e) {
+		qWarning(CAT_M2K_BUILDER) << "getAllChannels failed on" << id << ":" << e.what();
+	}
+	for(const std::string &chnId : channels) {
+		auto *chn = new component::Channel(dmmDev);
+		chn->setId(QString::fromStdString(chnId));
+		QString unit;
+		try {
+			const DMM_READING reading = dmm->readChannel(chnId);
+			chn->setName(QString::fromStdString(reading.name.empty() ? chnId : reading.name));
+			unit = QString::fromStdString(reading.unit_symbol);
+		} catch(const std::exception &e) {
+			qWarning(CAT_M2K_BUILDER) << "readChannel failed on" << id << chnId.c_str() << ":" << e.what();
+			chn->setName(chn->id());
+		}
+		chn->setLabel(chn->name());
+		chn->setIsOutput(false);
+
+		addReadOnlyAttr(
+			chn, QStringLiteral("value"), unit, resource,
+			[dmm, chnId]() { return QByteArray::number(dmm->readChannel(chnId).value, 'g', 12); },
+			executor);
+	}
+}
+
+void buildDmms(component::Context *ctx, libm2k::context::M2k *m2k, ICmdExecutor *executor)
+{
+	std::vector<DMM *> dmms;
+	try {
+		dmms = m2k->getAllDmm();
+	} catch(const std::exception &e) {
+		qWarning(CAT_M2K_BUILDER) << "getAllDmm failed:" << e.what();
+		return;
+	}
+
+	QSet<QString> used;
+	for(DMM *dmm : dmms) {
+		if(!dmm) {
+			continue;
+		}
+		QString name;
+		try {
+			name = QString::fromStdString(dmm->getName());
+		} catch(const std::exception &e) {
+			qWarning(CAT_M2K_BUILDER) << "DMM getName failed:" << e.what();
+		}
+		QString id = QStringLiteral("dmm-") + (name.isEmpty() ? QStringLiteral("unnamed") : name);
+		for(int n = 1; used.contains(id); ++n) {
+			id = QStringLiteral("dmm-%1-%2").arg(name).arg(n);
+		}
+		used.insert(id);
+		buildDmm(ctx, dmm, id, m2k, executor);
+	}
+}
+
+void invalidateInputsOnTriggerWrite(component::Context *ctx)
+{
+	auto *analogIn = ctx->findChild<component::Device *>(QStringLiteral("analog-in"), Qt::FindDirectChildrenOnly);
+	auto *digital = ctx->findChild<component::Device *>(QStringLiteral("digital"), Qt::FindDirectChildrenOnly);
+	M2kInputStream *ain = component::streamAt<M2kInputStream>(analogIn);
+	M2kDigitalInputStream *din = component::streamAt<M2kDigitalInputStream>(digital);
+
+	for(component::Device *dev : {analogIn, digital}) {
+		if(!dev) {
+			continue;
+		}
+		const QList<component::Attribute *> attrs = dev->findChildren<component::Attribute *>();
+		for(component::Attribute *attr : attrs) {
+			component::AttributeWriter *writer = attr->writeCapability();
+			if(!writer || !attr->name().startsWith(QStringLiteral("trigger_"))) {
+				continue;
+			}
+			if(ain) {
+				QObject::connect(writer, &component::AttributeWriter::writeSucceeded, ain,
+						 &M2kInputStream::invalidate);
+			}
+			if(din) {
+				QObject::connect(writer, &component::AttributeWriter::writeSucceeded, din,
+						 &M2kDigitalInputStream::invalidate);
+			}
+		}
+	}
 }
 
 } // namespace
@@ -695,6 +1068,9 @@ bool M2kComponentBuilder::build(component::Context *ctx, ICmdExecutor *executor)
 	buildAnalogOut(m2kCtx, m2k, executor);
 	buildPowerSupply(m2kCtx, m2k, executor);
 	buildDigital(m2kCtx, m2k, executor);
+	buildContextDevice(m2kCtx, m2k, executor);
+	buildDmms(m2kCtx, m2k, executor);
+	invalidateInputsOnTriggerWrite(m2kCtx);
 
 	return true;
 }
