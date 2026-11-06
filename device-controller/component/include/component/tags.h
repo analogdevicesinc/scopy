@@ -33,6 +33,12 @@ inline constexpr auto SampleRate = "sample-rate";
 inline constexpr auto TriggerLevel = "trigger-level";
 inline constexpr auto Offset = "offset";
 inline constexpr auto Enable = "enable";
+
+// Capability nodes carry "capability:<kind>" so a consumer that does not link the concrete type
+// can still find them (hasTag / findByTag) and drive them through the metaobject.
+inline constexpr auto CapabilityPrefix = "capability:";
+inline constexpr auto RegisterRead = "capability:register-read";
+inline constexpr auto RegisterWrite = "capability:register-write";
 } // namespace tags
 
 inline QStringList componentTags(const QObject *o) { return o->property("tags").toStringList(); }

@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "component/registerwriter.h"
 #include "core/result.h"
 #include "iioutil/handles.h"
 
@@ -41,21 +42,16 @@ class RegWriteCommand;
 
 namespace scopy::component::iio {
 
-// Register-write capability of a device (debug register access). IIO-only, no
-// generic base — addressed by number, attaches straight to the IIODevice
-// (discovered via findChild<IIORegisterWriter*>()).
-class COMPONENT_EXPORT IIORegisterWriter : public QObject
+// Register-write capability of an IIO device (debug register access), 32-bit address and value.
+// Attaches to the IIODevice; discovered via findChild<RegisterWriter*>() (or the IIO type).
+class COMPONENT_EXPORT IIORegisterWriter : public RegisterWriter
 {
 	Q_OBJECT
 public:
 	IIORegisterWriter(scopy::iio::IDeviceOps *ops, scopy::iio::DeviceHandle handle, scopy::ICmdExecutor *executor,
 			  QObject *parent = nullptr);
 
-	Q_INVOKABLE QCoro::Task<CommandResponse<void>> writeAsync(uint32_t addr, uint32_t value);
-
-Q_SIGNALS:
-	void writeSucceeded(uint32_t addr);
-	void writeFailed(const scopy::Error &error);
+	QCoro::Task<CommandResponse<void>> writeAsync(uint32_t addr, uint32_t value) override;
 
 private:
 	scopy::iio::IDeviceOps *m_ops;
