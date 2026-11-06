@@ -34,6 +34,7 @@
 #include <libm2k/m2k.hpp>
 
 #include <QLoggingCategory>
+#include <QPointer>
 #include <QTimer>
 
 Q_LOGGING_CATEGORY(CAT_M2KPS_CONTROLLER, "M2kPowerSupplyController")
@@ -92,6 +93,7 @@ component::Attribute *M2kPowerSupplyController::voltageAttribute(int channel) co
 
 QCoro::Task<void> M2kPowerSupplyController::initialize()
 {
+	QPointer<M2kPowerSupplyController> self(this);
 	if(!isUsable()) {
 		Q_EMIT failed(QStringLiteral("Power Supply: the device exposes no usable rails"));
 		co_return;
@@ -99,14 +101,21 @@ QCoro::Task<void> M2kPowerSupplyController::initialize()
 
 	for(int ch = 0; ch < 2; ++ch) {
 		co_await setRailEnabled(ch, false);
+		if(!self) {
+			co_return;
+		}
 	}
 	for(int ch = 0; ch < 2; ++ch) {
 		co_await setRailVoltage(ch, 0.0);
+		if(!self) {
+			co_return;
+		}
 	}
 }
 
 QCoro::Task<void> M2kPowerSupplyController::setRailEnabled(int channel, bool on)
 {
+	QPointer<M2kPowerSupplyController> self(this);
 	if(!channelValid(channel) || !m_enabled[channel]->writeCapability()) {
 		Q_EMIT failed(QStringLiteral("Power Supply: rail %1 cannot be switched").arg(channel + 1));
 		co_return;
@@ -114,6 +123,9 @@ QCoro::Task<void> M2kPowerSupplyController::setRailEnabled(int channel, bool on)
 
 	auto resp = co_await m_enabled[channel]->writeCapability()->writeAsync(on ? QStringLiteral("1")
 										  : QStringLiteral("0"));
+	if(!self) {
+		co_return;
+	}
 	if(!resp) {
 		qWarning(CAT_M2KPS_CONTROLLER) << "enable write failed:" << resp.error().message;
 		Q_EMIT failed(QStringLiteral("Power Supply: could not %1 %2")
@@ -126,12 +138,16 @@ QCoro::Task<void> M2kPowerSupplyController::setRailEnabled(int channel, bool on)
 
 QCoro::Task<void> M2kPowerSupplyController::setRailVoltage(int channel, double volts)
 {
+	QPointer<M2kPowerSupplyController> self(this);
 	if(!channelValid(channel) || !m_voltage[channel]->writeCapability()) {
 		Q_EMIT failed(QStringLiteral("Power Supply: rail %1 is not writable").arg(channel + 1));
 		co_return;
 	}
 
 	auto resp = co_await m_voltage[channel]->writeCapability()->writeAsync(QString::number(volts, 'f', 7));
+	if(!self) {
+		co_return;
+	}
 	if(!resp) {
 		qWarning(CAT_M2KPS_CONTROLLER) << "voltage write failed:" << resp.error().message;
 		Q_EMIT failed(QStringLiteral("Power Supply: could not set %1 to %2 V")
@@ -157,6 +173,7 @@ void M2kPowerSupplyController::stopPolling()
 
 QCoro::Task<void> M2kPowerSupplyController::pollOnce()
 {
+	QPointer<M2kPowerSupplyController> self(this);
 	for(int ch = 0; ch < 2; ++ch) {
 		if(!m_polling) {
 			co_return;
@@ -166,7 +183,7 @@ QCoro::Task<void> M2kPowerSupplyController::pollOnce()
 		}
 
 		auto resp = co_await m_measured[ch]->readCapability()->readAsync();
-		if(!m_polling) {
+		if(!self || !m_polling) {
 			co_return;
 		}
 		if(!resp) {

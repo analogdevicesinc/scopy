@@ -31,6 +31,7 @@
 #include <libm2k/m2khardwaretrigger.hpp>
 
 #include <QLoggingCategory>
+#include <QPointer>
 
 Q_LOGGING_CATEGORY(CAT_M2KVM_CONTROLLER, "M2kVoltmeterController")
 
@@ -48,6 +49,7 @@ M2kVoltmeterController::~M2kVoltmeterController() { release(); }
 
 QCoro::Task<bool> M2kVoltmeterController::claimAndConfigure()
 {
+	QPointer<M2kVoltmeterController> self(this);
 	if(!m_ctx || !m_ctx->m2k() || !m_ctx->executor()) {
 		qWarning(CAT_M2KVM_CONTROLLER) << "incomplete context";
 		co_return false;
@@ -78,6 +80,9 @@ QCoro::Task<bool> M2kVoltmeterController::claimAndConfigure()
 	auto r = co_await component::runCommand(
 		m_ctx->executor(), cmd, [](const scopy::Result<void> &) {},
 		[](const scopy::Error &e) { qWarning(CAT_M2KVM_CONTROLLER) << "setup failed:" << e.message; });
+	if(!self) {
+		co_return false;
+	}
 
 	if(!r) {
 		release();

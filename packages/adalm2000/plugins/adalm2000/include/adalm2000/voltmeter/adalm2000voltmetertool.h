@@ -73,7 +73,7 @@ class SCOPY_ADALM2000_EXPORT Adalm2000VoltmeterTool : public QWidget
 public:
 	explicit Adalm2000VoltmeterTool(ToolMenuEntry *tme, component::Context *ctx, const QString &uri,
 					QWidget *parent = nullptr);
-	~Adalm2000VoltmeterTool() override = default;
+	~Adalm2000VoltmeterTool() override;
 
 private:
 	void setupUi();

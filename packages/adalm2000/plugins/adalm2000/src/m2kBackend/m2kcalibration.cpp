@@ -25,6 +25,7 @@
 #include "component/capabilityexecutor.h"
 
 #include <QLoggingCategory>
+#include <QPointer>
 
 #include <utility>
 
@@ -55,18 +56,29 @@ QCoro::Task<void> M2kCalibration::run()
 		co_return;
 	}
 
+	QPointer<M2kCalibration> self(this);
 	m_running = true;
 	Q_EMIT started();
 
-	if(co_await call(m_isCalibrated)) {
+	const bool calibrated = co_await call(m_isCalibrated);
+	if(!self) {
+		co_return;
+	}
+	if(calibrated) {
 		m_running = false;
 		Q_EMIT finished(true);
 		co_return;
 	}
 
 	const bool ok = co_await call(m_calibrate);
+	if(!self) {
+		co_return;
+	}
 	if(!ok && m_resetCalibration) {
 		co_await call(m_resetCalibration);
+		if(!self) {
+			co_return;
+		}
 	}
 
 	m_running = false;

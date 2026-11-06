@@ -31,6 +31,7 @@
 #include <QLabel>
 #include <QLoggingCategory>
 #include <QPen>
+#include <QPointer>
 #include <QAbstractButton>
 #include <QComboBox>
 #include <QTimer>
@@ -84,6 +85,19 @@ Adalm2000VoltmeterTool::Adalm2000VoltmeterTool(ToolMenuEntry *tme, component::Co
 	m_api = new Adalm2000Voltmeter_API(this);
 	m_api->setObjectName("dmm");
 	ScopyJS::GetInstance()->registerApi(m_api);
+}
+
+Adalm2000VoltmeterTool::~Adalm2000VoltmeterTool()
+{
+	delete m_api;
+	m_api = nullptr;
+	if(m_reader) {
+		disconnect(m_reader, nullptr, this, nullptr);
+		m_reader->requestStop();
+	}
+	if(m_controller) {
+		disconnect(m_controller, nullptr, this, nullptr);
+	}
 }
 
 component::Attribute *Adalm2000VoltmeterTool::findRangeAttribute(int channel) const
@@ -555,7 +569,12 @@ void Adalm2000VoltmeterTool::setupUi()
 
 QCoro::Task<void> Adalm2000VoltmeterTool::startRunning()
 {
-	if(!co_await m_controller->claimAndConfigure()) {
+	QPointer<Adalm2000VoltmeterTool> self(this);
+	const bool claimed = co_await m_controller->claimAndConfigure();
+	if(!self) {
+		co_return;
+	}
+	if(!claimed) {
 		qWarning(CAT_ADALM2000VOLTMETER) << "could not claim the ADC";
 		StatusBarManager::pushUrgentMessage("Voltmeter: the ADC is in use by another tool");
 		m_runBtn->setChecked(false);

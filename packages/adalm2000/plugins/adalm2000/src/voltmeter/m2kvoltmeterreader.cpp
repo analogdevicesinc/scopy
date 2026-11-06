@@ -32,6 +32,7 @@
 #include <libm2k/m2k.hpp>
 
 #include <QLoggingCategory>
+#include <QPointer>
 #include <vector>
 
 Q_LOGGING_CATEGORY(CAT_M2KVM_READER, "M2kVoltmeterReader")
@@ -89,6 +90,7 @@ void M2kVoltmeterReader::setAutoGainEnabled(int channel, bool enabled)
 
 QCoro::Task<void> M2kVoltmeterReader::acquisitionLoop()
 {
+	QPointer<M2kVoltmeterReader> self(this);
 	if(!m_ctx || !m_ctx->m2k() || !m_ctx->executor()) {
 		m_running = false;
 		Q_EMIT finished();
@@ -119,6 +121,9 @@ QCoro::Task<void> M2kVoltmeterReader::acquisitionLoop()
 			qWarning(CAT_M2KVM_READER) << "startAcquisition failed:" << e.message;
 			StatusBarManager::pushUrgentMessage("Voltmeter: could not start acquisition");
 		});
+	if(!self) {
+		co_return;
+	}
 
 	if(!opened) {
 		m_running = false;
@@ -137,6 +142,9 @@ QCoro::Task<void> M2kVoltmeterReader::acquisitionLoop()
 		auto r = co_await component::runCommand(
 			exec, refill, [](const scopy::Result<std::vector<short>> &) {},
 			[](const scopy::Error &e) { qDebug(CAT_M2KVM_READER) << "refill error:" << e.message; });
+		if(!self) {
+			co_return;
+		}
 
 		if(!r) {
 			break;
@@ -171,6 +179,9 @@ QCoro::Task<void> M2kVoltmeterReader::acquisitionLoop()
 	co_await component::runCommand(
 		exec, closeCmd, [](const scopy::Result<void> &) {},
 		[](const scopy::Error &e) { qWarning(CAT_M2KVM_READER) << "stopAcquisition failed:" << e.message; });
+	if(!self) {
+		co_return;
+	}
 
 	if(m_pingWasMonitoring && ping) {
 		ping->startMonitoring();
