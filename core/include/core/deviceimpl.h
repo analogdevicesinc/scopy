@@ -43,9 +43,10 @@ class SCOPY_CORE_EXPORT DeviceImpl : public QObject, public Device
 	Q_OBJECT
 public:
 	// A non-empty kind makes this a connection-backed device: the connection and every
-	// compatible view are opened on construction (so plugins can inspect them in compatible()),
-	// released when the device goes idle, and on every connect only the views the loaded plugins
-	// declare through their "category" are rebuilt.
+	// compatible view are opened by verify() (called from init(); so plugins can inspect them in
+	// compatible()), released when the device goes idle, and on every connect only the views the
+	// loaded plugins declare through their "category" are rebuilt. The constructor opens nothing:
+	// verify()/init() run off the GUI thread, the constructor does not.
 	explicit DeviceImpl(QString param, QString category = "", component::ConnectionKind kind = {},
 			    int maxThreads = 1, QObject *parent = nullptr);
 	virtual ~DeviceImpl();

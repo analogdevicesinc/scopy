@@ -226,7 +226,6 @@ Controller::ConnMap::iterator Controller::_openLocked(const QString &uri, const 
 	if(!conn) {
 		return m_connections.end();
 	}
-	conn->setParent(this);
 
 	QList<BackendId> compatible;
 	int threads = std::max(1, maxThreads);
@@ -240,7 +239,22 @@ Controller::ConnMap::iterator Controller::_openLocked(const QString &uri, const 
 	}
 	conn->setBackends(compatible);
 	conn->setExecutor(new PooledCmdExecutor(threads, conn));
-	conn->start();
+	// open() may run on a worker thread (DeviceImpl::verify, DeviceLoader). The connection and
+	// its leaves (pings with QTimers) must live on a thread with an event loop, so they move to
+	// the Controller's thread; start() runs there (queued when the caller is elsewhere).
+	if(conn->thread() != thread()) {
+		conn->moveToThread(thread());
+		QMetaObject::invokeMethod(
+			conn,
+			[this, conn]() {
+				conn->setParent(this);
+				conn->start();
+			},
+			Qt::QueuedConnection);
+	} else {
+		conn->setParent(this);
+		conn->start();
+	}
 	connect(conn, &Connection::lost, this, [this, conn]() { Q_EMIT connectionLost(conn); });
 
 	auto it = m_connections.insert(uri, ConnEntry{conn, 0, threads, {}});
@@ -311,6 +325,10 @@ ContextHandle Controller::_connectCtx(const QString &uri, const BackendId &backe
 			return ContextHandle();
 		}
 		ctx->setUri(uri);
+		// Built on the caller's thread; the connection lives on the Controller's.
+		if(ctx->thread() != conn->thread()) {
+			ctx->moveToThread(conn->thread());
+		}
 		conn->add(id, ctx);
 		Q_EMIT contextCreated(conn, ctx);
 	}
