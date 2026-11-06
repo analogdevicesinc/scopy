@@ -29,6 +29,7 @@
 
 #include <QDesktopServices>
 #include <QLoggingCategory>
+#include <QPointer>
 #include <QSignalBlocker>
 #include <QUrl>
 #include <QVBoxLayout>
@@ -152,7 +153,11 @@ QCoro::Task<void> Adalm2000DigitalIoTool::applyOutputEnabled(bool on)
 	if(!m_controller) {
 		co_return;
 	}
+	QPointer<Adalm2000DigitalIoTool> self(this);
 	const bool ok = co_await m_controller->setOutputEnabled(on);
+	if(!self) {
+		co_return;
+	}
 	if(!ok && on && m_runBtn) {
 		m_runBtn->setChecked(false);
 	}
