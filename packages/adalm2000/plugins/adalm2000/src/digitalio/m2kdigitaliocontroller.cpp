@@ -35,6 +35,7 @@
 #include <libm2k/m2k.hpp>
 
 #include <QLoggingCategory>
+#include <QPointer>
 #include <QTimer>
 
 Q_LOGGING_CATEGORY(CAT_M2KDIO_CONTROLLER, "M2kDigitalIoController")
@@ -221,6 +222,7 @@ bool M2kDigitalIoController::outputEnabled() const
 
 QCoro::Task<void> M2kDigitalIoController::initialize()
 {
+	QPointer<M2kDigitalIoController> self(this);
 	auto *m2kCtx = qobject_cast<M2kContext *>(m_ctx);
 	if(!m2kCtx || !m2kCtx->m2k() || !m2kCtx->executor()) {
 		qWarning(CAT_M2KDIO_CONTROLLER) << "incomplete context";
@@ -242,6 +244,9 @@ QCoro::Task<void> M2kDigitalIoController::initialize()
 	auto r = co_await component::runCommand(
 		m2kCtx->executor(), cmd, [](const scopy::Result<void> &) {},
 		[](const scopy::Error &e) { qWarning(CAT_M2KDIO_CONTROLLER) << "reset failed:" << e.message; });
+	if(!self) {
+		co_return;
+	}
 
 	if(!r) {
 		Q_EMIT failed(QStringLiteral("Digital I/O: could not reset the pins"));
@@ -270,6 +275,7 @@ QCoro::Task<void> M2kDigitalIoController::initialize()
 
 QCoro::Task<bool> M2kDigitalIoController::setOutputEnabled(bool on)
 {
+	QPointer<M2kDigitalIoController> self(this);
 	if(!m_outputEnabledAttr || !m_outputEnabledAttr->writeCapability()) {
 		Q_EMIT failed(QStringLiteral("Digital I/O: the output enable is not writable"));
 		co_return false;
@@ -278,6 +284,9 @@ QCoro::Task<bool> M2kDigitalIoController::setOutputEnabled(bool on)
 	// The writer flushes every buffered direction and value in one command.
 	auto r = co_await m_outputEnabledAttr->writeCapability()->writeAsync(on ? QStringLiteral("1")
 										: QStringLiteral("0"));
+	if(!self) {
+		co_return false;
+	}
 	if(!r) {
 		qWarning(CAT_M2KDIO_CONTROLLER) << "output enable failed:" << r.error().message;
 		Q_EMIT failed(QStringLiteral("Digital I/O: could not %1 the outputs")
@@ -289,6 +298,9 @@ QCoro::Task<bool> M2kDigitalIoController::setOutputEnabled(bool on)
 	// the read-after-write the Attribute fires on writeSucceeded is async.
 	if(m_outputEnabledAttr->readCapability()) {
 		co_await m_outputEnabledAttr->readCapability()->readAsync();
+		if(!self) {
+			co_return false;
+		}
 	}
 
 	Q_EMIT outputEnabledChanged(on);
@@ -314,11 +326,15 @@ void M2kDigitalIoController::stopPolling()
 
 QCoro::Task<bool> M2kDigitalIoController::refreshInputs()
 {
+	QPointer<M2kDigitalIoController> self(this);
 	if(!m_gpiAttr || !m_gpiAttr->readCapability()) {
 		co_return false;
 	}
 
 	auto resp = co_await m_gpiAttr->readCapability()->readAsync();
+	if(!self) {
+		co_return false;
+	}
 	if(!resp) {
 		if(!m_readFailed) { // only on the ok -> failed transition
 			m_readFailed = true;
@@ -344,11 +360,15 @@ QCoro::Task<bool> M2kDigitalIoController::refreshInputs()
 
 QCoro::Task<void> M2kDigitalIoController::pollOnce()
 {
+	QPointer<M2kDigitalIoController> self(this);
 	if(!m_polling) {
 		co_return;
 	}
 
 	co_await refreshInputs();
+	if(!self) {
+		co_return;
+	}
 
 	// Stopped while the read was in flight: do not rearm.
 	if(m_polling) {
