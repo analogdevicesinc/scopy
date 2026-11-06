@@ -21,34 +21,64 @@
 
 #include "core/m2kdeviceimpl.h"
 
+#include <component/contextfactory.h>
+#include <component/controller.h>
+
 #include <QTest>
 
+#include <atomic>
+#include <memory>
+
 using namespace scopy;
+
+class CountingM2kFactory : public component::ContextFactory
+{
+public:
+	component::Context *create(const QString &, const int) override
+	{
+		++calls;
+		return nullptr;
+	}
+
+	std::atomic<int> calls{0};
+};
 
 class TST_M2kDeviceImpl : public QObject
 {
 	Q_OBJECT
 private Q_SLOTS:
+	void init();
 	void queuedSwapIsAbandonedOnDisconnect();
 	void destroyedBeforeTheSwapRunsDoesNotCrash();
+
+private:
+	std::shared_ptr<CountingM2kFactory> m_factory;
 };
+
+void TST_M2kDeviceImpl::init()
+{
+	m_factory = std::make_shared<CountingM2kFactory>();
+	component::Controller::GetInstance()->registerFactory(component::BackendKind::M2k, m_factory);
+}
 
 void TST_M2kDeviceImpl::queuedSwapIsAbandonedOnDisconnect()
 {
 	M2kDeviceImpl dev(QStringLiteral("not-a-uri"), 1);
 	dev.connectDev();
+	QVERIFY(dev.hasPendingBackendSwap());
 	dev.disconnectDev();
 	QTest::qWait(50);
-	QVERIFY(!dev.hasPendingBackendSwap());
+	QCOMPARE(m_factory->calls.load(), 0);
 }
 
 void TST_M2kDeviceImpl::destroyedBeforeTheSwapRunsDoesNotCrash()
 {
 	auto *dev = new M2kDeviceImpl(QStringLiteral("not-a-uri"), 1);
 	dev->connectDev();
+	QVERIFY(dev->hasPendingBackendSwap());
 	delete dev;
 	QTest::qWait(50);
-	QVERIFY(true); // reaching here without a crash is the assertion
+	QCOMPARE(m_factory->calls.load(), 0);
 }
 
 QTEST_MAIN(TST_M2kDeviceImpl)
