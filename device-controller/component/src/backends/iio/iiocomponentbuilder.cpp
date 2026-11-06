@@ -35,6 +35,7 @@
 #include "component/backends/iio/iioscanelement.h"
 #include "component/backends/iio/iiotrigger.h"
 #include "component/backends/iio/iiotriggerable.h"
+#include "component/tags.h"
 
 #include "iioutil/iattrops.h"
 #include "iioutil/ibackend.h"
@@ -163,8 +164,8 @@ void IIOComponentBuilder::buildDebugAttributes(IIODevice *dev, ICmdExecutor *exe
 
 	// Register access — only where the device exposes a debug/register plane.
 	if(hasRegAccess) {
-		new IIORegisterReader(devOps, dh, executor, dev);
-		new IIORegisterWriter(devOps, dh, executor, dev);
+		addTag(new IIORegisterReader(devOps, dh, executor, dev), tags::RegisterRead);
+		addTag(new IIORegisterWriter(devOps, dh, executor, dev), tags::RegisterWrite);
 	}
 }
 
