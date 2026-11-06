@@ -24,6 +24,7 @@
 #include "acquisition/acquisitionview.h"
 #include "attributessection.h"
 #include "generation/generatorview.h"
+#include "monitor/monitorview.h"
 #include "registers/registerview.h"
 
 #include <QHeaderView>
@@ -330,6 +331,9 @@ NodePanel *scopy::dcdebugger::createNodePanel(QObject *node, NodeKind kind, cons
 		panel->setMainView("Acquisition", new AcquisitionView(in, panel));
 	} else if(auto *out = qobject_cast<component::OutputStream *>(node)) {
 		panel->setMainView("Generator", new GeneratorView(out, panel));
+	} else if((kind == NodeKind::Context || kind == NodeKind::Device) &&
+		  !MonitorView::monitorableChannels(node).isEmpty()) {
+		panel->setMainView("Monitor", new MonitorView(node, panel));
 	}
 	if((kind == NodeKind::Context || kind == NodeKind::Device) && !RegisterView::targetsOf(node).isEmpty()) {
 		panel->setMainView("Registers", new RegisterView(node, panel));

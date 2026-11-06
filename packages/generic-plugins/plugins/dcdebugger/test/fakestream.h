@@ -24,6 +24,8 @@
 
 #include <QVector>
 
+#include <component/attribute.h>
+#include <component/attributereader.h>
 #include <component/inputstream.h>
 #include <component/outputstream.h>
 #include <component/scanelement.h>
@@ -123,6 +125,40 @@ private:
 	QVector<int16_t> m_buffer;
 	StreamFormat m_format;
 };
+// Returns `value` on every read (as a real reader, completes after a suspension-free co_return).
+class FakeAttributeReader : public AttributeReader
+{
+public:
+	QCoro::Task<CommandResponse<QByteArray>> readAsync(size_t bytes = 4096) override
+	{
+		Q_UNUSED(bytes);
+		reads++;
+		if(fail) {
+			co_return CommandResponse<QByteArray>(QUuid(), Unexpected<Error>{Error{-EIO, "read failed"}});
+		}
+		Result<QByteArray> r(value.toUtf8());
+		Q_EMIT readSucceeded(r);
+		co_return CommandResponse<QByteArray>(QUuid(), r);
+	}
+	QString value = "0";
+	bool fail = false;
+	int reads = 0;
+};
+
+inline Attribute *makeAttribute(QObject *parent, const QString &name, const QString &value,
+				FakeAttributeReader **reader = nullptr)
+{
+	auto *a = new Attribute(parent);
+	a->setName(name);
+	auto *r = new FakeAttributeReader();
+	r->value = value;
+	a->addReadCapability(r);
+	if(reader) {
+		*reader = r;
+	}
+	return a;
+}
+
 // Int16 interleaved write buffer; records what each push carried.
 class FakeOutputStream : public OutputStream
 {

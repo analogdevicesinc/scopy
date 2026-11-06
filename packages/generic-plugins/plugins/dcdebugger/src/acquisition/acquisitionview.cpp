@@ -107,7 +107,7 @@ AcquisitionView::AcquisitionView(InputStream *stream, QWidget *parent)
 	m_exportBtn = new QPushButton("Export...", this);
 	m_exportBtn->setToolTip("Save what the plot shows as CSV");
 	// basicButton look at the Run / Single height.
-	Style::setStyle(m_exportBtn, style::properties::dcdebugger::exportButton);
+	Style::setStyle(m_exportBtn, style::properties::dcdebugger::topButton);
 	m_exportBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	m_tool->addWidgetToTopContainerHelper(m_exportBtn, TTA_RIGHT);
 	connect(m_exportBtn, &QPushButton::clicked, this, &AcquisitionView::exportData);

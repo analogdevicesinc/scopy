@@ -139,11 +139,11 @@ RegisterView::RegisterView(QObject *root, QWidget *parent)
 	m_tool->addWidgetToTopContainerHelper(m_status, TTA_LEFT);
 	m_exportBtn = new QPushButton("Export...", this);
 	m_exportBtn->setToolTip("Save the history as CSV");
-	Style::setStyle(m_exportBtn, style::properties::dcdebugger::exportButton);
+	Style::setStyle(m_exportBtn, style::properties::dcdebugger::topButton);
 	m_exportBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	m_clearBtn = new QPushButton("Clear", this);
 	m_clearBtn->setToolTip("Forget the history");
-	Style::setStyle(m_clearBtn, style::properties::dcdebugger::exportButton);
+	Style::setStyle(m_clearBtn, style::properties::dcdebugger::topButton);
 	m_clearBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	m_tool->addWidgetToTopContainerHelper(m_exportBtn, TTA_RIGHT);
 	m_tool->addWidgetToTopContainerHelper(m_clearBtn, TTA_RIGHT);

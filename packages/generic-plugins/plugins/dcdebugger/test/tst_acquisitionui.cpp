@@ -34,6 +34,7 @@
 
 #include <component/connection.h>
 #include <component/context.h>
+#include <component/channel.h>
 #include <component/device.h>
 #include <menucombo.h>
 #include <menucontrolbutton.h>
@@ -56,6 +57,7 @@ private Q_SLOTS:
 	void disconnectWhileRunning();
 	void viewModesFillTheMeasurements();
 	void generatorStartsAndReappliesEdits();
+	void monitorPollsEnabledChannels();
 
 private:
 	QPushButton *button(const char *className) const;
@@ -67,6 +69,7 @@ private:
 	Connection *m_conn = nullptr;
 	FakeInputStream *m_stream = nullptr;
 	FakeOutputStream *m_out = nullptr;
+	Device *m_dev = nullptr;
 	QMainWindow *m_win = nullptr;
 	DCDebuggerTool *m_tool = nullptr;
 };
@@ -83,6 +86,15 @@ void TST_AcquisitionUi::init()
 	m_stream->setParent(dev);
 	m_out = new FakeOutputStream(2);
 	m_out->setParent(dev);
+	m_dev = dev;
+	auto *temp = new Channel(dev);
+	temp->setId("temp0");
+	makeAttribute(temp, "input", "25.5");
+	auto *volt = new Channel(dev);
+	volt->setId("voltage0");
+	makeAttribute(volt, "raw", "100");
+	makeAttribute(volt, "scale", "0.5");
+	makeAttribute(volt, "offset", "0");
 
 	m_win = new QMainWindow();
 	m_win->resize(1400, 900);
@@ -272,6 +284,38 @@ void TST_AcquisitionUi::generatorStartsAndReappliesEdits()
 	start->setChecked(false);
 	QTRY_VERIFY(!m_out->isOpen());
 	QCOMPARE(start->text(), QString("Start"));
+}
+
+void TST_AcquisitionUi::monitorPollsEnabledChannels()
+{
+	selectNode(m_dev);
+	QPushButton *start = button("scopy::RunBtn");
+	QVERIFY(start);
+	QTableWidget *table = nullptr;
+	for(QTableWidget *t : m_tool->findChildren<QTableWidget *>()) {
+		if(t->columnCount() == 5 && t->isVisible()) {
+			table = t;
+		}
+	}
+	QVERIFY(table);
+	QCOMPARE(table->rowCount(), 0);
+
+	// Enable both channels from their checkboxes in the channel list.
+	int enabled = 0;
+	for(MenuControlButton *b : m_tool->findChildren<MenuControlButton *>()) {
+		for(QLabel *l : b->findChildren<QLabel *>()) {
+			if(b->isVisible() && (l->text() == "temp0" || l->text() == "voltage0")) {
+				b->checkBox()->setChecked(true);
+				enabled++;
+			}
+		}
+	}
+	QCOMPARE(enabled, 2);
+	start->setChecked(true);
+	QTRY_COMPARE(table->rowCount(), 2);
+	QTRY_VERIFY(table->item(0, 1)->text().startsWith("25.5"));
+	QTRY_VERIFY(table->item(1, 1)->text().startsWith("50")); // raw 100 * scale 0.5
+	start->setChecked(false);
 }
 
 QTEST_MAIN(TST_AcquisitionUi)
