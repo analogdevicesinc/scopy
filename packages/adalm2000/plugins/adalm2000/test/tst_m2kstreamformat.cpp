@@ -63,6 +63,13 @@ private Q_SLOTS:
 	void digitalPinsOutOfRangeAreDropped();
 	void streamViewDecodesIndividualDigitalBits();
 	void isBitPackedTellsTheTwoLayoutsApart();
+	void outputAlignKeepsTheNonCyclicFloor();
+	void outputAlignRaisesCyclicBuffersTo1024();
+	void perChannelLengthsAcceptDifferentValidLengths();
+	void perChannelLengthsAcceptAnEmptyChannel();
+	void perChannelLengthsRejectAllEmpty();
+	void perChannelLengthsRejectShortCyclicBuffers();
+	void perChannelLengthsRejectNonMultiplesOfFour();
 };
 
 void TST_M2kStreamFormat::alignRoundsUpToAMultipleOfFourAboveSixteen()
@@ -311,6 +318,52 @@ void TST_M2kStreamFormat::isBitPackedTellsTheTwoLayoutsApart()
 	QVERIFY(!isBitPacked(interleavedInt16Format(analog, 2, 2, {0, 1}, {})));
 	QVERIFY(!isBitPacked(packedInt16Format(analog, 2, 2, {})));
 	QVERIFY(!isBitPacked(StreamFormat{}));
+}
+
+void TST_M2kStreamFormat::outputAlignKeepsTheNonCyclicFloor()
+{
+	QCOMPARE(alignOutputSamplesCount(1, false), size_t(20));
+	QCOMPARE(alignOutputSamplesCount(100, false), size_t(100));
+	QCOMPARE(alignOutputSamplesCount(101, false), size_t(104));
+}
+
+void TST_M2kStreamFormat::outputAlignRaisesCyclicBuffersTo1024()
+{
+	QCOMPARE(alignOutputSamplesCount(20, true), size_t(1024));
+	QCOMPARE(alignOutputSamplesCount(1023, true), size_t(1024));
+	QCOMPARE(alignOutputSamplesCount(1024, true), size_t(1024));
+	QCOMPARE(alignOutputSamplesCount(4097, true), size_t(4100));
+}
+
+void TST_M2kStreamFormat::perChannelLengthsAcceptDifferentValidLengths()
+{
+	QVERIFY(validatePerChannelLengths({1024, 4096}, true).isEmpty());
+	QVERIFY(validatePerChannelLengths({20, 400}, false).isEmpty());
+}
+
+void TST_M2kStreamFormat::perChannelLengthsAcceptAnEmptyChannel()
+{
+	QVERIFY(validatePerChannelLengths({0, 2048}, true).isEmpty());
+	QVERIFY(validatePerChannelLengths({2048}, true).isEmpty());
+}
+
+void TST_M2kStreamFormat::perChannelLengthsRejectAllEmpty()
+{
+	QVERIFY(!validatePerChannelLengths({}, true).isEmpty());
+	QVERIFY(!validatePerChannelLengths({0, 0}, false).isEmpty());
+}
+
+void TST_M2kStreamFormat::perChannelLengthsRejectShortCyclicBuffers()
+{
+	QVERIFY(!validatePerChannelLengths({1024, 1020}, true).isEmpty());
+	QVERIFY(validatePerChannelLengths({1024, 1020}, false).isEmpty());
+	QVERIFY(!validatePerChannelLengths({16}, false).isEmpty());
+}
+
+void TST_M2kStreamFormat::perChannelLengthsRejectNonMultiplesOfFour()
+{
+	QVERIFY(!validatePerChannelLengths({1026}, true).isEmpty());
+	QVERIFY(!validatePerChannelLengths({1024, 1030}, false).isEmpty());
 }
 
 QTEST_MAIN(TST_M2kStreamFormat)
