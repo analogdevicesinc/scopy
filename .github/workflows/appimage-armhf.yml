@@ -65,6 +65,44 @@ jobs:
                                         cd /home/runner/scopy && \
                                         ./ci/arm/arm_cross_build_process.sh download_cmake generate_appimage
                                         '
+        - name: Extract Scopy version
+          id: version
+          run: |
+            ver=$(grep -oP 'project\(scopy VERSION \K[0-9.]+' CMakeLists.txt)
+            phase=$(grep -oP 'set\(SCOPY_RELEASE_PHASE \K[^)]+' CMakeLists.txt | tr -d '"' | sed 's/^-/~/' || true)
+            printf 'version=%s%s\n' "$ver" "$phase" >> "$GITHUB_OUTPUT"
+
+        - name: Checkout shared-actions for build-deb.sh
+          uses: actions/checkout@v6
+          with:
+            repository: analogdevicesinc/shared-actions
+            ref: 9efc4d656aced2e6cba05ff76c24eea54c9e3688
+            path: shared-actions
+
+        - name: Set up QEMU for armhf containers
+          uses: docker/setup-qemu-action@v3
+
+        - name: Generate .deb package
+          id: deb
+          run: |
+            IGNORE_PATH=$(printf '%s\n' '${{ env.APPIMAGE_NAME }}.AppImage' 'shared-actions' 'build*' 'ci/arm/staging')
+            docker run --rm --platform linux/arm/v7 \
+              -w /scopy \
+              -e VERSION="${{ steps.version.outputs.version }}" \
+              -e CONTROL_PATH=ci/packaging/debian \
+              -e IGNORE_PATH="$IGNORE_PATH" \
+              -e DEB_APPIMAGE_PATH=/scopy/${{ env.APPIMAGE_NAME }}.AppImage \
+              -v "$GITHUB_WORKSPACE:/scopy" \
+              arm32v7/debian:trixie \
+              bash -c "apt-get update && apt-get install -y --no-install-recommends curl ca-certificates && bash /scopy/shared-actions/deb-generator-action/build-deb.sh"
+            echo "artifact-dir=$GITHUB_WORKSPACE/artifacts" >> "$GITHUB_OUTPUT"
+
+        - name: Upload deb package and sources
+          uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+          with:
+            name: scopy-deb-armhf${{ matrix.libiio == '0' && '-libiio-v0' || '' }}
+            path: ${{ steps.deb.outputs.artifact-dir }}
+
         - name: Set short git commit SHA
           shell: bash
           run: echo "commit_sha=$(git rev-parse --short ${{ github.sha }})" >> "$GITHUB_ENV"

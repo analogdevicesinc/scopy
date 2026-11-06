@@ -1,0 +1,5 @@
+scopy (@VERSION@) UNRELEASED; urgency=low
+
+  * CI release.
+
+ -- EngineerZone <linux@analog.com>  @DATE@
