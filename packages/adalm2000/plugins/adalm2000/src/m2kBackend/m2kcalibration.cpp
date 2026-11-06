@@ -44,7 +44,7 @@ M2kCalibration::M2kCalibration(void *resource, Procedure isCalibrated, Procedure
 	, m_executor(executor)
 {}
 
-QCoro::Task<void> M2kCalibration::run()
+QCoro::Task<void> M2kCalibration::run(bool force)
 {
 	if(m_running) {
 		qWarning(CAT_M2KCALIBRATION) << "calibration already in progress; request refused";
@@ -60,14 +60,16 @@ QCoro::Task<void> M2kCalibration::run()
 	m_running = true;
 	Q_EMIT started();
 
-	const bool calibrated = co_await call(m_isCalibrated);
-	if(!self) {
-		co_return;
-	}
-	if(calibrated) {
-		m_running = false;
-		Q_EMIT finished(true);
-		co_return;
+	if(!force) {
+		const bool calibrated = co_await call(m_isCalibrated);
+		if(!self) {
+			co_return;
+		}
+		if(calibrated) {
+			m_running = false;
+			Q_EMIT finished(true);
+			co_return;
+		}
 	}
 
 	const bool ok = co_await call(m_calibrate);

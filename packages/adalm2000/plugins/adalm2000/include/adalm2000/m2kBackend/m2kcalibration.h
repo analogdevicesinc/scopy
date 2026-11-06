@@ -43,7 +43,7 @@ public:
 
 	bool isRunning() const { return m_running; }
 
-	QCoro::Task<void> run();
+	QCoro::Task<void> run(bool force = false);
 
 Q_SIGNALS:
 	void started();

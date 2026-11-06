@@ -34,6 +34,7 @@
 
 #include <QLabel>
 #include <QLoggingCategory>
+#include <QPushButton>
 
 Q_LOGGING_CATEGORY(CAT_ADALM2000PLUGIN, "Adalm2000Plugin")
 
@@ -63,6 +64,15 @@ bool Adalm2000Plugin::compatible(QString param, QString category)
 }
 
 bool Adalm2000Plugin::loadPage() { return false; }
+
+bool Adalm2000Plugin::loadExtraButtons()
+{
+	m_btnCalibrate = new QPushButton("Calibrate");
+	Style::setStyle(m_btnCalibrate, style::properties::button::basicButton);
+	m_btnCalibrate->setEnabled(false);
+	m_extraButtons.append(m_btnCalibrate);
+	return true;
+}
 
 bool Adalm2000Plugin::loadIcon()
 {
@@ -125,14 +135,29 @@ bool Adalm2000Plugin::onConnect()
 		return true;
 	}
 
-	connect(calibration, &M2kCalibration::started, this, [this]() { setToolsRunLocked(true); });
+	connect(calibration, &M2kCalibration::started, this, [this]() {
+		setToolsRunLocked(true);
+		if(m_btnCalibrate) {
+			m_btnCalibrate->setEnabled(false);
+		}
+		StatusBarManager::pushMessage("ADALM2000: calibrating...");
+	});
 	connect(calibration, &M2kCalibration::finished, this, [this](bool ok) {
 		setToolsRunLocked(false);
+		if(m_btnCalibrate) {
+			m_btnCalibrate->setEnabled(true);
+		}
 		if(!ok) {
 			qWarning(CAT_ADALM2000PLUGIN) << "calibration failed; proceeding with uncalibrated readings";
 			StatusBarManager::pushUrgentMessage("Calibration failed", 15000);
+			return;
 		}
+		StatusBarManager::pushMessage("ADALM2000: calibration done");
 	});
+	if(m_btnCalibrate) {
+		m_calibrateConn = connect(m_btnCalibrate, &QPushButton::clicked, calibration,
+					  [calibration]() { calibration->run(true); });
+	}
 	calibration->run();
 	return true;
 }
@@ -150,6 +175,11 @@ void Adalm2000Plugin::setToolsRunLocked(bool locked)
 
 bool Adalm2000Plugin::onDisconnect()
 {
+	disconnect(m_calibrateConn);
+	if(m_btnCalibrate) {
+		m_btnCalibrate->setEnabled(false);
+	}
+
 	for(auto &tool : m_toolList) {
 		tool->setEnabled(false);
 		tool->setRunning(false);

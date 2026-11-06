@@ -31,6 +31,8 @@
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 
+class QPushButton;
+
 namespace scopy {
 class IIOWidgetGroup;
 }
@@ -47,6 +49,7 @@ public:
 	bool compatible(QString param, QString category) override;
 	bool loadPage() override;
 	bool loadIcon() override;
+	bool loadExtraButtons() override;
 	void loadToolList() override;
 	void unload() override;
 	void initMetadata() override;
@@ -60,6 +63,8 @@ private:
 	void setToolsRunLocked(bool locked);
 
 	IIOWidgetGroup *m_widgetGroup = nullptr;
+	QPushButton *m_btnCalibrate = nullptr;
+	QMetaObject::Connection m_calibrateConn;
 	component::ContextHandle m_context;
 };
 
