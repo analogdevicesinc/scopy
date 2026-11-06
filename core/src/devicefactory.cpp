@@ -21,28 +21,27 @@
 
 #include "devicefactory.h"
 
-#include "iiodeviceimpl.h"
-#include "swiotdeviceimpl.h"
+#include <QThread>
 
-#include <component/context.h>
-#include <component/device.h>
+#include <component/controller.h>
 #include <pluginbase/preferences.h>
 
 using namespace scopy;
 
+component::ConnectionKind DeviceFactory::kindFor(const QString &category)
+{
+	const QList<component::ConnectionKind> kinds = component::Controller::GetInstance()->providers();
+	return kinds.contains(category) ? category : component::ConnectionKind();
+}
+
 DeviceImpl *DeviceFactory::build(QString param, QString category, QObject *parent)
 {
-	int maxThreads = Preferences::get("dc_cmd_execution_parallel").toBool() ? QThread::idealThreadCount() : 1;
-	if(category.compare("iio", Qt::CaseInsensitive) == 0) {
-		component::ContextHandle ctx =
-			component::Controller::connectCtx(param, component::BackendKind::Libiio, maxThreads);
-		if(ctx && ctx->findChild<component::Device *>("swiot", Qt::FindDirectChildrenOnly)) {
-			return new SWIOTDeviceImpl(param, maxThreads, parent);
-		}
-		return new IIODeviceImpl(param, maxThreads, parent);
-	} else {
-		return new DeviceImpl(param, category, parent);
+	const component::ConnectionKind kind = kindFor(category);
+	if(kind.isEmpty()) {
+		return new DeviceImpl(param, category, {}, 1, parent);
 	}
+	int maxThreads = Preferences::get("dc_cmd_execution_parallel").toBool() ? QThread::idealThreadCount() : 1;
+	return new DeviceImpl(param, category, kind, maxThreads, parent);
 }
 
 #include "moc_devicefactory.cpp"

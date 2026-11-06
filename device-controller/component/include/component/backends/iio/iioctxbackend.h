@@ -19,26 +19,24 @@
  *
  */
 
-#include "component/backends/iio/iiocontext.h"
+#pragma once
 
-#include "iioutil/ibackend.h"
-#include "iioutil/icontextops.h"
+#include "component/contextbackend.h"
 
-using namespace scopy::component::iio;
+#include "component/component_export.h"
 
-IIOContext::~IIOContext()
+namespace scopy::component::iio {
+
+// The generic IIO view: runs the IIO component builder over an IIOConnection.
+class COMPONENT_EXPORT IIOCtxBackend : public ContextBackend
 {
-	if(!m_backend) {
-		return;
-	}
+public:
+	static constexpr const char *ID = "iio";
 
-	const QObjectList kids = children();
-	for(QObject *child : kids) {
-		delete child;
-		child = nullptr;
-	}
+	BackendId id() const override { return ID; }
+	ConnectionKind connectionKind() const override;
+	bool compatible(const Connection &c) const override;
+	Context *create(Connection &c) override;
+};
 
-	if(m_handle.ptr) {
-		m_backend->contextOps()->destroyContext(m_handle);
-	}
-}
+} // namespace scopy::component::iio

@@ -34,7 +34,7 @@ using namespace scopy::component::iio;
 
 IIOScanElement::IIOScanElement(scopy::iio::IChannelOps *ops, scopy::iio::ChannelHandle handle,
 			       scopy::iio::ChannelsMaskHandle mask, scopy::ICmdExecutor *executor, QObject *parent)
-	: QObject(parent)
+	: ScanElement(parent)
 	, m_ops(ops)
 	, m_handle(handle)
 	, m_mask(mask)

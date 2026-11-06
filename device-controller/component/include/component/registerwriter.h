@@ -21,20 +21,35 @@
 
 #pragma once
 
-#include <QString>
+#include "core/result.h"
+
+#include <QObject>
+#include <cstdint>
+#include <qcoro/qcorotask.h>
+#include "component/component_export.h"
 
 namespace scopy::component {
 
-class Context;
-
-// Creates a fully built, executor-backed Context for one backend kind. Each
-// concrete factory owns all backend-specific knowledge (loader, handle,
-// builder), so the Controller stays backend-agnostic.
-class ContextFactory
+// Register-write capability (abstract base); see RegisterReader. Tag "capability:register-write".
+class COMPONENT_EXPORT RegisterWriter : public QObject
 {
+	Q_OBJECT
+	Q_PROPERTY(int addressBits READ addressBits CONSTANT)
+	Q_PROPERTY(int valueBits READ valueBits CONSTANT)
 public:
-	virtual ~ContextFactory() = default;
-	virtual Context *create(const QString &uri, const int maxThreads) = 0;
+	explicit RegisterWriter(QObject *parent = nullptr)
+		: QObject(parent)
+	{}
+	~RegisterWriter() override = default;
+
+	virtual int addressBits() const { return 32; }
+	virtual int valueBits() const { return 32; }
+
+	Q_INVOKABLE virtual QCoro::Task<CommandResponse<void>> writeAsync(uint32_t addr, uint32_t value) = 0;
+
+Q_SIGNALS:
+	void writeSucceeded(uint32_t addr);
+	void writeFailed(const scopy::Error &error);
 };
 
 } // namespace scopy::component

@@ -33,6 +33,10 @@ class DeviceFactory : public QObject
 	Q_OBJECT
 public:
 	static DeviceImpl *build(QString param, QString category = "", QObject *parent = nullptr);
+
+	// The device category names the connection provider ("iio" → IIOProvider). A category without
+	// a registered provider builds a connection-less device and yields an empty kind.
+	static component::ConnectionKind kindFor(const QString &category);
 };
 } // namespace scopy
 #endif // DEVICEFACTORY_H

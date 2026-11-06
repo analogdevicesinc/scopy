@@ -139,10 +139,11 @@ QList<Plugin *> PluginRepository::getPlugins(QString category)
 	return pm->getPlugins(category);
 }
 
-QList<Plugin *> PluginRepository::getCompatiblePlugins(const QString &param, const QString &category)
+QList<Plugin *> PluginRepository::getCompatiblePlugins(const QString &param, const QString &category,
+						       const QStringList &backends)
 {
 	PluginManager *pm = getPluginManager();
-	return pm->getCompatiblePlugins(param, category);
+	return pm->getCompatiblePlugins(param, category, backends);
 }
 
 QList<PluginInfo> PluginRepository::getPluginsInfo()

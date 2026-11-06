@@ -89,6 +89,7 @@ private Q_SLOTS:
 	void writeThenReadBack();
 	void readEmitsSucceeded();
 	void failurePaths();
+	void genericBaseDiscovery();
 };
 
 void TstComponentRegister::writeThenReadBack()
@@ -136,6 +137,35 @@ void TstComponentRegister::failurePaths()
 	QVERIFY(!QCoro::waitFor(writer.writeAsync(0xdead, 1)));
 	QCOMPARE(rfail.count(), 1);
 	QCOMPARE(wfail.count(), 1);
+}
+
+// Consumers that do not know the backend find the leaves through the generic bases (or the
+// capability tags) and read the widths from the properties.
+void TstComponentRegister::genericBaseDiscovery()
+{
+	PooledCmdExecutor exec(1);
+	FakeDeviceOps ops;
+	ops.regs.insert(0x4, 0x9);
+	scopy::iio::DeviceHandle dh{reinterpret_cast<void *>(0x1)};
+	QObject dev;
+	new IIORegisterReader(&ops, dh, &exec, &dev);
+	new IIORegisterWriter(&ops, dh, &exec, &dev);
+
+	auto *reader = dev.findChild<scopy::component::RegisterReader *>();
+	auto *writer = dev.findChild<scopy::component::RegisterWriter *>();
+	QVERIFY(reader);
+	QVERIFY(writer);
+	QCOMPARE(reader->property("addressBits").toInt(), 32);
+	QCOMPARE(writer->property("valueBits").toInt(), 32);
+	QVERIFY(reader->inherits("scopy::component::RegisterReader"));
+
+	QSignalSpy ok(reader, &scopy::component::RegisterReader::readSucceeded);
+	const auto r = QCoro::waitFor(reader->readAsync(0x4));
+	QVERIFY(r);
+	QCOMPARE(r.value(), 0x9u);
+	QCOMPARE(ok.count(), 1);
+	QVERIFY(QCoro::waitFor(writer->writeAsync(0x4, 0xa)));
+	QCOMPARE(ops.regs.value(0x4), 0xau);
 }
 
 QTEST_MAIN(TstComponentRegister)

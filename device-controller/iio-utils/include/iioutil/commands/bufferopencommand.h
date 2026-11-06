@@ -25,6 +25,7 @@
 #include "iioutil/ibufferops.h"
 
 #include <cerrno>
+#include <cstring>
 #include "iioutil/controller_iioutils_export.h"
 
 namespace scopy::iio {
@@ -50,10 +51,16 @@ public:
 protected:
 	void run() override
 	{
+		errno = 0;
 		m_openedHandle = m_ops->openBuffer(m_devHandle, m_idx, m_mask, m_samples, m_cyclic, m_kernelBuffers);
+		// libiio reports the reason through errno; keep it in the error.
+		const int err = errno ? errno : EIO;
 		setResult(m_openedHandle.ptr
 				  ? Result<void>()
-				  : Result<void>(Unexpected{Error{-EIO, QStringLiteral("buffer open failed")}}));
+				  : Result<void>(Unexpected{Error{-err,
+								  QStringLiteral("buffer open failed: %1 (%2)")
+									  .arg(QString::fromLocal8Bit(strerror(err)))
+									  .arg(err)}}));
 	}
 
 private:

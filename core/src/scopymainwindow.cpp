@@ -138,10 +138,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 	Style::setBackgroundColor(ui->centralwidget, json::theme::background_primary);
 
-	scanTask = new DcIioScanTask(this);
-	scanTask->setScanParams("usb");
-	scanCycle = new CyclicalTask(scanTask, this);
-	scc = new ScannedIIOContextCollector(this);
+	m_scanner = new DeviceScanner(this);
 
 	loadPluginsFromRepository();
 
@@ -151,8 +148,8 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 	ScopySplashscreen::showMessage("Loading homepage");
 	hp = new ScopyHomePage(this);
-	m_sbc = new ScanButtonController(scanCycle, hp->scanControlBtn(), this);
-	connect(hp->scanBtn(), &QPushButton::clicked, this, [this]() { scanTask->run(); });
+	m_sbc = new ScanButtonController(m_scanner, hp->scanControlBtn(), this);
+	connect(hp->scanBtn(), &QPushButton::clicked, m_scanner, &DeviceScanner::scanNow);
 
 	DeviceAutoConnect::initPreferences();
 	dm = new DeviceManager(this);
@@ -171,17 +168,15 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	ts->add("package", pkgWidget);
 	ts->add("scripting", m_scriptingTool);
 
-	connect(scanTask, &DcIioScanTask::scanFinished, scc, &ScannedIIOContextCollector::update, Qt::QueuedConnection);
-
-	connect(scc, &ScannedIIOContextCollector::foundDevice, dm,
-		[this](QString cat, QString uri) { dm->createDevice(cat, uri); });
-	connect(scc, &ScannedIIOContextCollector::lostDevice, dm, &DeviceManager::removeDevice);
+	connect(m_scanner, &DeviceScanner::found, dm, [this](QString cat, QString uri) { dm->createDevice(cat, uri); });
+	connect(m_scanner, &DeviceScanner::lost, dm, &DeviceManager::removeDevice);
 
 	connect(hp, &ScopyHomePage::requestDevice, this, &ScopyMainWindow::requestTools);
 
 	connect(dm, &DeviceManager::deviceAdded, this, &ScopyMainWindow::addDeviceToUi);
 
-	connect(dm, &DeviceManager::deviceRemoveStarted, scc, &ScannedIIOContextCollector::removeDevice);
+	connect(dm, &DeviceManager::deviceRemoveStarted, m_scanner,
+		[this](QString, Device *d) { m_scanner->forget(d->param()); });
 	connect(dm, &DeviceManager::deviceRemoveStarted, this,
 		[this](QString id, Device *) { removeDeviceFromUi(id); });
 
@@ -194,13 +189,15 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(dm, &DeviceManager::deviceConnecting, this, [this](const QString &deviceId) {
 		Device *d = dm->getDevice(deviceId);
 		if(d && d->param().contains("usb:")) {
-			scc->lock(deviceId, d);
+			m_scanner->hold(d->param());
 		}
 	});
 
-	connect(dm, &DeviceManager::deviceConnected, scc, &ScannedIIOContextCollector::lock);
+	connect(dm, &DeviceManager::deviceConnected, m_scanner,
+		[this](QString, Device *d) { m_scanner->hold(d->param()); });
 	connect(dm, &DeviceManager::deviceConnected, hp, [this](QString id, Device *) { hp->connectDevice(id); });
-	connect(dm, &DeviceManager::deviceDisconnected, scc, &ScannedIIOContextCollector::unlock);
+	connect(dm, &DeviceManager::deviceDisconnected, m_scanner,
+		[this](QString, Device *d) { m_scanner->release(d->param()); });
 	connect(dm, &DeviceManager::deviceDisconnected, hp, [this](QString id, Device *) { hp->disconnectDevice(id); });
 
 	connect(dm, &DeviceManager::requestDevice, hp, &ScopyHomePage::viewDevice);
@@ -240,7 +237,8 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	prefPage->initSessionDevices();
 
 	if(Preferences::get("general_scan_for_devices").toBool()) {
-		scanTask->run();
+		// Blocking, so scanned devices are in the browser before the window shows.
+		m_scanner->scanBlocking();
 	}
 	enableScanner();
 
@@ -387,7 +385,7 @@ void ScopyMainWindow::requestTools(QString id) { m_toolMenuManager->showMenuItem
 
 ScopyMainWindow::~ScopyMainWindow()
 {
-	scanCycle->stop();
+	m_scanner->stop();
 	delete ui;
 }
 

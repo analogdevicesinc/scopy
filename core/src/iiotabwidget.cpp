@@ -30,15 +30,34 @@
 #include <QRegularExpressionValidator>
 #include <style.h>
 #include <stylehelper.h>
-#include "dcioscantask.h"
 #include <iioutil/serialportenumerator.h>
-#include <component/backends/iio/iiocontextfactory.h>
-#include <iioutil/ibackend.h>
-#include <iioutil/iscanops.h>
+#include <component/backends/iio/iioprovider.h>
+#include <component/controller.h>
 
 Q_LOGGING_CATEGORY(CAT_IIO_ADD_PAGE, "IIOTabWidget")
 
 using namespace scopy;
+
+namespace {
+std::shared_ptr<scopy::component::ConnectionProvider> iioBackend()
+{
+	return scopy::component::Controller::GetInstance()->provider(scopy::component::iio::IIOProvider::KIND);
+}
+
+// Appends {description, uri} for each found context. Returns the number found, or -1 on error.
+int scanContexts(QVector<QPair<QString, QString>> *ctxs, QString scanParams)
+{
+	if(!iioBackend()) {
+		return -1;
+	}
+	const QVector<scopy::component::ScanResult> results =
+		scopy::component::Controller::GetInstance()->scan(scopy::component::iio::IIOProvider::KIND, scanParams);
+	for(const scopy::component::ScanResult &r : results) {
+		ctxs->append({r.description, r.uri});
+	}
+	return ctxs->size();
+}
+} // namespace
 
 IioTabWidget::IioTabWidget(QWidget *parent)
 	: QWidget(parent)
@@ -159,11 +178,11 @@ void IioTabWidget::setupConnections()
 QStringList IioTabWidget::computeBackendsList()
 {
 	QStringList list;
-	scopy::iio::IBackend *backend = scopy::component::iio::IIOContextFactory::defaultBackend();
+	auto backend = iioBackend();
 	if(!backend) {
 		return list;
 	}
-	const QStringList backends = backend->scanOps()->availableBackends();
+	const QStringList backends = backend->scanFilters();
 	for(const QString &backEnd : backends) {
 		if(backEnd.compare("xml") == 0 || backEnd.compare("serial") == 0) {
 			continue;
@@ -233,7 +252,7 @@ void IioTabWidget::futureScan()
 {
 	m_scanList.clear();
 	QString scanParams = m_scanParamsList.join("");
-	QFuture<int> f = QtConcurrent::run(std::bind(&DcIioScanTask::scan, &m_scanList, scanParams));
+	QFuture<int> f = QtConcurrent::run(std::bind(&scanContexts, &m_scanList, scanParams));
 	m_fwScan->setFuture(f);
 }
 
@@ -321,8 +340,8 @@ bool IioTabWidget::isSerialCompatible()
 #ifdef WITH_LIBSERIALPORT
 	hasLibSerialPort = true;
 #endif
-	scopy::iio::IBackend *backend = scopy::component::iio::IIOContextFactory::defaultBackend();
-	bool hasSerialBackend = backend && backend->scanOps()->hasBackend("serial");
+	auto backend = iioBackend();
+	bool hasSerialBackend = backend && backend->scanFilters().contains("serial");
 	return hasLibSerialPort && hasSerialBackend;
 }
 
