@@ -86,7 +86,7 @@ void ComponentTreeModel::addNode(QStandardItem *parent, QObject *obj, NodeKind k
 	parent->appendRow(row);
 	m_objects.insert(row[NameColumn], obj);
 	m_items.insert(obj, row[NameColumn]);
-	watch(obj, kind, row[ValueColumn]);
+	watch(obj, kind, row[ValueColumn], row[InfoColumn]);
 	addChildren(row[NameColumn], obj);
 }
 
@@ -127,7 +127,7 @@ void ComponentTreeModel::addChildren(QStandardItem *item, QObject *obj)
 	}
 }
 
-void ComponentTreeModel::watch(QObject *obj, NodeKind kind, QStandardItem *valueItem)
+void ComponentTreeModel::watch(QObject *obj, NodeKind kind, QStandardItem *valueItem, QStandardItem *infoItem)
 {
 	auto refresh = [obj, kind, valueItem]() {
 		const QString v = ComponentNode::value(obj, kind);
@@ -155,6 +155,12 @@ void ComponentTreeModel::watch(QObject *obj, NodeKind kind, QStandardItem *value
 		break;
 	case NodeKind::DongleManager:
 		connect(static_cast<DongleManager *>(obj), &DongleManager::profileChanged, m_watchers, refresh);
+		break;
+	case NodeKind::Channel:
+		if(Attribute *dir = ComponentNode::directionAttribute(obj)) {
+			connect(dir, &Attribute::valueChanged, m_watchers,
+				[obj, kind, infoItem]() { infoItem->setText(ComponentNode::info(obj, kind)); });
+		}
 		break;
 	default:
 		break;

@@ -37,6 +37,7 @@
 #include <component/registerwriter.h>
 #include <component/samplecodec.h>
 #include <component/scanelement.h>
+#include <component/tags.h>
 #include <component/trigger.h>
 
 using namespace scopy;
@@ -290,13 +291,25 @@ QString ComponentNode::value(const QObject *obj, NodeKind kind)
 	return {};
 }
 
+Attribute *ComponentNode::directionAttribute(const QObject *channel)
+{
+	const QList<Attribute *> tagged = findByTag<Attribute>(channel, tags::Direction, false);
+	return tagged.isEmpty() ? nullptr : tagged.first();
+}
+
 QString ComponentNode::info(const QObject *obj, NodeKind kind)
 {
 	switch(kind) {
-	case NodeKind::Channel:
+	case NodeKind::Channel: {
+		// A bidirectional line reports its live direction; otherwise isOutput() is the identity.
+		if(const Attribute *dir = directionAttribute(obj)) {
+			const QString v = dir->cachedValue();
+			return kindName(kind) + (v.isEmpty() ? QString() : QStringLiteral(" (%1)").arg(v));
+		}
 		return kindName(kind) +
 			(static_cast<const Channel *>(obj)->isOutput() ? QStringLiteral(" (output)")
 								       : QStringLiteral(" (input)"));
+	}
 	case NodeKind::Attribute:
 		return kindName(kind) +
 			(static_cast<const Attribute *>(obj)->isWritable() ? QStringLiteral(" (rw)")

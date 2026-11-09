@@ -33,6 +33,8 @@ inline constexpr auto SampleRate = "sample-rate";
 inline constexpr auto TriggerLevel = "trigger-level";
 inline constexpr auto Offset = "offset";
 inline constexpr auto Enable = "enable";
+// Channel attribute holding the runtime direction ("in" / "out") of a bidirectional line.
+inline constexpr auto Direction = "direction";
 
 // Capability nodes carry "capability:<kind>" so a consumer that does not link the concrete type
 // can still find them (hasTag / findByTag) and drive them through the metaobject.

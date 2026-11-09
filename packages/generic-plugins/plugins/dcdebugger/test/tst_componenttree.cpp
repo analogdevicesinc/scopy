@@ -28,6 +28,7 @@
 #include <component/connection.h>
 #include <component/context.h>
 #include <component/device.h>
+#include <component/tags.h>
 
 using namespace scopy;
 using namespace scopy::component;
@@ -44,6 +45,7 @@ private Q_SLOTS:
 	void groupsAreOrdered();
 	void pathSkipsGroups();
 	void attributeValueFollowsCache();
+	void channelInfoFollowsDirectionAttribute();
 	void childObjectsWalkGroups();
 
 private:
@@ -159,6 +161,24 @@ void TST_ComponentTree::attributeValueFollowsCache()
 	m_attr->setCachedValue("1000000");
 	const QModelIndex value = m_model->indexOf(m_attr).siblingAtColumn(ComponentTreeModel::ValueColumn);
 	QCOMPARE(value.data().toString(), QString("1000000 Hz"));
+}
+
+void TST_ComponentTree::channelInfoFollowsDirectionAttribute()
+{
+	auto *gpio = new Channel(m_dev);
+	gpio->setId("gpio0");
+	auto *dir = new Attribute(gpio);
+	dir->setName("direction");
+	dir->setCachedValue("in");
+	addTag(dir, tags::Direction);
+	delete m_model;
+	m_model = new ComponentTreeModel();
+	m_model->setConnection(m_conn);
+
+	const QModelIndex info = m_model->indexOf(gpio).siblingAtColumn(ComponentTreeModel::InfoColumn);
+	QCOMPARE(info.data().toString(), QString("Channel (in)"));
+	dir->setCachedValue("out");
+	QCOMPARE(info.data().toString(), QString("Channel (out)"));
 }
 
 void TST_ComponentTree::childObjectsWalkGroups()

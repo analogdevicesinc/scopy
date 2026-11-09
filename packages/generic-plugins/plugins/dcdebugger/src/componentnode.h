@@ -27,6 +27,10 @@
 #include <QObject>
 #include <QString>
 
+namespace scopy::component {
+class Attribute;
+}
+
 namespace scopy::dcdebugger {
 
 // Base component type of a tree node, decided from the component bases / metaobject only.
@@ -68,6 +72,8 @@ public:
 	static QString name(const QObject *obj, NodeKind kind);
 	static QString value(const QObject *obj, NodeKind kind);
 	static QString info(const QObject *obj, NodeKind kind);
+	// The tags::Direction attribute of a channel, if it has one.
+	static component::Attribute *directionAttribute(const QObject *channel);
 };
 
 } // namespace scopy::dcdebugger

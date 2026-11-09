@@ -77,7 +77,7 @@ Q_SIGNALS:
 private:
 	void addNode(QStandardItem *parent, QObject *obj, NodeKind kind);
 	void addChildren(QStandardItem *item, QObject *obj);
-	void watch(QObject *obj, NodeKind kind, QStandardItem *valueItem);
+	void watch(QObject *obj, NodeKind kind, QStandardItem *valueItem, QStandardItem *infoItem);
 	QList<QStandardItem *> makeRow(const QString &name, const QString &value, const QString &info) const;
 
 	QPointer<component::Connection> m_conn;
