@@ -1,9 +1,10 @@
+.. rst-class:: hero
+
 Scopy
 ===============================================================================
 
-`Analog Devices Inc. <https://www.analog.com>`__
-Scopy is a multi-functional software toolset with strong capabilities for
-signal analysis.
+.. rubric:: **Scopy**: the bespoken signal analysis software
+   :heading-level: 1
 
 .. image:: sources/screenshot-light.png
    :class: only-light window
@@ -11,22 +12,17 @@ signal analysis.
 .. image:: sources/screenshot-dark.png
    :class: only-dark window
 
-.. note::
-
-   We are in the process of moving the Scopy documentation from
-   `wiki <https://wiki.analog.com/university/tools/m2k/scopy#user_guides>`__
-   to :git-scopy:`/`.
-
-   We apologize for any inconvenience that may occur due to this migration.
-
-.. hdl-build-status::
+`Analog Devices Inc. <https://www.analog.com>`__
+Scopy is a multi-functional software toolset with strong capabilities for
+signal analysis.
 
 Contents
 -------------------------------------------------------------------------------
 
 .. toctree::
    :includehidden:
-   :maxdepth: 6
+   :maxdepth: 3
+   :class: grid
 
    user_guide/index
    plugins/index
