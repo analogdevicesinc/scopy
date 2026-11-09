@@ -80,7 +80,7 @@ DacInstrument::DacInstrument(component::Context *ctx, QWidget *parent)
 		connect(infoBtn->getTutorialButton(), &QPushButton::clicked, this, &DacInstrument::startTutorial);
 		connect(infoBtn->getDocumentationButton(), &QAbstractButton::clicked, this, [=, this]() {
 			QDesktopServices::openUrl(
-				QUrl("https://analogdevicesinc.github.io/scopy/plugins/dac/dac.html"));
+				QUrl("https://analogdevicesinc.github.io/scopy/plugins/dac/dac/index.html"));
 		});
 	});
 

@@ -62,7 +62,7 @@ Faults::Faults(QString uri, ToolMenuEntry *tme, QWidget *parent)
 		connect(infoBtn->getTutorialButton(), &QPushButton::clicked, this, &Faults::startTutorial);
 		connect(infoBtn->getDocumentationButton(), &QAbstractButton::clicked, this, [=, this]() {
 			QDesktopServices::openUrl(
-				QUrl("https://analogdevicesinc.github.io/scopy/plugins/swiot1l/faults.html"));
+				QUrl("https://analogdevicesinc.github.io/scopy/plugins/swiot1l/faults/index.html"));
 		});
 	});
 	m_configBtn = createConfigBtn(this);

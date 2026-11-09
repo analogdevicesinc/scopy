@@ -611,7 +611,7 @@ void Ad74413r::setupToolTemplate()
 		connect(m_infoBtn->getTutorialButton(), &QPushButton::clicked, this, &Ad74413r::startTutorial);
 		connect(m_infoBtn->getDocumentationButton(), &QAbstractButton::clicked, this, [=, this]() {
 			QDesktopServices::openUrl(
-				QUrl("https://analogdevicesinc.github.io/scopy/plugins/swiot1l/ad74413r.html"));
+				QUrl("https://analogdevicesinc.github.io/scopy/plugins/swiot1l/ad74413r/index.html"));
 		});
 	});
 

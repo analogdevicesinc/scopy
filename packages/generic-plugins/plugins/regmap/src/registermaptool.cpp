@@ -80,8 +80,8 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 		});
 
 		connect(infoBtn->getDocumentationButton(), &QAbstractButton::clicked, this, []() {
-			QDesktopServices::openUrl(
-				QUrl("https://analogdevicesinc.github.io/scopy/plugins/registermap/registermap.html"));
+			QDesktopServices::openUrl(QUrl(
+				"https://analogdevicesinc.github.io/scopy/plugins/registermap/registermap/index.html"));
 		});
 	});
 

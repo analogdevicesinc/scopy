@@ -248,7 +248,7 @@ LogicAnalyzer::LogicAnalyzer(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEn
 	m_wheelEventGuard = new MouseWheelWidgetGuard(ui->mainWidget);
 	m_wheelEventGuard->installEventRecursively(ui->mainWidget);
 
-	ui->btnHelp->setUrl("https://analogdevicesinc.github.io/scopy/plugins/m2k/logic_analyzer.html");
+	ui->btnHelp->setUrl("https://analogdevicesinc.github.io/scopy/plugins/m2k/logic_analyzer/index.html");
 }
 
 LogicAnalyzer::~LogicAnalyzer()

@@ -67,7 +67,7 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	InfoBtn *infoBtn = new InfoBtn(this);
 	tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
 	connect(infoBtn, &QAbstractButton::clicked, this, [=, this]() {
-		QDesktopServices::openUrl(QUrl("https://analogdevicesinc.github.io/scopy/plugins/pqm/rms.html"));
+		QDesktopServices::openUrl(QUrl("https://analogdevicesinc.github.io/scopy/plugins/pqm/rms/index.html"));
 	});
 
 	QWidget *dockableAreaWidget = m_dockableArea->asWidget();
