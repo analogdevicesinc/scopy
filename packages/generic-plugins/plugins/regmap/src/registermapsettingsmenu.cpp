@@ -33,7 +33,7 @@
 #include <qlineedit.h>
 #include <qpushbutton.h>
 
-#include <src/readwrite/fileregisterreadstrategy.hpp>
+#include <readwrite/fileregisterreadstrategy.hpp>
 
 #include <menusectionwidget.h>
 #include <style.h>

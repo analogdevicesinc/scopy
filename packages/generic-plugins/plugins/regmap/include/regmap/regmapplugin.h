@@ -33,8 +33,8 @@
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 
-#include <readwrite/iregisterreadstrategy.hpp>
-#include <readwrite/iregisterwritestrategy.hpp>
+#include "readwrite/iregisterreadstrategy.hpp"
+#include "readwrite/iregisterwritestrategy.hpp"
 
 namespace Ui {}
 

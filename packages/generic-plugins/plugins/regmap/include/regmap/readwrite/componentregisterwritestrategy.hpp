@@ -31,7 +31,7 @@ class IIORegisterWriter;
 namespace scopy::regmap {
 
 // Register write strategy backed by a device-controller IIORegisterWriter.
-class ComponentRegisterWriteStrategy : public IRegisterWriteStrategy
+class SCOPY_REGMAP_EXPORT ComponentRegisterWriteStrategy : public IRegisterWriteStrategy
 {
 public:
 	explicit ComponentRegisterWriteStrategy(scopy::component::iio::IIORegisterWriter *writer);

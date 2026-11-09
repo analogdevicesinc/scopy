@@ -40,8 +40,8 @@
 #include <registermaptool.hpp>
 #include <style.h>
 #include <stylehelper.h>
-#include <src/readwrite/componentregisterreadstrategy.hpp>
-#include <src/readwrite/componentregisterwritestrategy.hpp>
+#include <readwrite/componentregisterreadstrategy.hpp>
+#include <readwrite/componentregisterwritestrategy.hpp>
 #include <component/controller.h>
 #include <component/context.h>
 #include <component/backends/iio/iiodevice.h>

@@ -19,7 +19,7 @@
  *
  */
 
-#include "fileregisterwritestrategy.hpp"
+#include <readwrite/fileregisterwritestrategy.hpp>
 
 #include "../logging_categories.h"
 

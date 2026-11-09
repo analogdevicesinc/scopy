@@ -46,7 +46,7 @@
 #include <qcheckbox.h>
 #include <style.h>
 
-#include <src/readwrite/fileregisterwritestrategy.hpp>
+#include <readwrite/fileregisterwritestrategy.hpp>
 #include <src/recyclerview/registermaptable.hpp>
 #include <utils.h>
 

@@ -19,21 +19,26 @@
  *
  */
 
-#ifndef IREGISTERREADSTRATEGY_HPP
-#define IREGISTERREADSTRATEGY_HPP
+#ifndef FILEREGISTERREADSTRATEGY_HPP
+#define FILEREGISTERREADSTRATEGY_HPP
 
-#include <QObject>
+#include "iregisterreadstrategy.hpp"
 
+class QString;
 namespace scopy::regmap {
-class IRegisterReadStrategy : public QObject
+class SCOPY_REGMAP_EXPORT FileRegisterReadStrategy : public IRegisterReadStrategy
 {
-	Q_OBJECT
 public:
-	virtual void read(uint32_t address) = 0;
+	FileRegisterReadStrategy(QString path);
+	// read a value from file from given address
+	void read(uint32_t address);
+	// read all values from file
+	void readAll();
 
 Q_SIGNALS:
-	void readDone(uint32_t address, uint32_t value);
-	void readError(const char *err);
+
+private:
+	QString path;
 };
 } // namespace scopy::regmap
-#endif // IREGISTERREADSTRATEGY_HPP
+#endif // FILEREGISTERREADSTRATEGY_HPP

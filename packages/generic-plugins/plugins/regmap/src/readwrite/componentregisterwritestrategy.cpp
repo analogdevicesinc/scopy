@@ -19,7 +19,7 @@
  *
  */
 
-#include "componentregisterwritestrategy.hpp"
+#include <readwrite/componentregisterwritestrategy.hpp>
 
 #include "../logging_categories.h"
 

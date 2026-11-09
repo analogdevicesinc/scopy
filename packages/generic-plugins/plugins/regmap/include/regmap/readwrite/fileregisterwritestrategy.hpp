@@ -19,26 +19,24 @@
  *
  */
 
-#ifndef FILEREGISTERREADSTRATEGY_HPP
-#define FILEREGISTERREADSTRATEGY_HPP
+#ifndef FILEREGISTERWRITESTRATEGY_HPP
+#define FILEREGISTERWRITESTRATEGY_HPP
 
-#include "iregisterreadstrategy.hpp"
+#include "iregisterwritestrategy.hpp"
 
 class QString;
 namespace scopy::regmap {
-class FileRegisterReadStrategy : public IRegisterReadStrategy
+class SCOPY_REGMAP_EXPORT FileRegisterWriteStrategy : public IRegisterWriteStrategy
 {
 public:
-	FileRegisterReadStrategy(QString path);
-	// read a value from file from given address
-	void read(uint32_t address);
-	// read all values from file
-	void readAll();
-
-Q_SIGNALS:
+	FileRegisterWriteStrategy(QString path);
 
 private:
 	QString path;
+
+	// IRegisterWriteStrategy interface
+public:
+	void write(uint32_t address, uint32_t val);
 };
 } // namespace scopy::regmap
-#endif // FILEREGISTERREADSTRATEGY_HPP
+#endif // FILEREGISTERWRITESTRATEGY_HPP

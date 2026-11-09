@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2026 Analog Devices Inc.
+ * Copyright (c) 2024 Analog Devices Inc.
  *
  * This file is part of Scopy
  * (see https://www.github.com/analogdevicesinc/scopy).
@@ -19,29 +19,23 @@
  *
  */
 
-#ifndef COMPONENTREGISTERREADSTRATEGY_HPP
-#define COMPONENTREGISTERREADSTRATEGY_HPP
+#ifndef IREGISTERWRITESTRATEGY_HPP
+#define IREGISTERWRITESTRATEGY_HPP
 
-#include "iregisterreadstrategy.hpp"
+#include "../scopy-regmap_export.h"
 
-namespace scopy::component::iio {
-class IIORegisterReader;
-}
+#include <QObject>
 
 namespace scopy::regmap {
-
-// Register read strategy backed by a device-controller IIORegisterReader.
-class ComponentRegisterReadStrategy : public IRegisterReadStrategy
+class IRegisterWriteStrategy : public QObject
 {
+	Q_OBJECT
 public:
-	explicit ComponentRegisterReadStrategy(scopy::component::iio::IIORegisterReader *reader);
-	void read(uint32_t address) override;
-	uint32_t getAddressSpace() const;
-	void setAddressSpace(uint32_t newAddressSpace);
+	virtual void write(uint32_t address, uint32_t val) = 0;
 
-private:
-	scopy::component::iio::IIORegisterReader *m_reader;
-	uint32_t m_addressSpace = 0;
+Q_SIGNALS:
+	void writeError(const char *err);
+	void writeSuccess(uint32_t address);
 };
 } // namespace scopy::regmap
-#endif // COMPONENTREGISTERREADSTRATEGY_HPP
+#endif // IREGISTERWRITESTRATEGY_HPP
