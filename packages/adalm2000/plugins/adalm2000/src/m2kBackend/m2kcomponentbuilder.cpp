@@ -45,6 +45,7 @@
 #include <libm2k/m2khardwaretrigger.hpp>
 
 #include <QLoggingCategory>
+#include <QPointer>
 #include <QSet>
 #include <QString>
 
@@ -507,9 +508,11 @@ void buildAnalogOutChannel(component::Device *analogOut, M2kAnalogOut *aout, voi
 		},
 		executor);
 
+#ifndef LIBIIO_V1
 	addReadOnlyAttr(
 		chn, QStringLiteral("push_done"), QString(), resource,
 		[aout, chIdx]() { return QByteArray::number(aout->isPushDone(chIdx) ? 1 : 0); }, executor);
+#endif
 
 	addWriteOnlyAttr(
 		chn, QStringLiteral("voltage"), QStringLiteral("V"), resource,
@@ -1009,32 +1012,51 @@ void buildDmms(component::Context *ctx, libm2k::context::M2k *m2k, ICmdExecutor 
 	}
 }
 
-void invalidateInputsOnTriggerWrite(component::Context *ctx)
+void invalidateInputsOnReconfigure(component::Context *ctx)
 {
-	auto *analogIn = ctx->findChild<component::Device *>(QStringLiteral("analog-in"), Qt::FindDirectChildrenOnly);
-	auto *digital = ctx->findChild<component::Device *>(QStringLiteral("digital"), Qt::FindDirectChildrenOnly);
-	M2kInputStream *ain = component::streamAt<M2kInputStream>(analogIn);
-	M2kDigitalInputStream *din = component::streamAt<M2kDigitalInputStream>(digital);
+	const auto device = [ctx](const QString &id) {
+		return ctx->findChild<component::Device *>(id, Qt::FindDirectChildrenOnly);
+	};
+	component::Device *analogIn = device(QStringLiteral("analog-in"));
+	component::Device *analogOut = device(QStringLiteral("analog-out"));
+	component::Device *powerSupply = device(QStringLiteral("power-supply"));
+	component::Device *digital = device(QStringLiteral("digital"));
 
-	for(component::Device *dev : {analogIn, digital}) {
+	QPointer<M2kInputStream> ain = component::streamAt<M2kInputStream>(analogIn);
+	QPointer<M2kDigitalInputStream> din = component::streamAt<M2kDigitalInputStream>(digital);
+	if(!ain && !din) {
+		return;
+	}
+	const auto invalidateInputs = [ain, din]() {
+		if(ain) {
+			ain->invalidate();
+		}
+		if(din) {
+			din->invalidate();
+		}
+	};
+
+	for(component::Device *dev : {analogIn, analogOut, powerSupply, digital}) {
 		if(!dev) {
 			continue;
 		}
 		const QList<component::Attribute *> attrs = dev->findChildren<component::Attribute *>();
 		for(component::Attribute *attr : attrs) {
 			component::AttributeWriter *writer = attr->writeCapability();
-			if(!writer || !attr->name().startsWith(QStringLiteral("trigger_"))) {
+			if(!writer) {
 				continue;
 			}
-			if(ain) {
-				QObject::connect(writer, &component::AttributeWriter::writeSucceeded, ain,
-						 &M2kInputStream::invalidate);
-			}
-			if(din) {
-				QObject::connect(writer, &component::AttributeWriter::writeSucceeded, din,
-						 &M2kDigitalInputStream::invalidate);
-			}
+			QObject::connect(writer, &component::AttributeWriter::writeSucceeded, ctx, invalidateInputs);
 		}
+	}
+
+	if(auto *aout = component::streamAt<M2kOutputStream>(analogOut)) {
+		QObject::connect(aout, &component::OutputStream::pushSucceeded, ctx, invalidateInputs);
+		QObject::connect(aout, &component::Stream::openedChanged, ctx, invalidateInputs);
+	}
+	if(auto *dout = component::streamAt<M2kDigitalOutputStream>(digital)) {
+		QObject::connect(dout, &component::OutputStream::pushSucceeded, ctx, invalidateInputs);
+		QObject::connect(dout, &component::Stream::openedChanged, ctx, invalidateInputs);
 	}
 }
 
@@ -1070,7 +1092,7 @@ bool M2kComponentBuilder::build(component::Context *ctx, ICmdExecutor *executor)
 	buildDigital(m2kCtx, m2k, executor);
 	buildContextDevice(m2kCtx, m2k, executor);
 	buildDmms(m2kCtx, m2k, executor);
-	invalidateInputsOnTriggerWrite(m2kCtx);
+	invalidateInputsOnReconfigure(m2kCtx);
 
 	return true;
 }

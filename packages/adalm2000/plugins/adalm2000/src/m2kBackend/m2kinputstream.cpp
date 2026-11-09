@@ -26,7 +26,10 @@
 
 #include <libm2k/analog/m2kanalogin.hpp>
 
+#include <qcoro/qcorofuture.h>
+
 #include <QLoggingCategory>
+#include <QtConcurrent/QtConcurrentRun>
 
 #include <cerrno>
 #include <cmath>
@@ -52,6 +55,7 @@ M2kInputStream::M2kInputStream(void *resource, M2kAnalogIn *ain, ICmdExecutor *e
 
 M2kInputStream::~M2kInputStream()
 {
+	m_cancelFuture.waitForFinished();
 	if(!m_open || !m_ain) {
 		return;
 	}
@@ -74,6 +78,13 @@ Result<void> M2kInputStream::setKernelBuffers(unsigned n)
 
 QCoro::Task<CommandResponse<void>> M2kInputStream::openAsync(const component::StreamConfig &cfg)
 {
+	if(m_open) {
+		co_return CommandResponse<void>(QUuid(), Unexpected{Error{-EBUSY, QStringLiteral("already open")}});
+	}
+	co_await awaitCancel();
+	if(!m_ain) {
+		co_return CommandResponse<void>(QUuid(), Unexpected{Error{-ENODEV, QStringLiteral("stream detached")}});
+	}
 	if(m_open) {
 		co_return CommandResponse<void>(QUuid(), Unexpected{Error{-EBUSY, QStringLiteral("already open")}});
 	}
@@ -154,10 +165,11 @@ QCoro::Task<CommandResponse<void>> M2kInputStream::closeAsync()
 	m_open = false;
 	m_format = component::StreamFormat{};
 	m_cancelRequested = false;
-	try {
-		m_ain->cancelAcquisition();
-	} catch(const std::exception &e) {
-		qWarning(CAT_M2K_INPUT_STREAM) << "cancelAcquisition failed:" << e.what();
+	startCancel();
+	co_await awaitCancel();
+	if(!m_ain) {
+		Q_EMIT openedChanged(false);
+		co_return CommandResponse<void>(QUuid());
 	}
 
 	M2kAnalogIn *ain = m_ain;
@@ -174,6 +186,11 @@ QCoro::Task<CommandResponse<void>> M2kInputStream::refillAsync()
 {
 	if(!m_open) {
 		co_return CommandResponse<void>(QUuid(), Unexpected{Error{-EIO, QStringLiteral("stream not open")}});
+	}
+	co_await awaitCancel();
+	if(!m_open) {
+		co_return CommandResponse<void>(QUuid(),
+						Unexpected{Error{-ECANCELED, QStringLiteral("refill cancelled")}});
 	}
 
 	M2kAnalogIn *ain = m_ain;
@@ -198,6 +215,7 @@ QCoro::Task<CommandResponse<void>> M2kInputStream::refillAsync()
 	const bool cancelled = m_cancelRequested || !m_open;
 	m_cancelRequested = false;
 	if(!result) {
+		m_stale = true;
 		if(cancelled) {
 			const Error error{-ECANCELED, QStringLiteral("refill cancelled")};
 			Q_EMIT refillFailed(error);
@@ -232,15 +250,54 @@ void M2kInputStream::cancel()
 		return;
 	}
 	m_cancelRequested = true;
-	try {
-		m_ain->cancelAcquisition();
-	} catch(const std::exception &e) {
-		qWarning(CAT_M2K_INPUT_STREAM) << "cancelAcquisition failed:" << e.what();
+	m_stale = true;
+	startCancel();
+}
+
+void M2kInputStream::startCancel()
+{
+	if(!m_ain || !m_cancelFuture.isFinished()) {
+		return;
 	}
+	M2kAnalogIn *ain = m_ain;
+	m_cancelFuture = QtConcurrent::run([ain]() {
+		try {
+			ain->cancelAcquisition();
+		} catch(const std::exception &e) {
+			qWarning(CAT_M2K_INPUT_STREAM) << "cancelAcquisition failed:" << e.what();
+		}
+	});
+}
+
+QCoro::Task<void> M2kInputStream::awaitCancel()
+{
+	QFuture<void> pending = m_cancelFuture;
+	if(!pending.isFinished()) {
+		co_await pending;
+	}
+}
+
+void M2kInputStream::detach()
+{
+	m_cancelFuture.waitForFinished();
+	if(m_open && m_ain) {
+		try {
+			m_ain->stopAcquisition();
+		} catch(const std::exception &e) {
+			qWarning(CAT_M2K_INPUT_STREAM) << "stopAcquisition failed:" << e.what();
+		}
+	}
+	m_open = false;
+	m_format = component::StreamFormat{};
+	m_ain = nullptr;
 }
 
 QCoro::Task<CommandResponse<short>> M2kInputStream::convertVoltsToRawAsync(unsigned channel, double volts)
 {
+	if(!m_ain) {
+		co_return CommandResponse<short>(QUuid(),
+						 Unexpected{Error{-ENODEV, QStringLiteral("stream detached")}});
+	}
 	if(channel >= static_cast<unsigned>(HW_CHANNELS)) {
 		co_return CommandResponse<short>(QUuid(),
 						 Unexpected{Error{-EINVAL, QStringLiteral("no such channel")}});

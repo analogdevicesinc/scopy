@@ -24,6 +24,7 @@
 
 #include "component/inputstream.h"
 
+#include <QFuture>
 #include <QVector>
 
 namespace libm2k::analog {
@@ -57,18 +58,23 @@ public:
 
 	void cancel();
 	void invalidate();
+	void detach();
 
 	QCoro::Task<CommandResponse<short>> convertVoltsToRawAsync(unsigned channel, double volts);
 
 	const component::StreamFormat &readFormat() const override { return m_format; }
 
 private:
+	void startCancel();
+	QCoro::Task<void> awaitCancel();
+
 	void *m_resource;
 	libm2k::analog::M2kAnalogIn *m_ain;
 	scopy::ICmdExecutor *m_executor;
 	unsigned m_kernelBuffers = 4;
 	bool m_cancelRequested = false;
 	bool m_stale = false;
+	QFuture<void> m_cancelFuture;
 	QVector<stream::ChannelScale> m_scales;
 	component::StreamFormat m_format;
 };

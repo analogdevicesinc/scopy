@@ -22,9 +22,12 @@
 
 #include "core/resultcommand.h"
 
+#include <libm2k/m2kexceptions.hpp>
+
 #include <QString>
 
 #include <cerrno>
+#include <cstdlib>
 #include <exception>
 #include <functional>
 #include <type_traits>
@@ -57,6 +60,11 @@ protected:
 			} else {
 				this->setResult(scopy::Result<T>{m_fn()});
 			}
+		} catch(const libm2k::m2k_exception &e) {
+			const bool timeout = e.type() == libm2k::EXC_TIMEOUT || std::abs(e.iioCode()) == ETIMEDOUT;
+			this->setResult(scopy::Unexpected{
+				scopy::Error{timeout ? -ETIMEDOUT : -EIO,
+					     QStringLiteral("libm2k call failed: ") + QString::fromUtf8(e.what())}});
 		} catch(const std::exception &e) {
 			this->setResult(scopy::Unexpected{scopy::Error{
 				-EIO, QStringLiteral("libm2k call failed: ") + QString::fromUtf8(e.what())}});
