@@ -740,36 +740,48 @@ void PlotNavigator::syncXNavigators(PlotNavigator *pNav1, PlotNavigator *pNav2)
 {
 	syncPlotNavigatorSignals(pNav1, pNav2);
 
-	// Sync navigators that already exist on both sides.
-	for(Navigator *nav1 : *pNav1->navigators()) {
-		if(!nav1->magnifier->isXAxisEn())
-			continue;
-		for(Navigator *nav2 : *pNav2->navigators()) {
-			if(!nav2->magnifier->isXAxisEn())
-				continue;
-			syncNavigators(pNav1, nav1, pNav2, nav2);
+	auto forward = [](PlotNavigator *src, PlotNavigator *dst) {
+		auto link = [src, dst](Navigator *nav) {
+			auto apply = [src, dst, nav](const QRectF &rect, navigationType type) {
+				PlotChannel *ch = src->m_plotWidget ? src->m_plotWidget->selectedChannel() : nullptr;
+				PlotAxis *x = ch ? ch->xAxis() : (src->m_plotWidget ? src->m_plotWidget->xAxis() : nullptr);
+				if(x && nav->magnifier->getXAxis() != x->axisId()) {
+					return;
+				}
+				for(Navigator *other : *dst->navigators()) {
+					if(other->magnifier->isXAxisEn()) {
+						other->zoomer->silentZoom(rect);
+						dst->addRectToHistory(other, rect, type);
+					}
+				}
+				Q_EMIT dst->rectChanged(rect, type);
+			};
+			if(!nav->magnifier->isXAxisEn()) {
+				return;
+			}
+			connect(nav->zoomer, &PlotZoomer::zoomed, dst,
+				[apply](const QRectF &rect) { apply(rect, navigationType::Zoom); });
+			connect(nav->magnifier, &PlotMagnifier::zoomedRect, dst,
+				[apply](const QRectF &rect) { apply(rect, navigationType::Magnify); });
+			connect(nav->magnifier, &PlotMagnifier::pannedRect, dst,
+				[apply](const QRectF &rect) { apply(rect, navigationType::Pan); });
+		};
+		for(Navigator *nav : *src->navigators()) {
+			link(nav);
 		}
-	}
+		connect(src, &PlotNavigator::addedNavigator, dst, link);
+		connect(src, &PlotNavigator::reset, dst, [dst]() {
+			for(Navigator *other : *dst->navigators()) {
+				if(other->magnifier->isXAxisEn()) {
+					Q_EMIT other->magnifier->reset();
+					Q_EMIT other->zoomer->reset();
+				}
+			}
+		});
+	};
 
-	// Sync navigators added to pNav1 in the future against all current and
-	// future X-axis navigators on pNav2.
-	connect(pNav1, &PlotNavigator::addedNavigator, pNav1, [pNav1, pNav2](Navigator *nav1) {
-		if(!nav1->magnifier->isXAxisEn())
-			return;
-		for(Navigator *nav2 : *pNav2->navigators()) {
-			if(nav2->magnifier->isXAxisEn())
-				syncNavigators(pNav1, nav1, pNav2, nav2);
-		}
-	});
-
-	connect(pNav2, &PlotNavigator::addedNavigator, pNav2, [pNav1, pNav2](Navigator *nav2) {
-		if(!nav2->magnifier->isXAxisEn())
-			return;
-		for(Navigator *nav1 : *pNav1->navigators()) {
-			if(nav1->magnifier->isXAxisEn())
-				syncNavigators(pNav2, nav2, pNav1, nav1);
-		}
-	});
+	forward(pNav1, pNav2);
+	forward(pNav2, pNav1);
 }
 
 void PlotNavigator::setResetButtonEn(bool en) { m_resetHover->setVisible(en); }
