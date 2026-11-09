@@ -16,8 +16,3 @@ body.light {
     margin-left: 0;
 }
 
-img.window {
-    box-shadow: 0 .5em 1em 0px rgba(0, 0, 0, 0.2), 0px 0px 1em 0px rgba(0, 0, 0, 0.3);
-    border-radius: clamp(0.5em, 1vw, 1em) !important;
-    margin-bottom: 1em;
-}
