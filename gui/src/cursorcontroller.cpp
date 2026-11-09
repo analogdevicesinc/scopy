@@ -128,8 +128,8 @@ void CursorController::xEnToggled(bool toggled)
 {
 	xEn = toggled;
 	plotCursorReadouts->setXVisible(xEn);
-	readoutsSetVisible(xEn || plotCursorReadouts->isYVisible());
-	plotCursors->setXVisible(xEn);
+	readoutsSetVisible(m_visible);
+	plotCursors->setXVisible(m_visible && xEn);
 }
 
 void CursorController::xLockToggled(bool toggled)
@@ -148,8 +148,8 @@ void CursorController::yEnToggled(bool toggled)
 {
 	yEn = toggled;
 	plotCursorReadouts->setYVisible(yEn);
-	readoutsSetVisible(plotCursorReadouts->isXVisible() || yEn);
-	plotCursors->setYVisible(yEn);
+	readoutsSetVisible(m_visible);
+	plotCursors->setYVisible(m_visible && yEn);
 }
 
 void CursorController::yLockToggled(bool toggled)
@@ -227,15 +227,13 @@ void CursorController::syncXCursorControllers(CursorController *ctrl1, CursorCon
 		ctrl1->x1Cursor->blockSignals(true);
 		ctrl2->x1Cursor->setPosition(pos);
 		ctrl1->x1Cursor->blockSignals(false);
-		ctrl2->x1Cursor->repaint();
-		ctrl2->m_plot->repaint();
+		ctrl2->m_plot->plot()->canvas()->update();
 	});
 	connect(ctrl1->x2Cursor, &PlotAxisHandle::scalePosChanged, ctrl2->x2Cursor, [ctrl1, ctrl2](double pos) {
 		ctrl1->x2Cursor->blockSignals(true);
 		ctrl2->x2Cursor->setPosition(pos);
 		ctrl1->x2Cursor->blockSignals(false);
-		ctrl2->x2Cursor->repaint();
-		ctrl2->m_plot->repaint();
+		ctrl2->m_plot->plot()->canvas()->update();
 	});
 
 	// connect ctrl2 to ctrl1
@@ -243,15 +241,13 @@ void CursorController::syncXCursorControllers(CursorController *ctrl1, CursorCon
 		ctrl2->x1Cursor->blockSignals(true);
 		ctrl1->x1Cursor->setPosition(pos);
 		ctrl2->x1Cursor->blockSignals(false);
-		ctrl1->x1Cursor->repaint();
-		ctrl1->m_plot->repaint();
+		ctrl1->m_plot->plot()->canvas()->update();
 	});
 	connect(ctrl2->x2Cursor, &PlotAxisHandle::scalePosChanged, ctrl1->x2Cursor, [ctrl1, ctrl2](double pos) {
 		ctrl2->x2Cursor->blockSignals(true);
 		ctrl1->x2Cursor->setPosition(pos);
 		ctrl2->x2Cursor->blockSignals(false);
-		ctrl1->x2Cursor->repaint();
-		ctrl1->m_plot->repaint();
+		ctrl1->m_plot->plot()->canvas()->update();
 	});
 }
 
