@@ -70,6 +70,7 @@ public:
 	QCoro::Task<CommandResponse<void>> pushAsync(std::vector<std::vector<double>> perDac);
 
 	void cancel();
+	void detach();
 
 	component::StreamFormat &writeFormat() override { return m_format; }
 

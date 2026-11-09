@@ -48,6 +48,7 @@ macro(add_adalm2000_unit_test name)
 			controller-core
 			QCoro6::Core
 			QCoro6::Coro
+			libm2k::libm2k
 	)
 	add_test(NAME ${_t} COMMAND ${_t})
 endmacro()

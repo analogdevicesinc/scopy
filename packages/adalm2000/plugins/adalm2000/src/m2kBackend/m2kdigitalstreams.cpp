@@ -26,7 +26,10 @@
 
 #include <libm2k/digital/m2kdigital.hpp>
 
+#include <qcoro/qcorofuture.h>
+
 #include <QLoggingCategory>
+#include <QtConcurrent/QtConcurrentRun>
 
 #include <cerrno>
 #include <memory>
@@ -74,6 +77,7 @@ M2kDigitalInputStream::M2kDigitalInputStream(void *resource, M2kDigital *digital
 
 M2kDigitalInputStream::~M2kDigitalInputStream()
 {
+	m_cancelFuture.waitForFinished();
 	if(!m_open || !m_digital) {
 		return;
 	}
@@ -96,6 +100,13 @@ Result<void> M2kDigitalInputStream::setKernelBuffers(unsigned n)
 
 QCoro::Task<CommandResponse<void>> M2kDigitalInputStream::openAsync(const component::StreamConfig &cfg)
 {
+	if(m_open) {
+		co_return CommandResponse<void>(QUuid(), Unexpected{Error{-EBUSY, QStringLiteral("already open")}});
+	}
+	co_await awaitCancel();
+	if(!m_digital) {
+		co_return CommandResponse<void>(QUuid(), Unexpected{Error{-ENODEV, QStringLiteral("stream detached")}});
+	}
 	if(m_open) {
 		co_return CommandResponse<void>(QUuid(), Unexpected{Error{-EBUSY, QStringLiteral("already open")}});
 	}
@@ -141,10 +152,11 @@ QCoro::Task<CommandResponse<void>> M2kDigitalInputStream::closeAsync()
 	m_open = false;
 	m_format = component::StreamFormat{};
 	m_cancelRequested = false;
-	try {
-		m_digital->cancelAcquisition();
-	} catch(const std::exception &e) {
-		qWarning(CAT_M2K_DIGITAL_STREAMS) << "cancelAcquisition failed:" << e.what();
+	startCancel();
+	co_await awaitCancel();
+	if(!m_digital) {
+		Q_EMIT openedChanged(false);
+		co_return CommandResponse<void>(QUuid());
 	}
 
 	M2kDigital *digital = m_digital;
@@ -161,6 +173,11 @@ QCoro::Task<CommandResponse<void>> M2kDigitalInputStream::refillAsync()
 {
 	if(!m_open) {
 		co_return CommandResponse<void>(QUuid(), Unexpected{Error{-EIO, QStringLiteral("stream not open")}});
+	}
+	co_await awaitCancel();
+	if(!m_open) {
+		co_return CommandResponse<void>(QUuid(),
+						Unexpected{Error{-ECANCELED, QStringLiteral("refill cancelled")}});
 	}
 
 	M2kDigital *digital = m_digital;
@@ -185,6 +202,7 @@ QCoro::Task<CommandResponse<void>> M2kDigitalInputStream::refillAsync()
 	const bool cancelled = m_cancelRequested || !m_open;
 	m_cancelRequested = false;
 	if(!result) {
+		m_stale = true;
 		if(cancelled) {
 			const Error error{-ECANCELED, QStringLiteral("refill cancelled")};
 			Q_EMIT refillFailed(error);
@@ -237,6 +255,9 @@ Result<void> M2kDigitalOutputStream::setCyclic(bool enable)
 
 QCoro::Task<CommandResponse<void>> M2kDigitalOutputStream::openAsync(const component::StreamConfig &cfg)
 {
+	if(!m_digital) {
+		co_return CommandResponse<void>(QUuid(), Unexpected{Error{-ENODEV, QStringLiteral("stream detached")}});
+	}
 	if(m_open) {
 		co_return CommandResponse<void>(QUuid(), Unexpected{Error{-EBUSY, QStringLiteral("already open")}});
 	}
@@ -338,11 +359,46 @@ void M2kDigitalInputStream::cancel()
 		return;
 	}
 	m_cancelRequested = true;
-	try {
-		m_digital->cancelAcquisition();
-	} catch(const std::exception &e) {
-		qWarning(CAT_M2K_DIGITAL_STREAMS) << "cancelAcquisition failed:" << e.what();
+	m_stale = true;
+	startCancel();
+}
+
+void M2kDigitalInputStream::startCancel()
+{
+	if(!m_digital || !m_cancelFuture.isFinished()) {
+		return;
 	}
+	M2kDigital *digital = m_digital;
+	m_cancelFuture = QtConcurrent::run([digital]() {
+		try {
+			digital->cancelAcquisition();
+		} catch(const std::exception &e) {
+			qWarning(CAT_M2K_DIGITAL_STREAMS) << "cancelAcquisition failed:" << e.what();
+		}
+	});
+}
+
+QCoro::Task<void> M2kDigitalInputStream::awaitCancel()
+{
+	QFuture<void> pending = m_cancelFuture;
+	if(!pending.isFinished()) {
+		co_await pending;
+	}
+}
+
+void M2kDigitalInputStream::detach()
+{
+	m_cancelFuture.waitForFinished();
+	if(m_open && m_digital) {
+		try {
+			m_digital->stopAcquisition();
+		} catch(const std::exception &e) {
+			qWarning(CAT_M2K_DIGITAL_STREAMS) << "stopAcquisition failed:" << e.what();
+		}
+	}
+	m_open = false;
+	m_format = component::StreamFormat{};
+	m_digital = nullptr;
 }
 
 void M2kDigitalInputStream::invalidate()
@@ -352,9 +408,23 @@ void M2kDigitalInputStream::invalidate()
 	}
 }
 
+void M2kDigitalOutputStream::detach()
+{
+	if(m_open && m_digital) {
+		try {
+			m_digital->stopBufferOut();
+		} catch(const std::exception &e) {
+			qWarning(CAT_M2K_DIGITAL_STREAMS) << "stopBufferOut failed:" << e.what();
+		}
+	}
+	m_open = false;
+	m_format = component::StreamFormat{};
+	m_digital = nullptr;
+}
+
 void M2kDigitalOutputStream::cancel()
 {
-	if(!m_open) {
+	if(!m_open || !m_digital) {
 		return;
 	}
 	m_cancelRequested = true;

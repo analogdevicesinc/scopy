@@ -65,6 +65,8 @@ private:
 	IIOWidgetGroup *m_widgetGroup = nullptr;
 	QPushButton *m_btnCalibrate = nullptr;
 	QMetaObject::Connection m_calibrateConn;
+	QMetaObject::Connection m_calibrationStartedConn;
+	QMetaObject::Connection m_calibrationFinishedConn;
 	component::ContextHandle m_context;
 };
 

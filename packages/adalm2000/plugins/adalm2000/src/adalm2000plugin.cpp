@@ -23,6 +23,9 @@
 #include "digitalio/adalm2000digitaliotool.h"
 #include "powersupply/adalm2000powersupplytool.h"
 #include "voltmeter/adalm2000voltmetertool.h"
+#ifdef ADALM2000_DEVTEST
+#include "devtest/adalm2000devtesttool.h"
+#endif
 #include "m2kcalibration.h"
 #include "m2kcontext.h"
 #include "m2kcontextfactory.h"
@@ -91,6 +94,11 @@ void Adalm2000Plugin::loadToolList()
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("adalm2000_dio", "Digital I/O",
 						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
 							  "/icons/tool_io.svg"));
+#ifdef ADALM2000_DEVTEST
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("adalm2000_devtest", "Dev Test (throwaway)",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_debugger.svg"));
+#endif
 }
 
 void Adalm2000Plugin::unload() {}
@@ -123,6 +131,11 @@ bool Adalm2000Plugin::onConnect()
 	auto *dioTool = new Adalm2000DigitalIoTool(m_toolList[2], m_context.get(), m_widgetGroup);
 	m_toolList[2]->setTool(dioTool);
 
+#ifdef ADALM2000_DEVTEST
+	auto *devTestTool = new Adalm2000DevTestTool(m_context.get());
+	m_toolList[3]->setTool(devTestTool);
+#endif
+
 	for(auto &entry : m_toolList) {
 		entry->setEnabled(true);
 	}
@@ -135,14 +148,14 @@ bool Adalm2000Plugin::onConnect()
 		return true;
 	}
 
-	connect(calibration, &M2kCalibration::started, this, [this]() {
+	m_calibrationStartedConn = connect(calibration, &M2kCalibration::started, this, [this]() {
 		setToolsRunLocked(true);
 		if(m_btnCalibrate) {
 			m_btnCalibrate->setEnabled(false);
 		}
 		StatusBarManager::pushMessage("ADALM2000: calibrating...");
 	});
-	connect(calibration, &M2kCalibration::finished, this, [this](bool ok) {
+	m_calibrationFinishedConn = connect(calibration, &M2kCalibration::finished, this, [this](bool ok) {
 		setToolsRunLocked(false);
 		if(m_btnCalibrate) {
 			m_btnCalibrate->setEnabled(true);
@@ -176,6 +189,8 @@ void Adalm2000Plugin::setToolsRunLocked(bool locked)
 bool Adalm2000Plugin::onDisconnect()
 {
 	disconnect(m_calibrateConn);
+	disconnect(m_calibrationStartedConn);
+	disconnect(m_calibrationFinishedConn);
 	if(m_btnCalibrate) {
 		m_btnCalibrate->setEnabled(false);
 	}
