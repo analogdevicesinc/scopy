@@ -376,6 +376,25 @@ Plugin *DeviceImpl::getPluginByName(const QString &pluginName)
 	return nullptr;
 }
 
+QList<ToolConfiguration> DeviceImpl::requestToolConfiguration(const QString &toolId, const QVariantMap &query)
+{
+	QList<ToolConfiguration> configs;
+	for(Plugin *p : std::as_const(m_plugins)) {
+		IToolConfigProvider *provider = qobject_cast<IToolConfigProvider *>(dynamic_cast<QObject *>(p));
+		if(!provider) {
+			continue;
+		}
+		QList<ToolConfiguration> answer = provider->toolConfiguration(toolId, query);
+		for(ToolConfiguration &config : answer) {
+			config.toolId = toolId;
+			config.provider = p->name();
+			configs.append(config);
+		}
+		qDebug(CAT_DEVICEIMPL) << p->name() << "configured" << answer.size() << "entries of" << toolId;
+	}
+	return configs;
+}
+
 QList<Plugin *> DeviceImpl::plugins() const { return m_plugins; }
 
 void DeviceImpl::showPage()

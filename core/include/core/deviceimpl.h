@@ -23,6 +23,7 @@
 #define DEVICEIMPL_H
 
 #include "device.h"
+#include "pluginbase/itoolconfigprovider.h"
 #include "pluginbase/plugin.h"
 #include "scopy-core_export.h"
 
@@ -65,6 +66,10 @@ public:
 	QList<Plugin *> plugins() const;
 	DeviceImpl::DeviceState_t state() override;
 	Plugin *getPluginByName(const QString &pluginName);
+
+	// Asks every plugin of this device that implements IToolConfigProvider for the configuration of a tool.
+	// Each answer is tagged with the name of the plugin that gave it.
+	QList<ToolConfiguration> requestToolConfiguration(const QString &toolId, const QVariantMap &query = {});
 
 	component::Context *context() const;
 

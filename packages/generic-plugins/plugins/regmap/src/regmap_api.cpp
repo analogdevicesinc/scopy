@@ -225,8 +225,12 @@ QString RegMap_API::readRegister(const QString &addr)
 QString RegMap_API::getValueOfRegister(const QString &addr)
 {
 	DeviceRegisterMap *devRegMap = getActiveDevRegMap();
-	if(!devRegMap || !devRegMap->registerMapValues) {
+	if(!devRegMap) {
 		qWarning(CAT_REGMAP_API) << "No active device register map";
+		return "";
+	}
+	if(!devRegMap->hasReadWrite()) {
+		qWarning(CAT_REGMAP_API) << "Device" << getDevice() << "has no read/write, no values";
 		return "";
 	}
 	uint32_t address = Utils::convertQStringToUint32(addr);

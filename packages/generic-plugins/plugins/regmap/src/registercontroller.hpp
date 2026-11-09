@@ -55,8 +55,6 @@ public:
 	void registerValueChanged(QString value);
 	QString getAddress();
 	void setHasMap(bool hasMap);
-	// false hides Read, Write and the value field; the address picker stays for navigation
-	void setReadWriteEnabled(bool enabled);
 	void startTutorial();
 	void startSimpleTutorial();
 

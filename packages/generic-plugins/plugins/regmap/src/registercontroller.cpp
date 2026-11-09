@@ -172,14 +172,6 @@ void RegisterController::setHasMap(bool hasMap)
 	}
 }
 
-void RegisterController::setReadWriteEnabled(bool enabled)
-{
-	readButton->setVisible(enabled);
-	writeButton->setVisible(enabled);
-	regValue->setVisible(enabled);
-	valueLabel->setVisible(enabled);
-}
-
 void RegisterController::applyStyle()
 {
 	setFixedHeight(72);

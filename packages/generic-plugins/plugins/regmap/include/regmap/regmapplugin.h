@@ -94,6 +94,9 @@ private:
 	RegMap_API *m_api = nullptr;
 
 	ToolConfiguration defaultEntry(const QString &devName, const QFileInfoList &xmlFiles);
+	QList<ToolConfiguration> mergeConfigurations(const QList<ToolConfiguration> &defaults,
+						     const QList<ToolConfiguration> &provided);
+	int providerPriority(const QString &provider);
 	bool applyConfiguration(const ToolConfiguration &config);
 	// Maps the "access" property to strategies. "none" gives two null strategies.
 	bool createStrategies(const ToolConfiguration &config, IRegisterReadStrategy *&read,

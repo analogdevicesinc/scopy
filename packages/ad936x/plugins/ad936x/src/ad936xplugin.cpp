@@ -35,6 +35,7 @@
 #include <component/controller.h>
 #include <component/context.h>
 #include <component/device.h>
+#include <pkg-manager/pkgmanager.h>
 
 #include "ad936x/ad936x.h"
 #include "ad936x/ad963xadvanced.h"
@@ -43,6 +44,7 @@
 #include <fmcomms5/fmcomms5advanced.h>
 
 Q_LOGGING_CATEGORY(CAT_AD936XPLUGIN, "Ad936xPlugin")
+using namespace scopy;
 using namespace scopy::ad936x;
 
 bool Ad936xPlugin::compatible(QString m_param, QString category)
@@ -188,6 +190,61 @@ bool Ad936xPlugin::onDisconnect()
 
 	m_context = {};
 	return true;
+}
+
+namespace {
+// Names of the regmap configuration keys; the reference list is regmap/regmapconfigkeys.h.
+// They are repeated here so AD936X doesn't depend on the regmap package.
+const QString REGMAP_TOOL_ID = "regmap";
+const QString KEY_TEMPLATE = "template";
+const QString KEY_ACCESS = "access";
+const QString ACCESS_DEFAULT = "default";
+
+QString findPackageFile(const QString &dir, const QString &fileName)
+{
+	const QFileInfoList files = PkgManager::listFilesInfo({dir}, {fileName});
+	if(files.isEmpty()) {
+		qWarning(CAT_AD936XPLUGIN) << "File" << fileName << "not found in" << dir;
+		return "";
+	}
+	return files.first().absoluteFilePath();
+}
+
+ToolConfiguration regmapEntry(const QString &target, const QVariantMap &properties)
+{
+	ToolConfiguration config;
+	config.toolId = REGMAP_TOOL_ID;
+	config.target = target;
+	config.properties = properties;
+	return config;
+}
+} // namespace
+
+QList<ToolConfiguration> Ad936xPlugin::toolConfiguration(const QString &toolId, const QVariantMap &query)
+{
+	Q_UNUSED(query)
+	if(toolId != REGMAP_TOOL_ID) {
+		return {};
+	}
+	return iioRegmapConfiguration();
+}
+
+QList<ToolConfiguration> Ad936xPlugin::iioRegmapConfiguration()
+{
+	// ad9361-phy (and ad9361-phy-B on FMCOMMS5): the shipped template, default IIO read/write
+	QList<ToolConfiguration> configs;
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx) {
+		return configs;
+	}
+	const QString templatePath = findPackageFile("regmap-xml", "ad9361-phy.xml");
+	for(component::Device *dev : ctx->findChildren<component::Device *>(Qt::FindDirectChildrenOnly)) {
+		if(dev->name().startsWith("ad9361-phy")) {
+			configs.append(
+				regmapEntry(dev->name(), {{KEY_TEMPLATE, templatePath}, {KEY_ACCESS, ACCESS_DEFAULT}}));
+		}
+	}
+	return configs;
 }
 
 void Ad936xPlugin::initApi()

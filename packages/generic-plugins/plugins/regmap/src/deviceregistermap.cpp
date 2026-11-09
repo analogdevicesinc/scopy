@@ -86,8 +86,6 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 
 	registerController = new RegisterController(this);
 	Style::setStyle(registerController, style::properties::regmap::registercontroller, true, true);
-	// template only: no read/write controls
-	registerController->setReadWriteEnabled(registerMapValues != nullptr);
 
 	QWidget *controllerWidget = new QWidget(this);
 	QHBoxLayout *controllerLayout = new QHBoxLayout(controllerWidget);
@@ -192,6 +190,11 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 	}
 
 	tool->addWidgetToCentralContainerHelper(controllerWidget);
+	if(!registerMapValues) {
+		// template only: the whole read/write section (address, read, value, write) is hidden.
+		// Its bitfield details toggle goes with it; the details stay open, as they are by default.
+		controllerWidget->hide();
+	}
 	controllerLayout->addWidget(registerController);
 
 	initSimpleTutorial();

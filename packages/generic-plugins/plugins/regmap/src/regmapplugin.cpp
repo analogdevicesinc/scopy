@@ -60,6 +60,8 @@
 
 #include "jsonformatedelement.hpp"
 #include "regmapconfigkeys.h"
+#include <core/deviceimpl.h>
+#include <readwrite/csvregisterstrategy.hpp>
 #include "scopy-regmap_config.h"
 #include "utils.hpp"
 #include "utils.hpp"
@@ -74,10 +76,14 @@ using namespace regmap;
 
 bool RegmapPlugin::loadPage()
 {
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx) {
+		// no IIO context, so no device info to show
+		return false;
+	}
+
 	m_page = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(m_page);
-
-	component::ContextHandle ctx = component::Controller::context(m_param);
 	auto deviceInfoPage = new DeviceInfoPage(ctx.get());
 	lay->addWidget(deviceInfoPage);
 	lay->addItem(new QSpacerItem(0, 0, QSizePolicy::Preferred, QSizePolicy::Expanding));
@@ -185,8 +191,14 @@ bool RegmapPlugin::onConnect()
 	registerMapTool = new RegisterMapTool();
 	layout->addWidget(registerMapTool);
 
+	Utils::applyJsonConfig();
+	QList<ToolConfiguration> provided;
+	if(m_device) {
+		provided = m_device->requestToolConfiguration(configkeys::TOOL_ID);
+	}
+	const QList<ToolConfiguration> configs = mergeConfigurations(defaultConfiguration(), provided);
+
 	clearToolConfiguration();
-	const QList<ToolConfiguration> configs = defaultConfiguration();
 	for(const ToolConfiguration &config : configs) {
 		applyConfiguration(config);
 	}
@@ -246,7 +258,7 @@ QList<ToolConfiguration> RegmapPlugin::defaultConfiguration()
 		return configs;
 	}
 
-	Utils::applyJsonConfig();
+	// the regmap-config.json lookup needs Utils::applyJsonConfig(), done in onConnect
 	const QFileInfoList xmlFiles = Utils::setXmlPath();
 	const QList<component::iio::IIODevice *> devices =
 		ctx->findChildren<component::iio::IIODevice *>(Qt::FindDirectChildrenOnly);
@@ -326,6 +338,56 @@ void RegmapPlugin::clearToolConfiguration(const QString &device)
 	}
 }
 
+int RegmapPlugin::providerPriority(const QString &provider)
+{
+	Plugin *p = m_device ? m_device->getPluginByName(provider) : nullptr;
+	return p ? p->metadata().value("priority").toInt() : 0;
+}
+
+QList<ToolConfiguration> RegmapPlugin::mergeConfigurations(const QList<ToolConfiguration> &defaults,
+							   const QList<ToolConfiguration> &provided)
+{
+	// A provider entry replaces the default for its device only, a device only a provider knows is added,
+	// and between two providers the higher priority wins.
+	QList<ToolConfiguration> merged = defaults;
+	QMap<QString, int> providerPrio; // target -> priority of the provider that configured it
+	const QFileInfoList xmlFiles = Utils::setXmlPath();
+
+	for(ToolConfiguration config : provided) {
+		if(config.toolId != configkeys::TOOL_ID || config.target.isEmpty()) {
+			continue;
+		}
+		// bitsPerRow and addressSpace are optional, regmap-config.json gives them as today
+		const ToolConfiguration jsonDefaults = defaultEntry(config.target, xmlFiles);
+		for(const QString &key : {configkeys::BITS_PER_ROW, configkeys::ADDRESS_SPACE}) {
+			if(!config.properties.contains(key) && jsonDefaults.properties.contains(key)) {
+				config.properties.insert(key, jsonDefaults.properties.value(key));
+			}
+		}
+
+		const int prio = providerPriority(config.provider);
+		int idx = -1;
+		for(int i = 0; i < merged.size(); i++) {
+			if(merged[i].target == config.target) {
+				idx = i;
+				break;
+			}
+		}
+
+		if(idx < 0) {
+			merged.append(config);
+			providerPrio.insert(config.target, prio);
+		} else if(!providerPrio.contains(config.target) || prio > providerPrio.value(config.target)) {
+			merged[idx] = config;
+			providerPrio.insert(config.target, prio);
+		} else {
+			qInfo(CAT_REGMAP) << "Ignoring" << config.provider << "for" << config.target << ":"
+					  << merged[idx].provider << "has a higher priority";
+		}
+	}
+	return merged;
+}
+
 bool RegmapPlugin::applyConfiguration(const ToolConfiguration &config)
 {
 	for(const QString &key : config.properties.keys()) {
@@ -360,7 +422,18 @@ bool RegmapPlugin::createStrategies(const ToolConfiguration &config, IRegisterRe
 	if(access == configkeys::ACCESS_NONE) {
 		return true;
 	}
-	// TODO: "file" (CSV) access comes with the simulated EEPROM device
+	if(access == configkeys::ACCESS_FILE) {
+		const QString path = config.properties.value(configkeys::FILE_PATH).toString();
+		if(path.isEmpty() || !QFileInfo::exists(path)) {
+			qWarning(CAT_REGMAP)
+				<< "Register values file" << path << "not found for device" << config.target;
+			return false;
+		}
+		QSharedPointer<CsvRegisterFile> file(new CsvRegisterFile(path));
+		read = new CsvRegisterReadStrategy(file);
+		write = new CsvRegisterWriteStrategy(file);
+		return true;
+	}
 	qWarning(CAT_REGMAP) << "Unsupported access" << access << "for device" << config.target;
 	return false;
 }
