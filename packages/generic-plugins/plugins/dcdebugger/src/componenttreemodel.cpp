@@ -26,7 +26,6 @@
 #include <component/attribute.h>
 #include <component/attributereader.h>
 #include <component/connection.h>
-#include <component/donglemanager.h>
 #include <component/scanelement.h>
 #include <component/stream.h>
 
@@ -152,9 +151,6 @@ void ComponentTreeModel::watch(QObject *obj, NodeKind kind, QStandardItem *value
 		break;
 	case NodeKind::ScanElement:
 		connect(static_cast<ScanElement *>(obj), &ScanElement::enabledChanged, m_watchers, refresh);
-		break;
-	case NodeKind::DongleManager:
-		connect(static_cast<DongleManager *>(obj), &DongleManager::profileChanged, m_watchers, refresh);
 		break;
 	case NodeKind::Channel:
 		if(Attribute *dir = ComponentNode::directionAttribute(obj)) {

@@ -49,10 +49,7 @@ enum class NodeKind
 	Triggerable,
 	RegisterReader,
 	RegisterWriter,
-	BusTransfer,
-	DongleManager,
 	Ping,
-	SequenceRunner,
 	Other, // a component leaf with no generic base (shown by class name)
 	Hidden // plumbing (readers/writers of an attribute, codecs, executors): not shown
 };

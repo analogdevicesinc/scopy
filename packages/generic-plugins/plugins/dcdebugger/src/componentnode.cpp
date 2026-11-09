@@ -24,12 +24,10 @@
 #include <component/attribute.h>
 #include <component/attributereader.h>
 #include <component/attributewriter.h>
-#include <component/bustransfer.h>
 #include <component/channel.h>
 #include <component/connection.h>
 #include <component/context.h>
 #include <component/device.h>
-#include <component/donglemanager.h>
 #include <component/inputstream.h>
 #include <component/outputstream.h>
 #include <component/ping.h>
@@ -102,18 +100,8 @@ NodeKind ComponentNode::kindOf(const QObject *obj)
 	if(qobject_cast<const RegisterWriter *>(obj)) {
 		return NodeKind::RegisterWriter;
 	}
-	if(qobject_cast<const BusTransfer *>(obj)) {
-		return NodeKind::BusTransfer;
-	}
-	if(qobject_cast<const DongleManager *>(obj)) {
-		return NodeKind::DongleManager;
-	}
 	if(qobject_cast<const Ping *>(obj)) {
 		return NodeKind::Ping;
-	}
-	// Lives in the sequence lib; identified by name so the plugin does not link it.
-	if(obj->inherits("scopy::sequence::SequenceRunner")) {
-		return NodeKind::SequenceRunner;
 	}
 	if(qobject_cast<const AttributeReader *>(obj) || qobject_cast<const AttributeWriter *>(obj) ||
 	   qobject_cast<const SampleCodec *>(obj) || obj->inherits("scopy::PooledCmdExecutor") ||
@@ -152,14 +140,8 @@ QString ComponentNode::kindName(NodeKind kind)
 		return QStringLiteral("RegisterReader");
 	case NodeKind::RegisterWriter:
 		return QStringLiteral("RegisterWriter");
-	case NodeKind::BusTransfer:
-		return QStringLiteral("BusTransfer");
-	case NodeKind::DongleManager:
-		return QStringLiteral("DongleManager");
 	case NodeKind::Ping:
 		return QStringLiteral("Ping");
-	case NodeKind::SequenceRunner:
-		return QStringLiteral("SequenceRunner");
 	case NodeKind::Other:
 		return QStringLiteral("Component");
 	case NodeKind::Hidden:
@@ -188,10 +170,7 @@ QString ComponentNode::groupOf(const QObject *obj, NodeKind kind)
 	case NodeKind::Triggerable:
 	case NodeKind::RegisterReader:
 	case NodeKind::RegisterWriter:
-	case NodeKind::BusTransfer:
-	case NodeKind::DongleManager:
 	case NodeKind::Ping:
-	case NodeKind::SequenceRunner:
 		return GROUP_CAPABILITIES;
 	case NodeKind::Other:
 		// Same-class leaves with no generic base are grouped by their class.
@@ -281,10 +260,6 @@ QString ComponentNode::value(const QObject *obj, NodeKind kind)
 	case NodeKind::ScanElement:
 		return static_cast<const ScanElement *>(obj)->isEnabled() ? QStringLiteral("enabled")
 									  : QStringLiteral("disabled");
-	case NodeKind::BusTransfer:
-		return static_cast<const BusTransfer *>(obj)->busType();
-	case NodeKind::DongleManager:
-		return static_cast<const DongleManager *>(obj)->activeProfile();
 	default:
 		break;
 	}
