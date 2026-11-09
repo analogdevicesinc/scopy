@@ -85,6 +85,9 @@ Result<void> M2kOutputStream::setKernelBuffers(unsigned n)
 
 QCoro::Task<CommandResponse<void>> M2kOutputStream::openAsync(const component::StreamConfig &cfg)
 {
+	if(!m_aout) {
+		co_return CommandResponse<void>(QUuid(), Unexpected{Error{-ENODEV, QStringLiteral("stream detached")}});
+	}
 	if(m_open) {
 		co_return CommandResponse<void>(QUuid(), Unexpected{Error{-EBUSY, QStringLiteral("already open")}});
 	}
@@ -283,9 +286,23 @@ QCoro::Task<CommandResponse<void>> M2kOutputStream::finishPush(M2kCallCommand<vo
 	co_return result;
 }
 
+void M2kOutputStream::detach()
+{
+	if(m_open && m_aout) {
+		try {
+			m_aout->stop();
+		} catch(const std::exception &e) {
+			qWarning(CAT_M2K_OUTPUT_STREAM) << "stop failed:" << e.what();
+		}
+	}
+	m_open = false;
+	m_format = component::StreamFormat{};
+	m_aout = nullptr;
+}
+
 void M2kOutputStream::cancel()
 {
-	if(!m_open) {
+	if(!m_open || !m_aout) {
 		return;
 	}
 	m_cancelRequested = true;

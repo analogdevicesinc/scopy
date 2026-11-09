@@ -20,6 +20,8 @@
 
 #include "m2kcallcommand.h"
 
+#include <libm2k/m2kexceptions.hpp>
+
 #include <QTest>
 #include <stdexcept>
 #include <string>
@@ -37,6 +39,9 @@ private Q_SLOTS:
 	void throwingCallableDoesNotPropagate();
 	void errorMessageIsOurs();
 	void cancelledCommandDoesNotRun();
+	void timeoutTypeMapsToEtimedout();
+	void timeoutIioCodeMapsToEtimedout();
+	void otherM2kExceptionMapsToEio();
 };
 
 void TST_M2kCallCommand::successStoresValue()
@@ -94,6 +99,40 @@ void TST_M2kCallCommand::cancelledCommandDoesNotRun()
 	cmd.execute();
 	QVERIFY(!ran);
 	QVERIFY(!bool(cmd.result()));
+}
+
+void TST_M2kCallCommand::timeoutTypeMapsToEtimedout()
+{
+	M2kCallCommand<void> cmd(nullptr, []() {
+		throw libm2k::m2k_exception::make("Buffer: Refill timeout occurred").type(libm2k::EXC_TIMEOUT).build();
+	});
+	cmd.execute();
+	QCOMPARE(cmd.result().error().code, -ETIMEDOUT);
+	QVERIFY(cmd.result().error().message.startsWith("libm2k call failed"));
+}
+
+void TST_M2kCallCommand::timeoutIioCodeMapsToEtimedout()
+{
+	M2kCallCommand<void> cmd(nullptr, []() {
+		throw libm2k::m2k_exception::make("Buffer: Cannot dequeue RX block")
+			.type(libm2k::EXC_RUNTIME_ERROR)
+			.iioCode(-ETIMEDOUT)
+			.build();
+	});
+	cmd.execute();
+	QCOMPARE(cmd.result().error().code, -ETIMEDOUT);
+}
+
+void TST_M2kCallCommand::otherM2kExceptionMapsToEio()
+{
+	M2kCallCommand<void> cmd(nullptr, []() {
+		throw libm2k::m2k_exception::make("Buffer: Cannot dequeue RX block")
+			.type(libm2k::EXC_RUNTIME_ERROR)
+			.iioCode(-ECANCELED)
+			.build();
+	});
+	cmd.execute();
+	QCOMPARE(cmd.result().error().code, -EIO);
 }
 
 QTEST_MAIN(TST_M2kCallCommand)

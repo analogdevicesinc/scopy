@@ -25,6 +25,7 @@
 #include "component/inputstream.h"
 #include "component/outputstream.h"
 
+#include <QFuture>
 #include <QVector>
 
 #include <cstdint>
@@ -61,16 +62,21 @@ public:
 
 	void cancel();
 	void invalidate();
+	void detach();
 
 	const component::StreamFormat &readFormat() const override { return m_format; }
 
 private:
+	void startCancel();
+	QCoro::Task<void> awaitCancel();
+
 	void *m_resource;
 	libm2k::digital::M2kDigital *m_digital;
 	scopy::ICmdExecutor *m_executor;
 	unsigned m_kernelBuffers = 4;
 	bool m_cancelRequested = false;
 	bool m_stale = false;
+	QFuture<void> m_cancelFuture;
 	component::StreamFormat m_format;
 };
 
@@ -98,6 +104,7 @@ public:
 	QCoro::Task<CommandResponse<void>> pushAsync() override;
 
 	void cancel();
+	void detach();
 
 	component::StreamFormat &writeFormat() override { return m_format; }
 
