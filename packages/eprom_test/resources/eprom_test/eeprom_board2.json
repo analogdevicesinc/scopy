@@ -1,0 +1,11 @@
+{
+    "board": "board 2",
+    "regmap": [
+        {
+            "target": "eprom4",
+            "template": "eprom4_regmap.xml",
+            "access": "file",
+            "file": "eprom4.csv"
+        }
+    ]
+}

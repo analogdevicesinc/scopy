@@ -86,8 +86,14 @@ public:
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
+	// configkeys::CONFIGURE_TOPIC for this device: pull the configuration again
+	void messageCallback(QString topic, QString message) override;
 
 private:
+	// Asks the providers, merges with the defaults, then rebuilds every register map
+	void reconfigure();
+	bool isDongle() const;
+
 	QWidget *m_registerMapWidget = nullptr;
 	RegisterMapTool *registerMapTool = nullptr;
 	void initApi();

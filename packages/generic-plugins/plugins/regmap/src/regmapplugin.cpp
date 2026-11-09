@@ -47,6 +47,7 @@
 #include <component/backends/iio/iiodevice.h>
 #include <component/backends/iio/iioregisterreader.h>
 #include <component/backends/iio/iioregisterwriter.h>
+#include <pluginbase/messagebroker.h>
 #include <pluginbase/preferences.h>
 #include <gui/preferenceshelper.h>
 #include <core/deviceinfopage.h>
@@ -61,6 +62,7 @@
 #include "jsonformatedelement.hpp"
 #include "regmapconfigkeys.h"
 #include <core/deviceimpl.h>
+#include <core/dongledevicemanager.h>
 #include <readwrite/csvregisterstrategy.hpp>
 #include "scopy-regmap_config.h"
 #include "utils.hpp"
@@ -125,6 +127,12 @@ void RegmapPlugin::unload()
 
 bool RegmapPlugin::compatible(QString m_param, QString category)
 {
+	// Claimed statically: the device plugins that configure regmap aren't visible yet here.
+	// On a dongle device regmap starts as an empty tool, filled when a provider asks (CONFIGURE_TOPIC).
+	if(category == DongleDeviceManager::CATEGORY) {
+		return true;
+	}
+
 	component::ContextHandle ctx = component::Controller::context(m_param);
 	if(!ctx) {
 		return false;
@@ -191,23 +199,17 @@ bool RegmapPlugin::onConnect()
 	registerMapTool = new RegisterMapTool();
 	layout->addWidget(registerMapTool);
 
-	Utils::applyJsonConfig();
-	QList<ToolConfiguration> provided;
-	if(m_device) {
-		provided = m_device->requestToolConfiguration(configkeys::TOOL_ID);
-	}
-	const QList<ToolConfiguration> configs = mergeConfigurations(defaultConfiguration(), provided);
+	reconfigure();
 
-	clearToolConfiguration();
-	for(const ToolConfiguration &config : configs) {
-		applyConfiguration(config);
-	}
-
-	if(registerMapTool->deviceCount() == 0) {
+	// a dongle device starts as an empty tool, its EEPROM configuration plugin fills it on request
+	if(registerMapTool->deviceCount() == 0 && !isDongle()) {
 		delete m_registerMapWidget;
 		m_registerMapWidget = nullptr;
 		registerMapTool = nullptr;
 		return false;
+	}
+	if(isDongle()) {
+		MessageBroker::GetInstance()->subscribe(this, configkeys::CONFIGURE_TOPIC);
 	}
 
 	m_toolList[0]->setEnabled(true);
@@ -226,6 +228,7 @@ bool RegmapPlugin::onConnect()
 
 bool RegmapPlugin::onDisconnect()
 {
+	MessageBroker::GetInstance()->unsubscribe(this, configkeys::CONFIGURE_TOPIC);
 	if(m_api) {
 		ScopyJS::GetInstance()->unregisterApi(m_api);
 		delete m_api;
@@ -249,6 +252,32 @@ bool RegmapPlugin::onDisconnect()
 
 	return true;
 }
+
+void RegmapPlugin::messageCallback(QString topic, QString message)
+{
+	if(topic != configkeys::CONFIGURE_TOPIC || message != m_param || !registerMapTool) {
+		return;
+	}
+	qInfo(CAT_REGMAP) << "Configuration requested for" << m_param;
+	reconfigure();
+}
+
+void RegmapPlugin::reconfigure()
+{
+	Utils::applyJsonConfig();
+	QList<ToolConfiguration> provided;
+	if(m_device) {
+		provided = m_device->requestToolConfiguration(configkeys::TOOL_ID);
+	}
+	const QList<ToolConfiguration> configs = mergeConfigurations(defaultConfiguration(), provided);
+
+	clearToolConfiguration();
+	for(const ToolConfiguration &config : configs) {
+		applyConfiguration(config);
+	}
+}
+
+bool RegmapPlugin::isDongle() const { return m_category == DongleDeviceManager::CATEGORY; }
 
 QList<ToolConfiguration> RegmapPlugin::defaultConfiguration()
 {
@@ -523,7 +552,8 @@ void RegmapPlugin::initMetadata()
 	{
 	   "priority":3,
 	   "category":[
-	      "iio"
+	      "iio",
+	      "dongle"
        ]
 	}
 )plugin");

@@ -29,7 +29,7 @@ inline const QString TOOL_ID = "regmap";
 
 inline const QString TEMPLATE = "template";	     // register XML path, empty for no template
 inline const QString ACCESS = "access";		     // one of the ACCESS_* values below
-inline const QString FILE_PATH = "file";		     // CSV path when access is "file"
+inline const QString FILE_PATH = "file";	     // CSV path when access is "file"
 inline const QString BITS_PER_ROW = "bitsPerRow";    // optional, default from regmap-config.json
 inline const QString ADDRESS_SPACE = "addressSpace"; // optional, default from regmap-config.json
 
@@ -38,6 +38,9 @@ inline const QString ACCESS_FILE = "file";	 // CSV read/write
 inline const QString ACCESS_NONE = "none";	 // template only
 
 inline const QStringList ALL = {TEMPLATE, ACCESS, FILE_PATH, BITS_PER_ROW, ADDRESS_SPACE};
+
+// MessageBroker topic: a provider asks regmap to pull its configuration again. The message is the device param.
+inline const QString CONFIGURE_TOPIC = "regmap/configure";
 } // namespace scopy::regmap::configkeys
 
 #endif // REGMAPCONFIGKEYS_H

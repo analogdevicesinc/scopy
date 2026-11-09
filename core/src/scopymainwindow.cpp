@@ -42,6 +42,7 @@
 #include "qmessagebox.h"
 #include "scopymainwindow.h"
 #include "animationmanager.h"
+#include "dongledevicemanager.h"
 
 #include "scanbuttoncontroller.h"
 #include "ui_scopymainwindow.h"
@@ -224,6 +225,11 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(dm, &DeviceManager::connectedDevices, prefPage, &ScopyPreferencesPage::updateSessionDevices);
 
 	initApi();
+
+	// regmap POC: the simulated dongleDevice on Home, only when the eprom_test package is installed
+	DongleDeviceManager *dongleDeviceManager = new DongleDeviceManager(dm, this);
+	dongleDeviceManager->addSimulatedDevices();
+
 #ifdef SCOPY_DEV_MODE
 	// this is an example of how autoconnect is done
 

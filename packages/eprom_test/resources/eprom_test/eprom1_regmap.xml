@@ -1,0 +1,113 @@
+<!-- Register map POC: template of eprom1 on the EEPROM test device. 5 registers, values in eprom1.csv -->
+<eprom_poc_ad9361>
+	<Register>
+		<Name>SPI_CONFIG</Name>
+		<Address>0x000</Address>
+		<Description>POC register 1</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>SPI_CONFIG[7:0]</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>POC register 1 value</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>MCS_CONTROL</Name>
+		<Address>0x001</Address>
+		<Description>POC register 2</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>MCS_CONTROL[7:0]</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>POC register 2 value</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>TX_ENABLE</Name>
+		<Address>0x002</Address>
+		<Description>POC register 3</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>TX_ENABLE[7:0]</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>POC register 3 value</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>RX_ENABLE</Name>
+		<Address>0x003</Address>
+		<Description>POC register 4</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>RX_ENABLE[7:0]</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>POC register 4 value</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>POC_REG</Name>
+		<Address>0x004</Address>
+		<Description>POC register 5, only in the simulated EEPROM template</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>POC_REG[7:0]</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>POC register 5 value</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+</eprom_poc_ad9361>

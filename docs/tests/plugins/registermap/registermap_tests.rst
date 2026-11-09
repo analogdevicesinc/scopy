@@ -1665,3 +1665,688 @@ Test 29 : Custom XML file
 
 
 
+
+
+Tests with the simulated dongleDevice
+-------------------------------------
+
+These tests use the simulated dongleDevice of the register map tool configuration POC. It needs the
+``eprom_test`` package (build option ``-DENABLE_PACKAGE_EPROM_TEST=ON``). The device has no IIO context.
+Its Register Map starts empty. The **EEPROM configuration** tool (``EpromTestPlugin``) reads the EEPROM of
+the board behind the dongle on **Sync** and configures three register map devices on **Configure**:
+``eprom1``, ``eprom2`` and ``eprom3``, one per mode. All read/write goes to the CSV files of the package.
+
+.. _regmap_dongle_setup:
+
+**Dongle.Sim:**
+    - Install Scopy with the ``eprom_test`` package
+    - Open Scopy
+    - The simulated dongleDevice (``dongle:sim0``) is already on the Home page
+    - Connect to it
+
+.. _regmap_eeprom_sim_setup:
+
+**Eeprom.Sim:**
+    - :ref:`Dongle.Sim <regmap_dongle_setup>`
+    - Open **EEPROM configuration**, press **Sync**, then **Configure**
+    - Open the Register Map plugin
+
+.. _TST_REGMAP_EEPROM_SIM_DEVICE:
+
+Test 30 : Simulated EEPROM device
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**UID:** TST.REGMAP.EEPROM_SIM_DEVICE
+
+**RBP:** P1
+
+**Description:** Verify that after Configure the register map of the dongleDevice shows the three
+configured devices.
+
+**OS:** ANY
+
+**Precondition:**
+    - :ref:`Eeprom.Sim <regmap_eeprom_sim_setup>`
+
+**Steps:**
+    1. Look at the Home page
+        - **Expected result:** A device named ``dongleDevice`` with the URI ``dongle:sim0`` is on the Home page
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    2. Look at the tool list of the connected device
+        - **Expected result:** The tools are EEPROM configuration and Register Map
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    3. Open Register Map and open the device list
+        - **Expected result:** The list holds ``eprom1``, ``eprom2`` and ``eprom3``
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
+.. _TST_REGMAP_EEPROM_CSV_READ:
+
+Test 31 : Read from the CSV file
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**UID:** TST.REGMAP.EEPROM_CSV_READ
+
+**RBP:** P1
+
+**Description:** Verify that a read on ``eprom1`` returns the value from ``eprom1.csv``.
+
+**OS:** ANY
+
+**Precondition:**
+    - :ref:`Eeprom.Sim <regmap_eeprom_sim_setup>`
+
+**Steps:**
+    1. Select device ``eprom1``
+    2. Select register ``POC_REG`` (``0x004``) and press Read
+        - **Expected result:** The value is ``0x9e``
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
+.. _TST_REGMAP_EEPROM_CSV_WRITE:
+
+Test 32 : Write to the CSV file
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**UID:** TST.REGMAP.EEPROM_CSV_WRITE
+
+**RBP:** P1
+
+**Description:** Verify that a write on ``eprom1`` changes the CSV file and the read-back shows the new
+value.
+
+**OS:** ANY
+
+**Precondition:**
+    - :ref:`Eeprom.Sim <regmap_eeprom_sim_setup>`
+
+**Steps:**
+    1. Select device ``eprom1``
+    2. Write ``0x33`` to register ``0x001``
+        - **Expected result:** The value shows ``0x33`` and the line in ``eprom1.csv`` becomes
+          ``0x001,0x33``
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    3. Write ``0x6b`` (the original value) to register ``0x001``
+        - **Expected result:** The value shows ``0x6b``
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
+.. _TST_REGMAP_EEPROM_TEMPLATE_ONLY:
+
+Test 33 : Template only device
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**UID:** TST.REGMAP.EEPROM_TEMPLATE_ONLY
+
+**RBP:** P2
+
+**Description:** Verify that a device with a template and no read/write shows the register table without
+any read/write control.
+
+**OS:** ANY
+
+**Precondition:**
+    - :ref:`Eeprom.Sim <regmap_eeprom_sim_setup>`
+
+**Steps:**
+    1. Select device ``eprom2``
+        - **Expected result:** The POC register table is shown: 5 registers, the 5th (``0x004``) is ``POC_REG``
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    2. Look under the table and at the top right
+        - **Expected result:** There is no read/write section (no address, Read, value or Write) and no
+          settings button. The bitfield details are shown under the table
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    3. Search for ``0x0`` and click a few registers and bitfields
+        - **Expected result:** The search filters the table, the details update and nothing crashes
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
+.. _TST_REGMAP_EEPROM_READ_WRITE_ONLY:
+
+Test 34 : Read/write only device
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**UID:** TST.REGMAP.EEPROM_READ_WRITE_ONLY
+
+**RBP:** P2
+
+**Description:** Verify that a device with read/write and no template reads and writes its own CSV file.
+
+**OS:** ANY
+
+**Precondition:**
+    - :ref:`Eeprom.Sim <regmap_eeprom_sim_setup>`
+
+**Steps:**
+    1. Select device ``eprom3``
+        - **Expected result:** There is no register table and no search bar, only the address, Read and Write
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    2. Read address ``0x0``
+        - **Expected result:** The value is ``0x90062``
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    3. Write ``0x12`` to address ``0x4``, then write ``0x0`` back
+        - **Expected result:** The value shows ``0x12``, then ``0x0``
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
+.. _TST_REGMAP_EEPROM_MISSING_ADDRESS:
+
+Test 35 : Address missing from the CSV file
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**UID:** TST.REGMAP.EEPROM_MISSING_ADDRESS
+
+**RBP:** P2
+
+**Description:** Verify that reading an address that is not in the CSV file shows an error.
+
+**OS:** ANY
+
+**Precondition:**
+    - :ref:`Eeprom.Sim <regmap_eeprom_sim_setup>`
+
+**Steps:**
+    1. Select device ``eprom1``
+    2. Type ``0x8`` in the address field and press Read (``0x008`` is not in the template)
+        - **Expected result:** The status bar shows
+          ``Register map eprom1: no value for address 0x8 in the register values file``
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
+.. _TST_REGMAP_DONGLE_EMPTY_TOOL:
+
+Test 36 : Empty register map before Configure
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**UID:** TST.REGMAP.DONGLE_EMPTY_TOOL
+
+**RBP:** P1
+
+**Description:** Verify that after connecting the dongleDevice the register map is an empty tool.
+
+**OS:** ANY
+
+**Precondition:**
+    - :ref:`Dongle.Sim <regmap_dongle_setup>`
+
+**Steps:**
+    1. Open Register Map
+        - **Expected result:** The device list is empty. There is no register table, no search bar, no
+          read/write section and no settings button
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    2. Open the info button and press the tutorial button
+        - **Expected result:** Nothing happens and Scopy doesn't crash
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
+.. _TST_REGMAP_DONGLE_SYNC:
+
+Test 37 : Sync the board EEPROM
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**UID:** TST.REGMAP.DONGLE_SYNC
+
+**RBP:** P1
+
+**Description:** Verify that Sync reads the board EEPROM and shows the configuration structure, without
+configuring the register map.
+
+**OS:** ANY
+
+**Precondition:**
+    - :ref:`Dongle.Sim <regmap_dongle_setup>`
+
+**Steps:**
+    1. Open EEPROM configuration
+        - **Expected result:** The structure box is empty and Configure is disabled
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    2. Press Sync
+        - **Expected result:** The box shows a ``regmap`` list with ``eprom1``, ``eprom2`` and ``eprom3``,
+          their template, access and file. The status says 3 devices were synced and Configure is enabled
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    3. Try to type in the structure box
+        - **Expected result:** The box is read-only
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    4. Open Register Map
+        - **Expected result:** The device list is still empty
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
+.. _TST_REGMAP_DONGLE_CONFIGURE:
+
+Test 38 : Configure the register map
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**UID:** TST.REGMAP.DONGLE_CONFIGURE
+
+**RBP:** P1
+
+**Description:** Verify that Configure fills the register map with the synced devices, and that a new
+connection starts empty again.
+
+**OS:** ANY
+
+**Precondition:**
+    - :ref:`Dongle.Sim <regmap_dongle_setup>`
+
+**Steps:**
+    1. Open EEPROM configuration, press Sync, then Configure
+        - **Expected result:** The status says 3 devices were configured
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    2. Open Register Map and open the device list
+        - **Expected result:** The list holds ``eprom1``, ``eprom2`` and ``eprom3``
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    3. Disconnect, connect again and open Register Map
+        - **Expected result:** The device list is empty again
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
+.. _TST_REGMAP_DONGLE_SWITCH_DEVICE:
+
+Test 39 : Switch the board behind the dongle
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**UID:** TST.REGMAP.DONGLE_SWITCH_DEVICE
+
+**RBP:** P1
+
+**Description:** Verify that after the board behind the dongle is replaced, Sync reads the new board and
+Configure reconfigures the register map without disconnecting.
+
+**OS:** ANY
+
+**Precondition:**
+    - :ref:`Eeprom.Sim <regmap_eeprom_sim_setup>`
+
+**Steps:**
+    1. Open EEPROM configuration and press **Switch device**
+        - **Expected result:** The tool shows ``Connected board: board 2``, the structure box is empty,
+          Configure is disabled and the status asks for Sync
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    2. Open Register Map and open the device list
+        - **Expected result:** The list still holds ``eprom1``, ``eprom2`` and ``eprom3``
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    3. Go back to EEPROM configuration and press **Sync**
+        - **Expected result:** The box shows ``"board": "board 2"`` and one ``regmap`` entry, ``eprom4``
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    4. Press **Configure**, then open Register Map and open the device list
+        - **Expected result:** The list holds only ``eprom4``. The device is still connected
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
+.. _TST_REGMAP_DONGLE_EPROM4_READ_WRITE:
+
+Test 40 : Read and write on the new board
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**UID:** TST.REGMAP.DONGLE_EPROM4_READ_WRITE
+
+**RBP:** P2
+
+**Description:** Verify that ``eprom4`` uses its own template and reads and writes its own CSV file.
+
+**OS:** ANY
+
+**Precondition:**
+    - :ref:`Eeprom.Sim <regmap_eeprom_sim_setup>`
+    - Steps 1-4 of :ref:`Test 39 <TST_REGMAP_DONGLE_SWITCH_DEVICE>` are done (board 2 is configured)
+
+**Steps:**
+    1. Select device ``eprom4``
+        - **Expected result:** 5 registers: BOARD_ID, BOARD_REV, GPIO_DIR, GPIO_OUT and POC_REG
+          (``0x000``-``0x004``)
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    2. Select register ``POC_REG`` (``0x004``) and press Read
+        - **Expected result:** The value is ``0x4b``
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    3. Write ``0x55`` to register ``0x001``, then write ``0x1c`` (the original value) back
+        - **Expected result:** The value shows ``0x55``, then ``0x1c``, and ``eprom4.csv`` ends with ``0x001,0x1c``
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
+.. _TST_REGMAP_DONGLE_SWITCH_BACK:
+
+Test 41 : Switch back to the first board
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**UID:** TST.REGMAP.DONGLE_SWITCH_BACK
+
+**RBP:** P2
+
+**Description:** Verify that switching back to board 1 and pressing Sync and Configure brings back its three
+register map devices without disconnecting.
+
+**OS:** ANY
+
+**Precondition:**
+    - :ref:`Eeprom.Sim <regmap_eeprom_sim_setup>`
+    - Steps 1-4 of :ref:`Test 39 <TST_REGMAP_DONGLE_SWITCH_DEVICE>` are done (board 2 is configured)
+
+**Steps:**
+    1. Open EEPROM configuration, press **Switch device**, then **Sync**
+        - **Expected result:** The tool shows ``Connected board: board 1`` and the box lists ``eprom1``,
+          ``eprom2`` and ``eprom3``
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    2. Press **Configure**, then open Register Map and open the device list
+        - **Expected result:** The list holds ``eprom1``, ``eprom2`` and ``eprom3`` and no ``eprom4``
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    3. Disconnect, connect again and open EEPROM configuration
+        - **Expected result:** The tool shows ``Connected board: board 1`` and Register Map is empty
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).

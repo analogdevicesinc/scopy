@@ -1,0 +1,12 @@
+{
+    "id": "eprom_test",
+    "title": "EEPROM test",
+    "version": "@PROJECT_VERSION@",
+    "description": "Simulated EEPROM test device for the register map POC",
+    "license": "LGPL",
+    "author": "Analog Devices Inc.",
+    "download_link": "",
+    "zip_checksum": "",
+    "scopy_compatibility": ["@CMAKE_PROJECT_VERSION@"],
+    "category": ["eeprom", "plugin"]
+  }

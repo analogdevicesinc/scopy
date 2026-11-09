@@ -126,6 +126,10 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 	});
 
 	initTutorialProperties();
+
+	// no register map yet: nothing to search, read or write until the first device is added
+	toggleSearchBarEnabled(false);
+	toggleReadWriteSettings(false);
 }
 
 RegisterMapTool::~RegisterMapTool() { delete deviceList; }
@@ -184,6 +188,7 @@ bool RegisterMapTool::removeDevice(const QString &devName)
 		} else {
 			first = true;
 			toggleSearchBarEnabled(false);
+			toggleReadWriteSettings(false);
 		}
 	}
 	return true;
@@ -249,6 +254,9 @@ void RegisterMapTool::initTutorialProperties()
 
 void RegisterMapTool::startTutorial()
 {
+	if(!deviceList->contains(activeRegisterMap)) {
+		return; // empty tool, nothing to show
+	}
 	settingsMenu->setChecked(true);
 
 	QWidget *parent = Util::findContainingWindow(this);
@@ -276,6 +284,9 @@ void RegisterMapTool::startTutorial()
 
 void RegisterMapTool::startSimpleTutorial()
 {
+	if(!deviceList->contains(activeRegisterMap)) {
+		return; // empty tool, nothing to show
+	}
 	settingsMenu->setChecked(true);
 
 	QWidget *parent = Util::findContainingWindow(this);

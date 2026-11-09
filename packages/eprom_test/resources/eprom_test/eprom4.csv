@@ -1,0 +1,7 @@
+# eprom4 register values of board 2 on the dongleDevice (regmap POC)
+# format: <address>,<value> (hex). The register map reads and writes this file instead of the device.
+0x000,0x02
+0x001,0x1c
+0x002,0x2d
+0x003,0x3e
+0x004,0x4b

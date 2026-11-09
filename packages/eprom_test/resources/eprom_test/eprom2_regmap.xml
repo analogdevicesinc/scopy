@@ -1,0 +1,113 @@
+<!-- Register map POC: template of eprom2 on the EEPROM test device (template only, no read/write). 5 registers -->
+<eprom_poc_adc>
+	<Register>
+		<Name>VERSION</Name>
+		<Address>0x000</Address>
+		<Description>POC register 1</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>VERSION[7:0]</Name>
+			<Access>RO</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>POC register 1 value</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>ID</Name>
+		<Address>0x001</Address>
+		<Description>POC register 2</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>ID[7:0]</Name>
+			<Access>RO</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>POC register 2 value</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>SCRATCH</Name>
+		<Address>0x002</Address>
+		<Description>POC register 3</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>SCRATCH[7:0]</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>POC register 3 value</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>CONFIG</Name>
+		<Address>0x003</Address>
+		<Description>POC register 4</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>CONFIG[7:0]</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>POC register 4 value</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>POC_REG</Name>
+		<Address>0x004</Address>
+		<Description>POC register 5, only in the simulated EEPROM template</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>POC_REG[7:0]</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>POC register 5 value</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+</eprom_poc_adc>

@@ -1,0 +1,22 @@
+{
+    "board": "board 1",
+    "regmap": [
+        {
+            "target": "eprom1",
+            "template": "eprom1_regmap.xml",
+            "access": "file",
+            "file": "eprom1.csv"
+        },
+        {
+            "target": "eprom2",
+            "template": "eprom2_regmap.xml",
+            "access": "none"
+        },
+        {
+            "target": "eprom3",
+            "template": "",
+            "access": "file",
+            "file": "eprom3.csv"
+        }
+    ]
+}

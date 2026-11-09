@@ -1,0 +1,7 @@
+# eprom3 register values of the EEPROM test device (regmap POC)
+# format: <address>,<value> (hex). No template: the register map shows only address, Read and Write.
+0x000,0x00090062
+0x004,0x00000000
+0x008,0x00000001
+0x00c,0x00000000
+0x010,0x00000001
