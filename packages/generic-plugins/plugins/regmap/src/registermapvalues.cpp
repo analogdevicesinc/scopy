@@ -72,9 +72,15 @@ void RegisterMapValues::setReadStrategy(IRegisterReadStrategy *readStrategy)
 	}
 
 	this->readStrategy = readStrategy;
+	if(!readStrategy) {
+		return;
+	}
 	QObject::disconnect(m_readConnection);
 	QObject::connect(this, &RegisterMapValues::requestRead, readStrategy, &IRegisterReadStrategy::read);
 	QObject::connect(readStrategy, &IRegisterReadStrategy::readDone, this, &RegisterMapValues::readDone);
+	QObject::connect(readStrategy, &IRegisterReadStrategy::readError, this, [this](const char *err) {
+		StatusBarManager::pushMessage("Register map " + m_deviceName + ": " + QString(err));
+	});
 	if(writeStrategy) {
 		QObject::connect(writeStrategy, &IRegisterWriteStrategy::writeSuccess, readStrategy,
 				 &IRegisterReadStrategy::read, Qt::UniqueConnection);
@@ -89,13 +95,21 @@ void RegisterMapValues::setWriteStrategy(IRegisterWriteStrategy *writeStrategy)
 	}
 
 	this->writeStrategy = writeStrategy;
+	if(!writeStrategy) {
+		return;
+	}
 	QObject::disconnect(writeConnection);
 	QObject::connect(this, &RegisterMapValues::requestWrite, writeStrategy, &IRegisterWriteStrategy::write);
+	QObject::connect(writeStrategy, &IRegisterWriteStrategy::writeError, this, [this](const char *err) {
+		StatusBarManager::pushMessage("Register map " + m_deviceName + ": " + QString(err));
+	});
 	if(readStrategy) {
 		QObject::connect(writeStrategy, &IRegisterWriteStrategy::writeSuccess, readStrategy,
 				 &IRegisterReadStrategy::read, Qt::UniqueConnection);
 	}
 }
+
+void RegisterMapValues::setDeviceName(const QString &deviceName) { m_deviceName = deviceName; }
 
 void RegisterMapValues::registerDump(QString path)
 {

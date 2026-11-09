@@ -46,6 +46,8 @@ public:
 	void setReadStrategy(IRegisterReadStrategy *readStrategy);
 	void setWriteStrategy(IRegisterWriteStrategy *writeStrategy);
 	void registerDump(QString path);
+	// used in the read/write error messages
+	void setDeviceName(const QString &deviceName);
 
 	IRegisterReadStrategy *getReadStrategy() const;
 
@@ -64,6 +66,7 @@ private:
 	IRegisterWriteStrategy *writeStrategy = nullptr;
 	QMetaObject::Connection m_readConnection;
 	QMetaObject::Connection writeConnection;
+	QString m_deviceName;
 };
 } // namespace scopy::regmap
 #endif // REGISTERMAPVALUES_HPP

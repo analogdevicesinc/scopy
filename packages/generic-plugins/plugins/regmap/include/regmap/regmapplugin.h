@@ -28,8 +28,10 @@
 #include "pluginbase/pluginbase.h"
 #include "scopy-regmap_export.h"
 
+#include <QFileInfo>
 #include <QObject>
 
+#include <pluginbase/itoolconfigprovider.h>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 
@@ -39,9 +41,6 @@
 namespace Ui {}
 
 namespace scopy {
-namespace component::iio {
-class IIODevice;
-}
 namespace regmap {
 
 class RegisterMapTool;
@@ -73,16 +72,36 @@ public:
 	void generateDevice(QString xmlPath, QString devName, IRegisterReadStrategy *readStrategy,
 			    IRegisterWriteStrategy *writeStrategy, int bitsPerRow = 8);
 
+	// Today's default setup as data: one entry per IIO device with register access. Builds no widgets.
+	QList<ToolConfiguration> defaultConfiguration();
+
+	// Template and read/write are independent. An empty path means no template.
+	// A null read/write means the default IIO strategy of that device. Regmap takes ownership.
+	bool configureTool(const QString &device, const QString &templatePath, IRegisterReadStrategy *read = nullptr,
+			   IRegisterWriteStrategy *write = nullptr);
+
+	// Removes one device, or every device when called with no argument.
+	void clearToolConfiguration(const QString &device = {});
+
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
 
 private:
 	QWidget *m_registerMapWidget = nullptr;
-	QList<component::iio::IIODevice *> *m_deviceList = nullptr;
-	RegisterMapTool *registerMapTool;
+	RegisterMapTool *registerMapTool = nullptr;
 	void initApi();
 	RegMap_API *m_api = nullptr;
+
+	ToolConfiguration defaultEntry(const QString &devName, const QFileInfoList &xmlFiles);
+	bool applyConfiguration(const ToolConfiguration &config);
+	// Maps the "access" property to strategies. "none" gives two null strategies.
+	bool createStrategies(const ToolConfiguration &config, IRegisterReadStrategy *&read,
+			      IRegisterWriteStrategy *&write);
+	bool createIioStrategies(const QString &device, uint32_t addressSpace, IRegisterReadStrategy *&read,
+				 IRegisterWriteStrategy *&write);
+	bool setupDevice(const QString &device, const QString &templatePath, int bitsPerRow,
+			 IRegisterReadStrategy *read, IRegisterWriteStrategy *write);
 };
 } // namespace regmap
 } // namespace scopy

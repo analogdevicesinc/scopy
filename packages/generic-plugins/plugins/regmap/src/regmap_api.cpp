@@ -39,6 +39,10 @@ void RegMap_API::write(const QString &addr, const QString &val)
 		qWarning(CAT_REGMAP_API) << "No active device register map";
 		return;
 	}
+	if(!devRegMap->hasReadWrite()) {
+		qWarning(CAT_REGMAP_API) << "Device" << getDevice() << "has no read/write, write ignored";
+		return;
+	}
 	uint32_t address = Utils::convertQStringToUint32(addr);
 	uint32_t value = Utils::convertQStringToUint32(val);
 	Q_EMIT devRegMap->registerMapValues->requestWrite(address, value);
@@ -49,6 +53,14 @@ void RegMap_API::writeBitField(const QString &addr, const QString &val)
 	DeviceRegisterMap *devRegMap = getActiveDevRegMap();
 	if(!devRegMap) {
 		qWarning(CAT_REGMAP_API) << "No active device register map";
+		return;
+	}
+	if(!devRegMap->hasTemplate() || !devRegMap->registerDetailedWidget) {
+		qWarning(CAT_REGMAP_API) << "Device" << getDevice() << "has no template, writeBitField ignored";
+		return;
+	}
+	if(!devRegMap->hasReadWrite()) {
+		qWarning(CAT_REGMAP_API) << "Device" << getDevice() << "has no read/write, writeBitField ignored";
 		return;
 	}
 	uint32_t address = Utils::convertQStringToUint32(addr);
@@ -67,7 +79,14 @@ QStringList RegMap_API::getAvailableDevicesName()
 	return devices->keys();
 }
 
-QString RegMap_API::getDevice() { return m_regMapPlugin->registerMapTool->activeRegisterMap; }
+QString RegMap_API::getDevice()
+{
+	if(!m_regMapPlugin || !m_regMapPlugin->registerMapTool) {
+		qWarning(CAT_REGMAP_API) << "Register map tool not initialized";
+		return "";
+	}
+	return m_regMapPlugin->registerMapTool->activeRegisterMap;
+}
 
 bool RegMap_API::setDevice(QString device)
 {
@@ -88,8 +107,12 @@ QList<QString> RegMap_API::search(QString searchParam)
 {
 	QList<uint32_t> resultIndexes;
 	DeviceRegisterMap *devRegMap = getActiveDevRegMap();
-	if(!devRegMap || !devRegMap->registerMapTemplate) {
+	if(!devRegMap) {
 		qWarning(CAT_REGMAP_API) << "No active device register map";
+		return {};
+	}
+	if(!devRegMap->registerMapTemplate) {
+		qWarning(CAT_REGMAP_API) << "Device" << getDevice() << "has no template, nothing to search";
 		return {};
 	}
 	resultIndexes = Search::searchForRegisters(devRegMap->registerMapTemplate->getRegisterList(), searchParam);
@@ -106,6 +129,10 @@ void RegMap_API::readInterval(QString startAddr, QString stopAddr)
 	DeviceRegisterMap *devRegMap = getActiveDevRegMap();
 	if(!devRegMap) {
 		qWarning(CAT_REGMAP_API) << "No active device register map";
+		return;
+	}
+	if(!devRegMap->hasReadWrite()) {
+		qWarning(CAT_REGMAP_API) << "Device" << getDevice() << "has no read/write, readInterval ignored";
 		return;
 	}
 	uint32_t start = Utils::convertQStringToUint32(startAddr);
@@ -143,8 +170,12 @@ bool RegMap_API::isAutoreadEnabled()
 void RegMap_API::registerDump(const QString &filePath)
 {
 	DeviceRegisterMap *devRegMap = getActiveDevRegMap();
-	if(!devRegMap || !devRegMap->registerMapValues) {
+	if(!devRegMap) {
 		qWarning(CAT_REGMAP_API) << "No active device register map";
+		return;
+	}
+	if(!devRegMap->hasReadWrite()) {
+		qWarning(CAT_REGMAP_API) << "Device" << getDevice() << "has no read/write, registerDump ignored";
 		return;
 	}
 	Q_EMIT devRegMap->registerMapValues->registerDump(filePath);
@@ -167,6 +198,11 @@ void RegMap_API::writeFromFile(const QString &filePath)
 		qWarning(CAT_REGMAP_API) << "Register map settings not initialized";
 		return;
 	}
+	DeviceRegisterMap *devRegMap = getActiveDevRegMap();
+	if(!devRegMap || !devRegMap->hasReadWrite()) {
+		qWarning(CAT_REGMAP_API) << "Device" << getDevice() << "has no read/write, writeFromFile ignored";
+		return;
+	}
 	setPath(filePath);
 	Q_EMIT m_regMapPlugin->registerMapTool->settings->writeListOfValuesButton->clicked();
 }
@@ -176,6 +212,10 @@ QString RegMap_API::readRegister(const QString &addr)
 	DeviceRegisterMap *devRegMap = getActiveDevRegMap();
 	if(!devRegMap || !devRegMap->registerController || !devRegMap->registerController->regValue) {
 		qWarning(CAT_REGMAP_API) << "No active device register map";
+		return "";
+	}
+	if(!devRegMap->hasReadWrite()) {
+		qWarning(CAT_REGMAP_API) << "Device" << getDevice() << "has no read/write, readRegister ignored";
 		return "";
 	}
 	Q_EMIT devRegMap->requestRead(Utils::convertQStringToUint32(addr));

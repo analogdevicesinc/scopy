@@ -61,6 +61,14 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 	, registerMapValues(registerMapValues)
 	, registerMapTemplate(registerMapTemplate)
 {
+	// a template without registers can't be shown, treat it as no template
+	if(registerMapTemplate &&
+	   (!registerMapTemplate->getRegisterList() || registerMapTemplate->getRegisterList()->isEmpty())) {
+		qWarning(CAT_REGMAP) << "Register map template has no registers, it is ignored";
+		registerMapTemplate = nullptr;
+		this->registerMapTemplate = nullptr;
+	}
+
 	layout = new QVBoxLayout(this);
 	Utils::removeLayoutMargins(layout);
 	setLayout(layout);
@@ -78,6 +86,8 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 
 	registerController = new RegisterController(this);
 	Style::setStyle(registerController, style::properties::regmap::registercontroller, true, true);
+	// template only: no read/write controls
+	registerController->setReadWriteEnabled(registerMapValues != nullptr);
 
 	QWidget *controllerWidget = new QWidget(this);
 	QHBoxLayout *controllerLayout = new QHBoxLayout(controllerWidget);
@@ -144,7 +154,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 					 registerMapTableWidget->setRegisterSelected(address);
 					 registerChanged(registerMapTemplate->getRegisterTemplate(address));
 					 registerController->blockSignals(false);
-					 if(autoread) {
+					 if(autoread && registerMapValues) {
 						 Q_EMIT registerMapValues->requestRead(address);
 					 }
 				 });
@@ -153,30 +163,33 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 				 [this, registerMapTemplate, registerMapValues](uint32_t address) {
 					 registerChanged(registerMapTemplate->getRegisterTemplate(address));
 					 registerMapTableWidget->scrollTo(address);
-					 if(autoread) {
+					 if(autoread && registerMapValues) {
 						 Q_EMIT registerMapValues->requestRead(address);
 					 }
 				 });
 	}
 
-	QObject::connect(registerController, &RegisterController::requestRead, registerMapValues,
-			 [registerMapValues](uint32_t address) { Q_EMIT registerMapValues->requestRead(address); });
-	QObject::connect(registerController, &RegisterController::requestWrite, registerMapValues,
-			 [registerMapValues](uint32_t address, uint32_t value) {
-				 Q_EMIT registerMapValues->requestWrite(address, value);
-			 });
-	QObject::connect(registerMapValues, &RegisterMapValues::registerValueChanged, this,
-			 [this, registerMapTemplate](uint32_t address, uint32_t value) {
-				 int regSize = 8;
-				 if(registerMapTemplate) {
-					 regSize = registerMapTemplate->getRegisterTemplate(0)->getWidth();
-				 }
-				 registerController->registerValueChanged(Utils::convertToHexa(value, regSize));
-				 if(registerMapTemplate) {
-					 registerMapTableWidget->valueUpdated(address, value);
-					 registerDetailedWidget->updateBitFieldsValue(value);
-				 }
-			 });
+	if(registerMapValues) {
+		QObject::connect(
+			registerController, &RegisterController::requestRead, registerMapValues,
+			[registerMapValues](uint32_t address) { Q_EMIT registerMapValues->requestRead(address); });
+		QObject::connect(registerController, &RegisterController::requestWrite, registerMapValues,
+				 [registerMapValues](uint32_t address, uint32_t value) {
+					 Q_EMIT registerMapValues->requestWrite(address, value);
+				 });
+		QObject::connect(registerMapValues, &RegisterMapValues::registerValueChanged, this,
+				 [this, registerMapTemplate](uint32_t address, uint32_t value) {
+					 int regSize = 8;
+					 if(registerMapTemplate) {
+						 regSize = registerMapTemplate->getRegisterTemplate(0)->getWidth();
+					 }
+					 registerController->registerValueChanged(Utils::convertToHexa(value, regSize));
+					 if(registerMapTemplate) {
+						 registerMapTableWidget->valueUpdated(address, value);
+						 registerDetailedWidget->updateBitFieldsValue(value);
+					 }
+				 });
+	}
 
 	tool->addWidgetToCentralContainerHelper(controllerWidget);
 	controllerLayout->addWidget(registerController);
@@ -257,12 +270,17 @@ bool DeviceRegisterMap::hasTemplate()
 	return false;
 }
 
+bool DeviceRegisterMap::hasReadWrite() const { return registerMapValues != nullptr; }
+
 bool DeviceRegisterMap::getAutoread() { return autoread; }
 void DeviceRegisterMap::startTutorial() { registerController->startTutorial(); }
 void DeviceRegisterMap::startSimpleTutorial() { registerController->startSimpleTutorial(); }
 
 void DeviceRegisterMap::initSettings()
 {
+	if(!registerMapValues) {
+		return;
+	}
 	QObject::connect(this, &DeviceRegisterMap::requestRead, registerMapValues, &RegisterMapValues::requestRead);
 	QObject::connect(this, &DeviceRegisterMap::requestRegisterDump, registerMapValues,
 			 &RegisterMapValues::registerDump);

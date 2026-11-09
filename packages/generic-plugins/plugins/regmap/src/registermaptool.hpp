@@ -53,8 +53,13 @@ public:
 	explicit RegisterMapTool(QWidget *parent = nullptr);
 	~RegisterMapTool();
 
+	// The register map takes ownership of the template and the values.
 	void addDevice(QString devName, RegisterMapTemplate *registerMapTemplate = nullptr,
 		       RegisterMapValues *registerMapValues = nullptr);
+	bool hasDevice(const QString &devName) const;
+	bool removeDevice(const QString &devName);
+	void clear();
+	int deviceCount() const;
 
 signals:
 
@@ -68,6 +73,8 @@ private:
 	QMap<QString, DeviceRegisterMap *> *deviceList;
 	bool first = true;
 	void toggleSettingsMenu(QString registerName, bool toggle);
+	void showRegisterMap(const QString &registerName);
+	void toggleReadWriteSettings(bool enabled);
 
 	void initTutorialProperties();
 	void startTutorial();

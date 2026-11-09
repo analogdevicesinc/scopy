@@ -119,7 +119,10 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 		->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
 
 	QObject::connect(searchBarWidget, &SearchBarWidget::requestSearch, this, [this](QString searchParam) {
-		deviceList->value(registerDeviceList->currentText())->applyFilters(searchParam);
+		DeviceRegisterMap *regMap = deviceList->value(registerDeviceList->currentText());
+		if(regMap) {
+			regMap->applyFilters(searchParam);
+		}
 	});
 
 	initTutorialProperties();
@@ -132,6 +135,12 @@ void RegisterMapTool::addDevice(QString devName, RegisterMapTemplate *registerMa
 {
 
 	DeviceRegisterMap *regMap = new DeviceRegisterMap(registerMapTemplate, registerMapValues, this);
+	if(registerMapTemplate) {
+		registerMapTemplate->setParent(regMap);
+	}
+	if(registerMapValues) {
+		registerMapValues->setParent(regMap);
+	}
 	deviceList->insert(devName, regMap);
 	tool->addWidgetToCentralContainerHelper(regMap);
 	deviceList->value(devName)->hide();
@@ -140,12 +149,72 @@ void RegisterMapTool::addDevice(QString devName, RegisterMapTemplate *registerMa
 
 	if(first) {
 		// the first regmap is set active
-		activeRegisterMap = devName;
 		first = false;
-		deviceList->value(devName)->show();
-		toggleSettingsMenu(devName, true);
-		toggleSearchBarEnabled(deviceList->value(devName)->hasTemplate());
+		showRegisterMap(devName);
 	}
+}
+
+bool RegisterMapTool::hasDevice(const QString &devName) const { return deviceList->contains(devName); }
+
+int RegisterMapTool::deviceCount() const { return deviceList->size(); }
+
+bool RegisterMapTool::removeDevice(const QString &devName)
+{
+	if(!deviceList->contains(devName)) {
+		return false;
+	}
+
+	const bool wasActive = (devName == activeRegisterMap);
+	if(wasActive) {
+		toggleSettingsMenu(devName, false);
+		activeRegisterMap = "";
+	}
+
+	DeviceRegisterMap *regMap = deviceList->take(devName);
+	regMap->hide();
+	regMap->deleteLater();
+
+	registerDeviceList->blockSignals(true);
+	registerDeviceList->removeItem(registerDeviceList->findText(devName));
+	registerDeviceList->blockSignals(false);
+
+	if(wasActive) {
+		if(registerDeviceList->count() > 0) {
+			showRegisterMap(registerDeviceList->currentText());
+		} else {
+			first = true;
+			toggleSearchBarEnabled(false);
+		}
+	}
+	return true;
+}
+
+void RegisterMapTool::clear()
+{
+	const QStringList names = deviceList->keys();
+	for(const QString &name : names) {
+		removeDevice(name);
+	}
+	activeRegisterMap = "";
+	first = true;
+}
+
+void RegisterMapTool::showRegisterMap(const QString &registerName)
+{
+	activeRegisterMap = registerName;
+	deviceList->value(registerName)->show();
+	toggleSettingsMenu(registerName, true);
+	toggleSearchBarEnabled(deviceList->value(registerName)->hasTemplate());
+	toggleReadWriteSettings(deviceList->value(registerName)->hasReadWrite());
+}
+
+void RegisterMapTool::toggleReadWriteSettings(bool enabled)
+{
+	// every setting of the menu reads or writes, so a template only register map has none
+	if(!enabled && settingsMenu->isChecked()) {
+		settingsMenu->setChecked(false);
+	}
+	settingsMenu->setVisible(enabled);
 }
 
 void RegisterMapTool::toggleSettingsMenu(QString registerName, bool toggle)
@@ -239,14 +308,13 @@ void RegisterMapTool::tutorialAborted()
 
 void RegisterMapTool::updateActiveRegisterMap(QString registerName)
 {
+	if(!deviceList->contains(registerName)) {
+		return;
+	}
 	if(activeRegisterMap != "" && registerName != activeRegisterMap) {
 		deviceList->value(activeRegisterMap)->hide();
 		toggleSettingsMenu(activeRegisterMap, false);
-		deviceList->value(registerName)->show();
-		toggleSettingsMenu(registerName, true);
-		toggleSearchBarEnabled(deviceList->value(registerName)->hasTemplate());
-
-		activeRegisterMap = registerName;
+		showRegisterMap(registerName);
 	}
 }
 

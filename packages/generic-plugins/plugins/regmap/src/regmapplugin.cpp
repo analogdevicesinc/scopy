@@ -59,6 +59,7 @@
 #include <deviceiconbuilder.h>
 
 #include "jsonformatedelement.hpp"
+#include "regmapconfigkeys.h"
 #include "scopy-regmap_config.h"
 #include "utils.hpp"
 #include "utils.hpp"
@@ -177,80 +178,38 @@ bool RegmapPlugin::loadPreferencesPage()
 
 bool RegmapPlugin::onConnect()
 {
-	component::ContextHandle ctx = component::Controller::context(m_param);
-	if(!ctx)
-		return false;
-
-	m_deviceList = new QList<component::iio::IIODevice *>();
-	const QList<component::iio::IIODevice *> devices =
-		ctx->findChildren<component::iio::IIODevice *>(Qt::FindDirectChildrenOnly);
-
-	for(component::iio::IIODevice *dev : devices) {
-		if(dev->findChild<component::iio::IIORegisterReader *>()) {
-			qDebug(CAT_REGMAP) << "DEVICE FOUND " << dev->name();
-			m_deviceList->push_back(dev);
-		}
-	}
 	m_registerMapWidget = new QWidget();
 	QVBoxLayout *layout = new QVBoxLayout(m_registerMapWidget);
 	layout->setContentsMargins(0, 0, 0, 0);
 	m_registerMapWidget->setLayout(layout);
-	Utils::applyJsonConfig();
+	registerMapTool = new RegisterMapTool();
+	layout->addWidget(registerMapTool);
 
-	if(m_deviceList && !m_deviceList->isEmpty()) {
-		QFileInfoList xmlFiles = Utils::setXmlPath();
-		registerMapTool = new RegisterMapTool();
-		layout->addWidget(registerMapTool);
-
-		for(int i = 0; i < m_deviceList->size(); ++i) {
-			component::iio::IIODevice *dev = m_deviceList->at(i);
-			ComponentRegisterReadStrategy *readStrategy = new ComponentRegisterReadStrategy(
-				dev->findChild<component::iio::IIORegisterReader *>());
-			ComponentRegisterWriteStrategy *writeStrategy = new ComponentRegisterWriteStrategy(
-				dev->findChild<component::iio::IIORegisterWriter *>());
-
-			QString devName = dev->name();
-			qDebug(CAT_REGMAP) << "CONNECTING TO DEVICE : " << devName;
-			JsonFormatedElement *templatePaths = Utils::getTemplate(devName);
-			qDebug(CAT_REGMAP) << "templatePaths :" << templatePaths;
-			QString templatePath = "";
-
-			if(templatePaths) {
-				qDebug(CAT_REGMAP) << "TEMPLATE FORUND FOR DEVICE : " << devName;
-				// Find the XML file with matching filename
-				for(const QFileInfo &xmlFile : xmlFiles) {
-					if(xmlFile.fileName() == templatePaths->getFileName()) {
-						templatePath = xmlFile.absoluteFilePath();
-						break;
-					}
-				}
-				if(templatePaths->getIsAxiCompatible()) {
-					uint32_t axiAddressSpace = Utils::convertQStringToUint32("80000000");
-					readStrategy->setAddressSpace(axiAddressSpace);
-					writeStrategy->setAddressSpace(axiAddressSpace);
-				}
-				generateDevice(templatePath, devName, readStrategy, writeStrategy,
-					       templatePaths->getBitsPerRow());
-			} else {
-				generateDevice(templatePath, devName, readStrategy, writeStrategy);
-			}
-		}
-
-		m_toolList[0]->setEnabled(true);
-		m_toolList[0]->setTool(m_registerMapWidget);
-
-		for(auto &tool : m_toolList) {
-			tool->setEnabled(true);
-			tool->setRunBtnVisible(true);
-		}
-
-		Q_EMIT toolListChanged();
-
-		initApi();
-		return true;
+	clearToolConfiguration();
+	const QList<ToolConfiguration> configs = defaultConfiguration();
+	for(const ToolConfiguration &config : configs) {
+		applyConfiguration(config);
 	}
 
-	return false;
+	if(registerMapTool->deviceCount() == 0) {
+		delete m_registerMapWidget;
+		m_registerMapWidget = nullptr;
+		registerMapTool = nullptr;
+		return false;
+	}
+
+	m_toolList[0]->setEnabled(true);
+	m_toolList[0]->setTool(m_registerMapWidget);
+
+	for(auto &tool : m_toolList) {
+		tool->setEnabled(true);
+		tool->setRunBtnVisible(true);
+	}
+
+	Q_EMIT toolListChanged();
+
+	initApi();
+	return true;
 }
 
 bool RegmapPlugin::onDisconnect()
@@ -265,12 +224,222 @@ bool RegmapPlugin::onDisconnect()
 		tme->setEnabled(false);
 		tme->setRunBtnVisible(false);
 		tme->setRunning(false);
-		tme->tool()->deleteLater();
+		if(tme->tool()) {
+			tme->tool()->deleteLater();
+		}
 		tme->setTool(nullptr);
 	}
+	// registerMapTool is a child of m_registerMapWidget, deleted above
+	m_registerMapWidget = nullptr;
+	registerMapTool = nullptr;
 
 	Q_EMIT toolListChanged();
 
+	return true;
+}
+
+QList<ToolConfiguration> RegmapPlugin::defaultConfiguration()
+{
+	QList<ToolConfiguration> configs;
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx) {
+		return configs;
+	}
+
+	Utils::applyJsonConfig();
+	const QFileInfoList xmlFiles = Utils::setXmlPath();
+	const QList<component::iio::IIODevice *> devices =
+		ctx->findChildren<component::iio::IIODevice *>(Qt::FindDirectChildrenOnly);
+	for(component::iio::IIODevice *dev : devices) {
+		if(dev->findChild<component::iio::IIORegisterReader *>()) {
+			qDebug(CAT_REGMAP) << "DEVICE FOUND " << dev->name();
+			configs.append(defaultEntry(dev->name(), xmlFiles));
+		}
+	}
+	return configs;
+}
+
+ToolConfiguration RegmapPlugin::defaultEntry(const QString &devName, const QFileInfoList &xmlFiles)
+{
+	ToolConfiguration config;
+	config.toolId = configkeys::TOOL_ID;
+	config.target = devName;
+	config.provider = name();
+	config.properties.insert(configkeys::ACCESS, configkeys::ACCESS_DEFAULT);
+
+	QString templatePath = "";
+	JsonFormatedElement *templatePaths = Utils::getTemplate(devName);
+	if(templatePaths) {
+		qDebug(CAT_REGMAP) << "TEMPLATE FOUND FOR DEVICE : " << devName;
+		// Find the XML file with matching filename
+		for(const QFileInfo &xmlFile : xmlFiles) {
+			if(xmlFile.fileName() == templatePaths->getFileName()) {
+				templatePath = xmlFile.absoluteFilePath();
+				break;
+			}
+		}
+		if(templatePaths->getIsAxiCompatible()) {
+			config.properties.insert(configkeys::ADDRESS_SPACE, Utils::convertQStringToUint32("80000000"));
+		}
+		config.properties.insert(configkeys::BITS_PER_ROW, templatePaths->getBitsPerRow());
+	}
+	config.properties.insert(configkeys::TEMPLATE, templatePath);
+	return config;
+}
+
+bool RegmapPlugin::configureTool(const QString &device, const QString &templatePath, IRegisterReadStrategy *read,
+				 IRegisterWriteStrategy *write)
+{
+	const ToolConfiguration defaults = defaultEntry(device, Utils::setXmlPath());
+	if(!read || !write) {
+		IRegisterReadStrategy *defaultRead = nullptr;
+		IRegisterWriteStrategy *defaultWrite = nullptr;
+		if(!createIioStrategies(device, defaults.properties.value(configkeys::ADDRESS_SPACE, 0).toUInt(),
+					defaultRead, defaultWrite)) {
+			qWarning(CAT_REGMAP) << "No default read/write for device" << device;
+			return false;
+		}
+		if(read) {
+			delete defaultRead;
+		} else {
+			read = defaultRead;
+		}
+		if(write) {
+			delete defaultWrite;
+		} else {
+			write = defaultWrite;
+		}
+	}
+	return setupDevice(device, templatePath, defaults.properties.value(configkeys::BITS_PER_ROW, 8).toInt(), read,
+			   write);
+}
+
+void RegmapPlugin::clearToolConfiguration(const QString &device)
+{
+	if(!registerMapTool) {
+		return;
+	}
+	if(device.isEmpty()) {
+		registerMapTool->clear();
+	} else {
+		registerMapTool->removeDevice(device);
+	}
+}
+
+bool RegmapPlugin::applyConfiguration(const ToolConfiguration &config)
+{
+	for(const QString &key : config.properties.keys()) {
+		if(!configkeys::ALL.contains(key)) {
+			qWarning(CAT_REGMAP) << "Unknown configuration key" << key << "for device" << config.target
+					     << "from" << config.provider;
+		}
+	}
+
+	IRegisterReadStrategy *read = nullptr;
+	IRegisterWriteStrategy *write = nullptr;
+	if(!createStrategies(config, read, write)) {
+		return false;
+	}
+
+	qDebug(CAT_REGMAP) << "CONNECTING TO DEVICE : " << config.target << "configured by" << config.provider;
+	return setupDevice(config.target, config.properties.value(configkeys::TEMPLATE).toString(),
+			   config.properties.value(configkeys::BITS_PER_ROW, 8).toInt(), read, write);
+}
+
+bool RegmapPlugin::createStrategies(const ToolConfiguration &config, IRegisterReadStrategy *&read,
+				    IRegisterWriteStrategy *&write)
+{
+	read = nullptr;
+	write = nullptr;
+	const QString access = config.properties.value(configkeys::ACCESS, configkeys::ACCESS_DEFAULT).toString();
+
+	if(access == configkeys::ACCESS_DEFAULT) {
+		return createIioStrategies(config.target,
+					   config.properties.value(configkeys::ADDRESS_SPACE, 0).toUInt(), read, write);
+	}
+	if(access == configkeys::ACCESS_NONE) {
+		return true;
+	}
+	// TODO: "file" (CSV) access comes with the simulated EEPROM device
+	qWarning(CAT_REGMAP) << "Unsupported access" << access << "for device" << config.target;
+	return false;
+}
+
+bool RegmapPlugin::createIioStrategies(const QString &device, uint32_t addressSpace, IRegisterReadStrategy *&read,
+				       IRegisterWriteStrategy *&write)
+{
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx) {
+		return false;
+	}
+
+	const QList<component::iio::IIODevice *> devices =
+		ctx->findChildren<component::iio::IIODevice *>(Qt::FindDirectChildrenOnly);
+	for(component::iio::IIODevice *dev : devices) {
+		if(dev->name() != device) {
+			continue;
+		}
+		component::iio::IIORegisterReader *reader = dev->findChild<component::iio::IIORegisterReader *>();
+		if(!reader) {
+			return false;
+		}
+		ComponentRegisterReadStrategy *readStrategy = new ComponentRegisterReadStrategy(reader);
+		ComponentRegisterWriteStrategy *writeStrategy =
+			new ComponentRegisterWriteStrategy(dev->findChild<component::iio::IIORegisterWriter *>());
+		if(addressSpace) {
+			readStrategy->setAddressSpace(addressSpace);
+			writeStrategy->setAddressSpace(addressSpace);
+		}
+		read = readStrategy;
+		write = writeStrategy;
+		return true;
+	}
+	return false;
+}
+
+bool RegmapPlugin::setupDevice(const QString &device, const QString &templatePath, int bitsPerRow,
+			       IRegisterReadStrategy *read, IRegisterWriteStrategy *write)
+{
+	if(!registerMapTool) {
+		delete read;
+		delete write;
+		return false;
+	}
+	if(registerMapTool->hasDevice(device)) {
+		registerMapTool->removeDevice(device);
+	}
+
+	RegisterMapTemplate *registerMapTemplate = nullptr;
+	if(!templatePath.isEmpty()) {
+		registerMapTemplate = new RegisterMapTemplate();
+		registerMapTemplate->setBitsPerRow(bitsPerRow);
+		XmlFileManager xmlFileManager(templatePath);
+		auto aux = xmlFileManager.getAllRegisters(registerMapTemplate);
+		if(!aux->isEmpty()) {
+			registerMapTemplate->setRegisterList(aux);
+		} else {
+			qWarning(CAT_REGMAP) << "No registers in template" << templatePath << "for device" << device;
+			delete registerMapTemplate;
+			registerMapTemplate = nullptr;
+		}
+	}
+
+	// no read and no write strategy: template only, the register map has no values
+	RegisterMapValues *registerMapValues = nullptr;
+	if(read || write) {
+		registerMapValues = new RegisterMapValues();
+		registerMapValues->setDeviceName(device);
+		if(read) {
+			read->setParent(registerMapValues);
+			registerMapValues->setReadStrategy(read);
+		}
+		if(write) {
+			write->setParent(registerMapValues);
+			registerMapValues->setWriteStrategy(write);
+		}
+	}
+
+	registerMapTool->addDevice(device, registerMapTemplate, registerMapValues);
 	return true;
 }
 
@@ -297,23 +466,7 @@ QWidget *RegmapPlugin::getTool() { return m_registerMapWidget; }
 void RegmapPlugin::generateDevice(QString xmlPath, QString devName, IRegisterReadStrategy *readStrategy,
 				  IRegisterWriteStrategy *writeStrategy, int bitsPerRow)
 {
-
-	RegisterMapTemplate *registerMapTemplate = nullptr;
-	if(!xmlPath.isEmpty()) {
-		registerMapTemplate = new RegisterMapTemplate(this);
-		registerMapTemplate->setBitsPerRow(bitsPerRow);
-		XmlFileManager xmlFileManager(xmlPath);
-		auto aux = xmlFileManager.getAllRegisters(registerMapTemplate);
-		if(!aux->isEmpty()) {
-			registerMapTemplate->setRegisterList(aux);
-		}
-	}
-
-	RegisterMapValues *registerMapValues = new RegisterMapValues();
-	registerMapValues->setReadStrategy(readStrategy);
-	registerMapValues->setWriteStrategy(writeStrategy);
-
-	registerMapTool->addDevice(devName, registerMapTemplate, registerMapValues);
+	setupDevice(devName, xmlPath, bitsPerRow, readStrategy, writeStrategy);
 }
 
 void RegmapPlugin::initApi()

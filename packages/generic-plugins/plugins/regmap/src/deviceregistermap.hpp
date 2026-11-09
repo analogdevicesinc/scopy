@@ -57,6 +57,7 @@ public:
 	void toggleAutoread(bool toggled);
 	void applyFilters(QString filter);
 	bool hasTemplate();
+	bool hasReadWrite() const;
 	bool getAutoread();
 	void startTutorial();
 	void startSimpleTutorial();
