@@ -23,20 +23,18 @@
 #define FILEREGISTERWRITESTRATEGY_HPP
 
 #include "iregisterwritestrategy.hpp"
+#include "registervaluesfile.hpp"
 
-class QString;
 namespace scopy::regmap {
+// Writes registers to a register values file, as if it were a device.
 class SCOPY_REGMAP_EXPORT FileRegisterWriteStrategy : public IRegisterWriteStrategy
 {
 public:
-	FileRegisterWriteStrategy(QString path);
+	explicit FileRegisterWriteStrategy(QString path);
+	QCoro::Task<scopy::Result<void>> write(uint32_t address, QVector<uint32_t> values) override;
 
 private:
-	QString path;
-
-	// IRegisterWriteStrategy interface
-public:
-	void write(uint32_t address, uint32_t val);
+	RegisterValuesFile m_file;
 };
 } // namespace scopy::regmap
 #endif // FILEREGISTERWRITESTRATEGY_HPP

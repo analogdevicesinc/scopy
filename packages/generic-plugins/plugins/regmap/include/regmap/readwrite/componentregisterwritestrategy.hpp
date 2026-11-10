@@ -24,6 +24,8 @@
 
 #include "iregisterwritestrategy.hpp"
 
+#include <QPointer>
+
 namespace scopy::component::iio {
 class IIORegisterWriter;
 }
@@ -35,12 +37,12 @@ class SCOPY_REGMAP_EXPORT ComponentRegisterWriteStrategy : public IRegisterWrite
 {
 public:
 	explicit ComponentRegisterWriteStrategy(scopy::component::iio::IIORegisterWriter *writer);
-	void write(uint32_t address, uint32_t val) override;
+	QCoro::Task<scopy::Result<void>> write(uint32_t address, QVector<uint32_t> values) override;
 	uint32_t getAddressSpace() const;
 	void setAddressSpace(uint32_t newAddressSpace);
 
 private:
-	scopy::component::iio::IIORegisterWriter *m_writer;
+	QPointer<scopy::component::iio::IIORegisterWriter> m_writer;
 	uint32_t m_addressSpace = 0;
 };
 } // namespace scopy::regmap

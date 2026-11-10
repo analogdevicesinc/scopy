@@ -25,27 +25,34 @@
 
 #include <component/backends/iio/iioregisterreader.h>
 
+#include <cerrno>
+
 using namespace scopy;
 using namespace regmap;
 
 ComponentRegisterReadStrategy::ComponentRegisterReadStrategy(component::iio::IIORegisterReader *reader)
 	: m_reader(reader)
-{
-	// Strip the address space so the UI sees the original register address.
-	connect(m_reader, &component::iio::IIORegisterReader::readSucceeded, this,
-		[this](uint32_t addr, uint32_t value) { Q_EMIT readDone(addr & ~m_addressSpace, value); });
-	connect(m_reader, &component::iio::IIORegisterReader::readFailed, this, [this](const scopy::Error &error) {
-		qDebug(CAT_IIO_OPERATION) << "device read error" << error.errorString();
-		Q_EMIT readError("device read error");
-	});
-}
+{}
 
-void ComponentRegisterReadStrategy::read(uint32_t address)
+QCoro::Task<Result<QVector<uint32_t>>> ComponentRegisterReadStrategy::read(uint32_t address, int count)
 {
-	if(!m_reader) {
-		return;
+	// copied before awaiting: this strategy can be deleted while a read runs
+	QPointer<component::iio::IIORegisterReader> reader = m_reader;
+	const uint32_t addressSpace = m_addressSpace;
+
+	QVector<uint32_t> values;
+	for(int i = 0; i < count; i++) {
+		if(!reader) {
+			co_return Unexpected(Error{-ENODEV, "no register reader"});
+		}
+		auto r = co_await reader->readAsync((address + i) | addressSpace);
+		if(!r) {
+			qDebug(CAT_IIO_OPERATION) << "device read error" << r.error().errorString();
+			co_return Unexpected(r.error());
+		}
+		values.append(r.value());
 	}
-	m_reader->readAsync(address | m_addressSpace);
+	co_return values;
 }
 
 uint32_t ComponentRegisterReadStrategy::getAddressSpace() const { return m_addressSpace; }

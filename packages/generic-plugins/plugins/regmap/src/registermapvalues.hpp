@@ -24,13 +24,24 @@
 
 #include "scopy-regmap_export.h"
 
+#include <QDateTime>
 #include <QMap>
 #include <QObject>
+#include <QVector>
+
+#include <core/result.h>
+#include <qcoro/qcorotask.h>
 
 namespace scopy::regmap {
 class IRegisterWriteStrategy;
 class IRegisterReadStrategy;
-class RegReadWrite;
+
+// a value that was read from the device; written values are never cached
+struct CacheEntry
+{
+	uint32_t value = 0;
+	QDateTime completedAt;
+};
 
 class SCOPY_REGMAP_EXPORT RegisterMapValues : public QObject
 {
@@ -39,10 +50,13 @@ public:
 	explicit RegisterMapValues(QObject *parent = nullptr);
 	~RegisterMapValues();
 
-	QMap<uint32_t, uint32_t> *registerReadValues;
+	// reads count registers; on success each one goes to the cache, on error accessFailed is emitted
+	QCoro::Task<scopy::Result<QVector<uint32_t>>> read(uint32_t address, int count = 1);
+	// writes, then reads the registers back; only the read-back updates the cache
+	QCoro::Task<scopy::Result<QVector<uint32_t>>> writeThenRead(uint32_t address, QVector<uint32_t> values);
 
-	void readDone(uint32_t address, uint32_t value);
 	uint32_t getValueOfRegister(uint32_t address);
+	bool hasValue(uint32_t address);
 	void setReadStrategy(IRegisterReadStrategy *readStrategy);
 	void setWriteStrategy(IRegisterWriteStrategy *writeStrategy);
 	void registerDump(QString path);
@@ -53,19 +67,16 @@ public:
 
 	IRegisterWriteStrategy *getWriteStrategy() const;
 
-	QMap<uint32_t, uint32_t> *getRegisterReadValues() const;
-	bool hasValue(uint32_t address);
-
 Q_SIGNALS:
 	void registerValueChanged(uint32_t address, uint32_t value);
+	void accessFailed(uint32_t address, const scopy::Error &error);
 	void requestRead(uint32_t address);
 	void requestWrite(uint32_t address, uint32_t value);
 
 private:
 	IRegisterReadStrategy *readStrategy = nullptr;
 	IRegisterWriteStrategy *writeStrategy = nullptr;
-	QMetaObject::Connection m_readConnection;
-	QMetaObject::Connection writeConnection;
+	QMap<uint32_t, CacheEntry> m_cache;
 	QString m_deviceName;
 };
 } // namespace scopy::regmap

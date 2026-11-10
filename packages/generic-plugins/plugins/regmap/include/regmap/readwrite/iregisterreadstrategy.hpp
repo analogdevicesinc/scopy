@@ -25,17 +25,20 @@
 #include "../scopy-regmap_export.h"
 
 #include <QObject>
+#include <QVector>
+
+#include <core/result.h>
+#include <qcoro/qcorotask.h>
 
 namespace scopy::regmap {
+// Each call returns its own result: one value per address, or the first error.
+// A strategy can be deleted while a call runs, so it must not touch `this` after a co_await.
 class IRegisterReadStrategy : public QObject
 {
 	Q_OBJECT
 public:
-	virtual void read(uint32_t address) = 0;
-
-Q_SIGNALS:
-	void readDone(uint32_t address, uint32_t value);
-	void readError(const char *err);
+	// reads count registers from address on
+	virtual QCoro::Task<scopy::Result<QVector<uint32_t>>> read(uint32_t address, int count = 1) = 0;
 };
 } // namespace scopy::regmap
 #endif // IREGISTERREADSTRATEGY_HPP

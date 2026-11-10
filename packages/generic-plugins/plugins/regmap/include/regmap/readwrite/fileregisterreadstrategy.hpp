@@ -23,22 +23,20 @@
 #define FILEREGISTERREADSTRATEGY_HPP
 
 #include "iregisterreadstrategy.hpp"
+#include "registervaluesfile.hpp"
 
-class QString;
 namespace scopy::regmap {
+// Reads registers from a register values file, as if it were a device.
 class SCOPY_REGMAP_EXPORT FileRegisterReadStrategy : public IRegisterReadStrategy
 {
 public:
-	FileRegisterReadStrategy(QString path);
-	// read a value from file from given address
-	void read(uint32_t address);
-	// read all values from file
-	void readAll();
-
-Q_SIGNALS:
+	explicit FileRegisterReadStrategy(QString path);
+	QCoro::Task<scopy::Result<QVector<uint32_t>>> read(uint32_t address, int count = 1) override;
+	// every value in the file, in file order (used to write a list of values)
+	scopy::Result<QVector<QPair<uint32_t, uint32_t>>> readAll() const;
 
 private:
-	QString path;
+	RegisterValuesFile m_file;
 };
 } // namespace scopy::regmap
 #endif // FILEREGISTERREADSTRATEGY_HPP

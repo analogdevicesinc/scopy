@@ -21,54 +21,24 @@
 
 #include <readwrite/fileregisterreadstrategy.hpp>
 
-#include "../logging_categories.h"
-#include <readwrite/iregisterreadstrategy.hpp>
-#include "utils.hpp"
-
-#include <QFile>
-#include <QString>
-#include <QStringList>
-
+using namespace scopy;
 using namespace scopy::regmap;
 
 FileRegisterReadStrategy::FileRegisterReadStrategy(QString path)
-	: path(path)
+	: m_file(path)
 {}
 
-void FileRegisterReadStrategy::read(uint32_t address)
+QCoro::Task<Result<QVector<uint32_t>>> FileRegisterReadStrategy::read(uint32_t address, int count)
 {
-	QFile file(path);
-	if(!file.open(QIODevice::ReadOnly)) {
-		qDebug(CAT_IIO_OPERATION) << "device read error " << file.errorString();
-		Q_EMIT readError("device read error");
-	} else {
-		while(!file.atEnd()) {
-			QString line(file.readLine());
-			QString addr(line.split(',').first());
-			if(addr.contains(QString::number(address, 16))) {
-				Q_EMIT readDone(address, Utils::convertQStringToUint32(line.split(',').at(1)));
-				qDebug(CAT_IIO_OPERATION) << "device read success for " << address << " with value "
-							  << Utils::convertQStringToUint32(line.split(',').at(1));
-				break;
-			}
+	QVector<uint32_t> values;
+	for(int i = 0; i < count; i++) {
+		auto r = m_file.read(address + i);
+		if(!r) {
+			co_return Unexpected(r.error());
 		}
+		values.append(r.value());
 	}
+	co_return values;
 }
 
-void FileRegisterReadStrategy::readAll()
-{
-	QFile file(path);
-	if(!file.open(QIODevice::ReadOnly)) {
-		qDebug(CAT_IIO_OPERATION) << "device read error " << file.errorString();
-		Q_EMIT readError("device read error");
-	} else {
-		while(!file.atEnd()) {
-			QString line(file.readLine());
-			uint32_t address = Utils::convertQStringToUint32(line.split(',').first());
-			uint32_t value = Utils::convertQStringToUint32(line.split(',').at(1));
-
-			Q_EMIT readDone(address, value);
-			qDebug(CAT_IIO_OPERATION) << "device read success for " << address << " with value " << value;
-		}
-	}
-}
+Result<QVector<QPair<uint32_t, uint32_t>>> FileRegisterReadStrategy::readAll() const { return m_file.readAll(); }

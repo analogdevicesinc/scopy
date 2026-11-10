@@ -40,6 +40,7 @@
 #include <tutorialbuilder.h>
 
 #include <pluginbase/preferences.h>
+#include <pluginbase/statusbarmanager.h>
 
 using namespace scopy;
 using namespace regmap;
@@ -136,12 +137,15 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 	writeListOfValuesButton->setEnabled(false);
 
 	QObject::connect(writeListOfValuesButton, &QPushButton::clicked, this, [this, fileBrowserEdit]() {
-		FileRegisterReadStrategy *fileRead = new FileRegisterReadStrategy(fileBrowserEdit->text());
-
-		QObject::connect(fileRead, &FileRegisterReadStrategy::readDone, this,
-				 &RegisterMapSettingsMenu::requestWrite);
-
-		fileRead->readAll();
+		auto values = FileRegisterReadStrategy(fileBrowserEdit->text()).readAll();
+		if(!values) {
+			StatusBarManager::pushMessage("Register map: " + values.error().errorString());
+			return;
+		}
+		// in file order, the order can matter on a device
+		for(const auto &entry : std::as_const(values.value())) {
+			Q_EMIT requestWrite(entry.first, entry.second);
+		}
 	});
 
 	menuSection->contentLayout()->addWidget(writeListOfValuesButton);

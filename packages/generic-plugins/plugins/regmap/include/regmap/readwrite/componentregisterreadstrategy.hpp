@@ -24,6 +24,8 @@
 
 #include "iregisterreadstrategy.hpp"
 
+#include <QPointer>
+
 namespace scopy::component::iio {
 class IIORegisterReader;
 }
@@ -35,12 +37,12 @@ class SCOPY_REGMAP_EXPORT ComponentRegisterReadStrategy : public IRegisterReadSt
 {
 public:
 	explicit ComponentRegisterReadStrategy(scopy::component::iio::IIORegisterReader *reader);
-	void read(uint32_t address) override;
+	QCoro::Task<scopy::Result<QVector<uint32_t>>> read(uint32_t address, int count = 1) override;
 	uint32_t getAddressSpace() const;
 	void setAddressSpace(uint32_t newAddressSpace);
 
 private:
-	scopy::component::iio::IIORegisterReader *m_reader;
+	QPointer<scopy::component::iio::IIORegisterReader> m_reader;
 	uint32_t m_addressSpace = 0;
 };
 } // namespace scopy::regmap

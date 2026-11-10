@@ -25,17 +25,20 @@
 #include "../scopy-regmap_export.h"
 
 #include <QObject>
+#include <QVector>
+
+#include <core/result.h>
+#include <qcoro/qcorotask.h>
 
 namespace scopy::regmap {
+// Each call returns its own result: nothing on success, or the first error.
+// A strategy can be deleted while a call runs, so it must not touch `this` after a co_await.
 class IRegisterWriteStrategy : public QObject
 {
 	Q_OBJECT
 public:
-	virtual void write(uint32_t address, uint32_t val) = 0;
-
-Q_SIGNALS:
-	void writeError(const char *err);
-	void writeSuccess(uint32_t address);
+	// writes values to address, address + 1, ...
+	virtual QCoro::Task<scopy::Result<void>> write(uint32_t address, QVector<uint32_t> values) = 0;
 };
 } // namespace scopy::regmap
 #endif // IREGISTERWRITESTRATEGY_HPP

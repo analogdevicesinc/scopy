@@ -234,9 +234,8 @@ QString RegMap_API::getValueOfRegister(const QString &addr)
 		return "";
 	}
 	uint32_t address = Utils::convertQStringToUint32(addr);
-	QMap<uint32_t, uint32_t> *values = devRegMap->registerMapValues->getRegisterReadValues();
-	if(values->keys().contains(address)) {
-		return Utils::convertToHexa(values->value(address), 16);
+	if(devRegMap->registerMapValues->hasValue(address)) {
+		return Utils::convertToHexa(devRegMap->registerMapValues->getValueOfRegister(address), 16);
 	}
 	qWarning(CAT_REGMAP_API) << "Value not read";
 	return "";

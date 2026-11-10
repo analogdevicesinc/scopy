@@ -21,31 +21,20 @@
 
 #include <readwrite/fileregisterwritestrategy.hpp>
 
-#include "../logging_categories.h"
-
-#include <QFile>
-#include <QTextStream>
-
 using namespace scopy;
-using namespace regmap;
+using namespace scopy::regmap;
 
 FileRegisterWriteStrategy::FileRegisterWriteStrategy(QString path)
-	: path(path)
+	: m_file(path)
 {}
 
-void FileRegisterWriteStrategy::write(uint32_t address, uint32_t val)
+QCoro::Task<Result<void>> FileRegisterWriteStrategy::write(uint32_t address, QVector<uint32_t> values)
 {
-	// TODO HOW SHOULD WE TREAT WRITE ?
-	QFile file(path);
-	QTextStream exportStream(&file);
-	if(!file.isOpen()) {
-		file.open(QIODevice::Append);
-		exportStream << QString::number(address, 16) << "," << QString::number(val, 16) << "\n";
-	} else {
-		qDebug(CAT_IIO_OPERATION) << "File already opened! ";
-		Q_EMIT writeError("device write err");
+	for(int i = 0; i < values.size(); i++) {
+		auto r = m_file.write(address + i, values[i]);
+		if(!r) {
+			co_return Unexpected(r.error());
+		}
 	}
-
-	if(file.isOpen())
-		file.close();
+	co_return Result<void>();
 }

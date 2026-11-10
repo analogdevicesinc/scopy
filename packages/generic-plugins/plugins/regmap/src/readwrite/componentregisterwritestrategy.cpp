@@ -25,27 +25,32 @@
 
 #include <component/backends/iio/iioregisterwriter.h>
 
+#include <cerrno>
+
 using namespace scopy;
 using namespace regmap;
 
 ComponentRegisterWriteStrategy::ComponentRegisterWriteStrategy(component::iio::IIORegisterWriter *writer)
 	: m_writer(writer)
-{
-	// Strip the address space so the UI sees the original register address.
-	connect(m_writer, &component::iio::IIORegisterWriter::writeSucceeded, this,
-		[this](uint32_t addr) { Q_EMIT writeSuccess(addr & ~m_addressSpace); });
-	connect(m_writer, &component::iio::IIORegisterWriter::writeFailed, this, [this](const scopy::Error &error) {
-		qDebug(CAT_IIO_OPERATION) << "device write error" << error.errorString();
-		Q_EMIT writeError("device write err");
-	});
-}
+{}
 
-void ComponentRegisterWriteStrategy::write(uint32_t address, uint32_t val)
+QCoro::Task<Result<void>> ComponentRegisterWriteStrategy::write(uint32_t address, QVector<uint32_t> values)
 {
-	if(!m_writer) {
-		return;
+	// copied before awaiting: this strategy can be deleted while a write runs
+	QPointer<component::iio::IIORegisterWriter> writer = m_writer;
+	const uint32_t addressSpace = m_addressSpace;
+
+	for(int i = 0; i < values.size(); i++) {
+		if(!writer) {
+			co_return Unexpected(Error{-ENODEV, "no register writer"});
+		}
+		auto r = co_await writer->writeAsync((address + i) | addressSpace, values[i]);
+		if(!r) {
+			qDebug(CAT_IIO_OPERATION) << "device write error" << r.error().errorString();
+			co_return Unexpected(r.error());
+		}
 	}
-	m_writer->writeAsync(address | m_addressSpace, val);
+	co_return Result<void>();
 }
 
 uint32_t ComponentRegisterWriteStrategy::getAddressSpace() const { return m_addressSpace; }
