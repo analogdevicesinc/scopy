@@ -24,11 +24,15 @@
 #include "commandlogmodel.h"
 
 #include <QAbstractButton>
+#include <QAction>
 #include <QCheckBox>
+#include <QClipboard>
+#include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMenu>
 #include <QPushButton>
 #include <QSignalBlocker>
 #include <QTreeView>
@@ -130,7 +134,7 @@ CommandLogView::CommandLogView(QWidget *parent)
 	m_tree->setUniformRowHeights(true);
 	m_tree->setRootIsDecorated(true);
 	m_tree->setSelectionBehavior(QAbstractItemView::SelectRows);
-	m_tree->setSelectionMode(QAbstractItemView::SingleSelection);
+	m_tree->setSelectionMode(QAbstractItemView::ExtendedSelection);
 	m_tree->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	m_tree->header()->setStretchLastSection(true);
 	m_tree->header()->setSectionResizeMode(QHeaderView::Interactive);
@@ -143,6 +147,17 @@ CommandLogView::CommandLogView(QWidget *parent)
 	Style::setStyle(m_tree->header(), style::properties::dcdebugger::headerView);
 	clay->addWidget(m_tree, 1);
 	m_tool->addWidgetToCentralContainerHelper(central);
+
+	// Copy: Ctrl+C while the table has focus, and the context menu.
+	m_copyAction = new QAction("Copy", m_tree);
+	m_copyAction->setShortcut(QKeySequence::Copy);
+	m_copyAction->setShortcutContext(Qt::WidgetShortcut);
+	m_tree->addAction(m_copyAction);
+	m_copyAllAction = new QAction("Copy all visible", m_tree);
+	m_tree->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(m_copyAction, &QAction::triggered, this, &CommandLogView::copySelectedRows);
+	connect(m_copyAllAction, &QAction::triggered, this, &CommandLogView::copyVisibleRows);
+	connect(m_tree, &QWidget::customContextMenuRequested, this, &CommandLogView::showContextMenu);
 
 	connect(m_log, &QAbstractButton::toggled, this, [this](bool on) {
 		// User action: drive this connection's monitor (not persisted).
@@ -264,6 +279,61 @@ void CommandLogView::exportCsv()
 		return;
 	}
 	FileManagerHelper::saveDataToFile(this, m_model->toCsv(), "Export command log");
+}
+
+bool CommandLogView::isShown(const QModelIndex &index) const
+{
+	const QModelIndex parent = index.parent();
+	return !parent.isValid() || m_tree->isExpanded(parent);
+}
+
+QString CommandLogView::selectedRowsText() const
+{
+	QModelIndexList rows;
+	for(const QModelIndex &i : m_tree->selectionModel()->selectedRows()) {
+		if(isShown(i)) {
+			rows.append(i);
+		}
+	}
+	return m_model->rowsText(rows);
+}
+
+QString CommandLogView::visibleRowsText() const
+{
+	QModelIndexList rows;
+	for(int r = 0; r < m_model->rowCount(); ++r) {
+		const QModelIndex top = m_model->index(r, 0);
+		rows.append(top);
+		if(!m_tree->isExpanded(top)) {
+			continue;
+		}
+		for(int c = 0; c < m_model->rowCount(top); ++c) {
+			rows.append(m_model->index(c, 0, top));
+		}
+	}
+	return m_model->rowsText(rows);
+}
+
+void CommandLogView::copyText(const QString &text)
+{
+	if(!text.isEmpty()) {
+		QGuiApplication::clipboard()->setText(text);
+	}
+}
+
+void CommandLogView::copySelectedRows() { copyText(selectedRowsText()); }
+
+void CommandLogView::copyVisibleRows() { copyText(visibleRowsText()); }
+
+void CommandLogView::showContextMenu(const QPoint &pos)
+{
+	m_copyAction->setEnabled(m_tree->selectionModel()->hasSelection());
+	m_copyAllAction->setEnabled(m_model->rowCount() > 0);
+	QMenu menu(this);
+	menu.addAction(m_copyAction);
+	menu.addAction(m_copyAllAction);
+	menu.exec(m_tree->viewport()->mapToGlobal(pos));
+	m_copyAction->setEnabled(true); // the shortcut stays live (a no-op without a selection)
 }
 
 void CommandLogView::updateStatus()

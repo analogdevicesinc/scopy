@@ -106,6 +106,11 @@ public:
 	static QStringList csvColumns();
 	QString toCsv() const;
 
+	// A row as shown, one text per column (folded: "×N" and min / avg / max); empty if invalid.
+	QStringList rowFields(const QModelIndex &index) const;
+	// One tab-separated line of rowFields() per row, in display order (any column of a row counts once).
+	QString rowsText(const QModelIndexList &rows) const;
+
 	static QString timeString(qint64 ns);
 	static QString durationString(qint64 ns);
 	static bool sameCommand(const CommandLogEntry &a, const CommandLogEntry &b);

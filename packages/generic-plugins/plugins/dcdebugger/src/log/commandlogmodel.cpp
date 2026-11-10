@@ -23,6 +23,7 @@
 
 #include <QDateTime>
 
+#include <algorithm>
 #include <limits>
 
 using namespace scopy;
@@ -214,6 +215,44 @@ QString CommandLogModel::toCsv() const
 		}
 	}
 	return csv;
+}
+
+QStringList CommandLogModel::rowFields(const QModelIndex &index) const
+{
+	QStringList fields;
+	if(!index.isValid() || index.model() != this) {
+		return fields;
+	}
+	for(int col = 0; col < ColumnCount; ++col) {
+		QString f = index.siblingAtColumn(col).data(Qt::DisplayRole).toString();
+		f.replace(QLatin1Char('\t'), QLatin1Char(' '));
+		f.replace(QLatin1Char('\n'), QLatin1Char(' '));
+		fields.append(f);
+	}
+	return fields;
+}
+
+QString CommandLogModel::rowsText(const QModelIndexList &rows) const
+{
+	// Display order: a top row, then its children.
+	auto key = [](const QModelIndex &i) {
+		return i.parent().isValid() ? std::pair(i.parent().row(), i.row()) : std::pair(i.row(), -1);
+	};
+	QList<QModelIndex> sorted;
+	for(const QModelIndex &i : rows) {
+		if(i.isValid() && i.model() == this) {
+			sorted.append(i.siblingAtColumn(0));
+		}
+	}
+	std::sort(sorted.begin(), sorted.end(),
+		  [&key](const QModelIndex &a, const QModelIndex &b) { return key(a) < key(b); });
+	sorted.erase(std::unique(sorted.begin(), sorted.end()), sorted.end());
+
+	QString text;
+	for(const QModelIndex &i : std::as_const(sorted)) {
+		text += rowFields(i).join(QLatin1Char('\t')) + QLatin1Char('\n');
+	}
+	return text;
 }
 
 QString CommandLogModel::timeString(qint64 ns)

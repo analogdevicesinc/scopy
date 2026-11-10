@@ -23,7 +23,11 @@
 #include "log/commandlogview.h"
 
 #include <QAbstractButton>
+#include <QAction>
 #include <QCheckBox>
+#include <QClipboard>
+#include <QGuiApplication>
+#include <QItemSelectionModel>
 #include <QPointer>
 #include <QPushButton>
 #include <QSignalSpy>
@@ -142,6 +146,11 @@ private Q_SLOTS:
 	void viewSurvivesMonitorDestruction();
 	void disabledRecordsNothingAndKeepsEntries();
 	void rowClickRequestsNode();
+	void copyTwoRows();
+	void copyFoldedRow();
+	void copyChildRows();
+	void copySkipsFilteredRows();
+	void copyEmptySelectionKeepsClipboard();
 };
 
 void TST_CommandLog::initTestCase() { CommandLogView::initPreferences(); }
@@ -501,6 +510,115 @@ void TST_CommandLog::rowClickRequestsNode()
 	QCOMPARE(spy[0][0].toString(), QStringLiteral("ctx/adc/raw"));
 	QCOMPARE(spy[0][1].toString(), QStringLiteral("iio"));
 	QCOMPARE(spy[0][2].value<quintptr>(), quintptr(0x1234));
+}
+
+namespace {
+void selectRow(QTreeView *tree, const QModelIndex &index)
+{
+	tree->selectionModel()->select(index, QItemSelectionModel::Select | QItemSelectionModel::Rows);
+}
+} // namespace
+
+void TST_CommandLog::copyTwoRows()
+{
+	CommandLogView view;
+	CommandLogModel *m = view.model();
+	m->append(readRaw());
+	m->append(entry(QStringLiteral("ctx/dac/scale"), {call("iio_attr_write_raw", -22)}));
+	// Selected bottom-up: copied in display order.
+	selectRow(view.tree(), m->index(1, 0));
+	selectRow(view.tree(), m->index(0, CommandLogModel::ValueColumn));
+	const QStringList lines = view.selectedRowsText().split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+	QCOMPARE(lines.size(), 2);
+	for(int r = 0; r < 2; ++r) {
+		const QStringList fields = lines[r].split(QLatin1Char('\t'));
+		QCOMPARE(fields.size(), int(CommandLogModel::ColumnCount));
+		for(int c = 0; c < CommandLogModel::ColumnCount; ++c) {
+			QCOMPARE(fields[c], m->index(r, c).data().toString());
+		}
+	}
+	QCOMPARE(lines[0].split(QLatin1Char('\t'))[CommandLogModel::ComponentColumn], QStringLiteral("ctx/adc/raw"));
+	QCOMPARE(lines[1].split(QLatin1Char('\t'))[CommandLogModel::OperationColumn],
+		 QStringLiteral("iio_attr_write_raw"));
+	QVERIFY(lines[1].split(QLatin1Char('\t'))[CommandLogModel::ValueColumn].startsWith(QStringLiteral("rc=-22")));
+
+	// Smoke: the Ctrl+C action puts the same text on the clipboard.
+	QGuiApplication::clipboard()->clear();
+	view.copyAction()->trigger();
+	QCOMPARE(QGuiApplication::clipboard()->text(), view.selectedRowsText());
+	QCOMPARE(view.copyAction()->shortcut(), QKeySequence(QKeySequence::Copy));
+	QCOMPARE(view.tree()->selectionMode(), QAbstractItemView::ExtendedSelection);
+}
+
+void TST_CommandLog::copyFoldedRow()
+{
+	CommandLogView view;
+	for(int i = 0; i < 10; ++i) {
+		view.model()->append(readRaw());
+	}
+	QCOMPARE(view.model()->rowCount(), 1);
+	selectRow(view.tree(), view.model()->index(0, 0));
+	const QString text = view.selectedRowsText();
+	QVERIFY(text.endsWith(QLatin1Char('\n')));
+	const QStringList fields = text.trimmed().split(QLatin1Char('\t'));
+	QCOMPARE(fields.size(), int(CommandLogModel::ColumnCount));
+	QVERIFY(fields[CommandLogModel::ValueColumn].endsWith(QStringLiteral("×10")));
+	QCOMPARE(fields[CommandLogModel::DurationColumn].count(QStringLiteral(" / ")), 2); // min / avg / max
+}
+
+void TST_CommandLog::copyChildRows()
+{
+	CommandLogView view;
+	CommandLogModel *m = view.model();
+	m->append(entry(QStringLiteral("ctx/adc/InputStream"),
+			{call("iio_buffer_open"), call("iio_buffer_stream_start")}));
+	const QModelIndex top = m->index(0, 0);
+	view.tree()->expand(top);
+	selectRow(view.tree(), m->index(1, 0, top));
+	selectRow(view.tree(), top);
+	QStringList lines = view.selectedRowsText().split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+	QCOMPARE(lines.size(), 2);
+	QVERIFY(lines[0].contains(QStringLiteral("2 calls")));
+	QCOMPARE(lines[1].split(QLatin1Char('\t'))[CommandLogModel::OperationColumn],
+		 QStringLiteral("iio_buffer_stream_start"));
+	QCOMPARE(view.visibleRowsText().count(QLatin1Char('\n')), 3);
+
+	// Under a collapsed row the child is not shown: not copied.
+	view.tree()->collapse(top);
+	lines = view.selectedRowsText().split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+	QCOMPARE(lines.size(), 1);
+	QVERIFY(lines[0].contains(QStringLiteral("2 calls")));
+	QCOMPARE(view.visibleRowsText().count(QLatin1Char('\n')), 1);
+}
+
+void TST_CommandLog::copySkipsFilteredRows()
+{
+	CommandLogView view;
+	CommandLogModel *m = view.model();
+	m->append(entry(QStringLiteral("ctx/adc/raw"), {call("iio_attr_read_raw")}));
+	m->append(entry(QStringLiteral("dongle/i2c0"), {call("capi_i2c_transmit")}));
+	m->append(entry(QStringLiteral("ctx/adc/scale"), {call("iio_attr_read_raw")}));
+	CommandLogFilter f;
+	f.component = QStringLiteral("adc");
+	m->setFilter(f);
+	view.tree()->selectAll();
+	const QString text = view.selectedRowsText();
+	QCOMPARE(text.count(QLatin1Char('\n')), 2);
+	QVERIFY(text.contains(QStringLiteral("ctx/adc/raw")));
+	QVERIFY(text.contains(QStringLiteral("ctx/adc/scale")));
+	QVERIFY(!text.contains(QStringLiteral("dongle/i2c0")));
+	QVERIFY(!view.visibleRowsText().contains(QStringLiteral("dongle/i2c0")));
+}
+
+void TST_CommandLog::copyEmptySelectionKeepsClipboard()
+{
+	CommandLogView view;
+	view.model()->append(readRaw());
+	QGuiApplication::clipboard()->setText(QStringLiteral("untouched"));
+	QVERIFY(view.selectedRowsText().isEmpty());
+	view.copyAction()->trigger();
+	view.copySelectedRows();
+	QCOMPARE(QGuiApplication::clipboard()->text(), QStringLiteral("untouched"));
 }
 
 QTEST_MAIN(TST_CommandLog)

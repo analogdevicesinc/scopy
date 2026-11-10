@@ -28,6 +28,7 @@
 #include <QString>
 #include <QWidget>
 
+class QAction;
 class QCheckBox;
 class QLabel;
 class QLineEdit;
@@ -51,6 +52,7 @@ class CommandLogModel;
 // CommandMonitor), with the "Log commands" checkbox (drives that monitor's setEnabled both ways;
 // per connection, not persisted), pause, clear, filters, follow tail and CSV export. A click on a
 // row asks for the node that issued the command. The rows outlive the monitor (disconnect).
+// Ctrl+C / context menu copy the selected rows (or all visible ones) as tab-separated text.
 class SCOPY_DCDEBUGGER_EXPORT CommandLogView : public QWidget
 {
 	Q_OBJECT
@@ -79,6 +81,15 @@ public:
 	QCheckBox *logCheckBox() const { return m_log; }
 	QPushButton *pauseButton() const { return m_pauseBtn; }
 	QString statusText() const;
+	QAction *copyAction() const { return m_copyAction; }
+
+	// Tab-separated lines of the selected (resp. all) rows the table shows: filtered, and children
+	// only under expanded rows. Empty when there is nothing to copy.
+	QString selectedRowsText() const;
+	QString visibleRowsText() const;
+	// To the clipboard; nothing to copy leaves it untouched.
+	void copySelectedRows();
+	void copyVisibleRows();
 
 Q_SIGNALS:
 	// The node that issued the clicked row (origin path, backend id, node identity).
@@ -91,6 +102,9 @@ private:
 	void onEnabledChanged(bool enabled);
 	void onMonitorDestroyed();
 	void exportCsv();
+	void showContextMenu(const QPoint &pos);
+	bool isShown(const QModelIndex &index) const;
+	void copyText(const QString &text);
 	void updateStatus();
 
 	CommandLogModel *m_model;
@@ -108,6 +122,8 @@ private:
 	QLineEdit *m_function;
 	MenuOnOffSwitch *m_errorsOnly;
 	QTreeView *m_tree;
+	QAction *m_copyAction;
+	QAction *m_copyAllAction;
 };
 
 } // namespace scopy::dcdebugger
