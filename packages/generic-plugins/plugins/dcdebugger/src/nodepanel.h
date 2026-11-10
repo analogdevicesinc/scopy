@@ -22,6 +22,8 @@
 #ifndef NODEPANEL_H
 #define NODEPANEL_H
 
+#include "scopy-dcdebugger_export.h"
+
 #include "componentnode.h"
 #include "pathtitle.h"
 
@@ -102,8 +104,9 @@ private:
 };
 
 // The panel for a component node (node != nullptr) or a group (node == nullptr, children set).
-NodePanel *createNodePanel(QObject *node, NodeKind kind, const QString &title, const QList<PathTitle::Segment> &path,
-			   const QList<QObject *> &children, QWidget *parent = nullptr);
+SCOPY_DCDEBUGGER_EXPORT NodePanel *createNodePanel(QObject *node, NodeKind kind, const QString &title,
+						   const QList<PathTitle::Segment> &path,
+						   const QList<QObject *> &children, QWidget *parent = nullptr);
 
 QString variantToString(const QVariant &v);
 

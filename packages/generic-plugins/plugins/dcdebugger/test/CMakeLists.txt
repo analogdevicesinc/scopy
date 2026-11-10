@@ -29,6 +29,7 @@ set(DCDEBUGGER_TESTS
     registers
     attributemonitor
     commandlog
+    pingview
 )
 setup_scopy_tests(${DCDEBUGGER_TESTS})
 foreach(t ${DCDEBUGGER_TESTS})

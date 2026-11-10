@@ -25,6 +25,7 @@
 #include "attributessection.h"
 #include "generation/generatorview.h"
 #include "monitor/monitorview.h"
+#include "ping/pingview.h"
 #include "registers/registerview.h"
 
 #include <QHeaderView>
@@ -38,6 +39,7 @@
 #include <component/attribute.h>
 #include <component/inputstream.h>
 #include <component/outputstream.h>
+#include <component/ping.h>
 #include <menusectionwidget.h>
 #include <style.h>
 #include <widgets/animatedrefreshbtn.h>
@@ -331,6 +333,10 @@ NodePanel *scopy::dcdebugger::createNodePanel(QObject *node, NodeKind kind, cons
 		panel->setMainView("Acquisition", new AcquisitionView(in, panel));
 	} else if(auto *out = qobject_cast<component::OutputStream *>(node)) {
 		panel->setMainView("Generator", new GeneratorView(out, panel));
+	} else if(auto *ping = qobject_cast<component::Ping *>(node)) {
+		auto *view = new PingView(ping, panel);
+		QObject::connect(panel, &NodePanel::refreshRequested, view, &PingView::refresh);
+		panel->setMainView("Ping", view);
 	} else if((kind == NodeKind::Context || kind == NodeKind::Device) &&
 		  !MonitorView::monitorableChannels(node).isEmpty()) {
 		panel->setMainView("Monitor", new MonitorView(node, panel));
