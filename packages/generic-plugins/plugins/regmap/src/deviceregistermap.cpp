@@ -175,6 +175,17 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 				 [registerMapValues](uint32_t address, uint32_t value) {
 					 Q_EMIT registerMapValues->requestWrite(address, value);
 				 });
+		// the Read / Write buttons follow the busy state of the selected register
+		QObject::connect(
+			registerMapValues, &RegisterMapValues::busyChanged, this, [this](uint32_t address, bool busy) {
+				if(address == Utils::convertQStringToUint32(registerController->getAddress())) {
+					registerController->setBusy(busy);
+				}
+			});
+		QObject::connect(registerController, &RegisterController::registerAddressChanged, this,
+				 [this, registerMapValues](uint32_t address) {
+					 registerController->setBusy(registerMapValues->isBusy(address));
+				 });
 		QObject::connect(registerMapValues, &RegisterMapValues::registerValueChanged, this,
 				 [this, registerMapTemplate](uint32_t address, uint32_t value) {
 					 int regSize = 8;
@@ -246,6 +257,8 @@ void DeviceRegisterMap::registerChanged(RegisterModel *regModel)
 
 	if(registerMapValues) {
 		uint32_t address = regModel->getAddress();
+		// a table selection blocks the controller's signals, so the busy state is set here
+		registerController->setBusy(registerMapValues->isBusy(address));
 		if(registerMapValues->hasValue(address)) {
 			uint32_t value = registerMapValues->getValueOfRegister(address);
 			registerDetailedWidget->updateBitFieldsValue(value);

@@ -148,6 +148,12 @@ void RegisterController::registerValueChanged(QString value) { regValue->setText
 
 QString RegisterController::getAddress() { return addressPicker->text(); }
 
+void RegisterController::setBusy(bool busy)
+{
+	readButton->setEnabled(!busy);
+	writeButton->setEnabled(!busy);
+}
+
 void RegisterController::setHasMap(bool hasMap)
 {
 	this->hasMap = hasMap;

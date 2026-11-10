@@ -27,6 +27,7 @@
 #include <QDateTime>
 #include <QMap>
 #include <QObject>
+#include <QSet>
 #include <QVector>
 
 #include <core/result.h>
@@ -54,6 +55,12 @@ public:
 	QCoro::Task<scopy::Result<QVector<uint32_t>>> read(uint32_t address, int count = 1);
 	// writes, then reads the registers back; only the read-back updates the cache
 	QCoro::Task<scopy::Result<QVector<uint32_t>>> writeThenRead(uint32_t address, QVector<uint32_t> values);
+	// read() and writeThenRead() skip busy registers; these wait for them instead (used by the JS API)
+	QCoro::Task<scopy::Result<QVector<uint32_t>>> readWhenIdle(uint32_t address, int count = 1);
+	QCoro::Task<scopy::Result<QVector<uint32_t>>> writeThenReadWhenIdle(uint32_t address, QVector<uint32_t> values);
+
+	// a register is busy from the start of a call until its result arrives; a busy register gets no other call
+	bool isBusy(uint32_t address) const;
 
 	uint32_t getValueOfRegister(uint32_t address);
 	bool hasValue(uint32_t address);
@@ -70,13 +77,21 @@ public:
 Q_SIGNALS:
 	void registerValueChanged(uint32_t address, uint32_t value);
 	void accessFailed(uint32_t address, const scopy::Error &error);
+	void busyChanged(uint32_t address, bool busy);
 	void requestRead(uint32_t address);
 	void requestWrite(uint32_t address, uint32_t value);
 
 private:
+	// false, and nothing marked, if any register of the range is busy
+	bool markBusy(uint32_t address, int count);
+	void clearBusy(uint32_t address, int count);
+	bool isRangeBusy(uint32_t address, int count) const;
+	QCoro::Task<scopy::Result<QVector<uint32_t>>> readAndCache(uint32_t address, int count);
+
 	IRegisterReadStrategy *readStrategy = nullptr;
 	IRegisterWriteStrategy *writeStrategy = nullptr;
 	QMap<uint32_t, CacheEntry> m_cache;
+	QSet<uint32_t> m_busy;
 	QString m_deviceName;
 };
 } // namespace scopy::regmap

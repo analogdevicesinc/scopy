@@ -55,6 +55,8 @@ public:
 	void registerValueChanged(QString value);
 	QString getAddress();
 	void setHasMap(bool hasMap);
+	// Read and Write are disabled while the selected register is busy
+	void setBusy(bool busy);
 	void startTutorial();
 	void startSimpleTutorial();
 
