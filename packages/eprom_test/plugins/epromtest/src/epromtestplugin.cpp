@@ -49,10 +49,9 @@ struct SimulatedBoard
 };
 const QList<SimulatedBoard> BOARDS = {{"board 1", "eeprom_board.json"}, {"board 2", "eeprom_board2.json"}};
 
-// Names of the regmap configuration keys and topic; the reference list is regmap/regmapconfigkeys.h.
-// They are repeated here so this plugin doesn't depend on the regmap package.
-const QString REGMAP_TOOL_ID = "regmap";
-const QString REGMAP_CONFIGURE_TOPIC = "regmap/configure";
+// Keys of the regmap section of the simulated EEPROM JSON
+const QString EEPROM_REGMAP = "regmap";
+const QString KEY_TARGET = "target";
 const QString KEY_TEMPLATE = "template";
 const QString KEY_ACCESS = "access";
 const QString KEY_FILE = "file";
@@ -173,16 +172,20 @@ bool EpromTestPlugin::sync()
 		return fail("Invalid board EEPROM: " + err.errorString());
 	}
 
-	for(const QJsonValue &value : doc.object().value(REGMAP_TOOL_ID).toArray()) {
+	for(const QJsonValue &value : doc.object().value(EEPROM_REGMAP).toArray()) {
 		const QJsonObject entry = value.toObject();
-		ToolConfiguration config;
-		config.toolId = REGMAP_TOOL_ID;
-		config.target = entry.value("target").toString();
-		config.properties.insert(KEY_TEMPLATE, resolve(entry.value(KEY_TEMPLATE).toString()));
-		config.properties.insert(KEY_ACCESS, entry.value(KEY_ACCESS).toString());
-		if(entry.contains(KEY_FILE)) {
-			config.properties.insert(KEY_FILE, resolve(entry.value(KEY_FILE).toString()));
+		RegisterMapToolConfig config;
+		config.target = entry.value(KEY_TARGET).toString();
+		config.templatePath = resolve(entry.value(KEY_TEMPLATE).toString());
+		bool ok = true;
+		const QString access = entry.value(KEY_ACCESS).toString("iio");
+		config.access = RegisterMapToolConfig::accessFromString(access, &ok);
+		if(!ok) {
+			qWarning(CAT_EPROMTESTPLUGIN)
+				<< "Unknown access" << access << "for" << config.target << ", skipped";
+			continue;
 		}
+		config.filePath = resolve(entry.value(KEY_FILE).toString());
 		if(!config.target.isEmpty()) {
 			m_synced.append(config);
 		}
@@ -210,7 +213,7 @@ bool EpromTestPlugin::configure()
 	}
 	m_applied = m_synced;
 	// regmap pulls again and gets m_applied through toolConfiguration()
-	MessageBroker::GetInstance()->publish(REGMAP_CONFIGURE_TOPIC, m_param);
+	MessageBroker::GetInstance()->publish(REGISTER_MAP_CONFIGURE_TOPIC, m_param);
 	if(m_tool) {
 		m_tool->setStatus(QString("Configured %1 register map devices.").arg(m_applied.size()));
 	}
@@ -223,23 +226,25 @@ QString EpromTestPlugin::structure() const
 		return "";
 	}
 	QJsonArray entries;
-	for(const ToolConfiguration &config : m_synced) {
-		QJsonObject entry = QJsonObject::fromVariantMap(config.properties);
-		entry.insert("target", config.target);
+	for(const RegisterMapToolConfig &config : m_synced) {
+		QJsonObject entry;
+		entry.insert(KEY_TARGET, config.target);
+		entry.insert(KEY_TEMPLATE, config.templatePath);
+		entry.insert(KEY_ACCESS, RegisterMapToolConfig::accessToString(config.access));
+		if(config.access == RegisterMapToolConfig::File) {
+			entry.insert(KEY_FILE, config.filePath);
+		}
 		entries.append(entry);
 	}
 	QJsonObject root;
 	root.insert("board", m_syncedBoard);
-	root.insert(REGMAP_TOOL_ID, entries);
+	root.insert(EEPROM_REGMAP, entries);
 	return QString::fromUtf8(QJsonDocument(root).toJson(QJsonDocument::Indented));
 }
 
-QList<ToolConfiguration> EpromTestPlugin::toolConfiguration(const QString &toolId, const QVariantMap &query)
+QList<RegisterMapToolConfig> EpromTestPlugin::registerMapConfiguration(const QVariantMap &query)
 {
 	Q_UNUSED(query)
-	if(toolId != REGMAP_TOOL_ID) {
-		return {};
-	}
 	return m_applied;
 }
 

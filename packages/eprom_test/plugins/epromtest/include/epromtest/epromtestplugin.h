@@ -28,7 +28,7 @@
 
 #include <QObject>
 
-#include <pluginbase/itoolconfigprovider.h>
+#include <pluginbase/registermaptoolconfig.h>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 
@@ -43,11 +43,11 @@ class EpromTest_API;
  * Configure applies it: regmap is asked to pull its configuration again and gets the synced entries.
  * Switch device simulates the board being replaced; Sync + Configure then reconfigure regmap while connected.
  */
-class SCOPY_EPROMTEST_EXPORT EpromTestPlugin : public QObject, public PluginBase, public IToolConfigProvider
+class SCOPY_EPROMTEST_EXPORT EpromTestPlugin : public QObject, public PluginBase, public IRegisterMapConfigProvider
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;
-	Q_INTERFACES(scopy::IToolConfigProvider)
+	Q_INTERFACES(scopy::IRegisterMapConfigProvider)
 
 	friend class EpromTest_API;
 
@@ -57,8 +57,8 @@ public:
 	void loadToolList() override;
 	QString displayName() override;
 
-	// IToolConfigProvider: the entries applied by the last Configure, empty before
-	QList<ToolConfiguration> toolConfiguration(const QString &toolId, const QVariantMap &query = {}) override;
+	// IRegisterMapConfigProvider: the entries applied by the last Configure, empty before
+	QList<RegisterMapToolConfig> registerMapConfiguration(const QVariantMap &query = {}) override;
 
 	// Reads the board EEPROM and builds the configuration structure. False if the EEPROM can't be read.
 	bool sync();
@@ -80,8 +80,8 @@ private:
 
 	int m_board = 0;
 	QString m_syncedBoard; // the board name read from the EEPROM by the last Sync
-	QList<ToolConfiguration> m_synced;
-	QList<ToolConfiguration> m_applied;
+	QList<RegisterMapToolConfig> m_synced;
+	QList<RegisterMapToolConfig> m_applied;
 	EpromConfigTool *m_tool = nullptr;
 	EpromTest_API *m_api = nullptr;
 };

@@ -60,7 +60,6 @@
 #include <deviceiconbuilder.h>
 
 #include "jsonformatedelement.hpp"
-#include "regmapconfigkeys.h"
 #include <core/deviceimpl.h>
 #include <core/dongledevicemanager.h>
 #include <readwrite/csvregisterstrategy.hpp>
@@ -209,7 +208,7 @@ bool RegmapPlugin::onConnect()
 		return false;
 	}
 	if(isDongle()) {
-		MessageBroker::GetInstance()->subscribe(this, configkeys::CONFIGURE_TOPIC);
+		MessageBroker::GetInstance()->subscribe(this, REGISTER_MAP_CONFIGURE_TOPIC);
 	}
 
 	m_toolList[0]->setEnabled(true);
@@ -228,7 +227,7 @@ bool RegmapPlugin::onConnect()
 
 bool RegmapPlugin::onDisconnect()
 {
-	MessageBroker::GetInstance()->unsubscribe(this, configkeys::CONFIGURE_TOPIC);
+	MessageBroker::GetInstance()->unsubscribe(this, REGISTER_MAP_CONFIGURE_TOPIC);
 	if(m_api) {
 		ScopyJS::GetInstance()->unregisterApi(m_api);
 		delete m_api;
@@ -255,7 +254,7 @@ bool RegmapPlugin::onDisconnect()
 
 void RegmapPlugin::messageCallback(QString topic, QString message)
 {
-	if(topic != configkeys::CONFIGURE_TOPIC || message != m_param || !registerMapTool) {
+	if(topic != REGISTER_MAP_CONFIGURE_TOPIC || message != m_param || !registerMapTool) {
 		return;
 	}
 	qInfo(CAT_REGMAP) << "Configuration requested for" << m_param;
@@ -265,23 +264,23 @@ void RegmapPlugin::messageCallback(QString topic, QString message)
 void RegmapPlugin::reconfigure()
 {
 	Utils::applyJsonConfig();
-	QList<ToolConfiguration> provided;
+	QList<RegisterMapToolConfig> provided;
 	if(m_device) {
-		provided = m_device->requestToolConfiguration(configkeys::TOOL_ID);
+		provided = m_device->requestRegisterMapConfiguration();
 	}
-	const QList<ToolConfiguration> configs = mergeConfigurations(defaultConfiguration(), provided);
+	const QList<RegisterMapToolConfig> configs = mergeConfigurations(defaultConfiguration(), provided);
 
 	clearToolConfiguration();
-	for(const ToolConfiguration &config : configs) {
+	for(const RegisterMapToolConfig &config : configs) {
 		applyConfiguration(config);
 	}
 }
 
 bool RegmapPlugin::isDongle() const { return m_category == DongleDeviceManager::CATEGORY; }
 
-QList<ToolConfiguration> RegmapPlugin::defaultConfiguration()
+QList<RegisterMapToolConfig> RegmapPlugin::defaultConfiguration()
 {
-	QList<ToolConfiguration> configs;
+	QList<RegisterMapToolConfig> configs;
 	component::ContextHandle ctx = component::Controller::context(m_param);
 	if(!ctx) {
 		return configs;
@@ -300,43 +299,39 @@ QList<ToolConfiguration> RegmapPlugin::defaultConfiguration()
 	return configs;
 }
 
-ToolConfiguration RegmapPlugin::defaultEntry(const QString &devName, const QFileInfoList &xmlFiles)
+RegisterMapToolConfig RegmapPlugin::defaultEntry(const QString &devName, const QFileInfoList &xmlFiles)
 {
-	ToolConfiguration config;
-	config.toolId = configkeys::TOOL_ID;
+	RegisterMapToolConfig config;
 	config.target = devName;
 	config.provider = name();
-	config.properties.insert(configkeys::ACCESS, configkeys::ACCESS_DEFAULT);
+	config.access = RegisterMapToolConfig::IIO;
 
-	QString templatePath = "";
 	JsonFormatedElement *templatePaths = Utils::getTemplate(devName);
 	if(templatePaths) {
 		qDebug(CAT_REGMAP) << "TEMPLATE FOUND FOR DEVICE : " << devName;
 		// Find the XML file with matching filename
 		for(const QFileInfo &xmlFile : xmlFiles) {
 			if(xmlFile.fileName() == templatePaths->getFileName()) {
-				templatePath = xmlFile.absoluteFilePath();
+				config.templatePath = xmlFile.absoluteFilePath();
 				break;
 			}
 		}
 		if(templatePaths->getIsAxiCompatible()) {
-			config.properties.insert(configkeys::ADDRESS_SPACE, Utils::convertQStringToUint32("80000000"));
+			config.addressSpace = Utils::convertQStringToUint32("80000000");
 		}
-		config.properties.insert(configkeys::BITS_PER_ROW, templatePaths->getBitsPerRow());
+		config.bitsPerRow = templatePaths->getBitsPerRow();
 	}
-	config.properties.insert(configkeys::TEMPLATE, templatePath);
 	return config;
 }
 
 bool RegmapPlugin::configureTool(const QString &device, const QString &templatePath, IRegisterReadStrategy *read,
 				 IRegisterWriteStrategy *write)
 {
-	const ToolConfiguration defaults = defaultEntry(device, Utils::setXmlPath());
+	const RegisterMapToolConfig defaults = defaultEntry(device, Utils::setXmlPath());
 	if(!read || !write) {
 		IRegisterReadStrategy *defaultRead = nullptr;
 		IRegisterWriteStrategy *defaultWrite = nullptr;
-		if(!createIioStrategies(device, defaults.properties.value(configkeys::ADDRESS_SPACE, 0).toUInt(),
-					defaultRead, defaultWrite)) {
+		if(!createIioStrategies(device, defaults.addressSpace.value_or(0), defaultRead, defaultWrite)) {
 			qWarning(CAT_REGMAP) << "No default read/write for device" << device;
 			return false;
 		}
@@ -351,8 +346,7 @@ bool RegmapPlugin::configureTool(const QString &device, const QString &templateP
 			write = defaultWrite;
 		}
 	}
-	return setupDevice(device, templatePath, defaults.properties.value(configkeys::BITS_PER_ROW, 8).toInt(), read,
-			   write);
+	return setupDevice(device, templatePath, defaults.bitsPerRow.value_or(8), read, write);
 }
 
 void RegmapPlugin::clearToolConfiguration(const QString &device)
@@ -373,25 +367,26 @@ int RegmapPlugin::providerPriority(const QString &provider)
 	return p ? p->metadata().value("priority").toInt() : 0;
 }
 
-QList<ToolConfiguration> RegmapPlugin::mergeConfigurations(const QList<ToolConfiguration> &defaults,
-							   const QList<ToolConfiguration> &provided)
+QList<RegisterMapToolConfig> RegmapPlugin::mergeConfigurations(const QList<RegisterMapToolConfig> &defaults,
+							       const QList<RegisterMapToolConfig> &provided)
 {
 	// A provider entry replaces the default for its device only, a device only a provider knows is added,
 	// and between two providers the higher priority wins.
-	QList<ToolConfiguration> merged = defaults;
+	QList<RegisterMapToolConfig> merged = defaults;
 	QMap<QString, int> providerPrio; // target -> priority of the provider that configured it
 	const QFileInfoList xmlFiles = Utils::setXmlPath();
 
-	for(ToolConfiguration config : provided) {
-		if(config.toolId != configkeys::TOOL_ID || config.target.isEmpty()) {
+	for(RegisterMapToolConfig config : provided) {
+		if(config.target.isEmpty()) {
 			continue;
 		}
 		// bitsPerRow and addressSpace are optional, regmap-config.json gives them as today
-		const ToolConfiguration jsonDefaults = defaultEntry(config.target, xmlFiles);
-		for(const QString &key : {configkeys::BITS_PER_ROW, configkeys::ADDRESS_SPACE}) {
-			if(!config.properties.contains(key) && jsonDefaults.properties.contains(key)) {
-				config.properties.insert(key, jsonDefaults.properties.value(key));
-			}
+		const RegisterMapToolConfig jsonDefaults = defaultEntry(config.target, xmlFiles);
+		if(!config.bitsPerRow) {
+			config.bitsPerRow = jsonDefaults.bitsPerRow;
+		}
+		if(!config.addressSpace) {
+			config.addressSpace = jsonDefaults.addressSpace;
 		}
 
 		const int prio = providerPriority(config.provider);
@@ -417,15 +412,8 @@ QList<ToolConfiguration> RegmapPlugin::mergeConfigurations(const QList<ToolConfi
 	return merged;
 }
 
-bool RegmapPlugin::applyConfiguration(const ToolConfiguration &config)
+bool RegmapPlugin::applyConfiguration(const RegisterMapToolConfig &config)
 {
-	for(const QString &key : config.properties.keys()) {
-		if(!configkeys::ALL.contains(key)) {
-			qWarning(CAT_REGMAP) << "Unknown configuration key" << key << "for device" << config.target
-					     << "from" << config.provider;
-		}
-	}
-
 	IRegisterReadStrategy *read = nullptr;
 	IRegisterWriteStrategy *write = nullptr;
 	if(!createStrategies(config, read, write)) {
@@ -433,37 +421,33 @@ bool RegmapPlugin::applyConfiguration(const ToolConfiguration &config)
 	}
 
 	qDebug(CAT_REGMAP) << "CONNECTING TO DEVICE : " << config.target << "configured by" << config.provider;
-	return setupDevice(config.target, config.properties.value(configkeys::TEMPLATE).toString(),
-			   config.properties.value(configkeys::BITS_PER_ROW, 8).toInt(), read, write);
+	return setupDevice(config.target, config.templatePath, config.bitsPerRow.value_or(8), read, write);
 }
 
-bool RegmapPlugin::createStrategies(const ToolConfiguration &config, IRegisterReadStrategy *&read,
+bool RegmapPlugin::createStrategies(const RegisterMapToolConfig &config, IRegisterReadStrategy *&read,
 				    IRegisterWriteStrategy *&write)
 {
 	read = nullptr;
 	write = nullptr;
-	const QString access = config.properties.value(configkeys::ACCESS, configkeys::ACCESS_DEFAULT).toString();
 
-	if(access == configkeys::ACCESS_DEFAULT) {
-		return createIioStrategies(config.target,
-					   config.properties.value(configkeys::ADDRESS_SPACE, 0).toUInt(), read, write);
-	}
-	if(access == configkeys::ACCESS_NONE) {
+	switch(config.access) {
+	case RegisterMapToolConfig::IIO:
+		return createIioStrategies(config.target, config.addressSpace.value_or(0), read, write);
+	case RegisterMapToolConfig::None:
 		return true;
-	}
-	if(access == configkeys::ACCESS_FILE) {
-		const QString path = config.properties.value(configkeys::FILE_PATH).toString();
-		if(path.isEmpty() || !QFileInfo::exists(path)) {
+	case RegisterMapToolConfig::File: {
+		if(config.filePath.isEmpty() || !QFileInfo::exists(config.filePath)) {
 			qWarning(CAT_REGMAP)
-				<< "Register values file" << path << "not found for device" << config.target;
+				<< "Register values file" << config.filePath << "not found for device" << config.target;
 			return false;
 		}
-		QSharedPointer<CsvRegisterFile> file(new CsvRegisterFile(path));
+		QSharedPointer<CsvRegisterFile> file(new CsvRegisterFile(config.filePath));
 		read = new CsvRegisterReadStrategy(file);
 		write = new CsvRegisterWriteStrategy(file);
 		return true;
 	}
-	qWarning(CAT_REGMAP) << "Unsupported access" << access << "for device" << config.target;
+	}
+	qWarning(CAT_REGMAP) << "Unsupported access" << config.access << "for device" << config.target;
 	return false;
 }
 

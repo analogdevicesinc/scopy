@@ -31,7 +31,7 @@
 #include <QFileInfo>
 #include <QObject>
 
-#include <pluginbase/itoolconfigprovider.h>
+#include <pluginbase/registermaptoolconfig.h>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 
@@ -73,7 +73,7 @@ public:
 			    IRegisterWriteStrategy *writeStrategy, int bitsPerRow = 8);
 
 	// Today's default setup as data: one entry per IIO device with register access. Builds no widgets.
-	QList<ToolConfiguration> defaultConfiguration();
+	QList<RegisterMapToolConfig> defaultConfiguration();
 
 	// Template and read/write are independent. An empty path means no template.
 	// A null read/write means the default IIO strategy of that device. Regmap takes ownership.
@@ -86,7 +86,7 @@ public:
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
-	// configkeys::CONFIGURE_TOPIC for this device: pull the configuration again
+	// REGISTER_MAP_CONFIGURE_TOPIC for this device: pull the configuration again
 	void messageCallback(QString topic, QString message) override;
 
 private:
@@ -99,13 +99,13 @@ private:
 	void initApi();
 	RegMap_API *m_api = nullptr;
 
-	ToolConfiguration defaultEntry(const QString &devName, const QFileInfoList &xmlFiles);
-	QList<ToolConfiguration> mergeConfigurations(const QList<ToolConfiguration> &defaults,
-						     const QList<ToolConfiguration> &provided);
+	RegisterMapToolConfig defaultEntry(const QString &devName, const QFileInfoList &xmlFiles);
+	QList<RegisterMapToolConfig> mergeConfigurations(const QList<RegisterMapToolConfig> &defaults,
+							 const QList<RegisterMapToolConfig> &provided);
 	int providerPriority(const QString &provider);
-	bool applyConfiguration(const ToolConfiguration &config);
-	// Maps the "access" property to strategies. "none" gives two null strategies.
-	bool createStrategies(const ToolConfiguration &config, IRegisterReadStrategy *&read,
+	bool applyConfiguration(const RegisterMapToolConfig &config);
+	// Maps the access to strategies. None gives two null strategies.
+	bool createStrategies(const RegisterMapToolConfig &config, IRegisterReadStrategy *&read,
 			      IRegisterWriteStrategy *&write);
 	bool createIioStrategies(const QString &device, uint32_t addressSpace, IRegisterReadStrategy *&read,
 				 IRegisterWriteStrategy *&write);

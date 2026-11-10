@@ -26,7 +26,7 @@
 
 #include "scopy-ad936x_export.h"
 #include <QObject>
-#include <pluginbase/itoolconfigprovider.h>
+#include <pluginbase/registermaptoolconfig.h>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 #include <component/controller.h>
@@ -42,11 +42,11 @@ class AD936X_ADVANCED_API;
 class FMCOMMS5_API;
 class FMCOMMS5_ADVANCED_API;
 
-class SCOPY_AD936X_EXPORT Ad936xPlugin : public QObject, public PluginBase, public IToolConfigProvider
+class SCOPY_AD936X_EXPORT Ad936xPlugin : public QObject, public PluginBase, public IRegisterMapConfigProvider
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;
-	Q_INTERFACES(scopy::IToolConfigProvider)
+	Q_INTERFACES(scopy::IRegisterMapConfigProvider)
 
 	friend class AD936X_API;
 	friend class AD936X_ADVANCED_API;
@@ -63,9 +63,9 @@ public:
 	QString description() override;
 	QString displayName() override;
 
-	// IToolConfigProvider: configures the register map tool of this device.
+	// IRegisterMapConfigProvider: configures the register map tool of this device.
 	// Uses only the parameter, the category and the IIO context, never this plugin's onConnect.
-	QList<ToolConfiguration> toolConfiguration(const QString &toolId, const QVariantMap &query = {}) override;
+	QList<RegisterMapToolConfig> registerMapConfiguration(const QVariantMap &query = {}) override;
 
 public Q_SLOTS:
 	bool onConnect() override;
@@ -73,7 +73,7 @@ public Q_SLOTS:
 
 private:
 	void initApi();
-	QList<ToolConfiguration> iioRegmapConfiguration();
+	QList<RegisterMapToolConfig> iioRegmapConfiguration();
 
 	AD936X_API *m_api = nullptr;
 	AD936X_ADVANCED_API *m_advancedApi = nullptr;

@@ -376,21 +376,21 @@ Plugin *DeviceImpl::getPluginByName(const QString &pluginName)
 	return nullptr;
 }
 
-QList<ToolConfiguration> DeviceImpl::requestToolConfiguration(const QString &toolId, const QVariantMap &query)
+QList<RegisterMapToolConfig> DeviceImpl::requestRegisterMapConfiguration(const QVariantMap &query)
 {
-	QList<ToolConfiguration> configs;
+	QList<RegisterMapToolConfig> configs;
 	for(Plugin *p : std::as_const(m_plugins)) {
-		IToolConfigProvider *provider = qobject_cast<IToolConfigProvider *>(dynamic_cast<QObject *>(p));
+		IRegisterMapConfigProvider *provider =
+			qobject_cast<IRegisterMapConfigProvider *>(dynamic_cast<QObject *>(p));
 		if(!provider) {
 			continue;
 		}
-		QList<ToolConfiguration> answer = provider->toolConfiguration(toolId, query);
-		for(ToolConfiguration &config : answer) {
-			config.toolId = toolId;
+		QList<RegisterMapToolConfig> answer = provider->registerMapConfiguration(query);
+		for(RegisterMapToolConfig &config : answer) {
 			config.provider = p->name();
 			configs.append(config);
 		}
-		qDebug(CAT_DEVICEIMPL) << p->name() << "configured" << answer.size() << "entries of" << toolId;
+		qDebug(CAT_DEVICEIMPL) << p->name() << "configured" << answer.size() << "register map entries";
 	}
 	return configs;
 }
