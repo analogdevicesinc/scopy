@@ -20,6 +20,7 @@
  */
 
 #include "v1contextops.h"
+#include "core/calltrace.h"
 #include <iio/iio.h>
 #include <cerrno>
 
@@ -32,7 +33,10 @@ ContextHandle V1ContextOps::createContext(const QString &uri, const ContextParam
 	iio_context_params iioParams = {};
 	iioParams.timeout_ms = params.timeoutMs;
 	QByteArray uriBytes = uri.toUtf8();
-	iio_context *c = iio_create_context(&iioParams, uriBytes.constData());
+	iio_context *c =
+		DC_TRACE_EX("libiio", "iio_create_context", nullptr,
+			    iio_create_context(&iioParams, uriBytes.constData()), iio_err(dcRc), CallTrace::outOf(dcRc),
+			    CallArg::string("uri", uri), CallArg::integer("timeout_ms", params.timeoutMs));
 	if(iio_err(c)) {
 		return {};
 	}
@@ -42,7 +46,7 @@ ContextHandle V1ContextOps::createContext(const QString &uri, const ContextParam
 void V1ContextOps::destroyContext(ContextHandle h)
 {
 	if(h.ptr) {
-		iio_context_destroy(ctx(h));
+		DC_TRACE("libiio", "iio_context_destroy", h.ptr, iio_context_destroy(ctx(h)));
 	}
 }
 
@@ -106,7 +110,9 @@ bool V1ContextOps::ping(ContextHandle h) const
 	if(!dev) {
 		return false;
 	}
-	const iio_device *trig = iio_device_get_trigger(dev);
+	// The trigger lookup is the one round trip of the ping.
+	const iio_device *trig = DC_TRACE_EX("libiio", "iio_device_get_trigger", dev, iio_device_get_trigger(dev),
+					     iio_err(dcRc), CallOut());
 	int err = iio_err(trig);
 	// -ENOSYS: the server answered but has no trigger support (e.g. iiod-emu).
 	return err == 0 || err == -ENOENT || err == -ENOSYS;

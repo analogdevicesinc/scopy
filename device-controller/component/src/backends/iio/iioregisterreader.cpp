@@ -22,6 +22,7 @@
 #include "component/backends/iio/iioregisterreader.h"
 
 #include "component/capabilityexecutor.h"
+#include "component/commandmonitor.h"
 #include "core/icmdexecutor.h"
 #include "iioutil/commands/regreadcommand.h"
 
@@ -41,6 +42,7 @@ IIORegisterReader::IIORegisterReader(scopy::iio::IDeviceOps *ops, scopy::iio::De
 QCoro::Task<CommandResponse<uint32_t>> IIORegisterReader::readAsync(uint32_t addr)
 {
 	auto *cmd = new scopy::iio::RegReadCommand(m_ops, m_handle, addr);
+	CommandMonitor::tag(cmd, this);
 	return runCommand(
 		m_executor, cmd, [this, addr](Result<uint32_t> &r) { Q_EMIT readSucceeded(addr, r.value()); },
 		[this](const scopy::Error &error) { Q_EMIT readFailed(error); });

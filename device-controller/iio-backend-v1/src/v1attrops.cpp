@@ -20,12 +20,19 @@
  */
 
 #include "v1attrops.h"
+#include "core/calltrace.h"
 #include <iio/iio.h>
 #include <cerrno>
 
 namespace scopy::iio {
 
 static const struct iio_attr *attr(AttrHandle h) { return static_cast<const iio_attr *>(h.ptr); }
+
+static QString attrName(AttrHandle h)
+{
+	const char *s = h.ptr ? iio_attr_get_name(attr(h)) : nullptr;
+	return s ? QString::fromUtf8(s) : QString();
+}
 
 AttrHandle V1AttrOps::contextAttr(ContextHandle ctx, const QString &name)
 {
@@ -65,7 +72,10 @@ void V1AttrOps::releaseAttr(AttrHandle attr) {}
 Result<QByteArray> V1AttrOps::read(AttrHandle h, size_t bytes)
 {
 	QByteArray buf(static_cast<int>(bytes), Qt::Uninitialized);
-	ssize_t ret = iio_attr_read_raw(attr(h), buf.data(), buf.size());
+	ssize_t ret =
+		DC_TRACE_OUT("libiio", "iio_attr_read_raw", h.ptr, iio_attr_read_raw(attr(h), buf.data(), buf.size()),
+			     dcRc > 0 ? CallTrace::text(buf.constData(), dcRc) : CallOut(),
+			     CallArg::string("attr", attrName(h)), CallArg::outLen("len", buf.size()));
 	if(ret < 0) {
 		return Unexpected{Error{static_cast<int>(ret), QStringLiteral("iio_attr_read_raw failed")}};
 	}
@@ -81,7 +91,10 @@ Result<QByteArray> V1AttrOps::read(AttrHandle h, size_t bytes)
 Result<void> V1AttrOps::write(AttrHandle h, const QString &value)
 {
 	QByteArray b = value.toUtf8();
-	ssize_t ret = iio_attr_write_raw(attr(h), b.constData(), static_cast<size_t>(b.size()));
+	ssize_t ret = DC_TRACE("libiio", "iio_attr_write_raw", h.ptr,
+			       iio_attr_write_raw(attr(h), b.constData(), static_cast<size_t>(b.size())),
+			       CallArg::string("attr", attrName(h)), CallArg::string("src", value),
+			       CallArg::integer("len", b.size()));
 	if(ret < 0) {
 		return Unexpected{Error{static_cast<int>(ret), QStringLiteral("iio_attr_write_raw failed")}};
 	}
@@ -90,7 +103,9 @@ Result<void> V1AttrOps::write(AttrHandle h, const QString &value)
 
 Result<void> V1AttrOps::getRange(AttrHandle h, double &min, double &step, double &max) const
 {
-	int ret = iio_attr_get_range(attr(h), &min, &step, &max);
+	int ret = DC_TRACE_OUT("libiio", "iio_attr_get_range", h.ptr, iio_attr_get_range(attr(h), &min, &step, &max),
+			       QStringLiteral("[%1 %2 %3]").arg(min).arg(step).arg(max),
+			       CallArg::string("attr", attrName(h)));
 	if(ret < 0) {
 		return Unexpected{Error{ret, QStringLiteral("iio_attr_get_range failed")}};
 	}
@@ -101,7 +116,9 @@ Result<void> V1AttrOps::getAvailable(AttrHandle h, QStringList &values) const
 {
 	char **list = nullptr;
 	size_t count = 0;
-	int ret = iio_attr_get_available(attr(h), &list, &count);
+	int ret =
+		DC_TRACE_OUT("libiio", "iio_attr_get_available", h.ptr, iio_attr_get_available(attr(h), &list, &count),
+			     QVariant::fromValue(qint64(count)), CallArg::string("attr", attrName(h)));
 	if(ret < 0) {
 		return Unexpected{Error{ret, QStringLiteral("iio_attr_get_available failed")}};
 	}

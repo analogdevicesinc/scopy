@@ -20,11 +20,21 @@
  */
 
 #include "v0deviceops.h"
+#include "core/calltrace.h"
 #include <iio.h>
 
 namespace scopy::iio {
 
 static iio_device *dev(DeviceHandle h) { return static_cast<iio_device *>(h.ptr); }
+
+static QString devName(const iio_device *d)
+{
+	const char *s = d ? iio_device_get_name(d) : nullptr;
+	if(!s && d) {
+		s = iio_device_get_id(d);
+	}
+	return s ? QString::fromUtf8(s) : QString();
+}
 
 QString V0DeviceOps::id(DeviceHandle h) const
 {
@@ -92,7 +102,9 @@ QString V0DeviceOps::bufferAttrName(DeviceHandle h, unsigned int /*bufferIdx*/, 
 DeviceHandle V0DeviceOps::getTrigger(DeviceHandle h) const
 {
 	const iio_device *trigger = nullptr;
-	int ret = iio_device_get_trigger(dev(h), &trigger);
+	int ret = DC_TRACE_OUT("libiio", "iio_device_get_trigger", h.ptr, iio_device_get_trigger(dev(h), &trigger),
+			       dcRc < 0 ? CallOut() : CallOut(devName(trigger)),
+			       CallArg::string("device", devName(dev(h))));
 	if(ret < 0) {
 		return {};
 	}
@@ -107,7 +119,9 @@ ssize_t V0DeviceOps::sampleSize(DeviceHandle h, ChannelsMaskHandle /*mask*/) con
 Result<uint32_t> V0DeviceOps::regRead(DeviceHandle h, uint32_t addr)
 {
 	uint32_t val = 0;
-	int ret = iio_device_reg_read(dev(h), addr, &val);
+	int ret = DC_TRACE_OUT("libiio", "iio_device_reg_read", h.ptr, iio_device_reg_read(dev(h), addr, &val),
+			       dcRc < 0 ? CallOut() : CallOut(QVariant::fromValue(quint64(val))),
+			       CallArg::string("device", devName(dev(h))), CallArg::hex("address", addr));
 	if(ret < 0) {
 		return Unexpected{Error{ret, QStringLiteral("iio_device_reg_read failed @0x%1").arg(addr, 0, 16)}};
 	}
@@ -116,7 +130,9 @@ Result<uint32_t> V0DeviceOps::regRead(DeviceHandle h, uint32_t addr)
 
 Result<void> V0DeviceOps::regWrite(DeviceHandle h, uint32_t addr, uint32_t val)
 {
-	int ret = iio_device_reg_write(dev(h), addr, val);
+	int ret = DC_TRACE("libiio", "iio_device_reg_write", h.ptr, iio_device_reg_write(dev(h), addr, val),
+			   CallArg::string("device", devName(dev(h))), CallArg::hex("address", addr),
+			   CallArg::hex("value", val));
 	if(ret < 0) {
 		return Unexpected{Error{ret, QStringLiteral("iio_device_reg_write failed @0x%1").arg(addr, 0, 16)}};
 	}
@@ -125,7 +141,9 @@ Result<void> V0DeviceOps::regWrite(DeviceHandle h, uint32_t addr, uint32_t val)
 
 Result<void> V0DeviceOps::setTrigger(DeviceHandle h, DeviceHandle trigger)
 {
-	int ret = iio_device_set_trigger(dev(h), trigger.ptr ? dev(trigger) : nullptr);
+	const iio_device *t = trigger.ptr ? dev(trigger) : nullptr;
+	int ret = DC_TRACE("libiio", "iio_device_set_trigger", h.ptr, iio_device_set_trigger(dev(h), t),
+			   CallArg::string("device", devName(dev(h))), CallArg::string("trigger", devName(t)));
 	if(ret < 0) {
 		return Unexpected{Error{ret, QStringLiteral("iio_device_set_trigger failed")}};
 	}

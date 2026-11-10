@@ -21,10 +21,13 @@
 
 #pragma once
 
+#include "core/callrecord.h"
 #include "core/result.h"
 #include "core/controller_core_export.h"
 #include <QObject>
 #include <QUuid>
+
+#include <memory>
 
 namespace scopy {
 
@@ -43,7 +46,9 @@ public:
 	{
 		Q_EMIT started(this);
 		if(!m_cancelled) {
+			Command *outer = beginRun();
 			run();
+			endRun(outer);
 		}
 		Q_EMIT finished(this);
 	}
@@ -59,6 +64,28 @@ public:
 	void cancel() { m_cancelled = true; }
 	bool isCancelled() const { return m_cancelled; }
 
+	// --- call trace (see core/calltrace.h) ---
+	// The command running on this thread (inside run()), nullptr elsewhere.
+	static Command *current();
+	// Recording right now (decided at the start of execute() from CallTrace::isEnabled()).
+	bool isRecording() const { return m_trace && m_trace->recording; }
+	// Recorded its last run (the executor publishes it).
+	bool isTraced() const { return m_trace && m_trace->traced; }
+	// Appends a library call; ignored unless recording.
+	void trace(CallRecord record);
+	QList<CallRecord> calls() const { return m_trace ? m_trace->calls : QList<CallRecord>{}; }
+	qint64 startedNs() const { return m_trace ? m_trace->startedNs : 0; }
+	qint64 finishedNs() const { return m_trace ? m_trace->finishedNs : 0; }
+
+	// Component that enqueued the command; set by the leaf before dispatch (only while tracing).
+	QString origin() const { return m_trace ? m_trace->origin.path : QString(); }
+	CommandOrigin originInfo() const { return m_trace ? m_trace->origin : CommandOrigin{}; }
+	void setOrigin(const QString &path);
+	void setOrigin(const CommandOrigin &origin);
+
+	// Failure of the last run for the log; ResultCommand reports its result error.
+	virtual Error failure() const { return {}; }
+
 Q_SIGNALS:
 	void started(scopy::Command *cmd);
 	void finished(scopy::Command *cmd);
@@ -69,6 +96,25 @@ protected:
 	QUuid m_id;
 	void *m_resource;
 	bool m_cancelled = false;
+
+private:
+	struct TraceData
+	{
+		CommandOrigin origin;
+		QList<CallRecord> calls;
+		qint64 startedNs = 0;
+		qint64 finishedNs = 0;
+		qint64 steadyStartNs = 0;
+		bool recording = false;
+		bool traced = false;
+	};
+
+	// Sets current() and, when the monitor is on, starts recording; returns the outer current().
+	Command *beginRun();
+	void endRun(Command *outer);
+	TraceData *traceData();
+
+	std::unique_ptr<TraceData> m_trace;
 };
 
 } // namespace scopy

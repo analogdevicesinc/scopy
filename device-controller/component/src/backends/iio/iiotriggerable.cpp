@@ -23,6 +23,7 @@
 
 #include "component/backends/iio/iiotrigger.h"
 #include "component/capabilityexecutor.h"
+#include "component/commandmonitor.h"
 #include "core/icmdexecutor.h"
 #include "iioutil/commands/settriggercommand.h"
 #include "iioutil/ideviceops.h"
@@ -53,6 +54,7 @@ QString IIOTriggerable::assignedTriggerName() const
 
 QCoro::Task<CommandResponse<void>> IIOTriggerable::setInternal(scopy::iio::SetTriggerCommand *cmd)
 {
+	CommandMonitor::tag(cmd, this);
 	return runCommand(
 		m_executor, cmd, [this](Result<void> &) { Q_EMIT triggerSucceeded(); },
 		[this](const scopy::Error &error) { Q_EMIT triggerFailed(error); });

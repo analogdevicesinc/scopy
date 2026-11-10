@@ -20,6 +20,7 @@
  */
 
 #include "v0attrops.h"
+#include "core/calltrace.h"
 #include <iio.h>
 #include <cerrno>
 #include <QRegularExpression>
@@ -39,6 +40,51 @@ static bool splitAvailable(const QByteArray &raw, QStringList &tokens)
 }
 
 static V0AttrInfo *info(AttrHandle h) { return static_cast<V0AttrInfo *>(h.ptr); }
+
+// Identifying name of the attr's parent (device name / channel id) for the trace.
+static QString parentName(const V0AttrInfo *ai)
+{
+	const char *s = nullptr;
+	switch(ai->scope) {
+	case V0AttrInfo::Context:
+		s = iio_context_get_name(static_cast<const iio_context *>(ai->parent));
+		break;
+	case V0AttrInfo::Channel:
+		s = iio_channel_get_id(static_cast<const iio_channel *>(ai->parent));
+		break;
+	default:
+		s = iio_device_get_name(static_cast<const iio_device *>(ai->parent));
+		if(!s) {
+			s = iio_device_get_id(static_cast<const iio_device *>(ai->parent));
+		}
+		break;
+	}
+	return s ? QString::fromUtf8(s) : QString();
+}
+
+static const char *parentArg(const V0AttrInfo *ai)
+{
+	switch(ai->scope) {
+	case V0AttrInfo::Context:
+		return "context";
+	case V0AttrInfo::Channel:
+		return "channel";
+	default:
+		return "device";
+	}
+}
+
+// v0 attr reads: rc = byte count (incl. NUL) or -errno, out = the value read.
+#define V0_TRACE_READ(fn, ai, expr, buf, len)                                                                          \
+	DC_TRACE_OUT("libiio", fn, (ai)->parent, expr,                                                                 \
+		     dcRc > 0 ? CallTrace::text((buf), qMin<qint64>(dcRc, (len))) : CallOut(),                         \
+		     CallArg::string(parentArg(ai), parentName(ai)),                                                   \
+		     CallArg::string("attr", QString::fromUtf8((ai)->name)), CallArg::outLen("len", (len)))
+
+#define V0_TRACE_WRITE(fn, ai, expr, val)                                                                              \
+	DC_TRACE("libiio", fn, (ai)->parent, expr, CallArg::string(parentArg(ai), parentName(ai)),                     \
+		 CallArg::string("attr", QString::fromUtf8((ai)->name)),                                               \
+		 CallArg::string("src", QString::fromUtf8(val)))
 
 AttrHandle V0AttrOps::makeHandle(V0AttrInfo::Scope scope, void *parent, const QString &name)
 {
@@ -81,8 +127,11 @@ Result<QByteArray> V0AttrOps::read(AttrHandle attr, size_t bytes)
 
 	switch(ai->scope) {
 	case V0AttrInfo::Context: {
-		const char *val =
-			iio_context_get_attr_value(static_cast<iio_context *>(ai->parent), ai->name.constData());
+		const char *val = DC_TRACE_OUT(
+			"libiio", "iio_context_get_attr_value", ai->parent,
+			iio_context_get_attr_value(static_cast<iio_context *>(ai->parent), ai->name.constData()),
+			dcRc ? CallTrace::text(dcRc, qstrlen(dcRc)) : CallOut(),
+			CallArg::string("attr", QString::fromUtf8(ai->name)));
 		if(val) {
 			return QByteArray(val);
 		}
@@ -90,20 +139,28 @@ Result<QByteArray> V0AttrOps::read(AttrHandle attr, size_t bytes)
 			-ENOENT, QStringLiteral("context attr read failed: %1").arg(QString::fromUtf8(ai->name))}};
 	}
 	case V0AttrInfo::Device:
-		ret = iio_device_attr_read(static_cast<const iio_device *>(ai->parent), ai->name.constData(),
-					   buf.data(), buf.size());
+		ret = V0_TRACE_READ("iio_device_attr_read", ai,
+				    iio_device_attr_read(static_cast<const iio_device *>(ai->parent),
+							 ai->name.constData(), buf.data(), buf.size()),
+				    buf.constData(), buf.size());
 		break;
 	case V0AttrInfo::Channel:
-		ret = iio_channel_attr_read(static_cast<const iio_channel *>(ai->parent), ai->name.constData(),
-					    buf.data(), buf.size());
+		ret = V0_TRACE_READ("iio_channel_attr_read", ai,
+				    iio_channel_attr_read(static_cast<const iio_channel *>(ai->parent),
+							  ai->name.constData(), buf.data(), buf.size()),
+				    buf.constData(), buf.size());
 		break;
 	case V0AttrInfo::Debug:
-		ret = iio_device_debug_attr_read(static_cast<const iio_device *>(ai->parent), ai->name.constData(),
-						 buf.data(), buf.size());
+		ret = V0_TRACE_READ("iio_device_debug_attr_read", ai,
+				    iio_device_debug_attr_read(static_cast<const iio_device *>(ai->parent),
+							       ai->name.constData(), buf.data(), buf.size()),
+				    buf.constData(), buf.size());
 		break;
 	case V0AttrInfo::Buffer:
-		ret = iio_device_buffer_attr_read(static_cast<const iio_device *>(ai->parent), ai->name.constData(),
-						  buf.data(), buf.size());
+		ret = V0_TRACE_READ("iio_device_buffer_attr_read", ai,
+				    iio_device_buffer_attr_read(static_cast<const iio_device *>(ai->parent),
+								ai->name.constData(), buf.data(), buf.size()),
+				    buf.constData(), buf.size());
 		break;
 	}
 
@@ -130,20 +187,28 @@ Result<void> V0AttrOps::write(AttrHandle attr, const QString &value)
 	case V0AttrInfo::Context:
 		return Unexpected{Error{-ENOSYS, QStringLiteral("context attrs are read-only")}};
 	case V0AttrInfo::Device:
-		ret = iio_device_attr_write(static_cast<const iio_device *>(ai->parent), ai->name.constData(),
-					    val.constData());
+		ret = V0_TRACE_WRITE("iio_device_attr_write", ai,
+				     iio_device_attr_write(static_cast<const iio_device *>(ai->parent),
+							   ai->name.constData(), val.constData()),
+				     val);
 		break;
 	case V0AttrInfo::Channel:
-		ret = iio_channel_attr_write(static_cast<const iio_channel *>(ai->parent), ai->name.constData(),
-					     val.constData());
+		ret = V0_TRACE_WRITE("iio_channel_attr_write", ai,
+				     iio_channel_attr_write(static_cast<const iio_channel *>(ai->parent),
+							    ai->name.constData(), val.constData()),
+				     val);
 		break;
 	case V0AttrInfo::Debug:
-		ret = iio_device_debug_attr_write(static_cast<const iio_device *>(ai->parent), ai->name.constData(),
-						  val.constData());
+		ret = V0_TRACE_WRITE("iio_device_debug_attr_write", ai,
+				     iio_device_debug_attr_write(static_cast<const iio_device *>(ai->parent),
+								 ai->name.constData(), val.constData()),
+				     val);
 		break;
 	case V0AttrInfo::Buffer:
-		ret = iio_device_buffer_attr_write(static_cast<const iio_device *>(ai->parent), ai->name.constData(),
-						   val.constData());
+		ret = V0_TRACE_WRITE("iio_device_buffer_attr_write", ai,
+				     iio_device_buffer_attr_write(static_cast<const iio_device *>(ai->parent),
+								  ai->name.constData(), val.constData()),
+				     val);
 		break;
 	}
 
@@ -172,20 +237,28 @@ Result<QByteArray> V0AttrOps::readAvailableAttr(const V0AttrInfo *ai) const
 		buf.resize(size);
 		switch(ai->scope) {
 		case V0AttrInfo::Device:
-			ret = iio_device_attr_read(static_cast<const iio_device *>(ai->parent), availName.constData(),
-						   buf.data(), buf.size());
+			ret = V0_TRACE_READ("iio_device_attr_read", ai,
+					    iio_device_attr_read(static_cast<const iio_device *>(ai->parent),
+								 availName.constData(), buf.data(), buf.size()),
+					    buf.constData(), buf.size());
 			break;
 		case V0AttrInfo::Channel:
-			ret = iio_channel_attr_read(static_cast<const iio_channel *>(ai->parent), availName.constData(),
-						    buf.data(), buf.size());
+			ret = V0_TRACE_READ("iio_channel_attr_read", ai,
+					    iio_channel_attr_read(static_cast<const iio_channel *>(ai->parent),
+								  availName.constData(), buf.data(), buf.size()),
+					    buf.constData(), buf.size());
 			break;
 		case V0AttrInfo::Debug:
-			ret = iio_device_debug_attr_read(static_cast<const iio_device *>(ai->parent),
-							 availName.constData(), buf.data(), buf.size());
+			ret = V0_TRACE_READ("iio_device_debug_attr_read", ai,
+					    iio_device_debug_attr_read(static_cast<const iio_device *>(ai->parent),
+								       availName.constData(), buf.data(), buf.size()),
+					    buf.constData(), buf.size());
 			break;
 		case V0AttrInfo::Buffer:
-			ret = iio_device_buffer_attr_read(static_cast<const iio_device *>(ai->parent),
-							  availName.constData(), buf.data(), buf.size());
+			ret = V0_TRACE_READ("iio_device_buffer_attr_read", ai,
+					    iio_device_buffer_attr_read(static_cast<const iio_device *>(ai->parent),
+									availName.constData(), buf.data(), buf.size()),
+					    buf.constData(), buf.size());
 			break;
 		default:
 			break;

@@ -20,6 +20,7 @@
  */
 
 #include "core/pooledcmdexecutor.h"
+#include "core/calltrace.h"
 #include "core/command.h"
 #include <QtConcurrent>
 
@@ -60,6 +61,8 @@ QFuture<void> PooledCmdExecutor::execute(Command *cmd)
 		}
 		if(!cmd->isCancelled()) {
 			cmd->execute();
+			// The one place every backend's commands pass through: hand recorded calls to the monitor.
+			CallTrace::publish(cmd);
 		}
 		promise->finish();
 	});

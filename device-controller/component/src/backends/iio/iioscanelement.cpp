@@ -21,6 +21,7 @@
 
 #include "component/backends/iio/iioscanelement.h"
 
+#include "component/commandmonitor.h"
 #include "core/icmdexecutor.h"
 #include "iioutil/commands/chndisablecommand.h"
 #include "iioutil/commands/chnenablecommand.h"
@@ -50,6 +51,7 @@ Command *IIOScanElement::makeCommand(bool en)
 QCoro::Task<CommandResponse<void>> IIOScanElement::enableAsync(bool en)
 {
 	auto *cmd = makeCommand(en);
+	CommandMonitor::tag(cmd, this);
 	const QUuid id = cmd->id();
 	const bool was = m_ops->isEnabled(m_handle, m_mask);
 	co_await m_executor->execute(cmd);

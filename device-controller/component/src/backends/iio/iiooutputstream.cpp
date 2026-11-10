@@ -23,6 +23,7 @@
 
 #include "component/backends/iio/iioscanelement.h"
 #include "component/capabilityexecutor.h"
+#include "component/commandmonitor.h"
 #include "iioutil/commands/bufferclosecommand.h"
 #include "iioutil/commands/bufferopencommand.h"
 #include "iioutil/commands/bufferpushcommand.h"
@@ -92,6 +93,7 @@ QCoro::Task<CommandResponse<void>> IIOOutputStream::openAsync(const StreamConfig
 
 	auto *cmd = new scopy::iio::BufferOpenCommand(m_bufOps, m_dev, m_bufferIndex, m_mask, cfg.samplesCount,
 						      m_cyclic, m_kernelBuffers);
+	CommandMonitor::tag(cmd, this);
 	auto result = co_await runCommand(
 		m_executor, cmd, [this, cmd](const Result<void> &) { m_buffer = cmd->openedHandle(); },
 		[this](const Error &e) { Q_EMIT streamError(e); });
@@ -118,6 +120,7 @@ QCoro::Task<CommandResponse<void>> IIOOutputStream::closeAsync()
 	m_open = false;
 	m_bufOps->cancelBuffer(buffer);
 	auto *cmd = new scopy::iio::BufferCloseCommand(m_bufOps, buffer);
+	CommandMonitor::tag(cmd, this);
 	co_await m_executor->execute(cmd);
 	auto response = cmd->result();
 	cmd->deleteLater();
@@ -131,6 +134,7 @@ QCoro::Task<CommandResponse<void>> IIOOutputStream::pushAsync()
 		co_return CommandResponse<void>(QUuid(), Unexpected{Error{-EIO, QStringLiteral("buffer not open")}});
 	}
 	auto *cmd = new scopy::iio::BufferPushCommand(m_bufOps, m_buffer);
+	CommandMonitor::tag(cmd, this);
 	co_return co_await runCommand(
 		m_executor, cmd,
 		[this](const Result<void> &) {

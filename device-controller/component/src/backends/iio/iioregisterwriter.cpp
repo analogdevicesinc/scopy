@@ -22,6 +22,7 @@
 #include "component/backends/iio/iioregisterwriter.h"
 
 #include "component/capabilityexecutor.h"
+#include "component/commandmonitor.h"
 #include "core/icmdexecutor.h"
 #include "iioutil/commands/regwritecommand.h"
 
@@ -41,6 +42,7 @@ IIORegisterWriter::IIORegisterWriter(scopy::iio::IDeviceOps *ops, scopy::iio::De
 QCoro::Task<CommandResponse<void>> IIORegisterWriter::writeAsync(uint32_t addr, uint32_t value)
 {
 	auto *cmd = new scopy::iio::RegWriteCommand(m_ops, m_handle, addr, value);
+	CommandMonitor::tag(cmd, this);
 	return runCommand(
 		m_executor, cmd, [this, addr](Result<void> &) { Q_EMIT writeSucceeded(addr); },
 		[this](const scopy::Error &error) { Q_EMIT writeFailed(error); });

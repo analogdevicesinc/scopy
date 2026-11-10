@@ -22,6 +22,7 @@
 #include "component/backends/iio/iioattributereader.h"
 
 #include "component/capabilityexecutor.h"
+#include "component/commandmonitor.h"
 #include "core/icmdexecutor.h"
 #include "iioutil/commands/attrreadcommand.h"
 
@@ -41,6 +42,7 @@ IIOAttributeReader::IIOAttributeReader(scopy::iio::IAttrOps *ops, scopy::iio::At
 QCoro::Task<CommandResponse<QByteArray>> IIOAttributeReader::readAsync(size_t bytes)
 {
 	auto *cmd = new scopy::iio::AttrReadCommand(m_ops, m_handle, bytes);
+	CommandMonitor::tag(cmd, this);
 	return runCommand(
 		m_executor, cmd, [this](Result<QByteArray> &r) { Q_EMIT readSucceeded(r); },
 		[this](const scopy::Error &error) { Q_EMIT readFailed(error); });

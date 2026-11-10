@@ -41,6 +41,8 @@ public:
 
 	ResponseType result() const { return ResponseType(m_id, m_result); }
 
+	Error failure() const override { return m_result ? Error{} : m_result.error(); }
+
 protected:
 	void setResult(ResultType result) { m_result = std::move(result); }
 

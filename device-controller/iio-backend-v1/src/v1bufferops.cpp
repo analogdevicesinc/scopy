@@ -20,10 +20,22 @@
  */
 
 #include "v1bufferops.h"
+#include "core/calltrace.h"
 #include <cerrno>
 #include <qdebug.h>
 
 namespace scopy::iio {
+
+// libiio v1 reports pointer errors in the pointer itself.
+#define V1_TRACE_PTR(fn, handle, expr, ...)                                                                            \
+	DC_TRACE_EX("libiio", fn, handle, expr, iio_err(dcRc), CallTrace::outOf(dcRc), __VA_ARGS__)
+
+static qint64 blockSize(iio_block *b)
+{
+	return static_cast<const char *>(iio_block_end(b)) - static_cast<const char *>(iio_block_start(b));
+}
+
+static CallOut blockPayload(iio_block *b) { return CallTrace::payload(iio_block_start(b), blockSize(b)); }
 
 BufferHandle V1BufferOps::openBuffer(DeviceHandle dev, unsigned int idx, ChannelsMaskHandle mask, size_t samplesCount,
 				     bool cyclic, unsigned int kernelBuffers)
@@ -31,19 +43,22 @@ BufferHandle V1BufferOps::openBuffer(DeviceHandle dev, unsigned int idx, Channel
 	iio_device *d = static_cast<iio_device *>(dev.ptr);
 	iio_channels_mask *m = static_cast<iio_channels_mask *>(mask.ptr);
 
-	iio_buffer *staticBuf = iio_device_get_buffer(d, idx);
+	iio_buffer *staticBuf =
+		V1_TRACE_PTR("iio_device_get_buffer", d, iio_device_get_buffer(d, idx), CallArg::integer("index", idx));
 	if(iio_err(staticBuf)) {
 		return {};
 	}
 
-	iio_buffer_stream *bufStream = iio_buffer_open(staticBuf, m);
+	iio_buffer_stream *bufStream =
+		V1_TRACE_PTR("iio_buffer_open", staticBuf, iio_buffer_open(staticBuf, m), CallArg::handle("mask", m));
 	if(iio_err(bufStream)) {
 		return {};
 	}
 
-	ssize_t sampleSize = iio_device_get_sample_size(d, m);
+	ssize_t sampleSize = DC_TRACE("libiio", "iio_device_get_sample_size", d, iio_device_get_sample_size(d, m),
+				      CallArg::handle("mask", m));
 	if(sampleSize <= 0) {
-		iio_buffer_close(bufStream);
+		DC_TRACE("libiio", "iio_buffer_close", bufStream, iio_buffer_close(bufStream));
 		return {};
 	}
 
@@ -52,12 +67,14 @@ BufferHandle V1BufferOps::openBuffer(DeviceHandle dev, unsigned int idx, Channel
 
 	QVector<iio_block *> blocks;
 	for(size_t i = 0; i < nbBlocks; ++i) {
-		iio_block *b = iio_buffer_stream_create_block(bufStream, blockSize);
+		iio_block *b = V1_TRACE_PTR("iio_buffer_stream_create_block", bufStream,
+					    iio_buffer_stream_create_block(bufStream, blockSize),
+					    CallArg::integer("size", qint64(blockSize)));
 		if(iio_err(b)) {
 			for(auto *blk : std::as_const(blocks)) {
-				iio_block_destroy(blk);
+				DC_TRACE("libiio", "iio_block_destroy", blk, iio_block_destroy(blk));
 			}
-			iio_buffer_close(bufStream);
+			DC_TRACE("libiio", "iio_buffer_close", bufStream, iio_buffer_close(bufStream));
 			return {};
 		}
 		blocks.push_back(b);
@@ -79,29 +96,36 @@ BufferHandle V1BufferOps::openBuffer(DeviceHandle dev, unsigned int idx, Channel
 void V1BufferOps::closeBuffer(BufferHandle h)
 {
 	V1BufferState *s = state(h);
-	iio_buffer_stream_cancel(s->bufStream);
+	DC_TRACE("libiio", "iio_buffer_stream_cancel", s->bufStream, iio_buffer_stream_cancel(s->bufStream));
 	if(s->bufEnabled) {
-		iio_buffer_stream_stop(s->bufStream);
+		DC_TRACE("libiio", "iio_buffer_stream_stop", s->bufStream, iio_buffer_stream_stop(s->bufStream));
 	}
 	for(auto *b : std::as_const(s->blocks)) {
-		iio_block_dequeue(b, false);
-		iio_block_destroy(b);
+		DC_TRACE("libiio", "iio_block_dequeue", b, iio_block_dequeue(b, false),
+			 CallArg::boolean("nonblock", false));
+		DC_TRACE("libiio", "iio_block_destroy", b, iio_block_destroy(b));
 	}
-	iio_buffer_close(s->bufStream);
+	DC_TRACE("libiio", "iio_buffer_close", s->bufStream, iio_buffer_close(s->bufStream));
 	delete s;
 }
 
-void V1BufferOps::cancelBuffer(BufferHandle h) { iio_buffer_stream_cancel(state(h)->bufStream); }
+void V1BufferOps::cancelBuffer(BufferHandle h)
+{
+	// Called directly (not from a command) to unblock a refill: traced only inside a command.
+	DC_TRACE("libiio", "iio_buffer_stream_cancel", state(h)->bufStream,
+		 iio_buffer_stream_cancel(state(h)->bufStream));
+}
 
 Result<void> V1BufferOps::startRefill(V1BufferState *s)
 {
 	for(auto *b : std::as_const(s->blocks)) {
-		int ret = iio_block_enqueue(b, 0, false);
+		int ret = DC_TRACE("libiio", "iio_block_enqueue", b, iio_block_enqueue(b, 0, false),
+				   CallArg::integer("bytes_used", 0), CallArg::boolean("cyclic", false));
 		if(ret < 0) {
 			return Unexpected{Error{ret, QStringLiteral("iio_block_enqueue failed (startRefill)")}};
 		}
 	}
-	int ret = iio_buffer_stream_start(s->bufStream);
+	int ret = DC_TRACE("libiio", "iio_buffer_stream_start", s->bufStream, iio_buffer_stream_start(s->bufStream));
 	if(ret < 0) {
 		return Unexpected{Error{ret, QStringLiteral("iio_buffer_stream_start failed")}};
 	}
@@ -112,7 +136,9 @@ Result<void> V1BufferOps::startRefill(V1BufferState *s)
 Result<void> V1BufferOps::continueRefill(V1BufferState *s)
 {
 	unsigned int doneIdx = s->crtIndex % s->nbBlocks;
-	int ret = iio_block_enqueue(s->blocks[doneIdx], 0, false);
+	iio_block *b = s->blocks[doneIdx];
+	int ret = DC_TRACE("libiio", "iio_block_enqueue", b, iio_block_enqueue(b, 0, false),
+			   CallArg::integer("bytes_used", 0), CallArg::boolean("cyclic", false));
 	if(ret < 0) {
 		return Unexpected{Error{ret, QStringLiteral("iio_block_enqueue failed (continueRefill)")}};
 	}
@@ -130,7 +156,9 @@ Result<void> V1BufferOps::refill(BufferHandle h)
 	}
 
 	unsigned int nextIdx = s->crtIndex % s->nbBlocks;
-	int ret = iio_block_dequeue(s->blocks[nextIdx], false);
+	iio_block *next = s->blocks[nextIdx];
+	int ret = DC_TRACE_OUT("libiio", "iio_block_dequeue", next, iio_block_dequeue(next, false),
+			       dcRc < 0 ? CallOut() : blockPayload(next), CallArg::boolean("nonblock", false));
 	if(ret < 0) {
 		return Unexpected{Error{ret, QStringLiteral("iio_block_dequeue failed (refill)")}};
 	}
@@ -149,19 +177,25 @@ Result<void> V1BufferOps::push(BufferHandle h)
 	}
 
 	if(s->crtIndex >= s->nbBlocks) {
-		int ret = iio_block_dequeue(crtBlock, false);
+		int ret = DC_TRACE("libiio", "iio_block_dequeue", crtBlock, iio_block_dequeue(crtBlock, false),
+				   CallArg::boolean("nonblock", false));
 		if(ret < 0) {
 			return Unexpected{Error{ret, QStringLiteral("iio_block_dequeue failed (push)")}};
 		}
 	}
 
-	int ret = iio_block_enqueue(crtBlock, 0, s->cyclic);
+	// The block content goes out with the call: keep its preview as an argument.
+	int ret = DC_TRACE("libiio", "iio_block_enqueue", crtBlock, iio_block_enqueue(crtBlock, 0, s->cyclic),
+			   CallArg::integer("bytes_used", 0), CallArg::boolean("cyclic", s->cyclic),
+			   CallArg::bytes("data", blockPayload(crtBlock).value.toByteArray()),
+			   CallArg::integer("size", blockSize(crtBlock)));
 	if(ret < 0) {
 		return Unexpected{Error{ret, QStringLiteral("iio_block_enqueue failed (push)")}};
 	}
 
 	if(!s->bufEnabled) {
-		ret = iio_buffer_stream_start(s->bufStream);
+		ret = DC_TRACE("libiio", "iio_buffer_stream_start", s->bufStream,
+			       iio_buffer_stream_start(s->bufStream));
 		if(ret < 0) {
 			return Unexpected{Error{ret, QStringLiteral("iio_buffer_stream_start failed (push)")}};
 		}
@@ -200,12 +234,14 @@ void *V1BufferOps::bufferFirst(BufferHandle h, ChannelHandle ch) const
 
 ChannelsMaskHandle V1BufferOps::createChannelsMask(unsigned int nbChannels)
 {
-	return {iio_create_channels_mask(nbChannels)};
+	return {DC_TRACE("libiio", "iio_create_channels_mask", nullptr, iio_create_channels_mask(nbChannels),
+			 CallArg::integer("nb_channels", nbChannels))};
 }
 
 void V1BufferOps::destroyChannelsMask(ChannelsMaskHandle mask)
 {
-	iio_channels_mask_destroy(static_cast<iio_channels_mask *>(mask.ptr));
+	DC_TRACE("libiio", "iio_channels_mask_destroy", mask.ptr,
+		 iio_channels_mask_destroy(static_cast<iio_channels_mask *>(mask.ptr)));
 }
 
 } // namespace scopy::iio

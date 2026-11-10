@@ -20,6 +20,7 @@
  */
 
 #include "v0bufferops.h"
+#include "core/calltrace.h"
 #include <iio.h>
 
 namespace scopy::iio {
@@ -27,11 +28,22 @@ namespace scopy::iio {
 static iio_device *dev(DeviceHandle h) { return static_cast<iio_device *>(h.ptr); }
 static iio_channel *chn(ChannelHandle h) { return static_cast<iio_channel *>(h.ptr); }
 
+static qint64 bufBytes(iio_buffer *b)
+{
+	return static_cast<const char *>(iio_buffer_end(b)) - static_cast<const char *>(iio_buffer_start(b));
+}
+
+static CallOut bufPayload(iio_buffer *b) { return CallTrace::payload(iio_buffer_start(b), bufBytes(b)); }
+
 BufferHandle V0BufferOps::openBuffer(DeviceHandle d, unsigned int /*idx*/, ChannelsMaskHandle /*mask*/,
 				     size_t samplesCount, bool cyclic, unsigned int kernelBuffers)
 {
-	iio_device_set_kernel_buffers_count(dev(d), kernelBuffers);
-	iio_buffer *b = iio_device_create_buffer(dev(d), samplesCount, cyclic);
+	DC_TRACE("libiio", "iio_device_set_kernel_buffers_count", d.ptr,
+		 iio_device_set_kernel_buffers_count(dev(d), kernelBuffers),
+		 CallArg::integer("nb_buffers", kernelBuffers));
+	iio_buffer *b = DC_TRACE(
+		"libiio", "iio_device_create_buffer", d.ptr, iio_device_create_buffer(dev(d), samplesCount, cyclic),
+		CallArg::integer("samples_count", qint64(samplesCount)), CallArg::boolean("cyclic", cyclic));
 	if(!b) {
 		return {};
 	}
@@ -43,7 +55,7 @@ void V0BufferOps::closeBuffer(BufferHandle h)
 {
 	V0BufferState *s = state(h);
 	if(s) {
-		iio_buffer_destroy(s->buf);
+		DC_TRACE("libiio", "iio_buffer_destroy", s->buf, iio_buffer_destroy(s->buf));
 		delete s;
 	}
 }
@@ -52,13 +64,16 @@ void V0BufferOps::cancelBuffer(BufferHandle h)
 {
 	V0BufferState *s = state(h);
 	if(s) {
-		iio_buffer_cancel(s->buf);
+		// Called directly (not from a command) to unblock a refill: traced only inside a command.
+		DC_TRACE("libiio", "iio_buffer_cancel", s->buf, iio_buffer_cancel(s->buf));
 	}
 }
 
 Result<void> V0BufferOps::refill(BufferHandle h)
 {
-	ssize_t ret = iio_buffer_refill(state(h)->buf);
+	iio_buffer *b = state(h)->buf;
+	ssize_t ret = DC_TRACE_OUT("libiio", "iio_buffer_refill", b, iio_buffer_refill(b),
+				   dcRc < 0 ? CallOut() : bufPayload(b));
 	if(ret < 0) {
 		return Unexpected{Error{static_cast<int>(ret), QStringLiteral("iio_buffer_refill failed")}};
 	}
@@ -71,7 +86,10 @@ Result<void> V0BufferOps::push(BufferHandle h)
 	if(s->cyclic && s->started) {
 		return {};
 	}
-	ssize_t ret = iio_buffer_push(s->buf);
+	// The buffer content goes out with the call: keep its preview as an argument.
+	ssize_t ret = DC_TRACE("libiio", "iio_buffer_push", s->buf, iio_buffer_push(s->buf),
+			       CallArg::bytes("data", bufPayload(s->buf).value.toByteArray()),
+			       CallArg::integer("size", bufBytes(s->buf)));
 	if(ret < 0) {
 		return Unexpected{Error{static_cast<int>(ret), QStringLiteral("iio_buffer_push failed")}};
 	}

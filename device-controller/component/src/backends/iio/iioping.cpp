@@ -22,6 +22,7 @@
 #include "component/backends/iio/iioping.h"
 
 #include "component/capabilityexecutor.h"
+#include "component/commandmonitor.h"
 #include "iioutil/icontextops.h"
 #include "iioutil/commands/pingcommand.h"
 
@@ -33,6 +34,7 @@ QCoro::Task<CommandResponse<void>> IIOPing::checkReachableAsync()
 	auto *ops = m_ops;
 	auto handle = m_handle;
 	auto *cmd = new scopy::iio::PingCommand(handle, [ops, handle]() { return ops->ping(handle); });
+	CommandMonitor::tag(cmd, this);
 	return runCommand(
 		m_executor, cmd, [this](const Result<void> &) { Q_EMIT reachabilityChecked(true); },
 		[this](const Error &) { Q_EMIT reachabilityChecked(false); });

@@ -20,6 +20,7 @@
  */
 
 #include "v0contextops.h"
+#include "core/calltrace.h"
 #include <iio.h>
 
 namespace scopy::iio {
@@ -28,12 +29,16 @@ static iio_context *ctx(ContextHandle h) { return static_cast<iio_context *>(h.p
 
 ContextHandle V0ContextOps::createContext(const QString &uri, const ContextParams &params)
 {
-	iio_context *c = iio_create_context_from_uri(uri.toUtf8().constData());
+	const QByteArray uriBytes = uri.toUtf8();
+	iio_context *c = DC_TRACE("libiio", "iio_create_context_from_uri", nullptr,
+				  iio_create_context_from_uri(uriBytes.constData()), CallArg::string("uri", uri));
 	if(!c) {
 		return {};
 	}
 	if(params.timeoutMs != 0) {
-		iio_context_set_timeout(c, static_cast<unsigned int>(params.timeoutMs));
+		DC_TRACE("libiio", "iio_context_set_timeout", c,
+			 iio_context_set_timeout(c, static_cast<unsigned int>(params.timeoutMs)),
+			 CallArg::integer("timeout_ms", params.timeoutMs));
 	}
 	return {c};
 }
@@ -41,7 +46,7 @@ ContextHandle V0ContextOps::createContext(const QString &uri, const ContextParam
 void V0ContextOps::destroyContext(ContextHandle h)
 {
 	if(h.ptr) {
-		iio_context_destroy(ctx(h));
+		DC_TRACE("libiio", "iio_context_destroy", h.ptr, iio_context_destroy(ctx(h)));
 	}
 }
 
@@ -104,7 +109,8 @@ bool V0ContextOps::ping(ContextHandle h) const
 		return false;
 	}
 	const iio_device *trig = nullptr;
-	int ret = iio_device_get_trigger(dev, &trig);
+	// The trigger lookup is the one round trip of the ping.
+	int ret = DC_TRACE("libiio", "iio_device_get_trigger", dev, iio_device_get_trigger(dev, &trig));
 	return ret >= 0 || ret == -ENOENT;
 }
 

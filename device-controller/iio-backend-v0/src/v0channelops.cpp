@@ -20,11 +20,18 @@
  */
 
 #include "v0channelops.h"
+#include "core/calltrace.h"
 #include <iio.h>
 
 namespace scopy::iio {
 
 static iio_channel *chn(ChannelHandle h) { return static_cast<iio_channel *>(h.ptr); }
+
+static QString chnId(ChannelHandle h)
+{
+	const char *s = iio_channel_get_id(chn(h));
+	return s ? QString::fromUtf8(s) : QString();
+}
 
 QString V0ChannelOps::id(ChannelHandle h) const
 {
@@ -81,9 +88,17 @@ DataFormat V0ChannelOps::dataFormat(ChannelHandle h) const
 	return df;
 }
 
-void V0ChannelOps::enable(ChannelHandle h, ChannelsMaskHandle /*mask*/) { iio_channel_enable(chn(h)); }
+void V0ChannelOps::enable(ChannelHandle h, ChannelsMaskHandle /*mask*/)
+{
+	DC_TRACE("libiio", "iio_channel_enable", h.ptr, iio_channel_enable(chn(h)),
+		 CallArg::string("channel", chnId(h)));
+}
 
-void V0ChannelOps::disable(ChannelHandle h, ChannelsMaskHandle /*mask*/) { iio_channel_disable(chn(h)); }
+void V0ChannelOps::disable(ChannelHandle h, ChannelsMaskHandle /*mask*/)
+{
+	DC_TRACE("libiio", "iio_channel_disable", h.ptr, iio_channel_disable(chn(h)),
+		 CallArg::string("channel", chnId(h)));
+}
 
 bool V0ChannelOps::isEnabled(ChannelHandle h, ChannelsMaskHandle /*mask*/) const
 {
