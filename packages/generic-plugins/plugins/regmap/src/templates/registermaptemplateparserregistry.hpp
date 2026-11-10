@@ -24,6 +24,7 @@
 
 #include <QList>
 #include <QString>
+#include <QStringList>
 
 namespace scopy::regmap {
 class IRegisterMapTemplateParser;
@@ -38,6 +39,10 @@ public:
 	void registerParser(IRegisterMapTemplateParser *parser);
 	// the parser with the longest matching suffix, or nullptr
 	IRegisterMapTemplateParser *parserFor(const QString &path) const;
+	// every suffix of every parser, e.g. ".xml", ".regmap.json"
+	QStringList fileSuffixes() const;
+	// the longest suffix of fileName that a parser handles, or empty
+	QString suffixOf(const QString &fileName) const;
 
 private:
 	RegisterMapTemplateParserRegistry();

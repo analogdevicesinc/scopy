@@ -22,6 +22,7 @@
 #include "registermaptemplateparserregistry.hpp"
 
 #include "iregistermaptemplateparser.hpp"
+#include "jsontemplateparser.hpp"
 #include "xmltemplateparser.hpp"
 
 using namespace scopy::regmap;
@@ -32,7 +33,11 @@ RegisterMapTemplateParserRegistry *RegisterMapTemplateParserRegistry::instance()
 	return &registry;
 }
 
-RegisterMapTemplateParserRegistry::RegisterMapTemplateParserRegistry() { registerParser(new XmlTemplateParser()); }
+RegisterMapTemplateParserRegistry::RegisterMapTemplateParserRegistry()
+{
+	registerParser(new XmlTemplateParser());
+	registerParser(new JsonTemplateParser());
+}
 
 RegisterMapTemplateParserRegistry::~RegisterMapTemplateParserRegistry() { qDeleteAll(m_parsers); }
 
@@ -53,6 +58,26 @@ IRegisterMapTemplateParser *RegisterMapTemplateParserRegistry::parserFor(const Q
 				match = parser;
 				matchLength = suffix.length();
 			}
+		}
+	}
+	return match;
+}
+
+QStringList RegisterMapTemplateParserRegistry::fileSuffixes() const
+{
+	QStringList suffixes;
+	for(IRegisterMapTemplateParser *parser : m_parsers) {
+		suffixes.append(parser->fileSuffixes());
+	}
+	return suffixes;
+}
+
+QString RegisterMapTemplateParserRegistry::suffixOf(const QString &fileName) const
+{
+	QString match;
+	for(const QString &suffix : fileSuffixes()) {
+		if(suffix.length() > match.length() && fileName.endsWith(suffix, Qt::CaseInsensitive)) {
+			match = suffix;
 		}
 	}
 	return match;

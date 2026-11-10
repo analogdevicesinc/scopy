@@ -86,7 +86,9 @@ else()
 	set(REGMAP_XML_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/resources/regmap-xml)
 endif()
 
-file(GLOB XMLS ${CMAKE_CURRENT_SOURCE_DIR}/resources/regmap-xml/*.xml)
+file(GLOB XMLS ${CMAKE_CURRENT_SOURCE_DIR}/resources/regmap-xml/*.xml
+     ${CMAKE_CURRENT_SOURCE_DIR}/resources/regmap-xml/*.regmap.json
+)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/resources/regmap-xml/regmap-config.json DESTINATION ${REGMAP_XML_BUILD_PATH})
 foreach(_xml ${XMLS})

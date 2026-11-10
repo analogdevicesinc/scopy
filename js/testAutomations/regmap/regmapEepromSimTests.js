@@ -38,7 +38,7 @@
 //   TST.REGMAP.EEPROM_READ_WRITE_ONLY   - eprom3: CSV read/write without a template
 //   TST.REGMAP.EEPROM_MISSING_ADDRESS   - An address missing from the CSV gives no value
 //   TST.REGMAP.DONGLE_SWITCH_DEVICE     - Switch device (board 2), Sync, Configure: only eprom4, still connected
-//   TST.REGMAP.DONGLE_EPROM4_READ_WRITE - eprom4 reads and writes its own CSV (eprom4.csv)
+//   TST.REGMAP.DONGLE_EPROM4_READ_WRITE - eprom4 loads its JSON template and reads and writes its own CSV (eprom4.csv)
 //   TST.REGMAP.DONGLE_SWITCH_BACK       - Switch back to board 1, Sync, Configure: eprom1..3 again
 //
 // The status bar message of TST.REGMAP.EEPROM_MISSING_ADDRESS and the hidden controls of
@@ -52,7 +52,7 @@ evaluateFile("../js/testAutomations/common/testFramework.js");
 var SIM_URI = "dongle:sim0";
 var EXPECTED_DEVICES = ["eprom1", "eprom2", "eprom3"];
 
-// Values shipped in packages/eprom_test/resources/eprom_test/ (*.csv and the two 5 register *.xml templates)
+// Values shipped in packages/eprom_test/resources/eprom_test/ (*.csv and the 5 register templates)
 var POC_REG_NAME = "POC_REG";
 var EPROM1_POC_REG_ADDR = "0x4"; // 5th register of eprom1_regmap.xml
 var EPROM2_POC_REG_ADDR = "0x4"; // 5th register of eprom2_regmap.xml
@@ -69,7 +69,8 @@ var EPROM3_WRITE_VALUE = 0x12;
 var BOARD1 = "board 1";
 var BOARD2 = "board 2";
 var BOARD2_DEVICES = ["eprom4"];
-var EPROM4_POC_REG_ADDR = "0x4"; // 5th register of eprom4_regmap.xml
+var EPROM4_POC_REG_ADDR = "0x4"; // 5th register of eprom4.regmap.json
+var EPROM4_JSON_MARKER = "(JSON template)"; // in every register description of eprom4.regmap.json
 var EPROM4_POC_REG_VALUE = 0x4b;
 var EPROM4_WRITE_ADDR = "0x1";
 var EPROM4_WRITE_VALUE = 0x55;
@@ -492,7 +493,7 @@ TestFramework.runTest("TST.REGMAP.DONGLE_SWITCH_DEVICE", function() {
 // ============================================
 // Test: eprom4 read/write
 // UID: TST.REGMAP.DONGLE_EPROM4_READ_WRITE
-// Description: eprom4 (board 2) uses its own template and reads and writes its own CSV
+// Description: eprom4 (board 2) uses its own JSON template and reads and writes its own CSV
 // ============================================
 TestFramework.runTest("TST.REGMAP.DONGLE_EPROM4_READ_WRITE", function() {
     var deviceSet = regmap.setDevice("eprom4");
@@ -505,6 +506,9 @@ TestFramework.runTest("TST.REGMAP.DONGLE_EPROM4_READ_WRITE", function() {
     printToConsole("  Register info for " + EPROM4_POC_REG_ADDR + ": " + info);
     if (info.indexOf("Name:" + POC_REG_NAME) === -1) {
         return "Expected " + POC_REG_NAME + " at " + EPROM4_POC_REG_ADDR + ", the eprom4 template is not used";
+    }
+    if (info.join("|").indexOf(EPROM4_JSON_MARKER) === -1) {
+        return "eprom4 is not described by eprom4.regmap.json: " + info;
     }
     var value = readValue(EPROM4_POC_REG_ADDR);
     printToConsole("  " + EPROM4_POC_REG_ADDR + " = " + (value === null ? "not read" : toHex(value)));

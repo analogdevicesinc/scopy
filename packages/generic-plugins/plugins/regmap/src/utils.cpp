@@ -24,6 +24,7 @@
 #include "jsonformatedelement.hpp"
 #include "logging_categories.h"
 #include "scopy-regmap_config.h"
+#include "templates/registermaptemplateparserregistry.hpp"
 
 #include <QApplication>
 #include <QDir>
@@ -73,8 +74,12 @@ void Utils::removeLayoutMargins(QLayout *layout)
 
 QFileInfoList Utils::setXmlPath()
 {
-	QFileInfoList files = PkgManager::listFilesInfo(QStringList() << "regmap-xml", QStringList() << "*.xml");
-	qDebug(CAT_REGMAP) << "XML files found: " << files.size();
+	QStringList patterns;
+	for(const QString &suffix : RegisterMapTemplateParserRegistry::instance()->fileSuffixes()) {
+		patterns << "*" + suffix;
+	}
+	QFileInfoList files = PkgManager::listFilesInfo(QStringList() << "regmap-xml", patterns);
+	qDebug(CAT_REGMAP) << "Template files found: " << files.size();
 	if(!files.empty()) {
 		return files;
 	}
@@ -127,6 +132,10 @@ void Utils::applyJsonConfig()
 
 	// Process each JSON config file
 	for(const QFileInfo &jsonFile : jsonFiles) {
+		// JSON register map templates share the folder with the configs
+		if(!RegisterMapTemplateParserRegistry::instance()->suffixOf(jsonFile.fileName()).isEmpty()) {
+			continue;
+		}
 		QString filePath = jsonFile.absoluteFilePath();
 		qDebug(CAT_REGMAP) << "Processing JSON config file: " << filePath;
 		getConfigurationFromJson(filePath);
@@ -196,9 +205,10 @@ void Utils::processXmlFiles()
 	QFileInfoList xmlFiles = Utils::setXmlPath();
 	for(const QFileInfo &xmlFile : xmlFiles) {
 		QString xmlName = xmlFile.fileName();
-		if(xmlName.contains(".xml")) {
+		QString suffix = RegisterMapTemplateParserRegistry::instance()->suffixOf(xmlName);
+		if(!suffix.isEmpty()) {
 			auto deviceName = xmlName.toLower();
-			deviceName.chop(4);
+			deviceName.chop(suffix.length());
 			if(spiJson->contains(xmlName)) {
 				spiJson->value(xmlName)->addCompatibleDevice(deviceName);
 			} else {

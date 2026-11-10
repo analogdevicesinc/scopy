@@ -3,7 +3,7 @@
     "regmap": [
         {
             "target": "eprom4",
-            "template": "eprom4_regmap.xml",
+            "template": "eprom4.regmap.json",
             "access": "file",
             "file": "eprom4.csv"
         }

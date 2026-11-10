@@ -1,0 +1,49 @@
+{
+	"registers": [
+		{
+			"name": "BOARD_ID",
+			"address": "0x000",
+			"description": "Board 2 register 1 (JSON template)",
+			"width": 8,
+			"bitfields": [
+				{ "name": "BOARD_ID[7:0]", "offset": 0, "width": 8, "access": "R/W", "default": "0x0", "description": "Board 2 register 1 value" }
+			]
+		},
+		{
+			"name": "BOARD_REV",
+			"address": "0x001",
+			"description": "Board 2 register 2 (JSON template)",
+			"width": 8,
+			"bitfields": [
+				{ "name": "BOARD_REV[7:0]", "offset": 0, "width": 8, "access": "R/W", "default": "0x0", "description": "Board 2 register 2 value" }
+			]
+		},
+		{
+			"name": "GPIO_DIR",
+			"address": "0x002",
+			"description": "Board 2 register 3 (JSON template)",
+			"width": 8,
+			"bitfields": [
+				{ "name": "GPIO_DIR[7:0]", "offset": 0, "width": 8, "access": "R/W", "default": "0x0", "description": "Board 2 register 3 value" }
+			]
+		},
+		{
+			"name": "GPIO_OUT",
+			"address": "0x003",
+			"description": "Board 2 register 4 (JSON template)",
+			"width": 8,
+			"bitfields": [
+				{ "name": "GPIO_OUT[7:0]", "offset": 0, "width": 8, "access": "R/W", "default": "0x0", "description": "Board 2 register 4 value" }
+			]
+		},
+		{
+			"name": "POC_REG",
+			"address": "0x004",
+			"description": "POC register 5, only in the board 2 template (JSON template)",
+			"width": 8,
+			"bitfields": [
+				{ "name": "POC_REG[7:0]", "offset": 0, "width": 8, "access": "R/W", "default": "0x0", "description": "POC register 5 value" }
+			]
+		}
+	]
+}
