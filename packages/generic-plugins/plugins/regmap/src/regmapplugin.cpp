@@ -62,7 +62,6 @@
 #include "jsonformatedelement.hpp"
 #include <core/deviceimpl.h>
 #include <core/dongledevicemanager.h>
-#include <readwrite/csvregisterstrategy.hpp>
 #include "scopy-regmap_config.h"
 #include "utils.hpp"
 #include "utils.hpp"
@@ -441,9 +440,8 @@ bool RegmapPlugin::createStrategies(const RegisterMapToolConfig &config, IRegist
 				<< "Register values file" << config.filePath << "not found for device" << config.target;
 			return false;
 		}
-		QSharedPointer<CsvRegisterFile> file(new CsvRegisterFile(config.filePath));
-		read = new CsvRegisterReadStrategy(file);
-		write = new CsvRegisterWriteStrategy(file);
+		read = new FileRegisterReadStrategy(config.filePath);
+		write = new FileRegisterWriteStrategy(config.filePath);
 		return true;
 	}
 	}
