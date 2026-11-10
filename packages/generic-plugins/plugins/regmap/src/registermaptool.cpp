@@ -227,21 +227,21 @@ void RegisterMapTool::toggleSettingsMenu(QString registerName, bool toggle)
 	if(toggle) {
 		QObject::connect(settings, &RegisterMapSettingsMenu::autoreadToggled, deviceList->value(registerName),
 				 &DeviceRegisterMap::toggleAutoread);
-		QObject::connect(settings, &RegisterMapSettingsMenu::requestRead, deviceList->value(registerName),
-				 &DeviceRegisterMap::requestRead);
+		QObject::connect(settings, &RegisterMapSettingsMenu::requestReadInterval,
+				 deviceList->value(registerName), &DeviceRegisterMap::requestReadInterval);
 		QObject::connect(settings, &RegisterMapSettingsMenu::requestRegisterDump,
 				 deviceList->value(registerName), &DeviceRegisterMap::requestRegisterDump);
-		QObject::connect(settings, &RegisterMapSettingsMenu::requestWrite, deviceList->value(registerName),
-				 &DeviceRegisterMap::requestWrite);
+		QObject::connect(settings, &RegisterMapSettingsMenu::requestWriteFromFile,
+				 deviceList->value(registerName), &DeviceRegisterMap::requestWriteFromFile);
 	} else {
 		QObject::disconnect(settings, &RegisterMapSettingsMenu::autoreadToggled,
 				    deviceList->value(registerName), &DeviceRegisterMap::toggleAutoread);
-		QObject::disconnect(settings, &RegisterMapSettingsMenu::requestRead, deviceList->value(registerName),
-				    &DeviceRegisterMap::requestRead);
+		QObject::disconnect(settings, &RegisterMapSettingsMenu::requestReadInterval,
+				    deviceList->value(registerName), &DeviceRegisterMap::requestReadInterval);
 		QObject::disconnect(settings, &RegisterMapSettingsMenu::requestRegisterDump,
 				    deviceList->value(registerName), &DeviceRegisterMap::requestRegisterDump);
-		QObject::disconnect(settings, &RegisterMapSettingsMenu::requestWrite, deviceList->value(registerName),
-				    &DeviceRegisterMap::requestWrite);
+		QObject::disconnect(settings, &RegisterMapSettingsMenu::requestWriteFromFile,
+				    deviceList->value(registerName), &DeviceRegisterMap::requestWriteFromFile);
 	}
 }
 

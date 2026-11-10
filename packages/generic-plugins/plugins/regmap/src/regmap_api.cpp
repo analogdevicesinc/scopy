@@ -138,10 +138,8 @@ void RegMap_API::readInterval(QString startAddr, QString stopAddr)
 	}
 	uint32_t start = Utils::convertQStringToUint32(startAddr);
 	uint32_t stop = Utils::convertQStringToUint32(stopAddr);
-	// one call per address, so each one is busy only during its own read
-	for(uint32_t i = start; i <= stop; i++) {
-		QCoro::waitFor(devRegMap->registerMapValues->readWhenIdle(i));
-	}
+	// a real sync call: waits for busy registers, one read per address
+	QCoro::waitFor(devRegMap->registerMapValues->readRange(start, stop, true));
 }
 
 bool RegMap_API::enableAutoread(bool enable)
@@ -180,7 +178,8 @@ void RegMap_API::registerDump(const QString &filePath)
 		qWarning(CAT_REGMAP_API) << "Device" << getDevice() << "has no read/write, registerDump ignored";
 		return;
 	}
-	Q_EMIT devRegMap->registerMapValues->registerDump(filePath);
+	// writes the values read so far, as before
+	QCoro::waitFor(devRegMap->registerMapValues->dump(filePath));
 }
 
 void RegMap_API::setPath(const QString &filePath)
@@ -206,7 +205,8 @@ void RegMap_API::writeFromFile(const QString &filePath)
 		return;
 	}
 	setPath(filePath);
-	Q_EMIT m_regMapPlugin->registerMapTool->settings->writeListOfValuesButton->clicked();
+	// a real sync call: every line is written and read back, waiting for busy registers
+	QCoro::waitFor(devRegMap->registerMapValues->writeFromFile(filePath, true));
 }
 
 QString RegMap_API::readRegister(const QString &addr)

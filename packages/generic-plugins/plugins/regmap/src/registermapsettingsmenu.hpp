@@ -47,9 +47,10 @@ public:
 
 Q_SIGNALS:
 	void autoreadToggled(bool toggled);
-	void requestRead(int address);
-	void requestWrite(uint32_t address, uint32_t value);
-	void requestRegisterDump(QString path);
+	void requestReadInterval(uint32_t start, uint32_t end);
+	void requestWriteFromFile(QString path);
+	// readFirst: the interval is read before the file is written
+	void requestRegisterDump(QString path, bool readFirst, uint32_t start, uint32_t end);
 	void tutorialDone();
 	void tutorialAborted();
 

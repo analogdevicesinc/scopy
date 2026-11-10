@@ -63,9 +63,10 @@ public:
 	void startSimpleTutorial();
 
 Q_SIGNALS:
-	void requestRead(uint32_t address);
-	void requestWrite(uint32_t address, uint32_t value);
-	void requestRegisterDump(QString path);
+	// forwarded from the settings menu to the register map values
+	void requestReadInterval(uint32_t start, uint32_t end);
+	void requestWriteFromFile(QString path);
+	void requestRegisterDump(QString path, bool readFirst, uint32_t start, uint32_t end);
 	void tutorialFinished();
 	void simpleTutorialFinished();
 	void tutorialAborted();

@@ -23,6 +23,7 @@
 
 #include "logging_categories.h"
 
+#include <readwrite/fileregisterreadstrategy.hpp>
 #include <readwrite/iregisterreadstrategy.hpp>
 #include <readwrite/iregisterwritestrategy.hpp>
 
@@ -48,10 +49,6 @@ constexpr std::chrono::milliseconds BUSY_POLL_INTERVAL{10};
 RegisterMapValues::RegisterMapValues(QObject *parent)
 	: QObject{parent}
 {
-	// the returned tasks are dropped here: the result reaches the UI through the signals
-	QObject::connect(this, &RegisterMapValues::requestRead, this, [this](uint32_t address) { read(address); });
-	QObject::connect(this, &RegisterMapValues::requestWrite, this,
-			 [this](uint32_t address, uint32_t value) { writeThenRead(address, {value}); });
 	QObject::connect(this, &RegisterMapValues::accessFailed, this, [this](uint32_t address, const Error &error) {
 		QString text = error.errorString();
 		if(!error.message.isEmpty() && error.code != 0) {
@@ -208,13 +205,61 @@ QCoro::Task<Result<QVector<uint32_t>>> RegisterMapValues::writeThenRead(uint32_t
 	co_return r;
 }
 
+QCoro::Task<void> RegisterMapValues::readRange(uint32_t start, uint32_t end, bool waitWhenBusy)
+{
+	QPointer<RegisterMapValues> self(this);
+	// one call per address, so each one is busy only during its own read
+	for(uint64_t address = start; address <= end && self; address++) {
+		if(waitWhenBusy) {
+			co_await self->readWhenIdle(address);
+		} else {
+			co_await self->read(address);
+		}
+	}
+}
+
+QCoro::Task<void> RegisterMapValues::writeFromFile(QString path, bool waitWhenBusy)
+{
+	auto values = FileRegisterReadStrategy(path).readAll();
+	if(!values) {
+		StatusBarManager::pushMessage("Register map " + m_deviceName + ": " + values.error().errorString());
+		co_return;
+	}
+
+	QPointer<RegisterMapValues> self(this);
+	// one line after the other, in file order: the order can matter on a device
+	for(const auto &entry : std::as_const(values.value())) {
+		if(!self) {
+			co_return;
+		}
+		if(waitWhenBusy) {
+			co_await self->writeThenReadWhenIdle(entry.first, {entry.second});
+		} else {
+			co_await self->writeThenRead(entry.first, {entry.second});
+		}
+	}
+}
+
+QCoro::Task<void> RegisterMapValues::dump(QString path, std::optional<QPair<uint32_t, uint32_t>> readFirst)
+{
+	QPointer<RegisterMapValues> self(this);
+	if(readFirst) {
+		// the file gets the values just read, not the ones from before
+		co_await readRange(readFirst->first, readFirst->second);
+		if(!self) {
+			co_return;
+		}
+	}
+	self->writeDumpFile(path);
+}
+
 void RegisterMapValues::setReadStrategy(IRegisterReadStrategy *readStrategy) { this->readStrategy = readStrategy; }
 
 void RegisterMapValues::setWriteStrategy(IRegisterWriteStrategy *writeStrategy) { this->writeStrategy = writeStrategy; }
 
 void RegisterMapValues::setDeviceName(const QString &deviceName) { m_deviceName = deviceName; }
 
-void RegisterMapValues::registerDump(QString path)
+void RegisterMapValues::writeDumpFile(const QString &path)
 {
 	QFile file(path);
 	if(!file.isOpen()) {

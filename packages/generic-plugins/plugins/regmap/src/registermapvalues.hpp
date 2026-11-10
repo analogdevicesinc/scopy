@@ -27,11 +27,15 @@
 #include <QDateTime>
 #include <QMap>
 #include <QObject>
+#include <QPair>
 #include <QSet>
+#include <QString>
 #include <QVector>
 
 #include <core/result.h>
 #include <qcoro/qcorotask.h>
+
+#include <optional>
 
 namespace scopy::regmap {
 class IRegisterWriteStrategy;
@@ -59,6 +63,14 @@ public:
 	QCoro::Task<scopy::Result<QVector<uint32_t>>> readWhenIdle(uint32_t address, int count = 1);
 	QCoro::Task<scopy::Result<QVector<uint32_t>>> writeThenReadWhenIdle(uint32_t address, QVector<uint32_t> values);
 
+	// Batches run their calls one after the other. waitWhenBusy: the JS API waits for a busy register, the UI
+	// skips it (logged).
+	QCoro::Task<void> readRange(uint32_t start, uint32_t end, bool waitWhenBusy = false);
+	// writes every "<address>,<value>" line of the file, in file order, each one read back
+	QCoro::Task<void> writeFromFile(QString path, bool waitWhenBusy = false);
+	// writes the cache to the file; with readFirst, the range is read first
+	QCoro::Task<void> dump(QString path, std::optional<QPair<uint32_t, uint32_t>> readFirst = std::nullopt);
+
 	// a register is busy from the start of a call until its result arrives; a busy register gets no other call
 	bool isBusy(uint32_t address) const;
 
@@ -66,7 +78,6 @@ public:
 	bool hasValue(uint32_t address);
 	void setReadStrategy(IRegisterReadStrategy *readStrategy);
 	void setWriteStrategy(IRegisterWriteStrategy *writeStrategy);
-	void registerDump(QString path);
 	// used in the read/write error messages
 	void setDeviceName(const QString &deviceName);
 
@@ -78,10 +89,9 @@ Q_SIGNALS:
 	void registerValueChanged(uint32_t address, uint32_t value);
 	void accessFailed(uint32_t address, const scopy::Error &error);
 	void busyChanged(uint32_t address, bool busy);
-	void requestRead(uint32_t address);
-	void requestWrite(uint32_t address, uint32_t value);
 
 private:
+	void writeDumpFile(const QString &path);
 	// false, and nothing marked, if any register of the range is busy
 	bool markBusy(uint32_t address, int count);
 	void clearBusy(uint32_t address, int count);

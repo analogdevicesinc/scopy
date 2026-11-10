@@ -153,7 +153,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 					 registerChanged(registerMapTemplate->getRegisterTemplate(address));
 					 registerController->blockSignals(false);
 					 if(autoread && registerMapValues) {
-						 Q_EMIT registerMapValues->requestRead(address);
+						 registerMapValues->read(address);
 					 }
 				 });
 
@@ -162,18 +162,17 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 					 registerChanged(registerMapTemplate->getRegisterTemplate(address));
 					 registerMapTableWidget->scrollTo(address);
 					 if(autoread && registerMapValues) {
-						 Q_EMIT registerMapValues->requestRead(address);
+						 registerMapValues->read(address);
 					 }
 				 });
 	}
 
 	if(registerMapValues) {
-		QObject::connect(
-			registerController, &RegisterController::requestRead, registerMapValues,
-			[registerMapValues](uint32_t address) { Q_EMIT registerMapValues->requestRead(address); });
+		QObject::connect(registerController, &RegisterController::requestRead, registerMapValues,
+				 [registerMapValues](uint32_t address) { registerMapValues->read(address); });
 		QObject::connect(registerController, &RegisterController::requestWrite, registerMapValues,
 				 [registerMapValues](uint32_t address, uint32_t value) {
-					 Q_EMIT registerMapValues->requestWrite(address, value);
+					 registerMapValues->writeThenRead(address, {value});
 				 });
 		// the Read / Write buttons follow the busy state of the selected register
 		QObject::connect(
@@ -297,10 +296,19 @@ void DeviceRegisterMap::initSettings()
 	if(!registerMapValues) {
 		return;
 	}
-	QObject::connect(this, &DeviceRegisterMap::requestRead, registerMapValues, &RegisterMapValues::requestRead);
+	// the returned tasks are dropped: the results reach the UI through the values' signals
+	QObject::connect(this, &DeviceRegisterMap::requestReadInterval, registerMapValues,
+			 [this](uint32_t start, uint32_t end) { registerMapValues->readRange(start, end); });
+	QObject::connect(this, &DeviceRegisterMap::requestWriteFromFile, registerMapValues,
+			 [this](QString path) { registerMapValues->writeFromFile(path); });
 	QObject::connect(this, &DeviceRegisterMap::requestRegisterDump, registerMapValues,
-			 &RegisterMapValues::registerDump);
-	QObject::connect(this, &DeviceRegisterMap::requestWrite, registerMapValues, &RegisterMapValues::requestWrite);
+			 [this](QString path, bool readFirst, uint32_t start, uint32_t end) {
+				 std::optional<QPair<uint32_t, uint32_t>> range;
+				 if(readFirst) {
+					 range = qMakePair(start, end);
+				 }
+				 registerMapValues->dump(path, range);
+			 });
 }
 
 void DeviceRegisterMap::initTutorial()

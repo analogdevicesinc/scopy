@@ -33,14 +33,11 @@
 #include <qlineedit.h>
 #include <qpushbutton.h>
 
-#include <readwrite/fileregisterreadstrategy.hpp>
-
 #include <menusectionwidget.h>
 #include <style.h>
 #include <tutorialbuilder.h>
 
 #include <pluginbase/preferences.h>
-#include <pluginbase/statusbarmanager.h>
 
 using namespace scopy;
 using namespace regmap;
@@ -92,11 +89,8 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 	readInterval->setEnabled(false);
 
 	QObject::connect(readInterval, &QPushButton::clicked, this, [this]() {
-		int startInterval = Utils::convertQStringToUint32(startReadInterval->text());
-		int endInterval = Utils::convertQStringToUint32(endReadInterval->text());
-		for(int i = startInterval; i <= endInterval; i++) {
-			Q_EMIT requestRead(i);
-		}
+		Q_EMIT requestReadInterval(Utils::convertQStringToUint32(startReadInterval->text()),
+					   Utils::convertQStringToUint32(endReadInterval->text()));
 	});
 
 	QObject::connect(startReadInterval, &QLineEdit::textChanged, this, [this]() {
@@ -136,17 +130,8 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 	writeListOfValuesButton = new QPushButton("Write values");
 	writeListOfValuesButton->setEnabled(false);
 
-	QObject::connect(writeListOfValuesButton, &QPushButton::clicked, this, [this, fileBrowserEdit]() {
-		auto values = FileRegisterReadStrategy(fileBrowserEdit->text()).readAll();
-		if(!values) {
-			StatusBarManager::pushMessage("Register map: " + values.error().errorString());
-			return;
-		}
-		// in file order, the order can matter on a device
-		for(const auto &entry : std::as_const(values.value())) {
-			Q_EMIT requestWrite(entry.first, entry.second);
-		}
-	});
+	QObject::connect(writeListOfValuesButton, &QPushButton::clicked, this,
+			 [this, fileBrowserEdit]() { Q_EMIT requestWriteFromFile(fileBrowserEdit->text()); });
 
 	menuSection->contentLayout()->addWidget(writeListOfValuesButton);
 
@@ -154,12 +139,13 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 	registerDump->setEnabled(false);
 
 	QObject::connect(registerDump, &QPushButton::clicked, this, [this, fileBrowserEdit]() {
-		if(autoread->isChecked()) {
-			readInterval->click();
-		}
+		// with autoread, the interval is read first, as the Read interval button does (only when it is enabled)
+		const bool readFirst = autoread->isChecked() && readInterval->isEnabled();
 		QString filePath = fileBrowserEdit->text();
 		QFile::remove(filePath);
-		Q_EMIT requestRegisterDump(filePath);
+		Q_EMIT requestRegisterDump(filePath, readFirst,
+					   Utils::convertQStringToUint32(startReadInterval->text()),
+					   Utils::convertQStringToUint32(endReadInterval->text()));
 	});
 
 	menuSection->contentLayout()->addWidget(registerDump);
