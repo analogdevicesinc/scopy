@@ -44,7 +44,7 @@ if (!TestFramework.connectToDevice("ip:127.0.0.0")) {
 }
 
 // Switch to Regmap tool
-if (!switchToTool("Register Map")) {
+if (!switchToTool("Register map")) {
     printToConsole("ERROR: Cannot switch to Register Map tool");
     scopy.exit();
 }
