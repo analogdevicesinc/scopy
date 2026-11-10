@@ -24,10 +24,16 @@
 
 using namespace scopy;
 
-EditableGuiStrategy::EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget *parent)
+// Slightly shorter than basicButton's unit_2, to sit flush with the line edit.
+#define BUTTON_HEIGHT_QSS "min-height: 18px; max-height: 18px; padding: 0px 8px;"
+
+EditableGuiStrategy::EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget *parent,
+					 bool manualReadWrite)
 	: QObject(parent)
 	, m_ui(new QWidget(parent))
 	, m_lineEdit(new MenuLineEdit(m_ui))
+	, m_readBtn(nullptr)
+	, m_writeBtn(nullptr)
 {
 	m_recipe = recipe;
 	m_title = new QLabel(recipe.data, m_ui);
@@ -59,23 +65,65 @@ EditableGuiStrategy::EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isC
 	m_ui->layout()->addWidget(m_lineEdit);
 	m_ui->layout()->setSpacing(0);
 
-	connect(m_lineEdit->edit(), &QLineEdit::editingFinished, this, [this]() {
-		QString currentText = m_lineEdit->edit()->text();
-		if(currentText != m_lastEmittedText) {
-			m_lastEmittedText = currentText;
-			Q_EMIT emitData(currentText);
-		}
-	});
-
 	// A component::Attribute with no write capability is display-only.
 	if(m_recipe.attribute && !m_recipe.attribute->isWritable()) {
 		m_lineEdit->edit()->setReadOnly(true);
+	}
+
+	if(manualReadWrite) {
+		setupManualReadWrite();
+	} else {
+		connect(m_lineEdit->edit(), &QLineEdit::editingFinished, this, [this]() {
+			QString currentText = m_lineEdit->edit()->text();
+			if(currentText != m_lastEmittedText) {
+				m_lastEmittedText = currentText;
+				Q_EMIT emitData(currentText);
+			}
+		});
 	}
 
 	Q_EMIT requestData();
 }
 
 EditableGuiStrategy::~EditableGuiStrategy() {}
+
+void EditableGuiStrategy::setupManualReadWrite()
+{
+	// Context attributes are read-only; component::Attributes expose their capabilities.
+	bool readable = !m_recipe.attribute || m_recipe.attribute->readCapability();
+	bool writable = m_recipe.attribute ? m_recipe.attribute->isWritable() : (m_recipe.channel || m_recipe.device);
+
+	// Swap the bare line edit for a row holding the line edit and the buttons.
+	m_ui->layout()->removeWidget(m_lineEdit);
+	QWidget *row = new QWidget(m_ui);
+	QHBoxLayout *rowLayout = new QHBoxLayout(row);
+	rowLayout->setContentsMargins(0, 0, 0, 0);
+	rowLayout->setSpacing(5);
+	rowLayout->addWidget(m_lineEdit);
+	m_ui->layout()->addWidget(row);
+
+	if(readable) {
+		m_readBtn = new QPushButton("Read", row);
+		Style::setStyle(m_readBtn, style::properties::button::basicButton);
+		m_readBtn->setStyleSheet(BUTTON_HEIGHT_QSS);
+		rowLayout->addWidget(m_readBtn);
+		connect(m_readBtn, &QPushButton::clicked, this, &EditableGuiStrategy::requestData);
+	}
+
+	if(writable) {
+		m_writeBtn = new QPushButton("Write", row);
+		Style::setStyle(m_writeBtn, style::properties::button::basicButton);
+		m_writeBtn->setStyleSheet(BUTTON_HEIGHT_QSS);
+		rowLayout->addWidget(m_writeBtn);
+		connect(m_writeBtn, &QPushButton::clicked, this, [this]() {
+			m_lastEmittedText = m_lineEdit->edit()->text();
+			Q_EMIT emitData(m_lastEmittedText);
+		});
+		connect(m_lineEdit->edit(), &QLineEdit::returnPressed, m_writeBtn, &QPushButton::click);
+	} else {
+		m_lineEdit->edit()->setReadOnly(true);
+	}
+}
 
 QWidget *EditableGuiStrategy::ui() { return m_ui; }
 

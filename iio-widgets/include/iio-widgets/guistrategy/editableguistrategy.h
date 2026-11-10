@@ -22,6 +22,7 @@
 #define SCOPY_EDITABLEGUISTRATEGY_H
 
 #include <QWidget>
+#include <QPushButton>
 #include <infoiconwidget.h>
 #include "guistrategy/guistrategyinterface.h"
 #include <gui/widgets/menulineedit.h>
@@ -37,8 +38,11 @@ public:
 	/**
 	 * @brief This contain a MenuLineEdit with no validation on what the text can or cannot be set. The
 	 * parent of this QObject will be the parent of the ui() QWidget.
+	 * @param manualReadWrite If true, editing the line edit no longer writes the attribute. Instead, Read
+	 * and/or Write buttons (depending on the attribute capabilities) trigger the operations manually.
 	 * */
-	explicit EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isCompact = false, QWidget *parent = nullptr);
+	explicit EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isCompact = false, QWidget *parent = nullptr,
+				     bool manualReadWrite = false);
 	~EditableGuiStrategy();
 
 	/**
@@ -60,11 +64,15 @@ Q_SIGNALS:
 	void requestData() override;
 
 private:
+	void setupManualReadWrite();
+
 	QWidget *m_ui;
 	MenuLineEdit *m_lineEdit;
 	QString m_lastEmittedText;
 	QLabel *m_title;
 	InfoIconWidget *m_infoIcon;
+	QPushButton *m_readBtn;
+	QPushButton *m_writeBtn;
 };
 } // namespace scopy
 

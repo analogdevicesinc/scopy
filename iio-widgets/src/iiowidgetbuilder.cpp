@@ -68,6 +68,7 @@ QString formatComponentOptions(scopy::component::Attribute *attr)
 IIOWidgetBuilder::IIOWidgetBuilder(QWidget *parent)
 	: QObject(parent)
 	, m_isCompact(false)
+	, m_manualReadWrite(false)
 	, m_includeDebugAttrs(Preferences::get("debugger_v2_include_debugfs").toBool())
 	, m_includeAvailableAttrs(false)
 	, m_context(nullptr)
@@ -322,6 +323,7 @@ QList<IIOWidget *> IIOWidgetBuilder::buildAll()
 void IIOWidgetBuilder::clear()
 {
 	m_isCompact = false;
+	m_manualReadWrite = false;
 	m_context = nullptr;
 	m_device = nullptr;
 	m_channel = nullptr;
@@ -341,6 +343,12 @@ void IIOWidgetBuilder::clear()
 IIOWidgetBuilder &IIOWidgetBuilder::compactMode(bool isCompact)
 {
 	m_isCompact = isCompact;
+	return *this;
+}
+
+IIOWidgetBuilder &IIOWidgetBuilder::manualReadWrite(bool isManual)
+{
+	m_manualReadWrite = isManual;
 	return *this;
 }
 
@@ -563,7 +571,7 @@ GuiStrategyInterface *IIOWidgetBuilder::createUIS()
 
 	switch(strategy) {
 	case UIS::EditableUi:
-		ui = new EditableGuiStrategy(m_generatedRecipe, m_isCompact, m_widgetParent);
+		ui = new EditableGuiStrategy(m_generatedRecipe, m_isCompact, m_widgetParent, m_manualReadWrite);
 
 		break;
 	case UIS::SwitchUi:

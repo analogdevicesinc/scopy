@@ -94,6 +94,15 @@ public:
 	IIOWidgetBuilder &compactMode(bool isCompact);
 
 	/**
+	 * @brief manualReadWrite If set to true, the line edit (EditableUi) widgets built by
+	 * buildSingle/buildAll get Read and/or Write buttons (depending on the attribute type)
+	 * and the read/write operations are only triggered manually by the user.
+	 * @param isManual Default value is false.
+	 * @return
+	 */
+	IIOWidgetBuilder &manualReadWrite(bool isManual);
+
+	/**
 	 * @brief includeDebugAttributes If set to true, the buildAll function will
 	 * also include the debugfs attributes when creating the IIOWidgets.
 	 * @param isIncluded Default value is false.
@@ -214,6 +223,7 @@ private:
 	GuiStrategyInterface *createUIS();
 
 	bool m_isCompact;
+	bool m_manualReadWrite;
 	bool m_includeDebugAttrs;
 	bool m_includeAvailableAttrs;
 	iio_context *m_context;
