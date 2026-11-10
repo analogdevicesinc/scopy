@@ -60,6 +60,8 @@ file(
 	src/readwrite/*.hpp
 	src/recyclerview/*.cpp
 	src/recyclerview/*.hpp
+	src/templates/*.cpp
+	src/templates/*.hpp
 )
 file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp
      include/${SCOPY_MODULE}/readwrite/*.hpp

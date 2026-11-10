@@ -38,7 +38,6 @@
 #include <stylehelper.h>
 #include <toolbuttons.h>
 #include <tutorialbuilder.h>
-#include <xmlfilemanager.hpp>
 
 #include <readwrite/fileregisterreadstrategy.hpp>
 #include <readwrite/fileregisterwritestrategy.hpp>

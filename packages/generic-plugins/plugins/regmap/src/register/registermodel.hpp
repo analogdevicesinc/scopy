@@ -43,6 +43,10 @@ public:
 	QString getNotes() const;
 	QVector<BitFieldModel *> *getBitFields() const;
 
+	void setName(const QString &newName);
+	void setDescription(const QString &newDescription);
+	void setBitFields(QVector<BitFieldModel *> *newBitFields);
+
 	RegisterMapTemplate *registerMapTemaplate() const;
 	void setRegisterMapTemaplate(RegisterMapTemplate *newRegisterMapTemaplate);
 

@@ -81,3 +81,7 @@ int BitFieldModel::getRegOffset() const { return regOffset; }
 int BitFieldModel::getSliceWidth() const { return sliceWidth; }
 
 QVector<BitFieldOption *> *BitFieldModel::getOptions() const { return options; }
+
+void BitFieldModel::setName(const QString &newName) { name = newName; }
+
+void BitFieldModel::setDescription(const QString &newDescription) { description = newDescription; }

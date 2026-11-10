@@ -22,12 +22,11 @@
 #include "jsonformatedelement.hpp"
 #include "regmapplugin.h"
 #include "utils.hpp"
-#include "xmlfilemanager.hpp"
 
 #include "registermaptemplate.hpp"
 #include "registermapvalues.hpp"
 #include "regmapplugin.h"
-#include "xmlfilemanager.hpp"
+#include "templates/registermaptemplateloader.hpp"
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QDebug>
@@ -496,12 +495,12 @@ bool RegmapPlugin::setupDevice(const QString &device, const QString &templatePat
 	RegisterMapTemplate *registerMapTemplate = nullptr;
 	if(!templatePath.isEmpty()) {
 		registerMapTemplate = new RegisterMapTemplate();
-		registerMapTemplate->setBitsPerRow(bitsPerRow);
-		XmlFileManager xmlFileManager(templatePath);
-		auto aux = xmlFileManager.getAllRegisters(registerMapTemplate);
-		if(!aux->isEmpty()) {
-			registerMapTemplate->setRegisterList(aux);
-		} else {
+		// regmap-config.json settings for this template file; the configured bitsPerRow wins, as before
+		RegisterMapTemplateOptions options = RegisterMapTemplateOptions::fromConfig(
+			Utils::getJsonTemplate(QFileInfo(templatePath).fileName()));
+		options.bitsPerRow = bitsPerRow;
+		if(!RegisterMapTemplateLoader::load(templatePath, options, registerMapTemplate) ||
+		   registerMapTemplate->getRegisterList()->isEmpty()) {
 			qWarning(CAT_REGMAP) << "No registers in template" << templatePath << "for device" << device;
 			delete registerMapTemplate;
 			registerMapTemplate = nullptr;

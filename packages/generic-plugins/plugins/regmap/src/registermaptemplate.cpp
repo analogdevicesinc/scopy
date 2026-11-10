@@ -24,7 +24,6 @@
 #include "register/bitfield/bitfieldmodel.hpp"
 #include "register/registermodel.hpp"
 #include "search.hpp"
-#include "xmlfilemanager.hpp"
 
 #include <QMap>
 

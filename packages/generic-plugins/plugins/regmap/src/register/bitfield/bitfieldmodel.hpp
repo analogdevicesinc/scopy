@@ -51,6 +51,9 @@ public:
 	int getSliceWidth() const;
 	QVector<BitFieldOption *> *getOptions() const;
 
+	void setName(const QString &newName);
+	void setDescription(const QString &newDescription);
+
 private:
 	QString name;
 	QString access;

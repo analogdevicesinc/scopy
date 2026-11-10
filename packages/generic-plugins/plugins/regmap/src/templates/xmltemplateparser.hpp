@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Analog Devices Inc.
+ * Copyright (c) 2026 Analog Devices Inc.
  *
  * This file is part of Scopy
  * (see https://www.github.com/analogdevicesinc/scopy).
@@ -19,39 +19,31 @@
  *
  */
 
-#ifndef XMLFILEMANAGER_HPP
-#define XMLFILEMANAGER_HPP
+#ifndef XMLTEMPLATEPARSER_HPP
+#define XMLTEMPLATEPARSER_HPP
 
-#include "registermaptemplate.hpp"
-#include "scopy-regmap_export.h"
+#include "iregistermaptemplateparser.hpp"
 
-#include <QObject>
+#include <QVector>
 
 class QDomElement;
-class QString;
 
 namespace scopy::regmap {
-class RegisterModel;
 class BitFieldModel;
+class RegisterModel;
 
-class SCOPY_REGMAP_EXPORT XmlFileManager : public QObject
+// The regmap XML format (<Register>, <BitFields>, <Options>)
+class XmlTemplateParser : public IRegisterMapTemplateParser
 {
-	Q_OBJECT
-
 public:
-	XmlFileManager(QString filePath);
-
-	QList<QString> *getAllAddresses();
-	QMap<uint32_t, RegisterModel *> *getAllRegisters(RegisterMapTemplate *parent);
-	RegisterModel *getRegAtAddress(QString addr);
-	RegisterModel *getRegister(QDomElement reg, RegisterMapTemplate *parent);
-	void getRegMapData(QString addr);
-	QVector<BitFieldModel *> *getBitFields(QString regAddr);
-	QVector<BitFieldModel *> *getBitFieldsOfRegister(QDomElement reg, bool reverseBitOrder);
-	BitFieldModel *getBitField(QDomElement bitField);
+	QString id() const override;
+	QStringList fileSuffixes() const override;
+	bool parse(const QString &path, RegisterMapTemplate *registerMapTemplate) override;
 
 private:
-	QString filePath;
+	RegisterModel *parseRegister(const QDomElement &reg, RegisterMapTemplate *registerMapTemplate);
+	QVector<BitFieldModel *> *parseBitFields(const QDomElement &reg);
+	BitFieldModel *parseBitField(const QDomElement &bitField);
 };
 } // namespace scopy::regmap
-#endif // XMLFILEMANAGER_HPP
+#endif // XMLTEMPLATEPARSER_HPP

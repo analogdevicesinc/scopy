@@ -51,6 +51,12 @@ QString RegisterModel::getNotes() const { return notes; }
 
 QVector<BitFieldModel *> *RegisterModel::getBitFields() const { return bitFields; }
 
+void RegisterModel::setName(const QString &newName) { name = newName; }
+
+void RegisterModel::setDescription(const QString &newDescription) { description = newDescription; }
+
+void RegisterModel::setBitFields(QVector<BitFieldModel *> *newBitFields) { bitFields = newBitFields; }
+
 RegisterMapTemplate *RegisterModel::registerMapTemaplate() const { return m_registerMapTemaplate; }
 
 void RegisterModel::setRegisterMapTemaplate(RegisterMapTemplate *newRegisterMapTemaplate)
