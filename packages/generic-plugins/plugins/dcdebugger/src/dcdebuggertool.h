@@ -43,6 +43,7 @@ class Connection;
 }
 
 namespace scopy::dcdebugger {
+class CommandLogView;
 class ComponentTreeModel;
 class NodePanel;
 
@@ -53,6 +54,8 @@ class SCOPY_DCDEBUGGER_EXPORT DCDebuggerTool : public QWidget
 public:
 	explicit DCDebuggerTool(component::Connection *conn, QWidget *parent = nullptr);
 	~DCDebuggerTool() override;
+
+	CommandLogView *commandLog() const { return m_log; }
 
 public Q_SLOTS:
 	void rebuild();
@@ -67,6 +70,8 @@ private:
 	void onExpanded(const QModelIndex &proxyIndex);
 	void onFilterChanged(const QString &text);
 	void selectNode(QObject *node);
+	void selectOrigin(const QString &origin, const QString &backendId, quintptr object);
+	void selectIndex(const QModelIndex &sourceIndex);
 	void readAttributes(const QList<QObject *> &objects);
 	void clearPanels();
 	QString panelKey(const QModelIndex &sourceIndex) const;
@@ -78,6 +83,7 @@ private:
 	ComponentTreeModel *m_model;
 	QSortFilterProxyModel *m_proxy;
 	QStackedWidget *m_panels;
+	CommandLogView *m_log;
 	QWidget *m_emptyPanel;
 	QHash<QString, NodePanel *> m_panelCache;
 	bool m_bulkExpand = false;

@@ -22,10 +22,12 @@
 #include "dcdebuggerplugin.h"
 
 #include "dcdebuggertool.h"
+#include "log/commandlogview.h"
 
 #include <QLabel>
 #include <QLoggingCategory>
 
+#include <component/commandmonitor.h>
 #include <component/connection.h>
 #include <component/context.h>
 #include <core/deviceimpl.h>
@@ -41,6 +43,10 @@ using namespace scopy::dcdebugger;
 namespace {
 const char *const TOOL_ID = "dcdebugger";
 } // namespace
+
+void DCDebuggerPlugin::init() { CommandLogView::initPreferences(); }
+
+void DCDebuggerPlugin::unload() { component::CommandMonitor::GetInstance()->setEnabled(false); }
 
 bool DCDebuggerPlugin::compatible(QString m_param, QString category)
 {
@@ -120,6 +126,9 @@ bool DCDebuggerPlugin::onConnect()
 	}
 	acquireViews(m_conn);
 
+	// The command log comes back the way the user left it (off by default).
+	component::CommandMonitor::GetInstance()->setEnabled(CommandLogView::enabledPreference());
+
 	m_tool = new DCDebuggerTool(m_conn);
 	ToolMenuEntry *tme = ToolMenuEntry::findToolMenuEntryById(m_toolList, TOOL_ID);
 	tme->setTool(m_tool);
@@ -150,6 +159,8 @@ bool DCDebuggerPlugin::onDisconnect()
 	}
 	releaseViews();
 	m_conn = nullptr;
+	// Not persisted: the next connect restores the user's choice.
+	component::CommandMonitor::GetInstance()->setEnabled(false);
 	return true;
 }
 

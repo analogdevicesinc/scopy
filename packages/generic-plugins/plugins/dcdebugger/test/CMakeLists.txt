@@ -20,8 +20,18 @@
 
 cmake_minimum_required(VERSION 3.16)
 include(ScopyTest)
-setup_scopy_tests(componenttree streamacquisition acquisitionui signalmath streamgeneration registers attributemonitor)
-foreach(t componenttree streamacquisition acquisitionui signalmath streamgeneration registers attributemonitor)
+set(DCDEBUGGER_TESTS
+    componenttree
+    streamacquisition
+    acquisitionui
+    signalmath
+    streamgeneration
+    registers
+    attributemonitor
+    commandlog
+)
+setup_scopy_tests(${DCDEBUGGER_TESTS})
+foreach(t ${DCDEBUGGER_TESTS})
 	target_include_directories(
 		${PROJECT_NAME}_test_${t} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src
 						  ${CMAKE_CURRENT_SOURCE_DIR}/../include/dcdebugger

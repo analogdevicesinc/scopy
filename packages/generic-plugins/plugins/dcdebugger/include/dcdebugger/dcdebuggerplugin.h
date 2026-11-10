@@ -46,6 +46,8 @@ class SCOPY_DCDEBUGGER_EXPORT DCDebuggerPlugin : public QObject, public PluginBa
 
 public:
 	void initMetadata() override;
+	void init() override;
+	void unload() override;
 	bool compatible(QString m_param, QString category) override;
 	bool loadIcon() override;
 	void loadToolList() override;

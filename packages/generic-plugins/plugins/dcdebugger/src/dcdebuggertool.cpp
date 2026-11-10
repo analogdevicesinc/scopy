@@ -24,6 +24,7 @@
 #include "acquisition/streamacquisition.h"
 #include "generation/streamgeneration.h"
 #include "componenttreemodel.h"
+#include "log/commandlogview.h"
 #include "nodepanel.h"
 
 #include <QCursor>
@@ -86,7 +87,20 @@ DCDebuggerTool::DCDebuggerTool(component::Connection *conn, QWidget *parent)
 	splitter->addWidget(panelContainer);
 	splitter->setStretchFactor(0, 3);
 	splitter->setStretchFactor(1, 2);
-	m_tool->addWidgetToCentralContainerHelper(splitter);
+
+	// Bottom: the command log of this connection.
+	auto *vsplitter = new QSplitter(Qt::Vertical, this);
+	m_log = new CommandLogView(vsplitter);
+	if(m_conn) {
+		m_log->setUri(m_conn->uri());
+	}
+	connect(m_log, &CommandLogView::nodeRequested, this, &DCDebuggerTool::selectOrigin);
+	vsplitter->addWidget(splitter);
+	vsplitter->addWidget(m_log);
+	vsplitter->setChildrenCollapsible(false);
+	vsplitter->setStretchFactor(0, 3);
+	vsplitter->setStretchFactor(1, 1);
+	m_tool->addWidgetToCentralContainerHelper(vsplitter);
 
 	m_model->setConnection(m_conn);
 }
@@ -262,9 +276,15 @@ void DCDebuggerTool::onFilterChanged(const QString &text)
 	m_bulkExpand = false;
 }
 
-void DCDebuggerTool::selectNode(QObject *node)
+void DCDebuggerTool::selectOrigin(const QString &origin, const QString &backendId, quintptr object)
 {
-	const QModelIndex src = m_model->indexOf(node);
+	selectIndex(m_model->indexOfOrigin(origin, backendId, object));
+}
+
+void DCDebuggerTool::selectNode(QObject *node) { selectIndex(m_model->indexOf(node)); }
+
+void DCDebuggerTool::selectIndex(const QModelIndex &src)
+{
 	if(!src.isValid()) {
 		return;
 	}

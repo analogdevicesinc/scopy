@@ -25,6 +25,7 @@
 
 #include <component/attribute.h>
 #include <component/channel.h>
+#include <component/commandmonitor.h>
 #include <component/connection.h>
 #include <component/context.h>
 #include <component/device.h>
@@ -47,6 +48,7 @@ private Q_SLOTS:
 	void attributeValueFollowsCache();
 	void channelInfoFollowsDirectionAttribute();
 	void childObjectsWalkGroups();
+	void indexOfOriginFindsTheIssuer();
 
 private:
 	QModelIndex child(const QModelIndex &parent, const QString &name) const;
@@ -186,6 +188,21 @@ void TST_ComponentTree::childObjectsWalkGroups()
 	const QModelIndex dev = m_model->indexOf(m_dev);
 	QCOMPARE(m_model->childObjects(dev).size(), 5);
 	QCOMPARE(m_model->childObjects(child(dev, "Channels (2)")).size(), 2);
+}
+
+void TST_ComponentTree::indexOfOriginFindsTheIssuer()
+{
+	// A command logged by the attribute (its reader resolves to the attribute's origin).
+	const CommandOrigin o = CommandMonitor::originOf(m_attr);
+	QCOMPARE(o.path, QStringLiteral("ctx/dev0/sampling_frequency"));
+	QCOMPARE(o.backendId, QStringLiteral("iio"));
+	QCOMPARE(o.uri, QStringLiteral("test:0"));
+	QCOMPARE(m_model->indexOfOrigin(o.path, o.backendId, o.object), m_model->indexOf(m_attr));
+	// The issuer itself is gone / unknown: the path still finds the node.
+	QCOMPARE(m_model->indexOfOrigin(o.path, o.backendId, 0), m_model->indexOf(m_attr));
+	QCOMPARE(m_model->indexOfOrigin(QStringLiteral("ctx/dev0"), {}, 0), m_model->indexOf(m_dev));
+	QVERIFY(!m_model->indexOfOrigin(o.path, QStringLiteral("capi"), 0).isValid());
+	QVERIFY(!m_model->indexOfOrigin(QStringLiteral("nope"), {}, 0).isValid());
 }
 
 QTEST_GUILESS_MAIN(TST_ComponentTree)

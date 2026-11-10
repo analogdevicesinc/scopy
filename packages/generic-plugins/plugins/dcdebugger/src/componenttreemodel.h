@@ -70,6 +70,9 @@ public:
 	// Components listed directly under index (through its groups for a component node).
 	QList<QObject *> childObjects(const QModelIndex &index) const;
 	QModelIndex indexOf(const QObject *obj) const;
+	// Node that issued a logged command: `object` itself when it is listed and still has that
+	// origin, else a listed node with the same origin path (and backend, when given).
+	QModelIndex indexOfOrigin(const QString &path, const QString &backendId, quintptr object) const;
 
 Q_SIGNALS:
 	void rebuilt();

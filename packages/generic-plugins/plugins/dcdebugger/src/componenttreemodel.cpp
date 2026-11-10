@@ -25,6 +25,7 @@
 
 #include <component/attribute.h>
 #include <component/attributereader.h>
+#include <component/commandmonitor.h>
 #include <component/connection.h>
 #include <component/scanelement.h>
 #include <component/stream.h>
@@ -211,6 +212,27 @@ QModelIndex ComponentTreeModel::indexOf(const QObject *obj) const
 {
 	QStandardItem *item = m_items.value(obj);
 	return item ? item->index() : QModelIndex();
+}
+
+QModelIndex ComponentTreeModel::indexOfOrigin(const QString &path, const QString &backendId, quintptr object) const
+{
+	auto matches = [&](const QObject *obj) {
+		const CommandOrigin o = component::CommandMonitor::originOf(obj);
+		return o.path == path && (backendId.isEmpty() || o.backendId == backendId);
+	};
+	for(auto it = m_objects.cbegin(); it != m_objects.cend(); ++it) {
+		const QObject *obj = it.value().data();
+		if(obj && quintptr(obj) == object && matches(obj)) {
+			return it.key()->index();
+		}
+	}
+	for(auto it = m_objects.cbegin(); it != m_objects.cend(); ++it) {
+		const QObject *obj = it.value().data();
+		if(obj && matches(obj)) {
+			return it.key()->index();
+		}
+	}
+	return {};
 }
 
 #include "moc_componenttreemodel.cpp"
