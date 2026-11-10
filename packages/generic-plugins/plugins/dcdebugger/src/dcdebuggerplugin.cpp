@@ -46,8 +46,6 @@ const char *const TOOL_ID = "dcdebugger";
 
 void DCDebuggerPlugin::init() { CommandLogView::initPreferences(); }
 
-void DCDebuggerPlugin::unload() { component::CommandMonitor::GetInstance()->setEnabled(false); }
-
 bool DCDebuggerPlugin::compatible(QString m_param, QString category)
 {
 	Q_UNUSED(category);
@@ -125,9 +123,7 @@ bool DCDebuggerPlugin::onConnect()
 		return false;
 	}
 	acquireViews(m_conn);
-
-	// The command log comes back the way the user left it (off by default).
-	component::CommandMonitor::GetInstance()->setEnabled(CommandLogView::enabledPreference());
+	// The command log state lives in the connection's monitor (off on every new connection).
 
 	m_tool = new DCDebuggerTool(m_conn);
 	ToolMenuEntry *tme = ToolMenuEntry::findToolMenuEntryById(m_toolList, TOOL_ID);
@@ -157,10 +153,12 @@ bool DCDebuggerPlugin::onDisconnect()
 		}
 		tme->setTool(nullptr);
 	}
+	// The connection may outlive this device (shared): stop tracing it, nothing shows the log.
+	if(m_conn && m_conn->monitor()) {
+		m_conn->monitor()->setEnabled(false);
+	}
 	releaseViews();
 	m_conn = nullptr;
-	// Not persisted: the next connect restores the user's choice.
-	component::CommandMonitor::GetInstance()->setEnabled(false);
 	return true;
 }
 

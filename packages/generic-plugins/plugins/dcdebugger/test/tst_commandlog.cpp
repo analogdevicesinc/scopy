@@ -23,12 +23,15 @@
 #include "log/commandlogview.h"
 
 #include <QAbstractButton>
+#include <QCheckBox>
+#include <QPointer>
 #include <QPushButton>
 #include <QSignalSpy>
 #include <QTreeView>
 #include <QtTest>
 
 #include <component/commandmonitor.h>
+#include <component/connection.h>
 #include <core/calltrace.h>
 #include <core/pooledcmdexecutor.h>
 #include <core/resultcommand.h>
@@ -91,6 +94,27 @@ protected:
 	}
 };
 
+// A connection with its own executor (and so its own monitor), like the Controller builds them.
+struct FakeLink
+{
+	component::Connection *conn;
+	PooledCmdExecutor *exec;
+
+	explicit FakeLink(const QString &uri)
+		: conn(new component::Connection(uri, QStringLiteral("fake")))
+		, exec(new PooledCmdExecutor(1, conn))
+	{
+		conn->setExecutor(exec);
+	}
+	~FakeLink() { delete conn; }
+	component::CommandMonitor *monitor() const { return conn->monitor(); }
+	void run() const
+	{
+		TracedCommand cmd;
+		exec->execute(&cmd).waitForFinished();
+	}
+};
+
 } // namespace
 
 class TST_CommandLog : public QObject
@@ -112,19 +136,17 @@ private Q_SLOTS:
 	void pauseKeepsRecording();
 	void csvColumns();
 
-	void switchFollowsMonitor();
-	void switchDrivesMonitorAndPreference();
+	void checkBoxFollowsMonitor();
+	void checkBoxDrivesMonitor();
+	void twoMonitorsAreIndependent();
+	void viewSurvivesMonitorDestruction();
 	void disabledRecordsNothingAndKeepsEntries();
 	void rowClickRequestsNode();
 };
 
-void TST_CommandLog::initTestCase()
-{
-	CommandLogView::initPreferences();
-	component::CommandMonitor::GetInstance()->setEnabled(false);
-}
+void TST_CommandLog::initTestCase() { CommandLogView::initPreferences(); }
 
-void TST_CommandLog::cleanup() { component::CommandMonitor::GetInstance()->setEnabled(false); }
+void TST_CommandLog::cleanup() { QVERIFY(!TraceConfig::anyEnabled()); }
 
 void TST_CommandLog::ringBufferDropsOldest()
 {
@@ -333,57 +355,124 @@ void TST_CommandLog::csvColumns()
 	QCOMPARE(lines[1].split(QLatin1Char(',')).size(), expected.size());
 }
 
-void TST_CommandLog::switchFollowsMonitor()
+void TST_CommandLog::checkBoxFollowsMonitor()
 {
+	FakeLink link(QStringLiteral("ip:a"));
+	auto *monitor = link.monitor();
 	CommandLogView view;
-	auto *monitor = component::CommandMonitor::GetInstance();
-	QVERIFY(!view.logSwitch()->isChecked());
+	QCOMPARE(view.logCheckBox()->text(), QStringLiteral("Log commands"));
+	// Unbound: nothing to switch.
+	QVERIFY(!view.logCheckBox()->isEnabled());
+	QVERIFY(!view.logCheckBox()->isChecked());
+
+	view.setMonitor(monitor);
+	QCOMPARE(view.monitor(), monitor);
+	QVERIFY(view.logCheckBox()->isEnabled());
+	QVERIFY(!view.logCheckBox()->isChecked()); // off on a new connection
 	QVERIFY(view.statusText().startsWith(QStringLiteral("Logging off")));
-	Preferences::set(CommandLogView::ENABLED_PREF, false);
 	monitor->setEnabled(true); // e.g. from a script
-	QVERIFY(view.logSwitch()->isChecked());
+	QVERIFY(view.logCheckBox()->isChecked());
 	QVERIFY(view.statusText().startsWith(QStringLiteral("Logging ·")));
-	// Following the monitor is not a user choice: the preference is untouched.
-	QCOMPARE(Preferences::get(CommandLogView::ENABLED_PREF).toBool(), false);
 	monitor->setEnabled(false); // e.g. disconnect
-	QVERIFY(!view.logSwitch()->isChecked());
+	QVERIFY(!view.logCheckBox()->isChecked());
+	QVERIFY(view.statusText().startsWith(QStringLiteral("Logging off")));
 }
 
-void TST_CommandLog::switchDrivesMonitorAndPreference()
+void TST_CommandLog::checkBoxDrivesMonitor()
 {
+	FakeLink link(QStringLiteral("ip:a"));
+	auto *monitor = link.monitor();
 	CommandLogView view;
-	auto *monitor = component::CommandMonitor::GetInstance();
-	view.logSwitch()->click();
+	view.setMonitor(monitor);
+	QSignalSpy spy(monitor, &component::CommandMonitor::enabledChanged);
+	view.logCheckBox()->click();
 	QVERIFY(monitor->isEnabled());
-	QVERIFY(CommandLogView::enabledPreference());
-	view.logSwitch()->click();
+	QVERIFY(view.statusText().startsWith(QStringLiteral("Logging ·")));
+	view.logCheckBox()->click();
 	QVERIFY(!monitor->isEnabled());
-	QVERIFY(!CommandLogView::enabledPreference());
+	QCOMPARE(spy.count(), 2);
 
-	// A new view (next connect) starts from the monitor state.
+	// A new view on the same connection starts from the monitor state.
 	monitor->setEnabled(true);
 	CommandLogView again;
-	QVERIFY(again.logSwitch()->isChecked());
+	again.setMonitor(monitor);
+	QVERIFY(again.logCheckBox()->isChecked());
+	again.logCheckBox()->click();
+	QVERIFY(!view.logCheckBox()->isChecked()); // both views follow the shared monitor
+}
+
+void TST_CommandLog::twoMonitorsAreIndependent()
+{
+	FakeLink a(QStringLiteral("ip:a"));
+	FakeLink b(QStringLiteral("ip:b"));
+	CommandLogView viewA;
+	CommandLogView viewB;
+	viewA.setMonitor(a.monitor());
+	viewB.setMonitor(b.monitor());
+
+	viewA.logCheckBox()->click();
+	QVERIFY(a.monitor()->isEnabled());
+	QVERIFY(!b.monitor()->isEnabled());
+	QVERIFY(!viewB.logCheckBox()->isChecked());
+	a.run();
+	b.run();
+	QTRY_COMPARE(viewA.model()->entryCount(), 1);
+	QTest::qWait(50);
+	QCOMPARE(viewB.model()->entryCount(), 0);
+	QCOMPARE(viewA.model()->entryAt(0).uri, QStringLiteral("ip:a"));
+
+	viewB.logCheckBox()->click();
+	viewA.logCheckBox()->click(); // a off, b stays on
+	QVERIFY(!a.monitor()->isEnabled());
+	QVERIFY(b.monitor()->isEnabled());
+	QVERIFY(viewB.logCheckBox()->isChecked());
+	QVERIFY(viewA.statusText().startsWith(QStringLiteral("Logging off")));
+	a.run();
+	b.run();
+	QTRY_COMPARE(viewB.model()->entryCount(), 1);
+	QTest::qWait(50);
+	QCOMPARE(viewA.model()->entryCount(), 1);
+	QCOMPARE(viewB.model()->entryAt(0).uri, QStringLiteral("ip:b"));
+	b.monitor()->setEnabled(false);
+}
+
+void TST_CommandLog::viewSurvivesMonitorDestruction()
+{
+	auto *link = new FakeLink(QStringLiteral("ip:a"));
+	QPointer<component::CommandMonitor> monitor = link->monitor();
+	CommandLogView view;
+	view.setMonitor(monitor);
+	view.logCheckBox()->click();
+	link->run();
+	QTRY_COMPARE(view.model()->entryCount(), 1);
+
+	delete link; // disconnect: the connection and its monitor go away
+	QVERIFY(monitor.isNull());
+	QCOMPARE(view.monitor(), nullptr);
+	QVERIFY(!view.logCheckBox()->isEnabled());
+	QVERIFY(!view.logCheckBox()->isChecked());
+	QVERIFY(view.statusText().startsWith(QStringLiteral("Logging off")));
+	QCOMPARE(view.model()->entryCount(), 1); // rows kept (export)
+	// Nothing left to drive: no crash.
+	view.logCheckBox()->setChecked(true);
+	view.model()->clear();
+	QCOMPARE(view.model()->entryCount(), 0);
 }
 
 void TST_CommandLog::disabledRecordsNothingAndKeepsEntries()
 {
+	FakeLink link(QStringLiteral("ip:a"));
+	auto *monitor = link.monitor();
 	CommandLogView view;
-	auto *monitor = component::CommandMonitor::GetInstance();
-	PooledCmdExecutor exec(1);
-	auto run = [&exec]() {
-		auto *cmd = new TracedCommand();
-		exec.execute(cmd).waitForFinished();
-		delete cmd;
-	};
+	view.setMonitor(monitor);
 
 	monitor->setEnabled(true);
-	run();
+	link.run();
 	QTRY_COMPARE(view.model()->entryCount(), 1);
 	QCOMPARE(view.model()->entryAt(0).calls.first().function, QStringLiteral("fake_read"));
 
 	monitor->setEnabled(false);
-	run();
+	link.run();
 	QTest::qWait(50);
 	QCOMPARE(view.model()->entryCount(), 1); // existing kept, no new
 
@@ -391,12 +480,13 @@ void TST_CommandLog::disabledRecordsNothingAndKeepsEntries()
 	monitor->setEnabled(true);
 	view.pauseButton()->click();
 	QVERIFY(view.model()->isPaused());
-	run();
+	link.run();
 	QTRY_COMPARE(view.model()->entryCount(), 2);
 	QCOMPARE(view.model()->rowCount(), 1);
 	QVERIFY(view.statusText().contains(QStringLiteral("paused")));
 	view.pauseButton()->click();
 	QCOMPARE(view.model()->rowCount(), 2);
+	monitor->setEnabled(false);
 }
 
 void TST_CommandLog::rowClickRequestsNode()

@@ -48,11 +48,15 @@ public:
 	void cancelByResource(void *resource) override;
 	void cancelAll() override;
 	int pendingCount() const override;
+	// Each command takes the config current when it starts and keeps it alive until published.
+	void setTraceConfig(std::shared_ptr<TraceConfig> config) override;
+	std::shared_ptr<TraceConfig> traceConfig() const override;
 	int maxThreads() const { return m_pool.maxThreadCount(); }
 
 private:
 	QThreadPool m_pool;
 	QList<Command *> m_pending;
+	std::shared_ptr<TraceConfig> m_traceConfig;
 	mutable QMutex m_mutex;
 };
 

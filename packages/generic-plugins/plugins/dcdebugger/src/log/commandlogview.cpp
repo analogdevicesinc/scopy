@@ -24,6 +24,7 @@
 #include "commandlogmodel.h"
 
 #include <QAbstractButton>
+#include <QCheckBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QLabel>
@@ -66,12 +67,9 @@ QLineEdit *filterEdit(const QString &placeholder, QWidget *parent, QHBoxLayout *
 
 void CommandLogView::initPreferences()
 {
-	Preferences::init(ENABLED_PREF, false);
 	Preferences::init(SIZE_PREF, DEFAULT_SIZE);
 	Preferences::init(COLLAPSE_PREF, DEFAULT_COLLAPSE_AFTER);
 }
-
-bool CommandLogView::enabledPreference() { return Preferences::get(ENABLED_PREF).toBool(); }
 
 CommandLogView::CommandLogView(QWidget *parent)
 	: QWidget(parent)
@@ -90,9 +88,10 @@ CommandLogView::CommandLogView(QWidget *parent)
 	m_tool->topContainerMenuControl()->setVisible(false);
 	lay->addWidget(m_tool);
 
-	// Top: Log switch + status on the left, the actions on the right.
-	m_log = new MenuOnOffSwitch("Log", this);
-	m_log->setToolTip("Record the library calls of every command (CommandMonitor)");
+	// Top: "Log commands" + status on the left, the actions on the right.
+	m_log = new QCheckBox("Log commands", this);
+	m_log->setToolTip("Record the library calls of every command of this connection");
+	m_log->setEnabled(false); // until a monitor is bound
 	m_status = new QLabel(this);
 	Style::setStyle(m_status, style::properties::label::subtle);
 	m_pauseBtn = new QPushButton("Pause", this);
@@ -145,16 +144,11 @@ CommandLogView::CommandLogView(QWidget *parent)
 	clay->addWidget(m_tree, 1);
 	m_tool->addWidgetToCentralContainerHelper(central);
 
-	component::CommandMonitor *monitor = component::CommandMonitor::GetInstance();
-	// Emitted on the executor threads: queued to the model here.
-	connect(monitor, &component::CommandMonitor::commandFinished, m_model, &CommandLogModel::append,
-		Qt::QueuedConnection);
-	connect(monitor, &component::CommandMonitor::enabledChanged, this, &CommandLogView::onEnabledChanged);
-	m_log->onOffswitch()->setChecked(monitor->isEnabled());
-	connect(m_log->onOffswitch(), &QAbstractButton::toggled, this, [](bool on) {
-		// User action: drive the monitor and remember the choice.
-		component::CommandMonitor::GetInstance()->setEnabled(on);
-		Preferences::set(ENABLED_PREF, on);
+	connect(m_log, &QAbstractButton::toggled, this, [this](bool on) {
+		// User action: drive this connection's monitor (not persisted).
+		if(m_monitor) {
+			m_monitor->setEnabled(on);
+		}
 	});
 
 	connect(m_pauseBtn, &QPushButton::toggled, this, [this](bool paused) {
@@ -199,7 +193,28 @@ QWidget *CommandLogView::buildFilters(QWidget *parent)
 
 void CommandLogView::setUri(const QString &uri) { m_model->setUri(uri); }
 
-QAbstractButton *CommandLogView::logSwitch() const { return m_log->onOffswitch(); }
+void CommandLogView::setMonitor(component::CommandMonitor *monitor)
+{
+	if(m_monitor == monitor) {
+		return;
+	}
+	if(m_monitor) {
+		disconnect(m_monitor, nullptr, this, nullptr);
+		disconnect(m_monitor, nullptr, m_model, nullptr);
+	}
+	m_monitor = monitor;
+	if(m_monitor) {
+		// Emitted on the executor threads: queued to the model here.
+		connect(m_monitor, &component::CommandMonitor::commandFinished, m_model, &CommandLogModel::append,
+			Qt::QueuedConnection);
+		connect(m_monitor, &component::CommandMonitor::enabledChanged, this, &CommandLogView::onEnabledChanged);
+		connect(m_monitor, &QObject::destroyed, this, &CommandLogView::onMonitorDestroyed);
+	}
+	m_log->setEnabled(m_monitor != nullptr);
+	onEnabledChanged(m_monitor && m_monitor->isEnabled());
+}
+
+component::CommandMonitor *CommandLogView::monitor() const { return m_monitor.data(); }
 
 QString CommandLogView::statusText() const { return m_status->text(); }
 
@@ -228,10 +243,18 @@ void CommandLogView::onRowClicked(const QModelIndex &index)
 
 void CommandLogView::onEnabledChanged(bool enabled)
 {
-	// Follows the monitor whoever turns it (script, disconnect); not persisted from here.
-	QSignalBlocker block(m_log->onOffswitch());
-	m_log->onOffswitch()->setChecked(enabled);
+	// Follows the monitor whoever turns it (script, disconnect).
+	QSignalBlocker block(m_log);
+	m_log->setChecked(enabled);
 	updateStatus();
+}
+
+void CommandLogView::onMonitorDestroyed()
+{
+	// The connection went away: keep the rows (still exportable), nothing left to switch.
+	m_monitor = nullptr;
+	m_log->setEnabled(false);
+	onEnabledChanged(false);
 }
 
 void CommandLogView::exportCsv()
@@ -245,7 +268,7 @@ void CommandLogView::exportCsv()
 
 void CommandLogView::updateStatus()
 {
-	QString text = component::CommandMonitor::GetInstance()->isEnabled()
+	QString text = (m_monitor && m_monitor->isEnabled())
 		? QStringLiteral("Logging · %1 entries").arg(m_model->entryCount())
 		: QStringLiteral("Logging off · %1 entries").arg(m_model->entryCount());
 	if(m_model->isPaused()) {

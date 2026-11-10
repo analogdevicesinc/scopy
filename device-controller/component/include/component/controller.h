@@ -71,6 +71,8 @@ public:
 	Connection *get() const { return m_conn; }
 	Connection *operator->() const { return m_conn; }
 	explicit operator bool() const { return m_conn != nullptr; }
+	// Command call trace of the connection.
+	CommandMonitor *monitor() const { return m_conn ? m_conn->monitor() : nullptr; }
 
 	void reset();
 

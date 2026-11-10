@@ -24,16 +24,21 @@
 #include "component/attribute.h"
 #include "component/backends/iio/iioattributereader.h"
 #include "component/commandmonitor.h"
+#include "component/connection.h"
 #include "component/context.h"
+#include "component/controller.h"
 #include "component/device.h"
 
 #include "core/calltrace.h"
 #include "core/pooledcmdexecutor.h"
 #include "core/resultcommand.h"
 
+#include <QMutex>
+#include <QPointer>
 #include <QSignalSpy>
 #include <QTest>
 #include <QThread>
+#include <QWaitCondition>
 #include <qcoro/qcorofuture.h>
 
 using namespace scopy;
@@ -86,49 +91,161 @@ private:
 	ICmdExecutor *m_exec;
 };
 
+// Blocks inside run() until released (teardown while a traced command is in flight).
+class GatedCommand : public ResultCommand<void>
+{
+	Q_OBJECT
+public:
+	GatedCommand()
+		: ResultCommand(nullptr)
+	{}
+
+	void waitEntered()
+	{
+		QMutexLocker lock(&m_mutex);
+		while(!m_entered) {
+			m_cond.wait(&m_mutex);
+		}
+	}
+	void release()
+	{
+		QMutexLocker lock(&m_mutex);
+		m_open = true;
+		m_cond.wakeAll();
+	}
+
+protected:
+	void run() override
+	{
+		DC_TRACE("fakelib", "fake_before", nullptr, fakeTransfer(0));
+		{
+			QMutexLocker lock(&m_mutex);
+			m_entered = true;
+			m_cond.wakeAll();
+			while(!m_open) {
+				m_cond.wait(&m_mutex);
+			}
+		}
+		DC_TRACE("fakelib", "fake_after", nullptr, fakeTransfer(0));
+		setResult(Result<void>());
+	}
+
+private:
+	QMutex m_mutex;
+	QWaitCondition m_cond;
+	bool m_entered = false;
+	bool m_open = false;
+};
+
+// A connection with its own executor and one named context, like the Controller builds them.
+struct FakeLink
+{
+	Connection *conn;
+	Context *ctx;
+	PooledCmdExecutor *exec;
+
+	explicit FakeLink(const QString &uri)
+		: conn(new Connection(uri, QStringLiteral("fake")))
+		, ctx(new Context())
+		, exec(new PooledCmdExecutor(1, conn))
+	{
+		conn->setExecutor(exec);
+		ctx->setName(QStringLiteral("fakectx"));
+		ctx->setUri(uri);
+		conn->add(QStringLiteral("fake"), ctx);
+	}
+	~FakeLink()
+	{
+		// Like the Controller: views go before their connection.
+		delete conn->take(QStringLiteral("fake"));
+		delete conn;
+	}
+	CommandMonitor *monitor() const { return conn->monitor(); }
+};
+
 } // namespace
 
 class TstComponentCommandMonitor : public QObject
 {
 	Q_OBJECT
 private Q_SLOTS:
-	void init() { CommandMonitor::GetInstance()->setEnabled(false); }
-	void cleanup() { CommandMonitor::GetInstance()->setEnabled(false); }
+	void cleanup() { QVERIFY(!TraceConfig::anyEnabled()); }
 
-	void enabledFollowsCallTrace();
+	void oneMonitorPerConnection();
+	void enabledFollowsConfig();
 	void oneLeafTwoCallsOneEntry();
 	void deliveredQueuedToGuiThread();
 	void disabledEmitsNothing();
+	void twoConnectionsAreIndependent();
+	void connectionDestroyedWhileInFlight();
+	void monitorGoesWithControllerConnection();
 	void originSetByAttributeReader();
 	void originOfUnnamedLeaf();
 };
 
-void TstComponentCommandMonitor::enabledFollowsCallTrace()
+void TstComponentCommandMonitor::oneMonitorPerConnection()
 {
-	CommandMonitor *m = CommandMonitor::GetInstance();
+	FakeLink a(QStringLiteral("fake:a"));
+	FakeLink b(QStringLiteral("fake:b"));
+	QVERIFY(a.monitor());
+	QVERIFY(b.monitor());
+	QVERIFY(a.monitor() != b.monitor());
+	QCOMPARE(a.monitor()->parent(), a.conn);
+	QCOMPARE(a.monitor()->connection(), a.conn);
+	QCOMPARE(a.monitor()->uri(), QStringLiteral("fake:a"));
+	QCOMPARE(a.conn->findChildren<CommandMonitor *>().size(), 1);
+	// Installed on the connection's executor.
+	QCOMPARE(a.exec->traceConfig(), a.monitor()->config());
+	QVERIFY(!a.monitor()->isEnabled()); // off by default
+
+	// Resolves from the connection, a context and any node below it.
+	auto *dev = new Device(a.ctx);
+	auto *leaf = new QObject(dev);
+	QCOMPARE(CommandMonitor::of(a.conn), a.monitor());
+	QCOMPARE(CommandMonitor::of(a.ctx), a.monitor());
+	QCOMPARE(CommandMonitor::of(leaf), a.monitor());
+	QCOMPARE(CommandMonitor::of(b.ctx), b.monitor());
+	QObject orphan;
+	QCOMPARE(CommandMonitor::of(&orphan), nullptr);
+	QCOMPARE(CommandMonitor::of(nullptr), nullptr);
+
+	ConnectionHandle h(QStringLiteral("fake:not-registered"), a.conn);
+	QCOMPARE(h.monitor(), a.monitor());
+	QCOMPARE(ConnectionHandle().monitor(), nullptr);
+}
+
+void TstComponentCommandMonitor::enabledFollowsConfig()
+{
+	FakeLink link(QStringLiteral("fake:0"));
+	CommandMonitor *m = link.monitor();
 	QSignalSpy spy(m, &CommandMonitor::enabledChanged);
 	QVERIFY(!m->isEnabled());
 	m->setEnabled(true);
-	QVERIFY(CallTrace::isEnabled());
+	QVERIFY(m->config()->isEnabled());
+	QVERIFY(TraceConfig::anyEnabled());
 	m->setEnabled(true); // no change, no signal
 	m->setEnabled(false);
-	QVERIFY(!CallTrace::isEnabled());
+	QVERIFY(!m->config()->isEnabled());
 	QCOMPARE(spy.count(), 2);
 	QCOMPARE(spy[0][0].toBool(), true);
 	QCOMPARE(spy[1][0].toBool(), false);
+
+	QSignalSpy capture(m, &CommandMonitor::captureDataChanged);
+	m->setCaptureData(true);
+	m->setCaptureData(true);
+	QVERIFY(m->config()->captureData());
+	QCOMPARE(capture.count(), 1);
+	m->setPreviewBytes(8);
+	QCOMPARE(m->config()->previewBytes(), 8);
 }
 
 void TstComponentCommandMonitor::oneLeafTwoCallsOneEntry()
 {
-	CommandMonitor *m = CommandMonitor::GetInstance();
-	PooledCmdExecutor exec(1);
-	Context ctx;
-	ctx.setName("fakectx");
-	ctx.setBackend("fake");
-	ctx.setUri("fake:0");
-	auto *dev = new Device(&ctx);
+	FakeLink link(QStringLiteral("fake:0"));
+	CommandMonitor *m = link.monitor();
+	auto *dev = new Device(link.ctx);
 	dev->setName("dev0");
-	auto *leaf = new TwoCallLeaf(&exec, dev);
+	auto *leaf = new TwoCallLeaf(link.exec, dev);
 
 	m->setEnabled(true);
 	QSignalSpy spy(m, &CommandMonitor::commandFinished);
@@ -148,14 +265,14 @@ void TstComponentCommandMonitor::oneLeafTwoCallsOneEntry()
 	QCOMPARE(e.uri, QStringLiteral("fake:0"));
 	QVERIFY(e.commandClass.contains(QStringLiteral("TwoCallCommand")));
 	QVERIFY(!e.failed());
+	m->setEnabled(false);
 }
 
 void TstComponentCommandMonitor::deliveredQueuedToGuiThread()
 {
-	CommandMonitor *m = CommandMonitor::GetInstance();
-	PooledCmdExecutor exec(1);
-	QObject root;
-	auto *leaf = new TwoCallLeaf(&exec, &root);
+	FakeLink link(QStringLiteral("fake:0"));
+	CommandMonitor *m = link.monitor();
+	auto *leaf = new TwoCallLeaf(link.exec, link.ctx);
 
 	QThread *deliveredOn = nullptr;
 	QObject receiver;
@@ -168,14 +285,14 @@ void TstComponentCommandMonitor::deliveredQueuedToGuiThread()
 	QCOMPARE(deliveredOn, nullptr);
 	QTRY_VERIFY(deliveredOn != nullptr);
 	QCOMPARE(deliveredOn, QThread::currentThread());
+	m->setEnabled(false);
 }
 
 void TstComponentCommandMonitor::disabledEmitsNothing()
 {
-	CommandMonitor *m = CommandMonitor::GetInstance();
-	PooledCmdExecutor exec(1);
-	QObject root;
-	auto *leaf = new TwoCallLeaf(&exec, &root);
+	FakeLink link(QStringLiteral("fake:0"));
+	CommandMonitor *m = link.monitor();
+	auto *leaf = new TwoCallLeaf(link.exec, link.ctx);
 
 	QSignalSpy spy(m, &CommandMonitor::commandFinished);
 	leaf->start().waitForFinished();
@@ -183,21 +300,105 @@ void TstComponentCommandMonitor::disabledEmitsNothing()
 	QCOMPARE(spy.count(), 0);
 }
 
+void TstComponentCommandMonitor::twoConnectionsAreIndependent()
+{
+	FakeLink a(QStringLiteral("fake:a"));
+	FakeLink b(QStringLiteral("fake:b"));
+	auto *leafA = new TwoCallLeaf(a.exec, a.ctx);
+	auto *leafB = new TwoCallLeaf(b.exec, b.ctx);
+	QSignalSpy spyA(a.monitor(), &CommandMonitor::commandFinished);
+	QSignalSpy spyB(b.monitor(), &CommandMonitor::commandFinished);
+	QSignalSpy enabledB(b.monitor(), &CommandMonitor::enabledChanged);
+	auto runBoth = [&]() {
+		leafA->start().waitForFinished();
+		leafB->start().waitForFinished();
+		QTest::qWait(50);
+	};
+
+	a.monitor()->setEnabled(true);
+	QVERIFY(!b.monitor()->isEnabled());
+	QCOMPARE(enabledB.count(), 0);
+	runBoth();
+	QCOMPARE(spyA.count(), 1);
+	QCOMPARE(spyB.count(), 0);
+	QCOMPARE(spyA[0][0].value<CommandLogEntry>().uri, QStringLiteral("fake:a"));
+
+	b.monitor()->setEnabled(true);
+	runBoth();
+	QCOMPARE(spyA.count(), 2);
+	QCOMPARE(spyB.count(), 1);
+	QCOMPARE(spyB[0][0].value<CommandLogEntry>().uri, QStringLiteral("fake:b"));
+
+	// Turning a off leaves b on.
+	a.monitor()->setEnabled(false);
+	QVERIFY(b.monitor()->isEnabled());
+	runBoth();
+	QCOMPARE(spyA.count(), 2);
+	QCOMPARE(spyB.count(), 2);
+	b.monitor()->setEnabled(false);
+}
+
+void TstComponentCommandMonitor::connectionDestroyedWhileInFlight()
+{
+	auto *conn = new Connection(QStringLiteral("fake:0"), QStringLiteral("fake"));
+	auto *exec = new PooledCmdExecutor(1, conn);
+	conn->setExecutor(exec);
+	CommandMonitor *m = conn->monitor();
+	QPointer<CommandMonitor> guard(m);
+	std::weak_ptr<TraceConfig> config = m->config();
+	m->setEnabled(true);
+
+	int delivered = 0;
+	QObject receiver;
+	connect(m, &CommandMonitor::commandFinished, &receiver, [&delivered](const CommandLogEntry &) { ++delivered; });
+
+	GatedCommand cmd;
+	QFuture<void> f = exec->execute(&cmd);
+	cmd.waitEntered();
+	// The monitor goes first (detached), then the executor drains: let the command finish in
+	// between, i.e. during the connection's teardown.
+	connect(m, &QObject::destroyed, &receiver, [&cmd]() { cmd.release(); });
+	delete conn;
+	QVERIFY(f.isFinished());
+	QVERIFY(guard.isNull());
+	QVERIFY(config.expired());
+	QVERIFY(cmd.isTraced()); // started on: complete entry, never delivered
+	QCOMPARE(cmd.calls().size(), 2);
+	QTest::qWait(50);
+	QCOMPARE(delivered, 0);
+}
+
+void TstComponentCommandMonitor::monitorGoesWithControllerConnection()
+{
+	auto *ctx = new Context();
+	ctx->setName(QStringLiteral("adopted"));
+	ContextHandle h = Controller::GetInstance()->adopt(QStringLiteral("fake:adopted"), ctx);
+	QVERIFY(h);
+	QPointer<CommandMonitor> m = CommandMonitor::of(h.get());
+	QVERIFY(m);
+	QCOMPARE(m.data(), h.connection()->monitor());
+	m->setEnabled(true);
+	h.reset();
+	QTRY_VERIFY(m.isNull());
+}
+
 void TstComponentCommandMonitor::originSetByAttributeReader()
 {
-	CommandMonitor *m = CommandMonitor::GetInstance();
 	dctest::FakeAttrOps ops;
 	auto handle = ops.make("raw", "42");
-	PooledCmdExecutor exec(1);
+	auto *conn = new Connection(QStringLiteral("ip:test"), QStringLiteral("iio"));
+	auto *exec = new PooledCmdExecutor(1, conn);
+	conn->setExecutor(exec);
+	CommandMonitor *m = conn->monitor();
 
-	Context ctx;
-	ctx.setName("ctx0");
-	ctx.setBackend("iio");
-	auto *dev = new Device(&ctx);
+	auto *ctx = new Context();
+	ctx->setName("ctx0");
+	conn->add(QStringLiteral("iio"), ctx);
+	auto *dev = new Device(ctx);
 	dev->setName("adc");
 	auto *attr = new Attribute(dev);
 	attr->setName("raw");
-	auto *reader = new component::iio::IIOAttributeReader(&ops, handle, &exec);
+	auto *reader = new component::iio::IIOAttributeReader(&ops, handle, exec);
 	attr->addReadCapability(reader);
 
 	m->setEnabled(true);
@@ -208,7 +409,10 @@ void TstComponentCommandMonitor::originSetByAttributeReader()
 	// The reader resolves to its Attribute.
 	QCOMPARE(e.origin, QStringLiteral("ctx0/adc/raw"));
 	QCOMPARE(e.backendId, QStringLiteral("iio"));
+	QCOMPARE(e.uri, QStringLiteral("ip:test"));
 	QVERIFY(e.commandClass.contains(QStringLiteral("AttrReadCommand")));
+	delete conn->take(QStringLiteral("iio"));
+	delete conn;
 }
 
 void TstComponentCommandMonitor::originOfUnnamedLeaf()

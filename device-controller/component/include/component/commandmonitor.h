@@ -25,25 +25,45 @@
 #include "core/callrecord.h"
 
 #include <QObject>
+#include <QString>
+
+#include <memory>
 
 namespace scopy {
 class Command;
-}
+class TraceConfig;
+} // namespace scopy
 
 namespace scopy::component {
 
-// Command call trace switch and sink (singleton). Off by default. When on, every command that
-// starts afterwards records its library calls (DC_TRACE) and, once finished, is emitted as one
-// CommandLogEntry through commandFinished — from the executor thread, so receivers living on the
-// GUI thread get it queued. Toggling takes effect at the next command (no partial entries).
+class Connection;
+
+// Command call trace of one connection: on/off switch and sink. Each Connection owns exactly
+// one (child of the connection) and installs its TraceConfig on the connection's executor. Off by
+// default. When on, every command that starts afterwards on that executor records its library
+// calls (DC_TRACE) and, once finished, is emitted as one CommandLogEntry through commandFinished —
+// from the executor thread, so receivers living on the GUI thread get it queued. Toggling takes
+// effect at the next command (no partial entries); other connections are not affected.
 class COMPONENT_EXPORT CommandMonitor : public QObject
 {
 	Q_OBJECT
 	Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
 	Q_PROPERTY(bool captureData READ captureData WRITE setCaptureData NOTIFY captureDataChanged)
 	Q_PROPERTY(int previewBytes READ previewBytes WRITE setPreviewBytes)
+	Q_PROPERTY(QString uri READ uri CONSTANT)
 public:
-	static CommandMonitor *GetInstance();
+	// Detaches from the trace config: no commandFinished once destroyed, even for a command
+	// still running on the executor.
+	~CommandMonitor() override;
+
+	// Monitor of the connection `node` belongs to (any tree node, a Context or the Connection
+	// itself); nullptr for a node not attached to a connection.
+	static CommandMonitor *of(const QObject *node);
+
+	QString uri() const { return m_uri; }
+	Connection *connection() const;
+	// The config installed on the connection's executor.
+	std::shared_ptr<TraceConfig> config() const { return m_config; }
 
 	bool isEnabled() const;
 	void setEnabled(bool enabled);
@@ -59,7 +79,7 @@ public:
 	// readers / writers resolve to their Attribute.
 	static CommandOrigin originOf(const QObject *node);
 	// Called by a leaf before dispatching `cmd`: records where it comes from. One atomic load
-	// and nothing else while the monitor is off.
+	// and nothing else while every monitor is off.
 	static void tag(Command *cmd, const QObject *leaf);
 
 Q_SIGNALS:
@@ -68,8 +88,12 @@ Q_SIGNALS:
 	void commandFinished(const scopy::CommandLogEntry &entry);
 
 private:
-	explicit CommandMonitor(QObject *parent = nullptr);
-	static void deliver(const CommandLogEntry &entry);
+	friend class Connection;
+	explicit CommandMonitor(Connection *connection);
+	void deliver(CommandLogEntry entry);
+
+	QString m_uri;
+	std::shared_ptr<TraceConfig> m_config;
 };
 
 } // namespace scopy::component

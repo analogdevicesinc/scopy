@@ -115,6 +115,10 @@ void TST_ComponentTree::rootIsConnection()
 	QCOMPARE(root.siblingAtColumn(ComponentTreeModel::InfoColumn).data().toString(), QString("Connection"));
 	QCOMPARE(m_model->kindAt(root), NodeKind::Connection);
 	QCOMPARE(m_model->objectAt(root), m_conn);
+	// The connection's command monitor is not a component: only the views group is listed.
+	QVERIFY(m_conn->monitor());
+	QCOMPARE(m_model->rowCount(root), 1);
+	QCOMPARE(m_model->indexOf(m_conn->monitor()).isValid(), false);
 }
 
 void TST_ComponentTree::childrenAreGrouped()

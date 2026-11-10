@@ -31,6 +31,8 @@
 
 #include <atomic>
 #include <cerrno>
+#include <functional>
+#include <mutex>
 #include <type_traits>
 #include <utility>
 
@@ -71,31 +73,68 @@ struct CallOut
 	}
 };
 
-// Library-call tracing. A command decides once, when it starts, whether it records (the
-// monitor's enabled flag at that moment); DC_TRACE then records every library call it makes.
+// Trace switches and sink of one executor (one connection). Off by default. Shared: the executor
+// keeps it alive while a command runs, the owner (the connection's command monitor) detaches its
+// sink before it goes away. All members are thread-safe.
+class CONTROLLER_CORE_EXPORT TraceConfig
+{
+public:
+	using Sink = std::function<void(const CommandLogEntry &entry)>;
+	static constexpr int DEFAULT_PREVIEW_BYTES = 64;
+
+	TraceConfig() = default;
+	~TraceConfig();
+	TraceConfig(const TraceConfig &) = delete;
+	TraceConfig &operator=(const TraceConfig &) = delete;
+
+	// Commands that start afterwards on the executor record their calls. Returns true if changed.
+	bool isEnabled() const { return m_enabled.load(std::memory_order_relaxed); }
+	bool setEnabled(bool enabled);
+
+	// Payloads (refill / push blocks, attr values) keep previewBytes() bytes, or everything when
+	// captureData() is on. setCaptureData returns true if changed.
+	bool captureData() const { return m_captureData.load(std::memory_order_relaxed); }
+	bool setCaptureData(bool capture);
+	int previewBytes() const { return m_previewBytes.load(std::memory_order_relaxed); }
+	void setPreviewBytes(int bytes);
+
+	// Receiver of finished recorded commands; called on the executor thread. Once setSink()
+	// returns, the previous sink is never called again (nullptr detaches).
+	void setSink(Sink sink);
+	void publish(const CommandLogEntry &entry) const;
+
+	// True while at least one config (any executor) is enabled: one relaxed load.
+	static bool anyEnabled() { return s_enabledCount.load(std::memory_order_relaxed) > 0; }
+
+private:
+	std::atomic<bool> m_enabled{false};
+	std::atomic<bool> m_captureData{false};
+	std::atomic<int> m_previewBytes{DEFAULT_PREVIEW_BYTES};
+	mutable std::mutex m_sinkMutex;
+	Sink m_sink;
+
+	static std::atomic<int> s_enabledCount;
+};
+
+// Library-call tracing. An executor runs each command under its TraceConfig (execute()); the
+// command decides once, when it starts, whether it records (that config's enabled flag at that
+// moment); DC_TRACE then records every library call it makes. A command executed directly
+// (outside any executor) never records.
 // Off: DC_TRACE is one relaxed atomic load + the call (no record, no clock, no allocation).
 class CONTROLLER_CORE_EXPORT CallTrace
 {
 public:
-	using Sink = void (*)(const CommandLogEntry &entry);
-
-	static bool isEnabled() { return s_enabled.load(std::memory_order_relaxed); }
-	static void setEnabled(bool enabled);
-
-	// Payloads (refill / push blocks, attr values) keep `previewBytes()` bytes, or everything
-	// when captureData() is on.
-	static bool captureData();
-	static void setCaptureData(bool capture);
-	static int previewBytes();
-	static void setPreviewBytes(int bytes);
+	// Executor hook: runs `cmd` under `config` (may be null: no tracing) and hands it to the
+	// config's sink if it recorded.
+	static void execute(Command *cmd, const TraceConfig *config);
+	// Config of the command recording on this thread, nullptr elsewhere.
+	static const TraceConfig *config();
 
 	// True while at least one command (on any thread) is recording.
 	static bool active() { return s_active.load(std::memory_order_relaxed) > 0; }
 
-	// Receiver of finished traced commands (the command monitor); called on the executor thread.
-	static void setSink(Sink sink);
-	// Executor hook: hands a finished traced command to the sink (no-op if it did not record).
-	static void publish(const Command *cmd);
+	// Hands a finished command to the config's sink (no-op if it did not record).
+	static void publish(const Command *cmd, const TraceConfig *config);
 	static CommandLogEntry entryOf(const Command *cmd);
 
 	static qint64 nowNs();	  // wall clock, ns since epoch
@@ -161,7 +200,6 @@ public:
 		}
 	}
 
-	static std::atomic<bool> s_enabled;
 	static std::atomic<int> s_active;
 
 private:

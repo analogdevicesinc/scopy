@@ -31,6 +31,8 @@
 
 namespace scopy {
 
+class TraceConfig;
+
 class CONTROLLER_CORE_EXPORT Command : public QObject
 {
 	Q_OBJECT
@@ -67,8 +69,11 @@ public:
 	// --- call trace (see core/calltrace.h) ---
 	// The command running on this thread (inside run()), nullptr elsewhere.
 	static Command *current();
-	// Recording right now (decided at the start of execute() from CallTrace::isEnabled()).
+	// Recording right now (decided at the start of execute() from the TraceConfig of the executor
+	// running it; never when executed directly).
 	bool isRecording() const { return m_trace && m_trace->recording; }
+	// Config of the executor this command records for; nullptr unless recording.
+	const TraceConfig *traceConfig() const { return isRecording() ? m_trace->config : nullptr; }
 	// Recorded its last run (the executor publishes it).
 	bool isTraced() const { return m_trace && m_trace->traced; }
 	// Appends a library call; ignored unless recording.
@@ -105,11 +110,13 @@ private:
 		qint64 startedNs = 0;
 		qint64 finishedNs = 0;
 		qint64 steadyStartNs = 0;
+		const TraceConfig *config = nullptr; // while recording
 		bool recording = false;
 		bool traced = false;
 	};
 
-	// Sets current() and, when the monitor is on, starts recording; returns the outer current().
+	// Sets current() and, when the running executor's config is on, starts recording; returns the
+	// outer current().
 	Command *beginRun();
 	void endRun(Command *outer);
 	TraceData *traceData();

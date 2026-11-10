@@ -21,6 +21,7 @@
 
 #include "component/connection.h"
 
+#include "component/commandmonitor.h"
 #include "component/context.h"
 
 using namespace scopy::component;
@@ -29,9 +30,23 @@ Connection::Connection(QString uri, ConnectionKind kind, QObject *parent)
 	: QObject(parent)
 	, m_uri(std::move(uri))
 	, m_kind(std::move(kind))
+	// First child, so destroyed before the executor: ~CommandMonitor turns its config off and
+	// detaches the sink before the executor drains its last commands (the executor keeps the
+	// config itself alive), so a command finishing during teardown delivers nothing.
+	, m_monitor(new CommandMonitor(this))
 {}
 
 Connection::~Connection() = default;
+
+CommandMonitor *Connection::monitor() const { return m_monitor.data(); }
+
+void Connection::setExecutor(ICmdExecutor *executor)
+{
+	m_executor = executor;
+	if(m_executor && m_monitor) {
+		m_executor->setTraceConfig(m_monitor->config());
+	}
+}
 
 QList<Context *> Connection::contexts() const
 {

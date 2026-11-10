@@ -39,6 +39,7 @@
 
 #include <component/attribute.h>
 #include <component/attributereader.h>
+#include <component/commandmonitor.h>
 #include <component/connection.h>
 #include <dcdebugger/style_properties.h>
 #include <style.h>
@@ -93,6 +94,8 @@ DCDebuggerTool::DCDebuggerTool(component::Connection *conn, QWidget *parent)
 	m_log = new CommandLogView(vsplitter);
 	if(m_conn) {
 		m_log->setUri(m_conn->uri());
+		// Every view (context) of the connection shares this one monitor.
+		m_log->setMonitor(component::CommandMonitor::of(m_conn));
 	}
 	connect(m_log, &CommandLogView::nodeRequested, this, &DCDebuggerTool::selectOrigin);
 	vsplitter->addWidget(splitter);

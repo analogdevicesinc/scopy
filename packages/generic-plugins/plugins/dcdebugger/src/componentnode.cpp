@@ -25,6 +25,7 @@
 #include <component/attributereader.h>
 #include <component/attributewriter.h>
 #include <component/channel.h>
+#include <component/commandmonitor.h>
 #include <component/connection.h>
 #include <component/context.h>
 #include <component/device.h>
@@ -104,8 +105,8 @@ NodeKind ComponentNode::kindOf(const QObject *obj)
 		return NodeKind::Ping;
 	}
 	if(qobject_cast<const AttributeReader *>(obj) || qobject_cast<const AttributeWriter *>(obj) ||
-	   qobject_cast<const SampleCodec *>(obj) || obj->inherits("scopy::PooledCmdExecutor") ||
-	   obj->inherits("QTimer")) {
+	   qobject_cast<const SampleCodec *>(obj) || qobject_cast<const CommandMonitor *>(obj) ||
+	   obj->inherits("scopy::PooledCmdExecutor") || obj->inherits("QTimer")) {
 		return NodeKind::Hidden;
 	}
 	return NodeKind::Other;

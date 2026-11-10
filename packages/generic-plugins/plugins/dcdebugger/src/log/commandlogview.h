@@ -24,10 +24,11 @@
 
 #include "scopy-dcdebugger_export.h"
 
+#include <QPointer>
 #include <QString>
 #include <QWidget>
 
-class QAbstractButton;
+class QCheckBox;
 class QLabel;
 class QLineEdit;
 class QModelIndex;
@@ -39,17 +40,21 @@ class MenuOnOffSwitch;
 class ToolTemplate;
 } // namespace scopy
 
+namespace scopy::component {
+class CommandMonitor;
+}
+
 namespace scopy::dcdebugger {
 class CommandLogModel;
 
-// Command log of the debugger: the library calls every command issued (CommandMonitor), with the
-// Log switch (drives CommandMonitor::setEnabled both ways, persisted), pause, clear, filters,
-// follow tail and CSV export. A click on a row asks for the node that issued the command.
+// Command log of the debugger: the library calls every command of one connection issued (its
+// CommandMonitor), with the "Log commands" checkbox (drives that monitor's setEnabled both ways;
+// per connection, not persisted), pause, clear, filters, follow tail and CSV export. A click on a
+// row asks for the node that issued the command. The rows outlive the monitor (disconnect).
 class SCOPY_DCDEBUGGER_EXPORT CommandLogView : public QWidget
 {
 	Q_OBJECT
 public:
-	static constexpr const char *ENABLED_PREF = "dcdebugger_command_log_enabled";
 	static constexpr const char *SIZE_PREF = "dcdebugger_command_log_size";
 	static constexpr const char *COLLAPSE_PREF = "dcdebugger_command_log_collapse_after";
 	static constexpr int DEFAULT_SIZE = 10000;
@@ -57,18 +62,21 @@ public:
 
 	// Preference defaults (Preferences::init: an existing value is kept).
 	static void initPreferences();
-	// The persisted Log switch state.
-	static bool enabledPreference();
 
 	explicit CommandLogView(QWidget *parent = nullptr);
 	~CommandLogView() override;
+
+	// Binds the log and the checkbox to one connection's monitor (nullptr: unbound, checkbox
+	// disabled). Dropped automatically when the monitor is destroyed; the rows are kept.
+	void setMonitor(component::CommandMonitor *monitor);
+	component::CommandMonitor *monitor() const;
 
 	// Keep only the commands of this connection.
 	void setUri(const QString &uri);
 
 	CommandLogModel *model() const { return m_model; }
 	QTreeView *tree() const { return m_tree; }
-	QAbstractButton *logSwitch() const;
+	QCheckBox *logCheckBox() const { return m_log; }
 	QPushButton *pauseButton() const { return m_pauseBtn; }
 	QString statusText() const;
 
@@ -81,13 +89,15 @@ private:
 	void applyFilter();
 	void onRowClicked(const QModelIndex &index);
 	void onEnabledChanged(bool enabled);
+	void onMonitorDestroyed();
 	void exportCsv();
 	void updateStatus();
 
 	CommandLogModel *m_model;
 	ToolTemplate *m_tool;
 	QLabel *m_status;
-	MenuOnOffSwitch *m_log;
+	QPointer<component::CommandMonitor> m_monitor;
+	QCheckBox *m_log;
 	QPushButton *m_pauseBtn;
 	MenuOnOffSwitch *m_follow;
 	QPushButton *m_clearBtn;

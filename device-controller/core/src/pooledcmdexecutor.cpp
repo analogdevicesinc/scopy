@@ -53,16 +53,18 @@ QFuture<void> PooledCmdExecutor::execute(Command *cmd)
 	promise->start();
 
 	m_pool.start([this, cmd, promise]() {
+		std::shared_ptr<TraceConfig> config;
 		{
 			QMutexLocker lock(&m_mutex);
 			if(cmd) {
 				m_pending.removeOne(cmd);
 			}
+			config = m_traceConfig;
 		}
 		if(!cmd->isCancelled()) {
-			cmd->execute();
-			// The one place every backend's commands pass through: hand recorded calls to the monitor.
-			CallTrace::publish(cmd);
+			// The one place every backend's commands pass through: run under this executor's
+			// trace config and hand recorded calls to its sink.
+			CallTrace::execute(cmd, config.get());
 		}
 		promise->finish();
 	});
@@ -96,6 +98,18 @@ void PooledCmdExecutor::cancelAll()
 	for(Command *cmd : std::as_const(m_pending)) {
 		cmd->cancel();
 	}
+}
+
+void PooledCmdExecutor::setTraceConfig(std::shared_ptr<TraceConfig> config)
+{
+	QMutexLocker lock(&m_mutex);
+	m_traceConfig = std::move(config);
+}
+
+std::shared_ptr<TraceConfig> PooledCmdExecutor::traceConfig() const
+{
+	QMutexLocker lock(&m_mutex);
+	return m_traceConfig;
 }
 
 int PooledCmdExecutor::pendingCount() const

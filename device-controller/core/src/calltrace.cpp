@@ -27,14 +27,13 @@
 
 using namespace scopy;
 
-std::atomic<bool> CallTrace::s_enabled{false};
 std::atomic<int> CallTrace::s_active{0};
+std::atomic<int> TraceConfig::s_enabledCount{0};
 
 namespace {
 thread_local Command *t_current = nullptr;
-std::atomic<bool> s_captureData{false};
-std::atomic<int> s_previewBytes{64};
-std::atomic<CallTrace::Sink> s_sink{nullptr};
+// Config of the executor running a command on this thread (CallTrace::execute), nullptr elsewhere.
+thread_local const TraceConfig *t_execConfig = nullptr;
 } // namespace
 
 // --- Command ---
@@ -53,8 +52,10 @@ Command *Command::beginRun()
 {
 	Command *outer = t_current;
 	t_current = this;
-	if(CallTrace::isEnabled()) {
+	const TraceConfig *config = t_execConfig;
+	if(config && config->isEnabled()) {
 		TraceData *t = traceData();
+		t->config = config;
 		t->calls.clear();
 		t->startedNs = CallTrace::nowNs();
 		t->steadyStartNs = CallTrace::steadyNs();
@@ -73,6 +74,7 @@ void Command::endRun(Command *outer)
 	if(m_trace && m_trace->recording) {
 		m_trace->finishedNs = m_trace->startedNs + (CallTrace::steadyNs() - m_trace->steadyStartNs);
 		m_trace->recording = false;
+		m_trace->config = nullptr;
 		CallTrace::s_active.fetch_sub(1, std::memory_order_relaxed);
 	}
 	t_current = outer;
@@ -89,19 +91,60 @@ void Command::setOrigin(const QString &path) { traceData()->origin.path = path; 
 
 void Command::setOrigin(const CommandOrigin &origin) { traceData()->origin = origin; }
 
+// --- TraceConfig ---
+
+TraceConfig::~TraceConfig() { setEnabled(false); }
+
+bool TraceConfig::setEnabled(bool enabled)
+{
+	if(m_enabled.exchange(enabled, std::memory_order_relaxed) == enabled) {
+		return false;
+	}
+	s_enabledCount.fetch_add(enabled ? 1 : -1, std::memory_order_relaxed);
+	return true;
+}
+
+bool TraceConfig::setCaptureData(bool capture)
+{
+	return m_captureData.exchange(capture, std::memory_order_relaxed) != capture;
+}
+
+void TraceConfig::setPreviewBytes(int bytes) { m_previewBytes.store(qMax(0, bytes), std::memory_order_relaxed); }
+
+void TraceConfig::setSink(Sink sink)
+{
+	// Taken by publish() for the whole call: once this returns no thread is still in the old sink.
+	std::lock_guard<std::mutex> lock(m_sinkMutex);
+	m_sink = std::move(sink);
+}
+
+void TraceConfig::publish(const CommandLogEntry &entry) const
+{
+	std::lock_guard<std::mutex> lock(m_sinkMutex);
+	if(m_sink) {
+		m_sink(entry);
+	}
+}
+
 // --- CallTrace ---
 
-void CallTrace::setEnabled(bool enabled) { s_enabled.store(enabled, std::memory_order_relaxed); }
+void CallTrace::execute(Command *cmd, const TraceConfig *config)
+{
+	if(!cmd) {
+		return;
+	}
+	const TraceConfig *outer = t_execConfig;
+	t_execConfig = config;
+	cmd->execute();
+	t_execConfig = outer;
+	publish(cmd, config);
+}
 
-bool CallTrace::captureData() { return s_captureData.load(std::memory_order_relaxed); }
-
-void CallTrace::setCaptureData(bool capture) { s_captureData.store(capture, std::memory_order_relaxed); }
-
-int CallTrace::previewBytes() { return s_previewBytes.load(std::memory_order_relaxed); }
-
-void CallTrace::setPreviewBytes(int bytes) { s_previewBytes.store(qMax(0, bytes), std::memory_order_relaxed); }
-
-void CallTrace::setSink(Sink sink) { s_sink.store(sink, std::memory_order_release); }
+const TraceConfig *CallTrace::config()
+{
+	const Command *cmd = Command::current();
+	return cmd ? cmd->traceConfig() : nullptr;
+}
 
 CommandLogEntry CallTrace::entryOf(const Command *cmd)
 {
@@ -122,15 +165,12 @@ CommandLogEntry CallTrace::entryOf(const Command *cmd)
 	return e;
 }
 
-void CallTrace::publish(const Command *cmd)
+void CallTrace::publish(const Command *cmd, const TraceConfig *config)
 {
-	if(!cmd || !cmd->isTraced()) {
+	if(!cmd || !config || !cmd->isTraced()) {
 		return;
 	}
-	Sink sink = s_sink.load(std::memory_order_acquire);
-	if(sink) {
-		sink(entryOf(cmd));
-	}
+	config->publish(entryOf(cmd));
 }
 
 qint64 CallTrace::nowNs()
@@ -154,7 +194,9 @@ CallOut CallTrace::payload(const void *data, qint64 size)
 		o.value = QByteArray();
 		return o;
 	}
-	const qint64 keep = captureData() ? size : qMin<qint64>(size, previewBytes());
+	const TraceConfig *c = config();
+	const bool all = c && c->captureData();
+	const qint64 keep = all ? size : qMin<qint64>(size, c ? c->previewBytes() : TraceConfig::DEFAULT_PREVIEW_BYTES);
 	o.value = QByteArray(static_cast<const char *>(data), static_cast<qsizetype>(keep));
 	return o;
 }
@@ -168,7 +210,9 @@ CallOut CallTrace::text(const char *data, qint64 size)
 		--len;
 	}
 	o.size = len;
-	const qint64 keep = captureData() ? len : qMin<qint64>(len, previewBytes());
+	const TraceConfig *c = config();
+	const bool all = c && c->captureData();
+	const qint64 keep = all ? len : qMin<qint64>(len, c ? c->previewBytes() : TraceConfig::DEFAULT_PREVIEW_BYTES);
 	o.value = QString::fromUtf8(data, static_cast<qsizetype>(keep));
 	return o;
 }

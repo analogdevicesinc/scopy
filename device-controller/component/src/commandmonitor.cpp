@@ -28,16 +28,10 @@
 
 #include <QMetaObject>
 
-#include <atomic>
-#include <mutex>
-
 using namespace scopy;
 using namespace scopy::component;
 
 namespace {
-std::mutex s_mutex;
-std::atomic<CommandMonitor *> s_instance{nullptr}; // read by deliver() on executor threads
-
 // Name of the component base a leaf derives from ("InputStream", "RegisterReader", ...).
 QString componentBaseName(const QObject *obj)
 {
@@ -51,56 +45,64 @@ QString componentBaseName(const QObject *obj)
 }
 } // namespace
 
-CommandMonitor::CommandMonitor(QObject *parent)
-	: QObject(parent)
+CommandMonitor::CommandMonitor(Connection *connection)
+	: QObject(connection)
+	, m_uri(connection ? connection->uri() : QString())
+	, m_config(std::make_shared<TraceConfig>())
 {
 	qRegisterMetaType<scopy::CallArg>("scopy::CallArg");
 	qRegisterMetaType<scopy::CallRecord>("scopy::CallRecord");
 	qRegisterMetaType<scopy::CommandLogEntry>("scopy::CommandLogEntry");
-	CallTrace::setSink(&CommandMonitor::deliver);
+	m_config->setSink([this](const CommandLogEntry &entry) { deliver(entry); });
 }
 
-CommandMonitor *CommandMonitor::GetInstance()
+CommandMonitor::~CommandMonitor()
 {
-	std::lock_guard<std::mutex> lock(s_mutex);
-	if(!s_instance.load()) {
-		s_instance.store(new CommandMonitor());
-	}
-	return s_instance.load();
+	// The executor may outlive this object (it holds the config): stop recording and wait for a
+	// delivery in progress on an executor thread; nothing reaches this object afterwards.
+	m_config->setEnabled(false);
+	m_config->setSink(nullptr);
 }
 
-void CommandMonitor::deliver(const CommandLogEntry &entry)
+CommandMonitor *CommandMonitor::of(const QObject *node)
 {
-	CommandMonitor *m = s_instance.load(std::memory_order_acquire);
-	if(m) {
-		Q_EMIT m->commandFinished(entry);
+	for(const QObject *cur = node; cur; cur = cur->parent()) {
+		if(auto *conn = qobject_cast<const Connection *>(cur)) {
+			return conn->monitor();
+		}
 	}
+	return nullptr;
 }
 
-bool CommandMonitor::isEnabled() const { return CallTrace::isEnabled(); }
+Connection *CommandMonitor::connection() const { return qobject_cast<Connection *>(parent()); }
+
+void CommandMonitor::deliver(CommandLogEntry entry)
+{
+	entry.uri = m_uri;
+	Q_EMIT commandFinished(entry);
+}
+
+bool CommandMonitor::isEnabled() const { return m_config->isEnabled(); }
 
 void CommandMonitor::setEnabled(bool enabled)
 {
-	bool expected = !enabled;
-	if(CallTrace::s_enabled.compare_exchange_strong(expected, enabled)) {
+	if(m_config->setEnabled(enabled)) {
 		Q_EMIT enabledChanged(enabled);
 	}
 }
 
-bool CommandMonitor::captureData() const { return CallTrace::captureData(); }
+bool CommandMonitor::captureData() const { return m_config->captureData(); }
 
 void CommandMonitor::setCaptureData(bool capture)
 {
-	if(CallTrace::captureData() == capture) {
-		return;
+	if(m_config->setCaptureData(capture)) {
+		Q_EMIT captureDataChanged(capture);
 	}
-	CallTrace::setCaptureData(capture);
-	Q_EMIT captureDataChanged(capture);
 }
 
-int CommandMonitor::previewBytes() const { return CallTrace::previewBytes(); }
+int CommandMonitor::previewBytes() const { return m_config->previewBytes(); }
 
-void CommandMonitor::setPreviewBytes(int bytes) { CallTrace::setPreviewBytes(bytes); }
+void CommandMonitor::setPreviewBytes(int bytes) { m_config->setPreviewBytes(bytes); }
 
 CommandOrigin CommandMonitor::originOf(const QObject *node)
 {
@@ -132,7 +134,7 @@ CommandOrigin CommandMonitor::originOf(const QObject *node)
 
 void CommandMonitor::tag(Command *cmd, const QObject *leaf)
 {
-	if(!cmd || !CallTrace::isEnabled()) {
+	if(!cmd || !TraceConfig::anyEnabled()) {
 		return;
 	}
 	cmd->setOrigin(originOf(leaf));

@@ -27,9 +27,11 @@
 #include <QMutex>
 #include <QTest>
 #include <QThread>
+#include <QWaitCondition>
 
 #include <cerrno>
 #include <functional>
+#include <memory>
 #include <new>
 
 #if defined(__GLIBC__)
@@ -97,14 +99,57 @@ private:
 	std::function<int()> m_body;
 };
 
-QMutex s_entriesMutex;
-QList<CommandLogEntry> s_entries;
-
-void collect(const CommandLogEntry &e)
+// Thread-safe collector of one sink's entries.
+struct Collector
 {
-	QMutexLocker lock(&s_entriesMutex);
-	s_entries.append(e);
-}
+	QMutex mutex;
+	QList<CommandLogEntry> entries;
+
+	TraceConfig::Sink sink()
+	{
+		return [this](const CommandLogEntry &e) {
+			QMutexLocker lock(&mutex);
+			entries.append(e);
+		};
+	}
+	int count()
+	{
+		QMutexLocker lock(&mutex);
+		return entries.size();
+	}
+};
+
+// Blocks a command inside run() until released.
+struct Gate
+{
+	QMutex mutex;
+	QWaitCondition cond;
+	bool entered = false;
+	bool open = false;
+
+	void wait()
+	{
+		QMutexLocker lock(&mutex);
+		entered = true;
+		cond.wakeAll();
+		while(!open) {
+			cond.wait(&mutex);
+		}
+	}
+	void waitEntered()
+	{
+		QMutexLocker lock(&mutex);
+		while(!entered) {
+			cond.wait(&mutex);
+		}
+	}
+	void release()
+	{
+		QMutexLocker lock(&mutex);
+		open = true;
+		cond.wakeAll();
+	}
+};
 
 } // namespace
 
@@ -112,34 +157,45 @@ class TstCallTrace : public QObject
 {
 	Q_OBJECT
 private Q_SLOTS:
-	void init()
+	void init() { m_config = std::make_unique<TraceConfig>(); }
+	void cleanup()
 	{
-		CallTrace::setEnabled(false);
-		CallTrace::setCaptureData(false);
-		CallTrace::setPreviewBytes(64);
-		CallTrace::setSink(nullptr);
-		s_entries.clear();
+		m_config.reset();
+		QVERIFY(!TraceConfig::anyEnabled());
+		QVERIFY(!CallTrace::active());
 	}
-	void cleanup() { CallTrace::setEnabled(false); }
 
 	void traceInsideCommand();
 	void traceOutsideCommandIsNoop();
+	void directExecuteNeverRecords();
 	void disabledRecordsNothing();
 	void disabledDoesNotAllocate();
 	void toggleMidCommandKeepsDecision();
 	void rcOutAndErrnoPreserved();
 	void payloadPreviewAndCapture();
+	void configCountsEnabled();
 	void executorPublishesEntry();
+	void executorWithoutConfigRecordsNothing();
+	void twoExecutorsAreIndependent();
+	void sinkDetachedWhileInFlight();
 	void cancelledCommandPublishesNothing();
 	void recordToString();
+
+private:
+	// Runs `cmd` on this thread the way an executor does, under m_config.
+	void run(Command &cmd) { CallTrace::execute(&cmd, m_config.get()); }
+
+	std::unique_ptr<TraceConfig> m_config;
 };
 
 void TstCallTrace::traceInsideCommand()
 {
-	CallTrace::setEnabled(true);
+	m_config->setEnabled(true);
 	Command *seen = nullptr;
-	FnTestCommand cmd([&seen] {
+	const TraceConfig *seenConfig = nullptr;
+	FnTestCommand cmd([&seen, &seenConfig] {
 		seen = Command::current();
+		seenConfig = CallTrace::config();
 		int a = DC_TRACE("testlib", "first_call", nullptr, fakeCall(1), CallArg::string("attr", "raw"));
 		QThread::usleep(200);
 		int b = DC_TRACE("testlib", "second_call", reinterpret_cast<void *>(0x10), fakeCall(2),
@@ -147,12 +203,15 @@ void TstCallTrace::traceInsideCommand()
 		return a + b - 3;
 	});
 	QCOMPARE(Command::current(), nullptr);
-	cmd.execute();
+	run(cmd);
 	QCOMPARE(seen, &cmd);
+	QCOMPARE(seenConfig, m_config.get());
 	QCOMPARE(Command::current(), nullptr);
+	QCOMPARE(CallTrace::config(), nullptr);
 
 	QVERIFY(cmd.isTraced());
 	QVERIFY(!cmd.isRecording());
+	QCOMPARE(cmd.traceConfig(), nullptr);
 	const QList<CallRecord> calls = cmd.calls();
 	QCOMPARE(calls.size(), 2);
 	QCOMPARE(calls[0].library, QStringLiteral("testlib"));
@@ -174,18 +233,32 @@ void TstCallTrace::traceInsideCommand()
 
 void TstCallTrace::traceOutsideCommandIsNoop()
 {
-	CallTrace::setEnabled(true);
+	m_config->setEnabled(true);
 	QCOMPARE(Command::current(), nullptr);
 	int v = DC_TRACE("testlib", "outside", nullptr, fakeCall(7), CallArg::integer("x", 1));
 	QCOMPARE(v, 7);
 	QVERIFY(!CallTrace::active());
 }
 
+void TstCallTrace::directExecuteNeverRecords()
+{
+	// A config is on, but the command is not run by an executor.
+	m_config->setEnabled(true);
+	FnTestCommand cmd([] { return DC_TRACE("testlib", "call", nullptr, fakeCall(0)); });
+	cmd.execute();
+	QVERIFY(!cmd.isTraced());
+	QVERIFY(cmd.calls().isEmpty());
+
+	// Nor does a null config.
+	CallTrace::execute(&cmd, nullptr);
+	QVERIFY(!cmd.isTraced());
+}
+
 void TstCallTrace::disabledRecordsNothing()
 {
 	FnTestCommand cmd([] { return DC_TRACE("testlib", "call", nullptr, fakeCall(0)); });
 	cmd.setOrigin(QStringLiteral("dev/attr"));
-	cmd.execute();
+	run(cmd);
 	QVERIFY(!cmd.isTraced());
 	QVERIFY(cmd.calls().isEmpty());
 	QCOMPARE(cmd.startedNs(), 0);
@@ -194,6 +267,9 @@ void TstCallTrace::disabledRecordsNothing()
 void TstCallTrace::disabledDoesNotAllocate()
 {
 #if defined(DC_HAVE_ALLOC_COUNTER)
+	// Another executor's config is on: this one's commands still take the fast path.
+	TraceConfig other;
+	other.setEnabled(true);
 	FnTestCommand cmd([] {
 		const QString name = QStringLiteral("raw");
 		t_allocs = 0;
@@ -206,11 +282,12 @@ void TstCallTrace::disabledDoesNotAllocate()
 		t_countAllocs = false;
 		return sum >= 0 ? 0 : -1;
 	});
-	cmd.execute();
+	run(cmd);
 	QCOMPARE(t_allocs, 0);
+	other.setEnabled(false);
 
 	// Sanity: the counter sees the allocations of a recording command.
-	CallTrace::setEnabled(true);
+	m_config->setEnabled(true);
 	FnTestCommand traced([] {
 		t_allocs = 0;
 		t_countAllocs = true;
@@ -218,7 +295,7 @@ void TstCallTrace::disabledDoesNotAllocate()
 		t_countAllocs = false;
 		return 0;
 	});
-	traced.execute();
+	run(traced);
 	QVERIFY(t_allocs > 0);
 #else
 	QSKIP("allocation counter needs glibc");
@@ -227,33 +304,34 @@ void TstCallTrace::disabledDoesNotAllocate()
 
 void TstCallTrace::toggleMidCommandKeepsDecision()
 {
-	// Started on: keeps recording after the monitor is turned off.
-	CallTrace::setEnabled(true);
-	FnTestCommand on([] {
+	TraceConfig *config = m_config.get();
+	// Started on: keeps recording after the config is turned off.
+	config->setEnabled(true);
+	FnTestCommand on([config] {
 		DC_TRACE("testlib", "a", nullptr, fakeCall(0));
-		CallTrace::setEnabled(false);
+		config->setEnabled(false);
 		DC_TRACE("testlib", "b", nullptr, fakeCall(0));
 		return 0;
 	});
-	on.execute();
+	run(on);
 	QVERIFY(on.isTraced());
 	QCOMPARE(on.calls().size(), 2);
 
 	// Started off: records nothing even if turned on midway.
-	FnTestCommand off([] {
+	FnTestCommand off([config] {
 		DC_TRACE("testlib", "a", nullptr, fakeCall(0));
-		CallTrace::setEnabled(true);
+		config->setEnabled(true);
 		DC_TRACE("testlib", "b", nullptr, fakeCall(0));
 		return 0;
 	});
-	off.execute();
+	run(off);
 	QVERIFY(!off.isTraced());
 	QVERIFY(off.calls().isEmpty());
 }
 
 void TstCallTrace::rcOutAndErrnoPreserved()
 {
-	CallTrace::setEnabled(true);
+	m_config->setEnabled(true);
 	int errnoAfter = 0;
 	FnTestCommand cmd([&errnoAfter] {
 		uint32_t val = 0;
@@ -266,7 +344,7 @@ void TstCallTrace::rcOutAndErrnoPreserved()
 		Q_UNUSED(p);
 		return rc;
 	});
-	cmd.execute();
+	run(cmd);
 	QCOMPARE(errnoAfter, EBUSY);
 	const QList<CallRecord> calls = cmd.calls();
 	QCOMPARE(calls.size(), 3);
@@ -280,16 +358,27 @@ void TstCallTrace::rcOutAndErrnoPreserved()
 
 void TstCallTrace::payloadPreviewAndCapture()
 {
-	QByteArray data(200, 'x');
+	const QByteArray data(200, 'x');
+	// Outside a recording command: the default preview.
 	CallOut o = CallTrace::payload(data.constData(), data.size());
 	QCOMPARE(o.kind, CallArg::Bytes);
 	QCOMPARE(o.size, 200);
-	QCOMPARE(o.value.toByteArray().size(), 64);
+	QCOMPARE(o.value.toByteArray().size(), TraceConfig::DEFAULT_PREVIEW_BYTES);
 
-	CallTrace::setCaptureData(true);
-	o = CallTrace::payload(data.constData(), data.size());
-	QCOMPARE(o.value.toByteArray().size(), 200);
-	CallTrace::setCaptureData(false);
+	// Inside: the running executor's config decides.
+	m_config->setEnabled(true);
+	CallOut inside;
+	FnTestCommand cmd([&inside, &data] {
+		inside = CallTrace::payload(data.constData(), data.size());
+		return 0;
+	});
+	m_config->setPreviewBytes(16);
+	run(cmd);
+	QCOMPARE(inside.value.toByteArray().size(), 16);
+	QCOMPARE(inside.size, 200);
+	m_config->setCaptureData(true);
+	run(cmd);
+	QCOMPARE(inside.value.toByteArray().size(), 200);
 
 	const char txt[] = "1234\0";
 	o = CallTrace::text(txt, sizeof(txt));
@@ -298,11 +387,34 @@ void TstCallTrace::payloadPreviewAndCapture()
 	QCOMPARE(o.size, 4);
 }
 
+void TstCallTrace::configCountsEnabled()
+{
+	QVERIFY(!TraceConfig::anyEnabled());
+	QVERIFY(m_config->setEnabled(true));
+	QVERIFY(!m_config->setEnabled(true)); // no change
+	QVERIFY(TraceConfig::anyEnabled());
+	{
+		TraceConfig other;
+		QVERIFY(other.setEnabled(true));
+		QVERIFY(m_config->setEnabled(false));
+		QVERIFY(TraceConfig::anyEnabled());
+	} // destroyed while on
+	QVERIFY(!TraceConfig::anyEnabled());
+	QVERIFY(m_config->setCaptureData(true));
+	QVERIFY(!m_config->setCaptureData(true));
+	m_config->setPreviewBytes(-5);
+	QCOMPARE(m_config->previewBytes(), 0);
+}
+
 void TstCallTrace::executorPublishesEntry()
 {
-	CallTrace::setSink(&collect);
-	CallTrace::setEnabled(true);
+	Collector c;
+	auto config = std::make_shared<TraceConfig>();
+	config->setSink(c.sink());
+	config->setEnabled(true);
 	PooledCmdExecutor exec(1);
+	exec.setTraceConfig(config);
+	QCOMPARE(exec.traceConfig(), config);
 
 	auto *ok = new FnTestCommand([] { return DC_TRACE("testlib", "ok_call", nullptr, fakeCall(0)); });
 	CommandOrigin origin;
@@ -318,9 +430,9 @@ void TstCallTrace::executorPublishesEntry()
 	f1.waitForFinished();
 	f2.waitForFinished();
 
-	QMutexLocker lock(&s_entriesMutex);
-	QCOMPARE(s_entries.size(), 2);
-	const CommandLogEntry &e = s_entries[0];
+	QMutexLocker lock(&c.mutex);
+	QCOMPARE(c.entries.size(), 2);
+	const CommandLogEntry &e = c.entries[0];
 	QCOMPARE(e.origin, origin.path);
 	QCOMPARE(e.uri, origin.uri);
 	QCOMPARE(e.backendId, origin.backendId);
@@ -329,23 +441,106 @@ void TstCallTrace::executorPublishesEntry()
 	QVERIFY(!e.failed());
 	QCOMPARE(e.calls.size(), 1);
 	QVERIFY(e.durationNs >= e.calls[0].durationNs);
-	QVERIFY(s_entries[1].failed());
-	QCOMPARE(s_entries[1].error.code, -EBUSY);
-	QCOMPARE(s_entries[1].calls[0].function, QStringLiteral("bad_call"));
+	QVERIFY(c.entries[1].failed());
+	QCOMPARE(c.entries[1].error.code, -EBUSY);
+	QCOMPARE(c.entries[1].calls[0].function, QStringLiteral("bad_call"));
 	delete ok;
 	delete bad;
 }
 
+void TstCallTrace::executorWithoutConfigRecordsNothing()
+{
+	m_config->setEnabled(true); // on, but not installed on this executor
+	PooledCmdExecutor exec(1);
+	QCOMPARE(exec.traceConfig(), nullptr);
+	FnTestCommand cmd([] { return DC_TRACE("testlib", "call", nullptr, fakeCall(0)); });
+	exec.execute(&cmd).waitForFinished();
+	QVERIFY(!cmd.isTraced());
+	QVERIFY(cmd.calls().isEmpty());
+}
+
+void TstCallTrace::twoExecutorsAreIndependent()
+{
+	Collector ca, cb;
+	auto a = std::make_shared<TraceConfig>();
+	auto b = std::make_shared<TraceConfig>();
+	a->setSink(ca.sink());
+	b->setSink(cb.sink());
+	PooledCmdExecutor execA(1), execB(1);
+	execA.setTraceConfig(a);
+	execB.setTraceConfig(b);
+	auto runBoth = [&]() {
+		FnTestCommand ra([] { return DC_TRACE("testlib", "on_a", nullptr, fakeCall(0)); });
+		FnTestCommand rb([] { return DC_TRACE("testlib", "on_b", nullptr, fakeCall(0)); });
+		QFuture<void> fa = execA.execute(&ra);
+		QFuture<void> fb = execB.execute(&rb);
+		fa.waitForFinished();
+		fb.waitForFinished();
+	};
+
+	a->setEnabled(true);
+	runBoth();
+	QCOMPARE(ca.count(), 1);
+	QCOMPARE(cb.count(), 0);
+	QCOMPARE(ca.entries[0].calls[0].function, QStringLiteral("on_a"));
+
+	// Toggling b leaves a alone.
+	b->setEnabled(true);
+	runBoth();
+	QCOMPARE(ca.count(), 2);
+	QCOMPARE(cb.count(), 1);
+	QCOMPARE(cb.entries[0].calls[0].function, QStringLiteral("on_b"));
+	b->setEnabled(false);
+	QVERIFY(a->isEnabled());
+	runBoth();
+	QCOMPARE(ca.count(), 3);
+	QCOMPARE(cb.count(), 1);
+}
+
+void TstCallTrace::sinkDetachedWhileInFlight()
+{
+	Collector c;
+	Gate gate;
+	auto config = std::make_shared<TraceConfig>();
+	config->setSink(c.sink());
+	config->setEnabled(true);
+	std::weak_ptr<TraceConfig> weak = config;
+	auto *exec = new PooledCmdExecutor(1);
+	exec->setTraceConfig(config);
+
+	FnTestCommand cmd([&gate] {
+		DC_TRACE("testlib", "before", nullptr, fakeCall(0));
+		gate.wait();
+		return DC_TRACE("testlib", "after", nullptr, fakeCall(0));
+	});
+	QFuture<void> f = exec->execute(&cmd);
+	gate.waitEntered();
+	// The owner goes away mid-command: detach, drop its reference.
+	config->setEnabled(false);
+	config->setSink(nullptr);
+	config.reset();
+	QVERIFY(!weak.expired()); // the executor keeps it alive
+	gate.release();
+	f.waitForFinished();
+	QVERIFY(cmd.isTraced()); // decided at start, no partial entry
+	QCOMPARE(cmd.calls().size(), 2);
+	QCOMPARE(c.count(), 0); // but not delivered
+	delete exec;
+	QVERIFY(weak.expired());
+}
+
 void TstCallTrace::cancelledCommandPublishesNothing()
 {
-	CallTrace::setSink(&collect);
-	CallTrace::setEnabled(true);
+	Collector c;
+	auto config = std::make_shared<TraceConfig>();
+	config->setSink(c.sink());
+	config->setEnabled(true);
 	auto *cmd = new FnTestCommand([] { return 0; });
 	cmd->cancel();
 	PooledCmdExecutor exec(1);
+	exec.setTraceConfig(config);
 	exec.execute(cmd).waitForFinished();
-	QMutexLocker lock(&s_entriesMutex);
-	QVERIFY(s_entries.isEmpty());
+	QCOMPARE(c.count(), 0);
 	delete cmd;
 }
 

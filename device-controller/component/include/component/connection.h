@@ -26,11 +26,13 @@
 #include <QList>
 #include <QObject>
 #include <QPair>
+#include <QPointer>
 #include <QString>
 #include "component/component_export.h"
 
 namespace scopy::component {
 
+class CommandMonitor;
 class Context;
 class Ping;
 
@@ -39,7 +41,7 @@ using ConnectionKind = QString;
 
 // One physical link to a device (one uri), owned by the Controller. Holds the executor shared by
 // every view built on it and one Context per compatible backend. Subclasses carry the native
-// handle (IIOConnection).
+// handle (IIOConnection). Owns the command monitor (call trace) of the link.
 class COMPONENT_EXPORT Connection : public QObject
 {
 	Q_OBJECT
@@ -52,7 +54,11 @@ public:
 	ConnectionKind kind() const { return m_kind; }
 
 	ICmdExecutor *executor() const { return m_executor; }
-	void setExecutor(ICmdExecutor *executor) { m_executor = executor; }
+	// Also installs the monitor's trace config on the executor.
+	void setExecutor(ICmdExecutor *executor);
+
+	// Command call trace of this connection (one per connection, child of it, off by default).
+	CommandMonitor *monitor() const;
 
 	// Compatible backends, decided once by the Controller right after open.
 	QList<BackendId> backends() const { return m_backends; }
@@ -96,6 +102,7 @@ protected:
 	QString m_uri;
 	ConnectionKind m_kind;
 	ICmdExecutor *m_executor = nullptr;
+	QPointer<CommandMonitor> m_monitor; // QPointer: subclasses may delete children early
 	QList<BackendId> m_backends;
 	QList<QPair<BackendId, Context *>> m_contexts;
 	Ping *m_ping = nullptr;

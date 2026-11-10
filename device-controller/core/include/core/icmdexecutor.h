@@ -24,9 +24,12 @@
 #include <QFuture>
 #include <QUuid>
 
+#include <memory>
+
 namespace scopy {
 
 class Command;
+class TraceConfig;
 
 class ICmdExecutor
 {
@@ -39,6 +42,11 @@ public:
 	virtual void cancelByResource(void *resource) = 0;
 	virtual void cancelAll() = 0;
 	virtual int pendingCount() const = 0;
+
+	// Call trace of the commands this executor runs (core/calltrace.h); nullptr = never record.
+	// Executors that do not trace keep the defaults.
+	virtual void setTraceConfig(std::shared_ptr<TraceConfig> config) { (void)config; }
+	virtual std::shared_ptr<TraceConfig> traceConfig() const { return {}; }
 };
 
 } // namespace scopy
