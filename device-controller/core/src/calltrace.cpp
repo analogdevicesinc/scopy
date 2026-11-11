@@ -157,6 +157,7 @@ CommandLogEntry CallTrace::entryOf(const Command *cmd)
 	e.originObject = o.object;
 	e.uri = o.uri;
 	e.backendId = o.backendId;
+	e.originScope = o.scope;
 	e.commandClass = QString::fromLatin1(cmd->metaObject()->className());
 	e.startNs = cmd->startedNs();
 	e.durationNs = cmd->finishedNs() - cmd->startedNs();

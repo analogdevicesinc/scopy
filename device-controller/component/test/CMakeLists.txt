@@ -33,3 +33,6 @@ add_component_test(tst_component_register)
 add_component_test(tst_component_trigger)
 add_component_test(tst_component_commandmonitor)
 add_component_test(tst_component_ping)
+add_component_test(tst_component_codeemitters)
+# Expected scripts of the libiio emitters (DC_UPDATE_GOLDENS=1 rewrites them).
+target_compile_definitions(tst_component_codeemitters PRIVATE DC_GOLDEN_DIR="${CMAKE_CURRENT_SOURCE_DIR}/golden")

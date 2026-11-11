@@ -155,7 +155,9 @@ void IIOComponentBuilder::buildDebugAttributes(IIODevice *dev, ICmdExecutor *exe
 	AttrMap attrs;
 	for(unsigned int i = 0; i < count; ++i) {
 		const QString name = devOps->debugAttrName(dh, i);
-		attrs.insert(name, makeAttribute(dev, name, m_attrOps->debugAttr(dh, name), executor));
+		IIOAttribute *attr = makeAttribute(dev, name, m_attrOps->debugAttr(dh, name), executor);
+		addTag(attr, tags::DebugAttribute);
+		attrs.insert(name, attr);
 		if(name.contains("direct_reg_access")) {
 			hasRegAccess = true;
 		}

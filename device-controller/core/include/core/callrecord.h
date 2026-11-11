@@ -28,6 +28,7 @@
 #include <QMetaType>
 #include <QString>
 #include <QVariant>
+#include <QVariantMap>
 
 namespace scopy {
 
@@ -86,6 +87,22 @@ struct CONTROLLER_CORE_EXPORT CallRecord
 	QString outString() const;
 };
 
+// Keys of CommandOrigin::scope: identifying names of the tree nodes on the origin path, for
+// consumers that re-address the node without the tree (code generation). Only present keys apply.
+namespace originscope {
+inline constexpr auto Kind = "kind";		   // component base class of the leaf ("Attribute", "InputStream", ...)
+inline constexpr auto Context = "context";	   // context name
+inline constexpr auto Device = "device";	   // device name (its id when unnamed)
+inline constexpr auto DeviceId = "deviceId";	   // device id
+inline constexpr auto Channel = "channel";	   // channel id (Channel or ScanElement)
+inline constexpr auto Output = "output";	   // bool: output channel / stream
+inline constexpr auto Stream = "stream";	   // "input" | "output"
+inline constexpr auto BufferIndex = "bufferIndex"; // stream buffer index
+inline constexpr auto Attribute = "attribute";	   // attribute name
+inline constexpr auto AttributeOf = "attributeOf"; // "context" | "device" | "channel" | "buffer"
+inline constexpr auto Debug = "debug";		   // bool: debug attribute
+} // namespace originscope
+
 // Where a command comes from: the component that enqueued it (set on the GUI thread).
 struct CONTROLLER_CORE_EXPORT CommandOrigin
 {
@@ -93,6 +110,7 @@ struct CONTROLLER_CORE_EXPORT CommandOrigin
 	QString uri;	     // connection uri
 	QString backendId;   // view of the connection ("iio", "capi", ...)
 	quintptr object = 0; // the component node (identity only, never dereferenced)
+	QVariantMap scope;   // originscope keys
 };
 
 // Everything one traced command did; delivered by the command monitor once the command finished.
@@ -107,6 +125,7 @@ struct CONTROLLER_CORE_EXPORT CommandLogEntry
 	qint64 durationNs = 0;
 	Error error; // code 0: success
 	QList<CallRecord> calls;
+	QVariantMap originScope; // CommandOrigin::scope (originscope keys)
 
 	bool failed() const { return error.code < 0; }
 };

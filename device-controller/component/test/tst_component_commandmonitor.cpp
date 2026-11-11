@@ -22,12 +22,15 @@
 #include "fakeattrops.h"
 
 #include "component/attribute.h"
+#include "component/channel.h"
 #include "component/backends/iio/iioattributereader.h"
 #include "component/commandmonitor.h"
 #include "component/connection.h"
 #include "component/context.h"
 #include "component/controller.h"
 #include "component/device.h"
+#include "component/scanelement.h"
+#include "component/tags.h"
 
 #include "core/calltrace.h"
 #include "core/pooledcmdexecutor.h"
@@ -181,6 +184,7 @@ private Q_SLOTS:
 	void monitorGoesWithControllerConnection();
 	void originSetByAttributeReader();
 	void originOfUnnamedLeaf();
+	void originScopeNamesTheNodes();
 };
 
 void TstComponentCommandMonitor::oneMonitorPerConnection()
@@ -411,6 +415,9 @@ void TstComponentCommandMonitor::originSetByAttributeReader()
 	QCOMPARE(e.backendId, QStringLiteral("iio"));
 	QCOMPARE(e.uri, QStringLiteral("ip:test"));
 	QVERIFY(e.commandClass.contains(QStringLiteral("AttrReadCommand")));
+	QCOMPARE(e.originScope.value(originscope::Attribute).toString(), QStringLiteral("raw"));
+	QCOMPARE(e.originScope.value(originscope::Device).toString(), QStringLiteral("adc"));
+	QCOMPARE(e.originScope.value(originscope::AttributeOf).toString(), QStringLiteral("device"));
 	delete conn->take(QStringLiteral("iio"));
 	delete conn;
 }
@@ -425,6 +432,67 @@ void TstComponentCommandMonitor::originOfUnnamedLeaf()
 	QCOMPARE(CommandMonitor::originOf(leaf).path, QStringLiteral("ctx0/adc/QObject"));
 	QCOMPARE(CommandMonitor::originOf(dev).path, QStringLiteral("ctx0/adc"));
 	QCOMPARE(CommandMonitor::originOf(dev).object, quintptr(dev));
+}
+
+namespace {
+class FakeScanElement : public ScanElement
+{
+public:
+	using ScanElement::ScanElement;
+	bool isEnabled() const override { return false; }
+	QCoro::Task<CommandResponse<void>> enableAsync(bool) override { co_return CommandResponse<void>(QUuid()); }
+};
+} // namespace
+
+void TstComponentCommandMonitor::originScopeNamesTheNodes()
+{
+	namespace os = originscope;
+	Context ctx;
+	ctx.setName("ctx0");
+	auto *dev = new Device(&ctx);
+	dev->setId("iio:device1");
+	dev->setName("ad9361-phy");
+	auto *ch = new Channel(dev);
+	ch->setId("voltage0");
+	ch->setIsOutput(true);
+	auto *chAttr = new Attribute(ch);
+	chAttr->setName("hardwaregain");
+	const QVariantMap s = CommandMonitor::originOf(chAttr).scope;
+	QCOMPARE(s.value(os::Kind).toString(), QStringLiteral("Attribute"));
+	QCOMPARE(s.value(os::Context).toString(), QStringLiteral("ctx0"));
+	QCOMPARE(s.value(os::Device).toString(), QStringLiteral("ad9361-phy"));
+	QCOMPARE(s.value(os::DeviceId).toString(), QStringLiteral("iio:device1"));
+	QCOMPARE(s.value(os::Channel).toString(), QStringLiteral("voltage0"));
+	QCOMPARE(s.value(os::Output).toBool(), true);
+	QCOMPARE(s.value(os::Attribute).toString(), QStringLiteral("hardwaregain"));
+	QCOMPARE(s.value(os::AttributeOf).toString(), QStringLiteral("channel"));
+	QVERIFY(!s.contains(os::Debug));
+
+	auto *dbg = new Attribute(dev);
+	dbg->setName("direct_reg_access");
+	addTag(dbg, tags::DebugAttribute);
+	const QVariantMap d = CommandMonitor::originOf(dbg).scope;
+	QCOMPARE(d.value(os::AttributeOf).toString(), QStringLiteral("device"));
+	QCOMPARE(d.value(os::Debug).toBool(), true);
+	QVERIFY(!d.contains(os::Channel));
+
+	auto *ctxAttr = new Attribute(&ctx);
+	ctxAttr->setName("hw_model");
+	const QVariantMap c = CommandMonitor::originOf(ctxAttr).scope;
+	QCOMPARE(c.value(os::AttributeOf).toString(), QStringLiteral("context"));
+	QVERIFY(!c.contains(os::Device));
+
+	// An unnamed device is addressed by its id; a scan element carries its channel and direction.
+	auto *anon = new Device(&ctx);
+	anon->setId("iio:device3");
+	auto *el = new FakeScanElement(anon);
+	el->setId("voltage1");
+	el->setIsOutput(false);
+	const QVariantMap e = CommandMonitor::originOf(el).scope;
+	QCOMPARE(e.value(os::Kind).toString(), QStringLiteral("ScanElement"));
+	QCOMPARE(e.value(os::Device).toString(), QStringLiteral("iio:device3"));
+	QCOMPARE(e.value(os::Channel).toString(), QStringLiteral("voltage1"));
+	QCOMPARE(e.value(os::Output).toBool(), false);
 }
 
 QTEST_MAIN(TstComponentCommandMonitor)

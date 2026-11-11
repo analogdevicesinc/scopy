@@ -22,8 +22,14 @@
 #include "component/commandmonitor.h"
 
 #include "component/attribute.h"
+#include "component/channel.h"
 #include "component/connection.h"
 #include "component/context.h"
+#include "component/device.h"
+#include "component/inputstream.h"
+#include "component/outputstream.h"
+#include "component/scanelement.h"
+#include "component/tags.h"
 #include "core/calltrace.h"
 
 #include <QMetaObject>
@@ -42,6 +48,62 @@ QString componentBaseName(const QObject *obj)
 	QString name = QString::fromLatin1(mo->className());
 	const qsizetype sep = name.lastIndexOf(QLatin1String("::"));
 	return sep >= 0 ? name.mid(sep + 2) : name;
+}
+
+void setOnce(QVariantMap &scope, const char *key, const QVariant &value)
+{
+	const QString k = QString::fromLatin1(key);
+	if(!scope.contains(k)) {
+		scope.insert(k, value);
+	}
+}
+
+// Identifying names of the nodes from `node` up to its Context (the nearest one of each kind).
+QVariantMap scopeOf(const QObject *node)
+{
+	namespace os = originscope;
+	QVariantMap scope;
+	scope.insert(QString::fromLatin1(os::Kind), componentBaseName(node));
+	for(const QObject *cur = node; cur; cur = cur->parent()) {
+		if(qobject_cast<const Connection *>(cur)) {
+			break;
+		}
+		if(auto *a = qobject_cast<const Attribute *>(cur)) {
+			if(!scope.contains(QString::fromLatin1(os::Attribute))) {
+				scope.insert(QString::fromLatin1(os::Attribute), a->objectName());
+				const QObject *p = a->parent();
+				const char *of = qobject_cast<const Channel *>(p) ? "channel"
+					: qobject_cast<const Device *>(p)	  ? "device"
+					: qobject_cast<const Context *>(p)	  ? "context"
+					: qobject_cast<const Stream *>(p)	  ? "buffer"
+										  : "";
+				if(*of) {
+					scope.insert(QString::fromLatin1(os::AttributeOf), QString::fromLatin1(of));
+				}
+				if(hasTag(a, QString::fromLatin1(tags::DebugAttribute))) {
+					scope.insert(QString::fromLatin1(os::Debug), true);
+				}
+			}
+		} else if(auto *ch = qobject_cast<const Channel *>(cur)) {
+			setOnce(scope, os::Channel, ch->id());
+			setOnce(scope, os::Output, ch->isOutput());
+		} else if(auto *el = qobject_cast<const ScanElement *>(cur)) {
+			setOnce(scope, os::Channel, el->id());
+			setOnce(scope, os::Output, el->isOutput());
+		} else if(auto *st = qobject_cast<const Stream *>(cur)) {
+			const bool out = qobject_cast<const OutputStream *>(st) != nullptr;
+			setOnce(scope, os::Stream, QString::fromLatin1(out ? "output" : "input"));
+			setOnce(scope, os::BufferIndex, st->bufferIndex());
+			setOnce(scope, os::Output, out);
+		} else if(auto *d = qobject_cast<const Device *>(cur)) {
+			setOnce(scope, os::Device, d->name().isEmpty() ? d->id() : d->name());
+			setOnce(scope, os::DeviceId, d->id());
+		} else if(auto *c = qobject_cast<const Context *>(cur)) {
+			setOnce(scope, os::Context, c->name());
+			break;
+		}
+	}
+	return scope;
 }
 } // namespace
 
@@ -111,6 +173,7 @@ CommandOrigin CommandMonitor::originOf(const QObject *node)
 		return o;
 	}
 	o.object = quintptr(node);
+	o.scope = scopeOf(node);
 	QStringList segments;
 	if(node->objectName().isEmpty() && !qobject_cast<const Attribute *>(node->parent())) {
 		segments.prepend(componentBaseName(node));

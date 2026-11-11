@@ -14,6 +14,8 @@ OMIT_DIRS_LIST=(
     tmp
     tools
     windows
+    # Expected outputs of the code generator tests (generated scripts, compared verbatim)
+    golden
     # Directories specific to your local environment that are not part of the repository
     venv
 )
