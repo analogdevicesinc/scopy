@@ -22,6 +22,7 @@
 #include "componenttreemodel.h"
 #include "dcdebuggertool.h"
 #include "fakestream.h"
+#include "monitor/monitorview.h"
 
 #include <QComboBox>
 #include <QDoubleSpinBox>
@@ -40,6 +41,7 @@
 #include <menucontrolbutton.h>
 #include <menuspinbox.h>
 #include <menuonoffswitch.h>
+#include <plotwidget.h>
 
 using namespace scopy;
 using namespace scopy::component;
@@ -299,6 +301,11 @@ void TST_AcquisitionUi::monitorPollsEnabledChannels()
 	}
 	QVERIFY(table);
 	QCOMPARE(table->rowCount(), 0);
+	// One plot from the start, shown before anything is polled.
+	auto *view = m_tool->findChild<MonitorView *>();
+	QVERIFY(view);
+	QCOMPARE(view->plotCount(), 1);
+	QTRY_VERIFY(view->plot(0)->isVisible());
 
 	// Enable both channels from their checkboxes in the channel list.
 	int enabled = 0;

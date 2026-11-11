@@ -38,6 +38,9 @@ public:
 
 	explicit PathTitle(const QList<Segment> &segments, QWidget *parent = nullptr);
 
+	// Fixed height of the segment buttons; header buttons beside the path match it.
+	static int buttonHeight();
+
 Q_SIGNALS:
 	void pathSelected(QObject *node);
 };

@@ -39,6 +39,7 @@ PathTitle::PathTitle(const QList<Segment> &segments, QWidget *parent)
 		auto *btn = new QPushButton(s.first, this);
 		btn->setToolTip(s.first);
 		Style::setStyle(btn, style::properties::button::borderButton);
+		btn->setFixedHeight(buttonHeight());
 		QPointer<QObject> node = s.second;
 		connect(btn, &QPushButton::clicked, this, [this, node]() {
 			if(node) {
@@ -49,5 +50,7 @@ PathTitle::PathTitle(const QList<Segment> &segments, QWidget *parent)
 	}
 	lay->addStretch();
 }
+
+int PathTitle::buttonHeight() { return Style::getDimension(json::global::unit_2); }
 
 #include "moc_pathtitle.cpp"

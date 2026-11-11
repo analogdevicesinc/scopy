@@ -28,6 +28,7 @@ set(DCDEBUGGER_TESTS
     streamgeneration
     registers
     attributemonitor
+    monitorview
     commandlog
     pingview
     bottompanes

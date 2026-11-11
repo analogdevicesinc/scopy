@@ -32,6 +32,7 @@
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QScrollArea>
+#include <QShowEvent>
 #include <QSignalBlocker>
 #include <QSplitter>
 #include <QTableWidget>
@@ -204,11 +205,15 @@ QWidget *MonitorView::buildSettings(QWidget *parent)
 	scroll->setWidgetResizable(true);
 	scroll->setFrameShape(QFrame::NoFrame);
 	scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	scroll->setObjectName("monitorSettingsMenu");
 	auto *content = new QWidget(scroll);
 	auto *outer = new QVBoxLayout(content);
 	outer->setContentsMargins(0, 0, 0, 0);
+	outer->setSpacing(10);
 
+	// Settings menu: the Polling section, then the Plots section.
 	MenuSectionCollapseWidget *section = makeSection("Polling", content);
+	section->setObjectName("monitorPollingSection");
 	QVBoxLayout *lay = section->contentLayout();
 	lay->setSpacing(8);
 	m_period = new gui::MenuSpinbox("Period", m_monitor->period() / 1000.0, "s", 0.001, 3600, true, false, false,
@@ -237,9 +242,46 @@ QWidget *MonitorView::buildSettings(QWidget *parent)
 	});
 
 	outer->addWidget(section);
+	outer->addWidget(buildPlotSettings(content));
 	outer->addStretch();
+	// Built before the first plot: plotsChanged() fills the Plots section from the start.
+	connect(this, &MonitorView::plotsChanged, this, &MonitorView::updatePlotControls);
 	scroll->setWidget(content);
 	return scroll;
+}
+
+QWidget *MonitorView::buildPlotSettings(QWidget *parent)
+{
+	MenuSectionCollapseWidget *section = makeSection("Plots", parent);
+	section->setObjectName("monitorPlotsSection");
+	QVBoxLayout *lay = section->contentLayout();
+	lay->setSpacing(6);
+	// The existing plots; Remove acts on the selected one. Filled by updatePlotControls().
+	m_plotSelect = new MenuCombo("Plot", section);
+	m_plotSelect->setObjectName("monitorPlotSelectMenu");
+	m_plotSelect->combo()->setObjectName("monitorPlotSelect");
+	m_plotSelect->setToolTip("Selected plot: Remove plot removes it");
+	connect(m_plotSelect->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int idx) {
+		if(idx >= 0) {
+			m_selectedPlot = idx;
+		}
+	});
+	m_addPlotBtn = new QPushButton("Add plot", section);
+	m_addPlotBtn->setObjectName("monitorAddPlot");
+	m_addPlotBtn->setToolTip(QStringLiteral("Add a plot under the others (at most %1)").arg(MaxPlots));
+	Style::setStyle(m_addPlotBtn, style::properties::button::basicButton);
+	connect(m_addPlotBtn, &QPushButton::clicked, this, [this]() { addPlot(); });
+	m_removePlotBtn = new QPushButton("Remove plot", section);
+	m_removePlotBtn->setObjectName("monitorRemovePlot");
+	m_removePlotBtn->setToolTip("Remove the selected plot; its channels move to the first plot");
+	Style::setStyle(m_removePlotBtn, style::properties::button::basicButton);
+	m_removePlotBtn->setVisible(false); // shown from 2 plots on
+	connect(m_removePlotBtn, &QPushButton::clicked, this,
+		[this]() { removePlot(m_plotSelect->combo()->currentIndex()); });
+	lay->addWidget(m_plotSelect);
+	lay->addWidget(m_addPlotBtn);
+	lay->addWidget(m_removePlotBtn);
+	return section;
 }
 
 void MonitorView::buildChannels()
@@ -249,7 +291,8 @@ void MonitorView::buildChannels()
 	m_menuGroup->setExclusive(true);
 
 	auto *settingsBtn = new MenuControlButton(vcm);
-	settingsBtn->setName("Polling");
+	settingsBtn->setObjectName("monitorSettingsButton");
+	settingsBtn->setName("Settings");
 	settingsBtn->setOpenMenuChecksThis(true);
 	settingsBtn->setDoubleClickToOpenMenu(false);
 	settingsBtn->checkBox()->setVisible(false);
@@ -260,7 +303,7 @@ void MonitorView::buildChannels()
 	m_menuGroup->addButton(settingsBtn);
 	connect(settingsBtn, &QAbstractButton::clicked, this, [this]() { m_tool->rightStack()->show(SETTINGS_KEY); });
 
-	QMap<QString, int> kinds; // channel kind -> plot
+	QMap<QString, int> kinds; // channel kind -> plot, over the existing plots
 	QMap<Device *, CollapsableMenuControlButton *> groups;
 	const QList<Channel *> channels = monitorableChannels(m_root);
 	for(int i = 0; i < channels.size(); ++i) {
@@ -289,7 +332,7 @@ void MonitorView::buildChannels()
 		e.attributes = ch->findChildren<Attribute *>(QString(), Qt::FindDirectChildrenOnly);
 		const QString kind = kindOf(ch);
 		if(!kinds.contains(kind)) {
-			kinds.insert(kind, kinds.size() % MaxPlots);
+			kinds.insert(kind, int(kinds.size() % m_plots.size()));
 		}
 		e.plotIndex = kinds.value(kind);
 
@@ -332,7 +375,8 @@ void MonitorView::buildChannels()
 			}
 		});
 		connect(e.plot->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [this, key](int idx) {
-			if(Entry *en = entry(key)) {
+			Entry *en = entry(key);
+			if(en && idx >= 0) {
 				assignPlot(*en, idx);
 				render();
 			}
@@ -365,7 +409,8 @@ QWidget *MonitorView::buildChannelMenu(Entry &e)
 	auto *plotSection = new MenuSectionCollapseWidget("PLOT", MenuCollapseSection::MHCW_NONE,
 							  MenuCollapseSection::MHW_BASEWIDGET, menu);
 	e.plot = new MenuCombo("Plot", plotSection);
-	for(int p = 0; p < MaxPlots; ++p) {
+	e.plot->combo()->setObjectName("monitorPlotCombo:" + e.key);
+	for(int p = 0; p < m_plots.size(); ++p) {
 		e.plot->combo()->addItem(QStringLiteral("Plot %1").arg(p + 1));
 	}
 	e.plot->combo()->setCurrentIndex(e.plotIndex);
@@ -380,31 +425,15 @@ QWidget *MonitorView::buildChannelMenu(Entry &e)
 
 void MonitorView::buildPlots()
 {
-	auto *splitter = new QSplitter(Qt::Vertical, this);
-	splitter->setChildrenCollapsible(true);
+	m_splitter = new QSplitter(Qt::Vertical, this);
+	m_splitter->setChildrenCollapsible(true);
 
-	auto *plotsArea = new QWidget(splitter);
-	auto *plotsLay = new QVBoxLayout(plotsArea);
-	plotsLay->setContentsMargins(0, 0, 0, 0);
-	plotsLay->setSpacing(6);
-	for(int p = 0; p < MaxPlots; ++p) {
-		auto *plot = new PlotWidget(plotsArea);
-		plot->xAxis()->scaleDraw()->setFormatter(new MetricPrefixFormatter());
-		plot->xAxis()->scaleDraw()->setFloatPrecision(2);
-		plot->xAxis()->scaleDraw()->setUnitType("s");
-		plot->yAxis()->scaleDraw()->setFormatter(new MetricPrefixFormatter());
-		plot->yAxis()->scaleDraw()->setFloatPrecision(3);
-		plot->xAxis()->setInterval(-m_monitor->history(), 0);
-		plot->yAxis()->setInterval(-1, 1);
-		plot->setShowXAxisLabels(true);
-		plot->setShowYAxisLabels(true);
-		plot->navigator()->setBounded(false);
-		plot->setVisible(false); // shown once a channel on it is enabled
-		plotsLay->addWidget(plot);
-		m_plots.append(plot);
-	}
+	m_plotsArea = new QWidget(m_splitter);
+	m_plotsLay = new QVBoxLayout(m_plotsArea);
+	m_plotsLay->setContentsMargins(0, 0, 0, 0);
+	m_plotsLay->setSpacing(6);
 
-	m_table = new QTableWidget(splitter);
+	m_table = new QTableWidget(m_splitter);
 	const QStringList headers = {"Channel", "Value", "Min", "Max", "Mean"};
 	m_table->setColumnCount(headers.size());
 	m_table->setHorizontalHeaderLabels(headers);
@@ -416,11 +445,160 @@ void MonitorView::buildPlots()
 	m_table->setFocusPolicy(Qt::NoFocus);
 	Style::setStyle(m_table, style::properties::widget::tableViewWidget);
 
-	splitter->addWidget(plotsArea);
-	splitter->addWidget(m_table);
-	splitter->setStretchFactor(0, 4);
-	splitter->setStretchFactor(1, 1);
-	m_tool->addWidgetToCentralContainerHelper(splitter);
+	m_splitter->addWidget(m_plotsArea);
+	m_splitter->addWidget(m_table);
+	// Extra height goes to the plots; the table keeps its size (see applyInitialSizes()).
+	m_splitter->setStretchFactor(0, 1);
+	m_splitter->setStretchFactor(1, 0);
+	m_tool->addWidgetToCentralContainerHelper(m_splitter);
+
+	addPlot(); // there is always at least one plot
+}
+
+PlotWidget *MonitorView::createPlot()
+{
+	auto *pw = new PlotWidget(m_plotsArea);
+	pw->xAxis()->scaleDraw()->setFormatter(new MetricPrefixFormatter());
+	pw->xAxis()->scaleDraw()->setFloatPrecision(2);
+	pw->xAxis()->scaleDraw()->setUnitType("s");
+	pw->yAxis()->scaleDraw()->setFormatter(new MetricPrefixFormatter());
+	pw->yAxis()->scaleDraw()->setFloatPrecision(3);
+	pw->xAxis()->setInterval(-m_monitor->history(), 0);
+	pw->yAxis()->setInterval(-1, 1);
+	pw->setShowXAxisLabels(true);
+	pw->setShowYAxisLabels(true);
+	pw->showAxisLabels();
+	pw->navigator()->setBounded(false);
+	return pw;
+}
+
+int MonitorView::addPlot()
+{
+	if(m_plots.size() >= MaxPlots) {
+		return -1;
+	}
+	m_plots.append(createPlot());
+	m_selectedPlot = plotCount() - 1; // the new plot is selected in the Plots section
+	rebuildPlotsLayout();
+	rebuildPlotCombos();
+	render();
+	Q_EMIT plotsChanged(plotCount());
+	return plotCount() - 1;
+}
+
+bool MonitorView::removePlot(int index)
+{
+	if(m_plots.size() <= 1 || index < 0 || index >= m_plots.size()) {
+		return false;
+	}
+	// Move the curves off first (assignPlot() detaches and frees them), then renumber.
+	const int target = index == 0 ? 1 : 0;
+	for(Entry &e : m_entries) {
+		if(e.plotIndex == index) {
+			assignPlot(e, target);
+		}
+	}
+	PlotWidget *gone = m_plots.takeAt(index);
+	for(Entry &e : m_entries) {
+		if(e.plotIndex > index) {
+			e.plotIndex--;
+		}
+	}
+	// Keep the Plots section's selection on the same plot, or on the one now in the removed one's place.
+	if(m_selectedPlot > index) {
+		m_selectedPlot--;
+	} else if(m_selectedPlot == index) {
+		m_selectedPlot = std::min(index, plotCount() - 1);
+	}
+	m_plotsLay->removeWidget(gone);
+	delete gone;
+	rebuildPlotsLayout();
+	rebuildPlotCombos();
+	render();
+	Q_EMIT plotsChanged(plotCount());
+	return true;
+}
+
+PlotWidget *MonitorView::plot(int index) const
+{
+	return index >= 0 && index < m_plots.size() ? m_plots[index] : nullptr;
+}
+
+int MonitorView::plotIndexOf(const QString &key) const
+{
+	for(const Entry &e : m_entries) {
+		if(e.key == key) {
+			return e.plotIndex;
+		}
+	}
+	return -1;
+}
+
+void MonitorView::rebuildPlotsLayout()
+{
+	for(PlotWidget *pw : std::as_const(m_plots)) {
+		m_plotsLay->removeWidget(pw);
+	}
+	for(PlotWidget *pw : std::as_const(m_plots)) {
+		m_plotsLay->addWidget(pw, 1);
+	}
+}
+
+void MonitorView::rebuildPlotCombos()
+{
+	for(Entry &e : m_entries) {
+		if(!e.plot) {
+			continue;
+		}
+		QComboBox *combo = e.plot->combo();
+		const QSignalBlocker blocker(combo);
+		combo->clear();
+		for(int p = 0; p < m_plots.size(); ++p) {
+			combo->addItem(QStringLiteral("Plot %1").arg(p + 1));
+		}
+		combo->setCurrentIndex(e.plotIndex);
+	}
+}
+
+void MonitorView::updatePlotControls()
+{
+	const int n = plotCount();
+	m_selectedPlot = std::clamp(m_selectedPlot, 0, std::max(0, n - 1));
+	if(m_plotSelect) {
+		QComboBox *combo = m_plotSelect->combo();
+		const QSignalBlocker blocker(combo);
+		combo->clear();
+		for(int p = 0; p < n; ++p) {
+			combo->addItem(QStringLiteral("Plot %1").arg(p + 1));
+		}
+		combo->setCurrentIndex(n > 0 ? m_selectedPlot : -1);
+	}
+	if(m_addPlotBtn) {
+		m_addPlotBtn->setEnabled(n < MaxPlots);
+	}
+	if(m_removePlotBtn) {
+		m_removePlotBtn->setVisible(n > 1);
+	}
+}
+
+void MonitorView::showEvent(QShowEvent *event)
+{
+	QWidget::showEvent(event);
+	if(!m_sized) {
+		// After the first layout pass, once the splitter has its real height.
+		QTimer::singleShot(0, this, &MonitorView::applyInitialSizes);
+	}
+}
+
+void MonitorView::applyInitialSizes()
+{
+	const int total = m_splitter->height() - m_splitter->handleWidth();
+	if(m_sized || total <= 0) {
+		return;
+	}
+	m_sized = true;
+	const int table = std::min(MeasurementsHeight, total / 4);
+	m_splitter->setSizes({total - table, table});
 }
 
 void MonitorView::applySource(Entry &e)
@@ -443,16 +621,18 @@ void MonitorView::applySource(Entry &e)
 
 void MonitorView::assignPlot(Entry &e, int plotIndex)
 {
-	plotIndex = std::clamp(plotIndex, 0, MaxPlots - 1);
+	plotIndex = std::clamp(plotIndex, 0, plotCount() - 1);
 	if(e.curve) {
-		m_plots[e.plotIndex]->removePlotChannel(e.curve);
+		if(PlotWidget *old = plot(e.plotIndex)) {
+			old->removePlotChannel(e.curve);
+		}
 		delete e.curve;
 		e.curve = nullptr;
 	}
 	e.plotIndex = plotIndex;
-	PlotWidget *plot = m_plots[plotIndex];
-	e.curve = new PlotChannel(e.name, QPen(e.color, 1), plot->xAxis(), plot->yAxis(), plot);
-	plot->addPlotChannel(e.curve);
+	PlotWidget *pw = m_plots[plotIndex];
+	e.curve = new PlotChannel(e.name, QPen(e.color, 1), pw->xAxis(), pw->yAxis(), pw);
+	pw->addPlotChannel(e.curve);
 	m_monitor->isEnabled(e.key) ? e.curve->enable() : e.curve->disable();
 }
 
@@ -471,12 +651,13 @@ void MonitorView::render()
 	m_dirty = false;
 	const double now = m_monitor->now();
 	const double history = m_monitor->history();
-	QVector<double> lo(MaxPlots, std::numeric_limits<double>::max());
-	QVector<double> hi(MaxPlots, std::numeric_limits<double>::lowest());
-	QVector<bool> used(MaxPlots, false);
+	const int plots = plotCount();
+	QVector<double> lo(plots, std::numeric_limits<double>::max());
+	QVector<double> hi(plots, std::numeric_limits<double>::lowest());
+	QVector<bool> used(plots, false);
 
 	for(Entry &e : m_entries) {
-		if(!e.curve) {
+		if(!e.curve || e.plotIndex < 0 || e.plotIndex >= plots) {
 			continue;
 		}
 		if(!m_monitor->isEnabled(e.key)) {
@@ -499,19 +680,19 @@ void MonitorView::render()
 		}
 	}
 
-	for(int p = 0; p < MaxPlots; ++p) {
-		PlotWidget *plot = m_plots[p];
-		plot->setVisible(used[p]);
-		if(!used[p] || plot->navigator()->isZoomed()) {
+	// Every plot is shown, with or without curves; all follow the same history window.
+	for(int p = 0; p < plots; ++p) {
+		PlotWidget *pw = m_plots[p];
+		if(pw->navigator()->isZoomed()) {
 			continue;
 		}
-		plot->xAxis()->setInterval(-history, 0);
-		if(lo[p] <= hi[p]) {
+		pw->xAxis()->setInterval(-history, 0);
+		if(used[p] && lo[p] <= hi[p]) {
 			const double span =
 				hi[p] > lo[p] ? hi[p] - lo[p] : std::max(1e-9, std::abs(hi[p]) * 0.01 + 1e-9);
-			plot->yAxis()->setInterval(lo[p] - span * 0.1, hi[p] + span * 0.1);
+			pw->yAxis()->setInterval(lo[p] - span * 0.1, hi[p] + span * 0.1);
 		}
-		plot->replot();
+		pw->replot();
 	}
 	updateTable();
 }

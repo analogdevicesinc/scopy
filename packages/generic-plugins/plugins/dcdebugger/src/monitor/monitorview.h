@@ -23,6 +23,7 @@
 #define MONITORVIEW_H
 
 #include "attributemonitor.h"
+#include "scopy-dcdebugger_export.h"
 
 #include <QList>
 #include <QMap>
@@ -32,8 +33,11 @@
 class QButtonGroup;
 class QLabel;
 class QPushButton;
+class QShowEvent;
+class QSplitter;
 class QTableWidget;
 class QTimer;
+class QVBoxLayout;
 
 namespace scopy {
 class MenuCombo;
@@ -56,9 +60,10 @@ namespace scopy::dcdebugger {
 
 // Monitor tab of a Context or Device: polls one attribute per channel (like Data Monitor) and
 // plots its history. Scopy instrument layout: channel list on the left grouped by device (a
-// channel's checkbox enables it), the channel's menu (source attribute, plot) or the Polling
-// settings on the right, stacked plots with a value / min / max / mean table below.
-class MonitorView : public QWidget
+// channel's checkbox enables it), the channel's menu (source attribute, plot) or the Settings
+// menu (Polling and Plots sections) on the right, stacked plots with a value / min / max / mean
+// table below. Starts with one plot; the Plots section adds and removes plots.
+class SCOPY_DCDEBUGGER_EXPORT MonitorView : public QWidget
 {
 	Q_OBJECT
 public:
@@ -70,6 +75,26 @@ public:
 	// Channels of `root` (a Context's devices, or a Device) that have attributes to poll.
 	static QList<component::Channel *> monitorableChannels(QObject *root);
 	static constexpr int MaxPlots = 8;
+	// Initial height of the measurements table, at most a quarter of the view.
+	static constexpr int MeasurementsHeight = 140;
+
+	int plotCount() const { return int(m_plots.size()); }
+	PlotWidget *plot(int index) const;
+	// Plot a channel (by monitor key) is drawn on; -1 for an unknown key.
+	int plotIndexOf(const QString &key) const;
+
+public Q_SLOTS:
+	// Appends a plot under the others; returns its index, or -1 at MaxPlots.
+	int addPlot();
+	// Removes a plot; its channels move to the first plot and later plots are renumbered.
+	// False for the last plot or an index out of range.
+	bool removePlot(int index);
+
+Q_SIGNALS:
+	void plotsChanged(int count);
+
+protected:
+	void showEvent(QShowEvent *event) override;
 
 private:
 	struct Entry
@@ -89,7 +114,13 @@ private:
 	QWidget *buildSettings(QWidget *parent);
 	void buildChannels();
 	QWidget *buildChannelMenu(Entry &e);
+	QWidget *buildPlotSettings(QWidget *parent);
 	void buildPlots();
+	PlotWidget *createPlot();
+	void rebuildPlotsLayout();
+	void rebuildPlotCombos();
+	void updatePlotControls();
+	void applyInitialSizes();
 	void applySource(Entry &e);
 	void assignPlot(Entry &e, int plotIndex);
 	void render();
@@ -110,7 +141,15 @@ private:
 	MenuOnOffSwitch *m_scaled;
 	QButtonGroup *m_menuGroup;
 	QList<PlotWidget *> m_plots;
-	QTableWidget *m_table;
+	QSplitter *m_splitter = nullptr;
+	QWidget *m_plotsArea = nullptr;
+	QVBoxLayout *m_plotsLay = nullptr;
+	MenuCombo *m_plotSelect = nullptr; // the Plots section's plot list
+	QPushButton *m_addPlotBtn = nullptr;
+	QPushButton *m_removePlotBtn = nullptr;
+	int m_selectedPlot = 0; // selection of m_plotSelect, kept across its rebuilds
+	bool m_sized = false;
+	QTableWidget *m_table = nullptr;
 	QTimer *m_redraw;
 	bool m_dirty = false;
 };

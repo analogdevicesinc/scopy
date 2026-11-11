@@ -28,6 +28,7 @@
 #include "ping/pingview.h"
 #include "registers/registerview.h"
 
+#include <QHBoxLayout>
 #include <QHeaderView>
 #include <QLabel>
 #include <QMetaProperty>
@@ -147,11 +148,16 @@ NodePanel::NodePanel(QObject *node, NodeKind kind, const QString &title, const Q
 	m_layout->setSpacing(6);
 	QVBoxLayout *lay = m_layout;
 
+	// Header: [path ... refresh] on the first row, the title and info below.
 	auto *header = new QWidget(this);
-	auto *headerLay = new QHBoxLayout(header);
+	auto *headerLay = new QVBoxLayout(header);
 	headerLay->setContentsMargins(6, 6, 6, 0);
-	auto *titles = new QVBoxLayout();
-	titles->setSpacing(2);
+	headerLay->setSpacing(2);
+	auto *pathRow = new QWidget(header);
+	pathRow->setObjectName("nodePanelPathRow");
+	auto *pathLay = new QHBoxLayout(pathRow);
+	pathLay->setContentsMargins(0, 0, 0, 0);
+	pathLay->setSpacing(6);
 	auto *titleLabel = new QLabel(title, header);
 	Style::setStyle(titleLabel, style::properties::label::menuBig);
 	auto *infoLabel = new QLabel(
@@ -159,17 +165,22 @@ NodePanel::NodePanel(QObject *node, NodeKind kind, const QString &title, const Q
 			(node && kind == NodeKind::Other ? " — " + ComponentNode::className(node) : QString()),
 		header);
 	Style::setStyle(infoLabel, style::properties::label::subtle);
-	auto *pathTitle = new PathTitle(path, header);
+	auto *pathTitle = new PathTitle(path, pathRow);
 	connect(pathTitle, &PathTitle::pathSelected, this, &NodePanel::pathSelected);
-	titles->addWidget(pathTitle);
-	titles->addWidget(titleLabel);
-	titles->addWidget(infoLabel);
-	headerLay->addLayout(titles, 1);
+	pathLay->addWidget(pathTitle, 1, Qt::AlignVCenter);
 
-	auto *refreshBtn = new AnimatedRefreshBtn(false, header);
+	// As tall as the path buttons, on their line.
+	auto *refreshBtn = new AnimatedRefreshBtn(true, pathRow);
 	refreshBtn->setToolTip("Refresh");
-	headerLay->addWidget(refreshBtn, 0, Qt::AlignTop);
+	const int h = PathTitle::buttonHeight();
+	refreshBtn->setFixedHeight(h);
+	refreshBtn->setIconSize(QSize(h - 6, h - 6));
+	pathLay->addWidget(refreshBtn, 0, Qt::AlignVCenter);
 	connect(refreshBtn, &QPushButton::clicked, this, &NodePanel::refresh);
+
+	headerLay->addWidget(pathRow);
+	headerLay->addWidget(titleLabel);
+	headerLay->addWidget(infoLabel);
 	lay->addWidget(header);
 
 	auto *scroll = new QScrollArea(this);

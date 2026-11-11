@@ -35,6 +35,7 @@
 #include <menuonoffswitch.h>
 #include <menuspinbox.h>
 #include <qcoro/qcorotask.h>
+#include <widgets/animatedrefreshbtn.h>
 
 using namespace scopy;
 using namespace scopy::dcdebugger;
@@ -127,6 +128,7 @@ private Q_SLOTS:
 	void lostShownOnlyWhenLost();
 	void survivesPingDestruction();
 	void nodePanelHasPingTab();
+	void nodePanelRefreshInPathRow();
 };
 
 void TST_PingView::initialStopped()
@@ -341,6 +343,36 @@ void TST_PingView::nodePanelHasPingTab()
 	auto *tabs = panel->findChild<QTabWidget *>();
 	QVERIFY(tabs);
 	QCOMPARE(tabs->tabText(0), QStringLiteral("Ping"));
+	delete panel;
+}
+
+void TST_PingView::nodePanelRefreshInPathRow()
+{
+	QObject root;
+	FakePing p;
+	NodePanel *panel = createNodePanel(&p, NodeKind::Ping, "ping", {{"ctx", &root}, {"ping", &p}}, {});
+	auto *refresh = panel->findChild<AnimatedRefreshBtn *>();
+	QVERIFY(refresh);
+	QPushButton *segment = nullptr;
+	for(QPushButton *b : panel->findChildren<QPushButton *>()) {
+		if(b->text() == QStringLiteral("ctx")) {
+			segment = b;
+		}
+	}
+	QVERIFY(segment);
+	// Same row: the segment's PathTitle and the refresh button share the path row.
+	QWidget *row = refresh->parentWidget();
+	QCOMPARE(row->objectName(), QStringLiteral("nodePanelPathRow"));
+	QCOMPARE(segment->parentWidget()->parentWidget(), row);
+
+	panel->resize(900, 600);
+	panel->show();
+	QVERIFY(QTest::qWaitForWindowExposed(panel));
+	QCOMPARE(refresh->height(), segment->height());
+	const QPoint s = segment->mapTo(panel, segment->rect().center());
+	const QPoint r = refresh->mapTo(panel, refresh->rect().center());
+	QVERIFY(qAbs(s.y() - r.y()) <= 1); // vertically centred with the path
+	QVERIFY(r.x() > s.x());		   // on the right
 	delete panel;
 }
 
