@@ -168,7 +168,9 @@ CommandLogEntry CallTrace::entryOf(const Command *cmd)
 
 void CallTrace::publish(const Command *cmd, const TraceConfig *config)
 {
-	if(!cmd || !config || !cmd->isTraced()) {
+	// A command that reached no library (cached / client-side reads and writes) is not logged: the
+	// log lists the library calls, and such an entry carries none.
+	if(!cmd || !config || !cmd->isTraced() || cmd->calls().isEmpty()) {
 		return;
 	}
 	config->publish(entryOf(cmd));

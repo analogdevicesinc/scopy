@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "core/calltrace.h"
 #include "iioutil/iattrops.h"
 
 #include <QHash>
@@ -29,6 +30,7 @@ namespace dctest {
 
 // In-memory IAttrOps: each AttrHandle.ptr is a key into a value map. read()
 // returns the stored bytes; write() overwrites them. Range/available optional.
+// read / write trace a "fake" library call, like a real backend, so the command log sees them.
 class FakeAttrOps : public scopy::iio::IAttrOps
 {
 public:
@@ -52,11 +54,15 @@ public:
 
 	scopy::Result<QByteArray> read(scopy::iio::AttrHandle attr, size_t bytes = 4096) override
 	{
-		return m_values.value(static_cast<int *>(attr.ptr));
+		int *key = static_cast<int *>(attr.ptr);
+		DC_TRACE("fake", "fake_attr_read", key, 0, scopy::CallArg::string("attr", m_names.value(key)));
+		return m_values.value(key);
 	}
 	scopy::Result<void> write(scopy::iio::AttrHandle attr, const QString &value) override
 	{
-		m_values.insert(static_cast<int *>(attr.ptr), value.toUtf8());
+		int *key = static_cast<int *>(attr.ptr);
+		DC_TRACE("fake", "fake_attr_write", key, 0, scopy::CallArg::string("attr", m_names.value(key)));
+		m_values.insert(key, value.toUtf8());
 		return {};
 	}
 	scopy::Result<void> getRange(scopy::iio::AttrHandle, double &, double &, double &) const override

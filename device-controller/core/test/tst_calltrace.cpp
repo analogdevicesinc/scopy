@@ -179,6 +179,7 @@ private Q_SLOTS:
 	void twoExecutorsAreIndependent();
 	void sinkDetachedWhileInFlight();
 	void cancelledCommandPublishesNothing();
+	void commandWithoutCallsPublishesNothing();
 	void recordToString();
 
 private:
@@ -542,6 +543,25 @@ void TstCallTrace::cancelledCommandPublishesNothing()
 	exec.execute(cmd).waitForFinished();
 	QCOMPARE(c.count(), 0);
 	delete cmd;
+}
+
+void TstCallTrace::commandWithoutCallsPublishesNothing()
+{
+	Collector c;
+	auto config = std::make_shared<TraceConfig>();
+	config->setSink(c.sink());
+	config->setEnabled(true);
+	PooledCmdExecutor exec(1);
+	exec.setTraceConfig(config);
+	// A cached read: runs as a command, calls no library.
+	FnTestCommand cached([] { return 0; });
+	exec.execute(&cached).waitForFinished();
+	QVERIFY(cached.isTraced());
+	QVERIFY(cached.calls().isEmpty());
+	QCOMPARE(c.count(), 0);
+	FnTestCommand real([] { return DC_TRACE("testlib", "call", nullptr, fakeCall(0)); });
+	exec.execute(&real).waitForFinished();
+	QCOMPARE(c.count(), 1);
 }
 
 void TstCallTrace::recordToString()
