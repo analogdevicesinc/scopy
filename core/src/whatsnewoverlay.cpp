@@ -60,8 +60,6 @@ WhatsNewOverlay::WhatsNewOverlay(QWidget *parent)
 	optionsControlLayout->addWidget(showAgain);
 
 	Preferences *p = Preferences::GetInstance();
-	showAgain->setChecked(p->get("general_dont_show_whats_new").toBool());
-
 	connect(showAgain, &QCheckBox::toggled, this, [p](bool en) {
 		p->set("general_dont_show_whats_new", en);
 		if(en) {
@@ -69,6 +67,9 @@ WhatsNewOverlay::WhatsNewOverlay(QWidget *parent)
 		}
 		p->save();
 	});
+
+	// after connect: a pre-checked box records the current version
+	showAgain->setChecked(p->get("general_dont_show_whats_new").toBool());
 
 	// version picker
 	m_versionCb = new QComboBox(optionsoverlayControlWidget);
@@ -92,8 +93,8 @@ WhatsNewOverlay::WhatsNewOverlay(QWidget *parent)
 
 WhatsNewOverlay::~WhatsNewOverlay()
 {
-	// TODO
-	if(m_tintedOverlay != nullptr) {
+	// sibling widget -- may be destroyed before this destructor runs
+	if(!m_tintedOverlay.isNull()) {
 		m_tintedOverlay->deleteLater();
 	}
 }
