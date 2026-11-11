@@ -33,6 +33,7 @@
 #include <core/callrecord.h>
 
 class QAction;
+class QFrame;
 class QSplitter;
 class QTimer;
 class QLabel;
@@ -42,6 +43,8 @@ class QPushButton;
 class QTreeView;
 
 namespace scopy {
+class DockableAreaInterface;
+class DockWrapperInterface;
 class MenuOnOffSwitch;
 class ToolTemplate;
 } // namespace scopy
@@ -59,8 +62,11 @@ class CommandLogModel;
 // per connection, not persisted), pause, clear, filters, follow tail and CSV export. A click on a
 // row asks for the node that issued the command. The rows outlive the monitor (disconnect).
 // Ctrl+C / context menu copy the selected rows (or all visible ones) as tab-separated text.
-// "Generate code..." (toolbar toggle, context menu) opens a side panel with the script of the
-// selected rows (none selected: every visible row); it follows the selection and the log.
+// "Generate code..." (top bar toggle, context menu) opens the code generator right of the log,
+// with the script of the selected rows (none selected: every visible row); it follows the
+// selection and the log. The log and the generator are docks ("Command log", "Generate code"):
+// KDDockWidgets in their own area when available and preferred (general_use_docking_if_available),
+// else the classic wrappers in a horizontal splitter.
 class SCOPY_DCDEBUGGER_EXPORT CommandLogView : public QWidget
 {
 	Q_OBJECT
@@ -113,6 +119,16 @@ public:
 	// Feeds the panel now (it otherwise follows the log with a short delay).
 	void refreshCodeGenerator();
 
+	// Docking: KDDockWidgets (true) or the classic wrappers in splitter() (false, else nullptr).
+	bool usesDocking() const { return m_docking; }
+	QWidget *dockArea() const;
+	QWidget *logDock() const;
+	QWidget *codeGeneratorDock() const;
+	QSplitter *splitter() const { return m_split; }
+	// The log panel (the left dock's content) and its "Log commands" / "Follow" column.
+	QFrame *logPane() const { return m_logPane; }
+	QFrame *switchesRow() const { return m_switches; }
+
 Q_SIGNALS:
 	// The node that issued the clicked row (origin path, backend id, node identity).
 	void nodeRequested(const QString &origin, const QString &backendId, quintptr object);
@@ -132,8 +148,11 @@ private:
 	void updateStatus();
 	QModelIndexList shownSelectedRows() const;
 	void scheduleCodeGenerator();
+	static QWidget *dockWidget(DockWrapperInterface *dock);
 
 	CommandLogModel *m_model;
+	QFrame *m_logPane;
+	QFrame *m_switches;
 	ToolTemplate *m_tool;
 	QLabel *m_status;
 	QPointer<component::CommandMonitor> m_monitor;
@@ -151,9 +170,14 @@ private:
 	QAction *m_copyAction;
 	QAction *m_copyAllAction;
 	QAction *m_generateAction;
-	QSplitter *m_split;
+	DockableAreaInterface *m_area;
+	DockWrapperInterface *m_logDock;
+	DockWrapperInterface *m_codegenDock;
+	QSplitter *m_split = nullptr;
 	CodeGeneratorPanel *m_codegen;
 	QTimer *m_codegenTimer;
+	bool m_docking = false;
+	bool m_codegenShown = false;
 	bool m_recording = false;
 };
 

@@ -66,7 +66,7 @@ public:
 	void setEntries(const QList<CommandLogEntry> &entries, const QString &scope = {});
 	const QList<CommandLogEntry> &entries() const { return m_entries; }
 
-	// Language ids offered (codegen::C / Python / CSharp), in combo order.
+	// Language ids offered (codegen::C / Python), in combo order.
 	QStringList languages() const;
 	QString language() const;
 	void setLanguage(const QString &language);
@@ -80,12 +80,15 @@ public:
 	QPushButton *copyButton() const { return m_copyBtn; }
 	QPushButton *saveButton() const { return m_saveBtn; }
 	QLabel *scopeLabel() const { return m_scope; }
+	// "Generate code"; hidden when a dock title bar already shows it.
+	QLabel *titleLabel() const { return m_title; }
+	void setTitleVisible(bool visible);
 
 	// The script to the clipboard (nothing when empty).
 	void copyToClipboard();
 	// Writes the script to `path`; false on error or nothing to save.
 	bool saveTo(const QString &path) const;
-	// Save dialog (.c / .py / .cs by language).
+	// Save dialog (.c / .py by language).
 	void save();
 
 Q_SIGNALS:
@@ -98,6 +101,7 @@ private:
 	const component::CodeEmitterRegistry *m_registry;
 	QList<CommandLogEntry> m_entries;
 	QString m_script;
+	QLabel *m_title;
 	QLabel *m_scope;
 	MenuCombo *m_language;
 	MenuOnOffSwitch *m_loops;

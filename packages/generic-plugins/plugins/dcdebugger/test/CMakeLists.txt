@@ -33,6 +33,7 @@ set(DCDEBUGGER_TESTS
     pingview
     bottompanes
     codegenerator
+    logscreenshots
 )
 setup_scopy_tests(${DCDEBUGGER_TESTS})
 foreach(t ${DCDEBUGGER_TESTS})
@@ -40,4 +41,6 @@ foreach(t ${DCDEBUGGER_TESTS})
 		${PROJECT_NAME}_test_${t} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src
 						  ${CMAKE_CURRENT_SOURCE_DIR}/../include/dcdebugger
 	)
+	# The style is looked up in "./style" of the build folder (SCOPY_STYLE_BUILD_PATH).
+	target_compile_definitions(${PROJECT_NAME}_test_${t} PRIVATE DCDEBUGGER_TEST_BUILD_DIR="${CMAKE_BINARY_DIR}")
 endforeach()

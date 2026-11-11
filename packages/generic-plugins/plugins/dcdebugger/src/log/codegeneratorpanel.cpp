@@ -49,18 +49,23 @@ CodeGeneratorPanel::CodeGeneratorPanel(QWidget *parent)
 	: QFrame(parent)
 	, m_registry(component::CodeEmitterRegistry::GetInstance())
 {
-	// The lighter shade of the log pane (like its filter strip); the preview is the darker one.
+	// One rounded basicComponent panel, like the log beside it; the preview is the darker shade.
+	// Every row is a QFrame without a box: the ".QWidget" backgrounds cascaded by ToolTemplates
+	// and dock wrappers do not reach it, it shows the panel colour. A QFrame subclass paints a
+	// style sheet background only with WA_StyledBackground.
+	setObjectName(QStringLiteral("codeGeneratorPanel"));
+	setAttribute(Qt::WA_StyledBackground, true);
 	Style::setStyle(this, style::properties::widget::basicComponent);
 	auto *lay = new QVBoxLayout(this);
 	lay->setContentsMargins(6, 6, 6, 6);
 	lay->setSpacing(6);
 
-	auto *title = new QLabel("Generate code", this);
-	Style::setStyle(title, style::properties::label::menuMedium);
+	m_title = new QLabel("Generate code", this);
+	Style::setStyle(m_title, style::properties::label::menuMedium);
 	m_scope = new QLabel(this);
 	Style::setStyle(m_scope, style::properties::label::subtle);
 	m_scope->setWordWrap(true);
-	lay->addWidget(title);
+	lay->addWidget(m_title);
 	lay->addWidget(m_scope);
 
 	m_language = new MenuCombo("Language", this);
@@ -70,7 +75,9 @@ CodeGeneratorPanel::CodeGeneratorPanel(QWidget *parent)
 	m_loops = new MenuOnOffSwitch("Loops for repeats", this);
 	m_loops->setToolTip("Repeated command sequences (e.g. refills) become a loop");
 	m_loops->onOffswitch()->setChecked(true);
-	auto *switches = new QWidget(this);
+	m_loops->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+	auto *switches = new QFrame(this);
+	switches->setObjectName(QStringLiteral("codeGeneratorOptions"));
 	auto *swLay = new QHBoxLayout(switches);
 	swLay->setContentsMargins(0, 0, 0, 0);
 	swLay->setSpacing(12);
@@ -91,7 +98,8 @@ CodeGeneratorPanel::CodeGeneratorPanel(QWidget *parent)
 	m_copyBtn->setToolTip("Copy the script to the clipboard");
 	m_saveBtn = new QPushButton("Save...", this);
 	m_saveBtn->setToolTip("Save the script to a file");
-	auto *buttons = new QWidget(this);
+	auto *buttons = new QFrame(this);
+	buttons->setObjectName(QStringLiteral("codeGeneratorButtons"));
 	auto *btnLay = new QHBoxLayout(buttons);
 	btnLay->setContentsMargins(0, 0, 0, 0);
 	btnLay->addStretch();
@@ -111,6 +119,8 @@ CodeGeneratorPanel::CodeGeneratorPanel(QWidget *parent)
 }
 
 CodeGeneratorPanel::~CodeGeneratorPanel() = default;
+
+void CodeGeneratorPanel::setTitleVisible(bool visible) { m_title->setVisible(visible); }
 
 void CodeGeneratorPanel::setRegistry(const component::CodeEmitterRegistry *registry)
 {

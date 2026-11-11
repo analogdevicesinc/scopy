@@ -314,7 +314,7 @@ void TstComponentCodeEmitters::golden_data()
 	QTest::addColumn<QString>("language");
 	QTest::addColumn<QString>("file");
 	for(int v : {0, 1}) {
-		for(const char *l : {codegen::C, codegen::Python, codegen::CSharp}) {
+		for(const char *l : {codegen::C, codegen::Python}) {
 			const QString file =
 				QStringLiteral("libiio_v%1.%2").arg(v).arg(codegen::fileExtension(lang(l)));
 			QTest::newRow(qPrintable(file)) << v << lang(l) << file;
@@ -357,7 +357,7 @@ void TstComponentCodeEmitters::languagesForMixedLibraries()
 {
 	auto r = registryFor(LibiioVersion::V1);
 	r->add(std::make_shared<OtherEmitter>());
-	const QStringList all = {lang(codegen::C), lang(codegen::Python), lang(codegen::CSharp)};
+	const QStringList all = {lang(codegen::C), lang(codegen::Python)};
 	QCOMPARE(r->languagesFor({QStringLiteral("libiio")}), all);
 	QCOMPARE(r->languagesFor({QStringLiteral("libiio"), QStringLiteral("other")}), QStringList{lang(codegen::C)});
 	QCOMPARE(r->languagesFor({QStringLiteral("other")}), QStringList{lang(codegen::C)});
@@ -394,7 +394,7 @@ void TstComponentCodeEmitters::instanceMatchesLinkedBackend()
 	auto *r = CodeEmitterRegistry::GetInstance();
 	QCOMPARE(r, CodeEmitterRegistry::GetInstance());
 	const LibiioVersion linked = component::iio::IIOProvider::defaultBackend()->version();
-	for(const char *l : {codegen::C, codegen::Python, codegen::CSharp}) {
+	for(const char *l : {codegen::C, codegen::Python}) {
 		auto e = std::dynamic_pointer_cast<LibiioEmitter>(r->emitter(QStringLiteral("libiio"), lang(l)));
 		QVERIFY(e);
 		QCOMPARE(e->version(), linked);
@@ -477,7 +477,7 @@ void TstComponentCodeEmitters::libraryWithoutEmitterIsComment()
 void TstComponentCodeEmitters::headerWarnsAboutState()
 {
 	auto r = registryFor(LibiioVersion::V0);
-	for(const char *l : {codegen::C, codegen::Python, codegen::CSharp}) {
+	for(const char *l : {codegen::C, codegen::Python}) {
 		const QString script = r->exportScript(gainReads({QStringLiteral("1")}), lang(l));
 		QVERIFY(script.contains(QStringLiteral("state configured before logging started")));
 		QVERIFY(script.contains(QStringLiteral("Connection: ip:192.168.2.1")));
@@ -528,7 +528,7 @@ void TstComponentCodeEmitters::unresolvedAttributeIsComment()
 	auto r = registryFor(LibiioVersion::V1);
 	QList<CommandLogEntry> log = gainReads({QStringLiteral("1")});
 	log[0].originScope.clear(); // no origin: v1 records only carry the attribute name
-	for(const char *l : {codegen::C, codegen::Python, codegen::CSharp}) {
+	for(const char *l : {codegen::C, codegen::Python}) {
 		const QString script = r->exportScript(log, lang(l));
 		QVERIFY2(script.contains(QStringLiteral(
 				 "iio_attr_read_raw(hardwaregain, len=4096) = 2: cannot resolve the attribute")),
@@ -553,8 +553,6 @@ void TstComponentCodeEmitters::failedCallIsCaught()
 	const QString c = r->exportScript(log.entries, lang(codegen::C));
 	QVERIFY(c.contains(QStringLiteral(
 		"// recorded: failed with rc = -22\n\tret = iio_channel_attr_write(ch0, \"hardwaregain\", \"x\");")));
-	const QString cs = r->exportScript(log.entries, lang(codegen::CSharp));
-	QVERIFY(cs.contains(QStringLiteral("catch (Exception e)")));
 }
 
 void TstComponentCodeEmitters::partialPayloadNotWritten()
@@ -571,8 +569,6 @@ void TstComponentCodeEmitters::partialPayloadNotWritten()
 	const QString py = r->exportScript(log.entries, lang(codegen::Python));
 	QVERIFY(py.contains(QStringLiteral("# payload: 4 of 4096 bytes logged, not written")));
 	QVERIFY(py.contains(QStringLiteral("buf0.write(bytearray(bytes([0x01, 0x02])))\nbuf0.push()")));
-	const QString cs = r->exportScript(log.entries, lang(codegen::CSharp));
-	QVERIFY(cs.contains(QStringLiteral("buf0.fill(new byte[] { 0x01, 0x02 });")));
 	const QString c = r->exportScript(log.entries, lang(codegen::C));
 	QVERIFY(c.contains(QStringLiteral("static const uint8_t data0[] = { 0x01, 0x02 };")));
 	QVERIFY(c.contains(QStringLiteral("memcpy(iio_buffer_start(buf0), data0, sizeof(data0));")));
@@ -581,8 +577,8 @@ void TstComponentCodeEmitters::partialPayloadNotWritten()
 void TstComponentCodeEmitters::literalsPerKind()
 {
 	using namespace codegen;
-	const QString c = lang(C), py = lang(Python), cs = lang(CSharp);
-	for(const QString &l : {c, py, cs}) {
+	const QString c = lang(C), py = lang(Python);
+	for(const QString &l : {c, py}) {
 		QCOMPARE(literal(l, quint64(0x50), CallArg::Hex), QStringLiteral("0x50"));
 		QCOMPARE(literal(l, qint64(-12), CallArg::Int), QStringLiteral("-12"));
 		QCOMPARE(literal(l, qint64(4096), CallArg::OutLen), QStringLiteral("4096"));
@@ -590,40 +586,32 @@ void TstComponentCodeEmitters::literalsPerKind()
 	}
 	QCOMPARE(literal(py, true, CallArg::Bool), QStringLiteral("True"));
 	QCOMPARE(literal(c, false, CallArg::Bool), QStringLiteral("false"));
-	QCOMPARE(literal(cs, true, CallArg::Bool), QStringLiteral("true"));
 	const QByteArray b("\x00\x7f\xff", 3);
 	QCOMPARE(literal(py, b, CallArg::Bytes), QStringLiteral("bytes([0x00, 0x7f, 0xff])"));
-	QCOMPARE(literal(cs, b, CallArg::Bytes), QStringLiteral("new byte[] { 0x00, 0x7f, 0xff }"));
 	QCOMPARE(literal(c, b, CallArg::Bytes), QStringLiteral("{ 0x00, 0x7f, 0xff }"));
 	QCOMPARE(bytesLiteral(py, {}), QStringLiteral("bytes([])"));
-	QCOMPARE(bytesLiteral(cs, {}), QStringLiteral("new byte[0]"));
 	// Long payloads wrap at 16 bytes per line.
 	const QString wrapped = bytesLiteral(py, QByteArray(17, '\x01'));
 	QCOMPARE(wrapped.count('\n'), 3);
 	QVERIFY(wrapped.startsWith(QStringLiteral("bytes([\n    0x01, ")));
 	QVERIFY(wrapped.endsWith(QStringLiteral("\n    0x01\n])")));
 	QCOMPARE(literal(py, QStringLiteral("ab"), CallArg::String), QStringLiteral("\"ab\""));
-	QCOMPARE(languageName(cs), QStringLiteral("C#"));
 	QCOMPARE(fileExtension(py), QStringLiteral("py"));
 	QCOMPARE(fileExtension(c), QStringLiteral("c"));
-	QCOMPARE(fileExtension(cs), QStringLiteral("cs"));
 }
 
 void TstComponentCodeEmitters::stringEscaping()
 {
 	using namespace codegen;
-	const QString c = lang(C), py = lang(Python), cs = lang(CSharp);
+	const QString c = lang(C), py = lang(Python);
 	const QString tricky = QStringLiteral("a\"b\\c\nd\te\r") + QChar(0x01);
 	QCOMPARE(stringLiteral(c, tricky), QStringLiteral("\"a\\\"b\\\\c\\nd\\te\\r\\001\""));
 	QCOMPARE(stringLiteral(py, tricky), QStringLiteral("\"a\\\"b\\\\c\\nd\\te\\r\\x01\""));
-	QCOMPARE(stringLiteral(cs, tricky), QStringLiteral("\"a\\\"b\\\\c\\nd\\te\\r\\u0001\""));
-	// Non-ASCII: UTF-8 octal in C (a following digit is not swallowed), \u in Python / C#.
+	// Non-ASCII: UTF-8 octal in C (a following digit is not swallowed), \x / \U in Python.
 	const QString micro = QString(QChar(0x00b5)) + QStringLiteral("1");
 	QCOMPARE(stringLiteral(c, micro), QStringLiteral("\"\\302\\2651\""));
 	QCOMPARE(stringLiteral(py, micro), QStringLiteral("\"\\xb51\""));
-	QCOMPARE(stringLiteral(cs, micro), QStringLiteral("\"\\u00b51\""));
 	QCOMPARE(stringLiteral(py, QString::fromUcs4(U"\U0001F600")), QStringLiteral("\"\\U0001f600\""));
-	QCOMPARE(stringLiteral(cs, QString::fromUcs4(U"\U0001F600")), QStringLiteral("\"\\ud83d\\ude00\""));
 	// No trigraphs in C.
 	QCOMPARE(stringLiteral(c, QStringLiteral("??=")), QStringLiteral("\"?\\?=\""));
 	QCOMPARE(stringLiteral(py, QStringLiteral("??=")), QStringLiteral("\"??=\""));
@@ -637,7 +625,6 @@ void TstComponentCodeEmitters::stringEscaping()
 	QVERIFY(r->exportScript(log.entries, py).contains(QStringLiteral("attr0.value = \"say \\\"hi\\\"\\n\"")));
 	QVERIFY(r->exportScript(log.entries, c)
 			.contains(QStringLiteral("iio_attr_write_raw(attr0, \"say \\\"hi\\\"\\n\", 9);")));
-	QVERIFY(r->exportScript(log.entries, cs).contains(QStringLiteral("attr0.write(\"say \\\"hi\\\"\\n\");")));
 }
 
 void TstComponentCodeEmitters::comments()
@@ -645,7 +632,7 @@ void TstComponentCodeEmitters::comments()
 	using namespace codegen;
 	QCOMPARE(comment(lang(Python), QStringLiteral("a\nb")), QStringLiteral("# a\n# b"));
 	QCOMPARE(comment(lang(C), QStringLiteral("x\n\ny")), QStringLiteral("// x\n//\n// y"));
-	QCOMPARE(comment(lang(CSharp), QStringLiteral("path\\")), QStringLiteral("// path\\."));
+	QCOMPARE(comment(lang(C), QStringLiteral("path\\")), QStringLiteral("// path\\."));
 	QCOMPARE(loopBegin(lang(Python), 4), QStringLiteral("for _ in range(4):"));
 	QCOMPARE(loopEnd(lang(Python)), QString());
 }

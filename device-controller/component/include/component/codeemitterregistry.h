@@ -35,7 +35,7 @@
 namespace scopy::component {
 
 // Code emitters per (library, language): turns command log entries into one script. The instance
-// holds the libiio emitters (C / Python / C#) of the API version of the linked IIO backend, so they
+// holds the libiio emitters (C / Python) of the API version of the linked IIO backend, so they
 // match the calls it records; other libraries register theirs at plugin init() (e.g. remote-bus).
 class COMPONENT_EXPORT CodeEmitterRegistry
 {
@@ -56,8 +56,8 @@ public:
 	std::shared_ptr<CodeEmitter> emitter(const QString &library, const QString &language) const;
 	QStringList libraries() const;
 
-	// Languages with an emitter for every one of `libraries` (C, Python, C# first, in that
-	// order); empty for no libraries.
+	// Languages with an emitter for every one of `libraries` (C, Python first, in that order);
+	// empty for no libraries.
 	QStringList languagesFor(const QStringList &libraries) const;
 	// Libraries of the calls in `entries`, in order of first use.
 	static QStringList librariesOf(const QList<CommandLogEntry> &entries);

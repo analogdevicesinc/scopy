@@ -38,11 +38,10 @@ namespace scopy {
 namespace codegen {
 inline constexpr auto C = "c";
 inline constexpr auto Python = "python";
-inline constexpr auto CSharp = "csharp";
 
-// "C" / "Python" / "C#" (the id itself for an unknown language).
+// "C" / "Python" (the id itself for an unknown language).
 CONTROLLER_CORE_EXPORT QString languageName(const QString &language);
-// "c" / "py" / "cs" ("txt" for an unknown language).
+// "c" / "py" ("txt" for an unknown language).
 CONTROLLER_CORE_EXPORT QString fileExtension(const QString &language);
 // One indentation level: a tab for C, four spaces otherwise.
 CONTROLLER_CORE_EXPORT QString indentUnit(const QString &language);
@@ -52,9 +51,9 @@ CONTROLLER_CORE_EXPORT QString indent(const QString &text, const QString &prefix
 // Line comment ("# " for Python, "// " otherwise), one per line of `text`.
 CONTROLLER_CORE_EXPORT QString comment(const QString &language, const QString &text);
 // Escaped, double-quoted string literal of the language (UTF-8 bytes as octal escapes in C,
-// \uXXXX for non-ASCII in Python / C#).
+// \x / \u / \U for non-ASCII in Python).
 CONTROLLER_CORE_EXPORT QString stringLiteral(const QString &language, const QString &text);
-// Python `bytes([0x01, 0x02])`, C# `new byte[] { 0x01, 0x02 }`, C array initializer `{ 0x01, 0x02 }`.
+// Python `bytes([0x01, 0x02])`, C array initializer `{ 0x01, 0x02 }`.
 CONTROLLER_CORE_EXPORT QString bytesLiteral(const QString &language, const QByteArray &bytes);
 CONTROLLER_CORE_EXPORT QString boolLiteral(const QString &language, bool value);
 CONTROLLER_CORE_EXPORT QString hexLiteral(quint64 value);
@@ -64,8 +63,8 @@ CONTROLLER_CORE_EXPORT QString literal(const QString &language, const QVariant &
 CONTROLLER_CORE_EXPORT QString loopBegin(const QString &language, int count);
 CONTROLLER_CORE_EXPORT QString loopEnd(const QString &language);
 
-// The whole file: header comment, header lines (#include / import / using), then the body inside the
-// language's entry point (C main, C# Program.Main, Python top level).
+// The whole file: header comment, header lines (#include / import), then the body inside the
+// language's entry point (C main, Python top level).
 CONTROLLER_CORE_EXPORT QString script(const QString &language, const QString &headerComment, const QStringList &headers,
 				      const QString &body);
 } // namespace codegen
@@ -124,11 +123,11 @@ public:
 	virtual ~CodeEmitter();
 
 	virtual QString library() const = 0;  // CallRecord::library it handles: "libiio", "remote-bus"
-	virtual QString language() const = 0; // codegen::C / Python / CSharp
+	virtual QString language() const = 0; // codegen::C / Python
 	// Shown in the script header, e.g. "libiio v1 API (pylibiio 1.x)".
 	virtual QString description() const { return library(); }
 
-	// #include / import / using lines (called after the body: may depend on what was used).
+	// #include / import lines (called after the body: may depend on what was used).
 	virtual QStringList headers(EmitContext &ctx) const = 0;
 	// Statements before the calls: open the context / device.
 	virtual QString prologue(EmitContext &ctx) const = 0;

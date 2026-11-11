@@ -33,9 +33,8 @@
 namespace scopy::iio {
 
 // Code for the libiio calls recorded by iio-backend-v0 / iio-backend-v1 (their C names), in C
-// (the libiio API itself), Python (the `iio` module, pylibiio) or C# (libiio-sharp, namespace
-// `iio`), for the v0 or the v1 API. Pure text: no libiio linkage, so both versions build with
-// either SCOPY_LIBIIO_VERSION.
+// (the libiio API itself) or Python (the `iio` module, pylibiio), for the v0 or the v1 API. Pure
+// text: no libiio linkage, so both versions build with either SCOPY_LIBIIO_VERSION.
 // Objects are addressed by name: a device / channel / attribute is looked up once, when its handle
 // is first used, from the record's identifying args (v0) or the command's origin scope (v1 attribute
 // records carry only the attribute name). What cannot be resolved becomes a comment.
@@ -47,7 +46,7 @@ public:
 	LibiioEmitter(LibiioVersion version, const QString &language);
 	~LibiioEmitter() override;
 
-	// The C, Python and C# emitters of one API version.
+	// The C and Python emitters of one API version.
 	static QList<std::shared_ptr<CodeEmitter>> create(LibiioVersion version);
 
 	LibiioVersion version() const { return m_version; }

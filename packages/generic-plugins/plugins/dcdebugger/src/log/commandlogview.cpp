@@ -44,6 +44,8 @@
 #include <component/commandmonitor.h>
 #include <dcdebugger/style_properties.h>
 #include <filemanager.h>
+#include <gui/docking/dockablearea.h>
+#include <gui/docking/dockwrapper.h>
 #include <menulineedit.h>
 #include <menuonoffswitch.h>
 #include <pluginbase/preferences.h>
@@ -86,17 +88,20 @@ CommandLogView::CommandLogView(QWidget *parent)
 	m_model->setCollapseAfter(intPreference(COLLAPSE_PREF, DEFAULT_COLLAPSE_AFTER));
 	m_model->setErrorColor(QColor(Style::getAttribute(json::theme::content_error)));
 
-	// Instrument look, like the node panel above: one grey, rounded pane (basicComponent) holding
-	// the controls, the filter strip (a lighter shade, logFilterBar) and the table (a darker
-	// shade, logTable); the actions are primary buttons (basicButton).
+	// Two dockable panels side by side, like the Scopy instruments: the log (left) and the code
+	// generator (right, hidden until asked for). Each panel is one rounded basicComponent frame;
+	// every container in them is a QFrame (or a styled widget), never a plain QWidget, so the
+	// ".QWidget" backgrounds that ToolTemplates and dock wrappers cascade (Style::setBackgroundColor)
+	// do not paint them: they show the panel's colour. Only the table and the preview are darker.
 	auto *lay = new QVBoxLayout(this);
 	lay->setContentsMargins(0, 0, 0, 0);
-	auto *pane = new QFrame(this);
-	Style::setStyle(pane, style::properties::widget::basicComponent);
-	auto *paneLay = new QVBoxLayout(pane);
+	m_logPane = new QFrame(this);
+	m_logPane->setObjectName(QStringLiteral("commandLogPane"));
+	m_logPane->setAttribute(Qt::WA_StyledBackground, true);
+	Style::setStyle(m_logPane, style::properties::widget::basicComponent);
+	auto *paneLay = new QVBoxLayout(m_logPane);
 	paneLay->setContentsMargins(6, 6, 6, 6);
-	lay->addWidget(pane);
-	m_tool = new ToolTemplate(pane);
+	m_tool = new ToolTemplate(m_logPane);
 	// ToolTemplate fills its plain containers (".QWidget") background_subtle; let the pane show.
 	Style::setBackgroundColor(m_tool, QStringLiteral("transparent"));
 	m_tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -112,14 +117,15 @@ CommandLogView::CommandLogView(QWidget *parent)
 	m_follow = new MenuOnOffSwitch("Follow", this);
 	m_follow->onOffswitch()->setChecked(true);
 	m_follow->setToolTip("Scroll to the newest command");
-	auto *switches = new QWidget(this);
-	auto *switchLay = new QVBoxLayout(switches);
+	m_switches = new QFrame(this);
+	m_switches->setObjectName(QStringLiteral("commandLogSwitches"));
+	auto *switchLay = new QVBoxLayout(m_switches);
 	switchLay->setContentsMargins(0, 0, 0, 0);
 	switchLay->setSpacing(4);
 	// One column as wide as the wider switch: labels left-aligned, the toggles lined up.
 	switchLay->addWidget(m_log);
 	switchLay->addWidget(m_follow);
-	switches->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	m_switches->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	m_status = new QLabel(this);
 	Style::setStyle(m_status, style::properties::label::subtle);
 	m_pauseBtn = new QPushButton("Pause", this);
@@ -130,13 +136,14 @@ CommandLogView::CommandLogView(QWidget *parent)
 	m_exportBtn = new QPushButton("Export...", this);
 	m_exportBtn->setToolTip("Save the filtered calls as CSV");
 	m_generateBtn = new QPushButton("Generate code...", this);
+	m_generateBtn->setObjectName(QStringLiteral("commandLogGenerate"));
 	m_generateBtn->setCheckable(true);
 	m_generateBtn->setToolTip("Show the script repeating the selected rows (none selected: every visible row)");
 	for(QPushButton *b : {m_pauseBtn, m_clearBtn, m_exportBtn, m_generateBtn}) {
 		Style::setStyle(b, style::properties::button::basicButton);
 		b->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	}
-	m_tool->addWidgetToTopContainerHelper(switches, TTA_LEFT);
+	m_tool->addWidgetToTopContainerHelper(m_switches, TTA_LEFT);
 	m_tool->addWidgetToTopContainerHelper(m_status, TTA_LEFT);
 	m_tool->addWidgetToTopContainerHelper(m_pauseBtn, TTA_RIGHT);
 	m_tool->addWidgetToTopContainerHelper(m_clearBtn, TTA_RIGHT);
@@ -144,7 +151,7 @@ CommandLogView::CommandLogView(QWidget *parent)
 	m_tool->addWidgetToTopContainerHelper(m_generateBtn, TTA_RIGHT);
 
 	// Central: filters, then the log.
-	auto *central = new QWidget(this);
+	auto *central = new QFrame(this);
 	auto *clay = new QVBoxLayout(central);
 	clay->setContentsMargins(0, 0, 0, 0);
 	clay->setSpacing(6);
@@ -164,19 +171,60 @@ CommandLogView::CommandLogView(QWidget *parent)
 	m_tree->setColumnWidth(CommandLogModel::ArgsColumn, 240);
 	m_tree->setColumnWidth(CommandLogModel::ValueColumn, 200);
 	Style::setStyle(m_tree, style::properties::dcdebugger::logTable);
-	// The code generator sits right of the table, hidden until asked for.
-	// Like every splitter of the debugger, both sides collapse: a panel dragged fully closed is
-	// hidden (its toggle unchecked).
-	m_split = new QSplitter(Qt::Horizontal, central);
-	m_split->addWidget(m_tree);
-	m_codegen = new CodeGeneratorPanel(m_split);
-	m_codegen->setMinimumWidth(360);
-	m_codegen->setVisible(false);
-	m_split->addWidget(m_codegen);
-	m_split->setStretchFactor(0, 3);
-	m_split->setStretchFactor(1, 2);
-	clay->addWidget(m_split, 1);
+	clay->addWidget(m_tree, 1);
 	m_tool->addWidgetToCentralContainerHelper(central);
+
+	m_codegen = new CodeGeneratorPanel(this);
+	m_codegen->setMinimumWidth(360);
+
+	// The docks: KDDockWidgets when available and preferred (their own area: they only dock
+	// with each other), else the classic wrappers in a splitter.
+	m_area = createDockableArea(this);
+	QWidget *area = m_area->asWidget();
+	area->setObjectName(QStringLiteral("commandLogDockArea"));
+	m_logDock = createDockWrapper("Command log");
+	m_logDock->setTitle("Command log"); // the KDDW constructor indents its own title twice
+	m_logDock->setInnerWidget(m_logPane);
+	m_codegenDock = createDockWrapper("Generate code");
+	m_codegenDock->setTitle("Generate code");
+	m_codegenDock->setInnerWidget(m_codegen);
+	m_docking = !dynamic_cast<classic::DockableArea *>(m_area);
+	if(m_docking) {
+		// The dock title bar names the generator: no second title inside it.
+		m_codegen->setTitleVisible(false);
+		m_area->addDockWrapper(m_logDock, DockableAreaInterface::Direction_LEFT);
+		m_area->addDockWrapper(m_codegenDock, DockableAreaInterface::Direction_RIGHT);
+#ifdef USE_KDDOCKWIDGETS
+		if(auto *dock = dynamic_cast<KDDockWidgets::QtWidgets::DockWidget *>(m_codegenDock)) {
+			// Closed by the layout (not through the toggle): uncheck it.
+			connect(dock, &KDDockWidgets::QtWidgets::DockWidget::isOpenChanged, this, [this](bool open) {
+				if(!open && m_codegenShown) {
+					showCodeGenerator(false);
+				}
+			});
+		}
+#endif
+	} else {
+		// Like every splitter of the debugger, both sides collapse: the generator dragged fully
+		// closed is hidden (its toggle unchecked).
+		auto *areaLay = new QHBoxLayout(area);
+		areaLay->setContentsMargins(0, 0, 0, 0);
+		m_split = new QSplitter(Qt::Horizontal, area);
+		m_split->setObjectName(QStringLiteral("commandLogSplitter"));
+		m_split->setChildrenCollapsible(true);
+		m_split->addWidget(dockWidget(m_logDock));
+		m_split->addWidget(dockWidget(m_codegenDock));
+		m_split->setStretchFactor(0, 3);
+		m_split->setStretchFactor(1, 2);
+		areaLay->addWidget(m_split);
+		connect(m_split, &QSplitter::splitterMoved, this, [this] {
+			if(m_codegenShown && m_split->sizes().value(1) == 0) {
+				showCodeGenerator(false);
+			}
+		});
+	}
+	m_codegenDock->setActivated(false);
+	lay->addWidget(area);
 
 	// Copy: Ctrl+C while the table has focus, and the context menu.
 	m_copyAction = new QAction("Copy", m_tree);
@@ -196,11 +244,6 @@ CommandLogView::CommandLogView(QWidget *parent)
 	m_codegenTimer->setInterval(400);
 	connect(m_codegenTimer, &QTimer::timeout, this, &CommandLogView::refreshCodeGenerator);
 	connect(m_generateBtn, &QPushButton::toggled, this, [this](bool on) { showCodeGenerator(on); });
-	connect(m_split, &QSplitter::splitterMoved, this, [this] {
-		if(isCodeGeneratorShown() && m_split->sizes().value(1) == 0) {
-			showCodeGenerator(false);
-		}
-	});
 	connect(m_generateAction, &QAction::triggered, this, [this] { showCodeGenerator(true); });
 	connect(m_tree->selectionModel(), &QItemSelectionModel::selectionChanged, this, [this] {
 		if(isCodeGeneratorShown()) {
@@ -243,15 +286,23 @@ CommandLogView::CommandLogView(QWidget *parent)
 	updateStatus();
 }
 
-CommandLogView::~CommandLogView() = default;
+CommandLogView::~CommandLogView()
+{
+	// KDDockWidgets unparents a closed dock: it would outlive this view.
+	if(m_docking) {
+		delete dockWidget(m_codegenDock);
+		delete dockWidget(m_logDock);
+	}
+}
 
 QWidget *CommandLogView::buildFilters(QWidget *parent)
 {
 	// A QFrame, not a plain QWidget: the ToolTemplate's ".QWidget" background does not reach it.
+	// No box of its own: it sits on the pane colour.
 	auto *w = new QFrame(parent);
-	Style::setStyle(w, style::properties::widget::basicComponent);
+	w->setObjectName(QStringLiteral("commandLogFilters"));
 	auto *lay = new QHBoxLayout(w);
-	lay->setContentsMargins(4, 4, 4, 4);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(10);
 	m_component = filterEdit("Filter component", w, lay);
 	m_library = filterEdit("Filter library", w, lay);
@@ -372,7 +423,15 @@ QList<CommandLogEntry> CommandLogView::generationEntries() const
 	return rows.isEmpty() ? m_model->visibleEntries() : m_model->entriesFor(rows);
 }
 
-bool CommandLogView::isCodeGeneratorShown() const { return !m_codegen->isHidden(); }
+bool CommandLogView::isCodeGeneratorShown() const { return m_codegenShown; }
+
+QWidget *CommandLogView::dockWidget(DockWrapperInterface *dock) { return dynamic_cast<QWidget *>(dock); }
+
+QWidget *CommandLogView::dockArea() const { return m_area->asWidget(); }
+
+QWidget *CommandLogView::logDock() const { return dockWidget(m_logDock); }
+
+QWidget *CommandLogView::codeGeneratorDock() const { return dockWidget(m_codegenDock); }
 
 void CommandLogView::showCodeGenerator(bool show)
 {
@@ -380,10 +439,14 @@ void CommandLogView::showCodeGenerator(bool show)
 		m_generateBtn->setChecked(show); // toggled → back here
 		return;
 	}
-	m_codegen->setVisible(show);
+	if(m_codegenShown == show) {
+		return;
+	}
+	m_codegenShown = show;
+	m_codegenDock->setActivated(show);
 	if(show) {
 		// Reopened after being dragged closed: give it its share back.
-		const QList<int> sizes = m_split->sizes();
+		const QList<int> sizes = m_split ? m_split->sizes() : QList<int>();
 		if(sizes.size() == 2 && sizes[1] == 0 && sizes[0] > 0) {
 			m_split->setSizes({sizes[0] * 3 / 5, sizes[0] * 2 / 5});
 		}

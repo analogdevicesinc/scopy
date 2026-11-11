@@ -1,9 +1,9 @@
-/* The command log table: framed like the component tree (treeView / headerView), on a darker
-   shade than the log pane around it, with a light grid between the cells. */
+/* The command log table: framed like the component tree (treeView / headerView), on the pane
+   colour (basicComponent), with grid lines between the rows and the columns. */
 QTreeView[&&property&&=true] {
 	border: &border_width& solid &interactive_subtle_disabled&;
 	border-radius: &radius_1&;
-	background-color: &background_subtle&;
+	background-color: &background_primary&;
 	show-decoration-selected: 1;
 	color: &content_default&;
 }

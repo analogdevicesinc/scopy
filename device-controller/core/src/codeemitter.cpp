@@ -26,7 +26,6 @@ using namespace scopy;
 namespace {
 bool isC(const QString &l) { return l == QLatin1String(codegen::C); }
 bool isPython(const QString &l) { return l == QLatin1String(codegen::Python); }
-bool isCSharp(const QString &l) { return l == QLatin1String(codegen::CSharp); }
 
 bool isPrintableAscii(uint c) { return c >= 0x20 && c < 0x7f; }
 
@@ -108,24 +107,6 @@ QString pythonString(const QString &text)
 	}
 	return QLatin1Char('"') + out + QLatin1Char('"');
 }
-
-QString csharpString(const QString &text)
-{
-	QString out;
-	for(QChar qc : text) {
-		const uint c = qc.unicode();
-		const QString esc = commonEscape(c);
-		if(!esc.isEmpty()) {
-			out += esc;
-		} else if(isPrintableAscii(c)) {
-			out += qc;
-		} else {
-			// UTF-16 code units (surrogate pairs stay pairs); \x is variable length in C#.
-			out += QStringLiteral("\\u%1").arg(c, 4, 16, QLatin1Char('0'));
-		}
-	}
-	return QLatin1Char('"') + out + QLatin1Char('"');
-}
 } // namespace
 
 QString codegen::languageName(const QString &language)
@@ -135,9 +116,6 @@ QString codegen::languageName(const QString &language)
 	}
 	if(isPython(language)) {
 		return QStringLiteral("Python");
-	}
-	if(isCSharp(language)) {
-		return QStringLiteral("C#");
 	}
 	return language;
 }
@@ -149,9 +127,6 @@ QString codegen::fileExtension(const QString &language)
 	}
 	if(isPython(language)) {
 		return QStringLiteral("py");
-	}
-	if(isCSharp(language)) {
-		return QStringLiteral("cs");
 	}
 	return QStringLiteral("txt");
 }
@@ -182,7 +157,7 @@ QString codegen::comment(const QString &language, const QString &text)
 	for(QString line : text.split(QLatin1Char('\n'))) {
 		line.remove(QLatin1Char('\r'));
 		if(line.endsWith(QLatin1Char('\\'))) {
-			line += QLatin1Char('.'); // a trailing backslash would continue a C / C# line comment
+			line += QLatin1Char('.'); // a trailing backslash would continue a C line comment
 		}
 		out << (line.isEmpty() ? lead : lead + QLatin1Char(' ') + line);
 	}
@@ -193,9 +168,6 @@ QString codegen::stringLiteral(const QString &language, const QString &text)
 {
 	if(isPython(language)) {
 		return pythonString(text);
-	}
-	if(isCSharp(language)) {
-		return csharpString(text);
 	}
 	return cString(text);
 }
@@ -212,12 +184,6 @@ QString codegen::bytesLiteral(const QString &language, const QByteArray &bytes)
 	if(isPython(language)) {
 		open = QStringLiteral("bytes([");
 		close = QStringLiteral("])");
-	} else if(isCSharp(language)) {
-		if(bytes.isEmpty()) {
-			return QStringLiteral("new byte[0]");
-		}
-		open = QStringLiteral("new byte[] {");
-		close = QStringLiteral("}");
 	} else {
 		open = QStringLiteral("{");
 		close = QStringLiteral("}");
@@ -272,9 +238,6 @@ QString codegen::loopBegin(const QString &language, int count)
 	if(isPython(language)) {
 		return QStringLiteral("for _ in range(%1):").arg(count);
 	}
-	if(isCSharp(language)) {
-		return QStringLiteral("for (int i = 0; i < %1; i++)\n{").arg(count);
-	}
 	return QStringLiteral("for (int i = 0; i < %1; i++) {").arg(count);
 }
 
@@ -283,7 +246,6 @@ QString codegen::loopEnd(const QString &language) { return isPython(language) ? 
 QString codegen::script(const QString &language, const QString &headerComment, const QStringList &headers,
 			const QString &body)
 {
-	QStringList heads = headers;
 	QStringList out;
 	if(isPython(language)) {
 		out << QStringLiteral("#!/usr/bin/env python3");
@@ -291,11 +253,8 @@ QString codegen::script(const QString &language, const QString &headerComment, c
 	if(!headerComment.isEmpty()) {
 		out << headerComment;
 	}
-	if(isCSharp(language) && !heads.contains(QStringLiteral("using System;"))) {
-		heads.prepend(QStringLiteral("using System;"));
-	}
-	if(!heads.isEmpty()) {
-		out << QString() << heads;
+	if(!headers.isEmpty()) {
+		out << QString() << headers;
 	}
 	out << QString();
 
@@ -305,14 +264,6 @@ QString codegen::script(const QString &language, const QString &headerComment, c
 			out << indent(body, QStringLiteral("\t")) << QString();
 		}
 		out << QStringLiteral("\treturn 0;") << QStringLiteral("}");
-	} else if(isCSharp(language)) {
-		const QString u = indentUnit(language);
-		out << QStringLiteral("class Program") << QStringLiteral("{");
-		out << u + QStringLiteral("static void Main()") << u + QStringLiteral("{");
-		if(!body.isEmpty()) {
-			out << indent(body, u + u);
-		}
-		out << u + QStringLiteral("}") << QStringLiteral("}");
 	} else {
 		if(!body.isEmpty()) {
 			out << body;

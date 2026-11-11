@@ -74,13 +74,12 @@ public:
 		: v1(v == LibiioVersion::V1)
 		, c(language == QLatin1String(codegen::C))
 		, py(language == QLatin1String(codegen::Python))
-		, cs(language == QLatin1String(codegen::CSharp))
 		, lang(language)
 		, ctx(ctx)
 	{}
 
 	const bool v1;
-	const bool c, py, cs;
+	const bool c, py;
 	const QString lang;
 	EmitContext &ctx;
 
@@ -91,13 +90,10 @@ public:
 	QString st(const QString &code) const { return py ? code : code + QLatin1Char(';'); }
 	QString comment(const QString &text) const { return ctx.comment(text); }
 	QString unit() const { return codegen::indentUnit(lang); }
-	QString null() const
-	{
-		return py ? QStringLiteral("None") : c ? QStringLiteral("NULL") : QStringLiteral("null");
-	}
+	QString null() const { return py ? QStringLiteral("None") : QStringLiteral("NULL"); }
 
 	// "Type var = expr;" (Python "var = expr"); in a loop body the variable is declared before the
-	// loop and only assigned here, so it outlives the loop (C / C# scopes).
+	// loop and only assigned here, so it outlives the loop (C scopes).
 	QString create(const QString &type, const QString &var, const QString &expr) const
 	{
 		if(py) {
@@ -110,7 +106,6 @@ public:
 		}
 		return st(decl + QStringLiteral(" = ") + expr);
 	}
-	QString cType(const QString &cName, const QString &csName) const { return c ? cName : csName; }
 
 	// Scratch variables, declared once at the top scope.
 	void scratch(const QString &name)
@@ -128,21 +123,10 @@ public:
 				ctx.declareOnce(QStringLiteral("libiio/c/trig"),
 						QStringLiteral("const struct iio_device *trig;"));
 			}
-		} else if(cs) {
-			static const QHash<QString, QString> types = {
-				{QStringLiteral("val"), QStringLiteral("string val;")},
-				{QStringLiteral("reg"), QStringLiteral("uint reg;")},
-				{QStringLiteral("trig"), QStringLiteral("Trigger trig;")},
-				{QStringLiteral("data"), QStringLiteral("byte[] data;")},
-				{QStringLiteral("sampleSize"), QStringLiteral("uint sampleSize;")},
-			};
-			if(types.contains(name)) {
-				ctx.declareOnce(QStringLiteral("libiio/cs/") + name, types.value(name));
-			}
 		}
 	}
 
-	// A recorded failure: C keeps going (comment), Python / C# catch what the binding throws.
+	// A recorded failure: C keeps going (comment), Python catches what the binding throws.
 	QString failure(const QStringList &stmts, int rc) const
 	{
 		const QString note = QStringLiteral("recorded: failed with rc = %1").arg(rc);
@@ -151,21 +135,9 @@ public:
 		}
 		const QString u = unit();
 		QStringList out;
-		if(py) {
-			out << QStringLiteral("try:") << codegen::indent(stmts.join(QLatin1Char('\n')), u)
-			    << QStringLiteral("except OSError as e:")
-			    << u +
-					QStringLiteral("print(%1, e)")
-						.arg(s(QStringLiteral("expected failure (%1):").arg(note)));
-		} else {
-			out << QStringLiteral("try") << QStringLiteral("{")
-			    << codegen::indent(stmts.join(QLatin1Char('\n')), u) << QStringLiteral("}")
-			    << QStringLiteral("catch (Exception e)") << QStringLiteral("{")
-			    << u +
-					QStringLiteral("Console.WriteLine(%1 + e.Message);")
-						.arg(s(QStringLiteral("expected failure (%1): ").arg(note)))
-			    << QStringLiteral("}");
-		}
+		out << QStringLiteral("try:") << codegen::indent(stmts.join(QLatin1Char('\n')), u)
+		    << QStringLiteral("except OSError as e:")
+		    << u + QStringLiteral("print(%1, e)").arg(s(QStringLiteral("expected failure (%1):").arg(note)));
 		return out.join(QLatin1Char('\n'));
 	}
 	QString done(const CallRecord &r, const QStringList &stmts) const
@@ -238,13 +210,10 @@ public:
 			QString expr;
 			if(c) {
 				expr = QStringLiteral("iio_context_find_device(ctx, %1)").arg(s(name));
-			} else if(py) {
-				expr = QStringLiteral("ctx.find_device(%1)").arg(s(name));
 			} else {
-				expr = QStringLiteral("ctx.get_device(%1)").arg(s(name));
+				expr = QStringLiteral("ctx.find_device(%1)").arg(s(name));
 			}
-			ctx.declare(lookup(cType(QStringLiteral("struct iio_device *"), QStringLiteral("Device ")), v,
-					   expr));
+			ctx.declare(lookup(QStringLiteral("struct iio_device *"), v, expr));
 		}
 		if(handle) {
 			ctx.vars.insert(handle, v);
@@ -271,13 +240,10 @@ public:
 			if(c) {
 				expr = QStringLiteral("iio_device_find_channel(%1, %2, %3)")
 					       .arg(devVar, s(id), b(output));
-			} else if(py || !v1) {
-				expr = QStringLiteral("%1.find_channel(%2, %3)").arg(devVar, s(id), b(output));
 			} else {
-				expr = QStringLiteral("%1.get_channel(%2, %3)").arg(devVar, s(id), b(output));
+				expr = QStringLiteral("%1.find_channel(%2, %3)").arg(devVar, s(id), b(output));
 			}
-			ctx.declare(lookup(cType(QStringLiteral("struct iio_channel *"), QStringLiteral("Channel ")), v,
-					   expr));
+			ctx.declare(lookup(QStringLiteral("struct iio_channel *"), v, expr));
 		}
 		if(handle) {
 			ctx.vars.insert(handle, v);
@@ -303,13 +269,10 @@ public:
 			QString expr;
 			if(c) {
 				expr = QStringLiteral("iio_device_get_buffer(%1, %2)").arg(devVar).arg(index);
-			} else if(py) {
-				expr = QStringLiteral("%1.get_buffer(%2)").arg(devVar).arg(index);
 			} else {
-				expr = QStringLiteral("%1.buffers[%2]").arg(devVar).arg(index);
+				expr = QStringLiteral("%1.get_buffer(%2)").arg(devVar).arg(index);
 			}
-			ctx.declare(lookup(cType(QStringLiteral("struct iio_buffer *"), QStringLiteral("IOBuffer ")), v,
-					   expr));
+			ctx.declare(lookup(QStringLiteral("struct iio_buffer *"), v, expr));
 		}
 		if(handle) {
 			ctx.vars.insert(handle, v);
@@ -334,15 +297,12 @@ public:
 		QString expr;
 		if(c) {
 			expr = QStringLiteral("iio_create_channels_mask(iio_device_get_channels_count(%1))").arg(dev);
-		} else if(py) {
-			expr = QStringLiteral("iio.ChannelsMask(%1)").arg(dev);
 		} else {
-			expr = QStringLiteral("new ChannelsMask((uint)%1.channels.Count)").arg(dev);
+			expr = QStringLiteral("iio.ChannelsMask(%1)").arg(dev);
 		}
 		ctx.declare(comment(QStringLiteral("%1: channels mask of %2 (created with the stream, not logged)")
 					    .arg(v, devName)));
-		ctx.declare(lookup(cType(QStringLiteral("struct iio_channels_mask *"), QStringLiteral("ChannelsMask ")),
-				   v, expr));
+		ctx.declare(lookup(QStringLiteral("struct iio_channels_mask *"), v, expr));
 		own(QStringLiteral("mask"), v);
 		return v;
 	}
@@ -434,7 +394,7 @@ public:
 		return {};
 	}
 
-	// Attribute object variable (C v1, Python, C#); empty for a Python / C# context attribute
+	// Attribute object variable (C v1, Python); empty for a Python context attribute
 	// (a plain string in ctx.attrs).
 	QString attrVar(const AttrTarget &t, const QString &parentVar, quintptr v1Handle)
 	{
@@ -456,22 +416,13 @@ public:
 							    "iio_device_find_debug_attr",
 							    "iio_buffer_find_attr"};
 				expr = QStringLiteral("%1(%2, %3)").arg(QLatin1String(fns[t.scope]), parentVar, n);
-			} else if(py || v1) {
+			} else {
 				static const char *dicts[] = {"", "", "attrs", "attrs", "debug_attrs", "attrs"};
 				const char *dict =
 					(!v1 && t.scope == AttrTarget::Buffer) ? "buffer_attrs" : dicts[t.scope];
 				expr = QStringLiteral("%1.%2[%3]").arg(parentVar, QLatin1String(dict), n);
-			} else {
-				static const char *finds[] = {"",
-							      "",
-							      "find_attribute",
-							      "find_attribute",
-							      "find_debug_attribute",
-							      "find_buffer_attribute"};
-				expr = QStringLiteral("%1.%2(%3)").arg(parentVar, QLatin1String(finds[t.scope]), n);
 			}
-			ctx.declare(lookup(cType(QStringLiteral("const struct iio_attr *"), QStringLiteral("Attr ")), v,
-					   expr));
+			ctx.declare(lookup(QStringLiteral("const struct iio_attr *"), v, expr));
 		}
 		if(v1Handle) {
 			ctx.vars.insert(v1Handle, v);
@@ -529,13 +480,10 @@ public:
 			}
 		} else {
 			const QString expr = a.isEmpty() ? QStringLiteral("ctx.attrs[%1]").arg(s(t.attr))
-				: py			 ? a + QStringLiteral(".value")
-							 : a + QStringLiteral(".read()");
-			scratch(QStringLiteral("val"));
-			out << st(QStringLiteral("val = ") + expr);
+							 : a + QStringLiteral(".value");
+			out << QStringLiteral("val = ") + expr;
 			if(!r.failed()) {
-				out << (py ? QStringLiteral("print(%1, val)").arg(s(label + " ="))
-					   : QStringLiteral("Console.WriteLine(%1 + val);").arg(s(label + " = ")));
+				out << QStringLiteral("print(%1, val)").arg(s(label + " ="));
 			}
 		}
 		return done(r, out);
@@ -571,10 +519,8 @@ public:
 				out << st(
 					QStringLiteral("ret = %1(%2, %3, %4)").arg(r.function, p, s(t.attr), s(value)));
 			}
-		} else if(py) {
-			out << QStringLiteral("%1.value = %2").arg(a, s(value));
 		} else {
-			out << st(QStringLiteral("%1.write(%2)").arg(a, s(value)));
+			out << QStringLiteral("%1.value = %2").arg(a, s(value));
 		}
 		return done(r, out);
 	}
@@ -598,16 +544,10 @@ public:
 				fmt.replace(QLatin1Char('%'), QStringLiteral("%%"));
 				out << st(QStringLiteral("printf(%1, (unsigned int)reg)").arg(s(fmt + " = 0x%x\n")));
 			}
-		} else if(py) {
+		} else {
 			out << QStringLiteral("reg = %1.reg_read(%2)").arg(dev, hex(addr));
 			if(!r.failed()) {
 				out << QStringLiteral("print(%1, hex(reg))").arg(s(label + " ="));
-			}
-		} else {
-			out << st(QStringLiteral("reg = %1.reg_read(%2)").arg(dev, hex(addr)));
-			if(!r.failed()) {
-				out << st(QStringLiteral("Console.WriteLine(%1 + reg.ToString(\"x\"))")
-						  .arg(s(label + " = 0x")));
 			}
 		}
 		return done(r, out);
@@ -657,12 +597,9 @@ public:
 						"printf(%1, ret == 0 && trig ? iio_device_get_name(trig) : \"(none)\")")
 						.arg(s(fmt + " = %s\n")));
 			}
-		} else if(py) {
+		} else {
 			out << QStringLiteral("trig = %1.trigger").arg(dev);
 			out << QStringLiteral("print(%1, trig.name if trig else None)").arg(s(label + " ="));
-		} else {
-			out << st(QStringLiteral("trig = %1.get_trigger()").arg(dev));
-			out << st(QStringLiteral("Console.WriteLine(%1 + trig.name)").arg(s(label + " = ")));
 		}
 		return done(r, out);
 	}
@@ -679,11 +616,8 @@ public:
 		if(c) {
 			scratch(QStringLiteral("ret"));
 			out << st(QStringLiteral("ret = iio_device_set_trigger(%1, %2)").arg(dev, trig));
-		} else if(py) {
-			out << QStringLiteral("%1.trigger = %2").arg(dev, trig);
 		} else {
-			out << st(QStringLiteral("%1.set_trigger(%2)")
-					  .arg(dev, trigName.isEmpty() ? trig : QStringLiteral("(Trigger)") + trig));
+			out << QStringLiteral("%1.trigger = %2").arg(dev, trig);
 		}
 		return done(r, out);
 	}
@@ -701,10 +635,8 @@ public:
 		if(!v1) {
 			if(c) {
 				out << st(QStringLiteral("%1(%2)").arg(r.function, ch));
-			} else if(py) {
-				out << QStringLiteral("%1.enabled = %2").arg(ch, b(enable));
 			} else {
-				out << st(QStringLiteral("%1.%2()").arg(ch, enable ? "enable" : "disable"));
+				out << QStringLiteral("%1.enabled = %2").arg(ch, b(enable));
 			}
 			return done(r, out);
 		}
@@ -715,12 +647,10 @@ public:
 		}
 		if(c) {
 			out << st(QStringLiteral("%1(%2, %3)").arg(r.function, ch, mk));
-		} else if(py) {
+		} else {
 			out << (enable ? QStringLiteral("%1.channels = %1.channels + [%2]").arg(mk, ch)
 				       : QStringLiteral("%1.channels = [c for c in %1.channels if c != %2]")
 						 .arg(mk, ch));
-		} else {
-			out << st(QStringLiteral("%1.%2(%3)").arg(ch, enable ? "enable" : "disable", mk));
 		}
 		return done(r, out);
 	}
@@ -750,26 +680,16 @@ public:
 						    : QStringLiteral("iio_buffer_start(%1)").arg(target);
 			return {st(QStringLiteral("memcpy(%1, %2, sizeof(%2))").arg(start, arr))};
 		}
-		if(py) {
-			return {QStringLiteral("%1.write(bytearray(%2))")
-					.arg(target, codegen::bytesLiteral(lang, data))};
-		}
-		return {st(QStringLiteral("%1.fill(%2)").arg(target, codegen::bytesLiteral(lang, data)))};
+		return {QStringLiteral("%1.write(bytearray(%2))").arg(target, codegen::bytesLiteral(lang, data))};
 	}
 
-	// Python / C#: copy the samples out after a refill / dequeue that returned a payload.
+	// Python: copy the samples out after a refill / dequeue that returned a payload.
 	QStringList readPayload(const CallRecord &r, const QString &source)
 	{
 		if(r.failed() || r.outKind != CallArg::Bytes || c) {
 			return {};
 		}
-		if(py) {
-			return {QStringLiteral("data = %1.read()").arg(source)};
-		}
-		const qint64 size = r.outSize >= 0 ? r.outSize : r.out.toByteArray().size();
-		scratch(QStringLiteral("data"));
-		return {st(QStringLiteral("data = new byte[%1]").arg(size)),
-			st(QStringLiteral("%1.read(data)").arg(source))};
+		return {QStringLiteral("data = %1.read()").arg(source)};
 	}
 
 	QString unknownHandle(const CallRecord &r, const QString &what)
@@ -815,13 +735,10 @@ public:
 					       .arg(dev)
 					       .arg(samples)
 					       .arg(cyclic);
-			} else if(py) {
-				expr = QStringLiteral("iio.Buffer(%1, %2, %3)").arg(dev).arg(samples).arg(cyclic);
 			} else {
-				expr = QStringLiteral("new IOBuffer(%1, %2, %3)").arg(dev).arg(samples).arg(cyclic);
+				expr = QStringLiteral("iio.Buffer(%1, %2, %3)").arg(dev).arg(samples).arg(cyclic);
 			}
-			out << create(cType(QStringLiteral("struct iio_buffer *"), QStringLiteral("IOBuffer")), buf,
-				      expr);
+			out << create(QStringLiteral("struct iio_buffer *"), buf, expr);
 			if(!r.failed()) {
 				own(QStringLiteral("buffer"), buf);
 			}
@@ -858,14 +775,14 @@ public:
 		return done(r, out);
 	}
 
-	// "iio_x_destroy(v);" / "del v" / "v.Dispose();", and v is no longer released by the epilogue.
+	// "iio_x_destroy(v);" / "del v", and v is no longer released by the epilogue.
 	QString release(const QString &var, const QString &cFunction)
 	{
 		release(var);
 		if(c) {
 			return st(QStringLiteral("%1(%2)").arg(cFunction, var));
 		}
-		return py ? QStringLiteral("del ") + var : st(var + QStringLiteral(".Dispose()"));
+		return QStringLiteral("del ") + var;
 	}
 
 	// --- v1 buffers / streams / blocks ---
@@ -897,14 +814,10 @@ public:
 			QString expr;
 			if(c) {
 				expr = QStringLiteral("iio_create_channels_mask(%1)").arg(n);
-			} else if(py) {
-				expr = QStringLiteral("iio.ChannelsMask(%1)").arg(dev);
 			} else {
-				expr = QStringLiteral("new ChannelsMask(%1)").arg(n);
+				expr = QStringLiteral("iio.ChannelsMask(%1)").arg(dev);
 			}
-			out << create(
-				cType(QStringLiteral("struct iio_channels_mask *"), QStringLiteral("ChannelsMask")), mk,
-				expr);
+			out << create(QStringLiteral("struct iio_channels_mask *"), mk, expr);
 			if(!r.failed()) {
 				own(QStringLiteral("mask"), mk);
 			}
@@ -921,11 +834,8 @@ public:
 			if(c) {
 				scratch(QStringLiteral("ret"));
 				out << st(QStringLiteral("ret = iio_device_get_sample_size(%1, %2)").arg(dev, mk));
-			} else if(py) {
-				out << QStringLiteral("sample_size = %1.sample_size").arg(mk);
 			} else {
-				scratch(QStringLiteral("sampleSize"));
-				out << st(QStringLiteral("sampleSize = %1.get_sample_size(%2)").arg(dev, mk));
+				out << QStringLiteral("sample_size = %1.sample_size").arg(mk);
 			}
 			return done(r, out);
 		}
@@ -944,9 +854,7 @@ public:
 			const QString stream = ctx.bind(r.out.value<quintptr>(), QStringLiteral("stream"));
 			QString expr = c ? QStringLiteral("iio_buffer_open(%1, %2)").arg(buf, mk)
 					 : QStringLiteral("%1.open(%2)").arg(buf, mk);
-			out << create(
-				cType(QStringLiteral("struct iio_buffer_stream *"), QStringLiteral("BufferStream")),
-				stream, expr);
+			out << create(QStringLiteral("struct iio_buffer_stream *"), stream, expr);
 			if(!r.failed()) {
 				own(QStringLiteral("stream"), stream);
 			}
@@ -962,7 +870,7 @@ public:
 			const QString expr = c
 				? QStringLiteral("iio_buffer_stream_create_block(%1, %2)").arg(stream).arg(size)
 				: QStringLiteral("%1.create_block(%2)").arg(stream).arg(size);
-			out << create(cType(QStringLiteral("struct iio_block *"), QStringLiteral("Block")), blk, expr);
+			out << create(QStringLiteral("struct iio_block *"), blk, expr);
 			if(!r.failed()) {
 				own(QStringLiteral("block"), blk);
 			}
@@ -984,7 +892,7 @@ public:
 						  .arg(obj)
 						  .arg(used)
 						  .arg(b(cyclic)));
-			} else if(py) {
+			} else {
 				QStringList args;
 				if(used) {
 					args << QString::number(used);
@@ -993,10 +901,6 @@ public:
 					args << QStringLiteral("cyclic=True");
 				}
 				out << QStringLiteral("%1.enqueue(%2)").arg(obj, args.join(QStringLiteral(", ")));
-			} else {
-				out << st(cyclic	 ? QStringLiteral("%1.enqueue(%2, true)").arg(obj).arg(used)
-						  : used ? QStringLiteral("%1.enqueue(%2)").arg(obj).arg(used)
-							 : QStringLiteral("%1.enqueue()").arg(obj));
 			}
 		} else if(fn == QLatin1String("iio_block_dequeue")) {
 			const bool nonblock = flag(r, "nonblock");
@@ -1141,8 +1045,7 @@ LibiioEmitter::~LibiioEmitter() = default;
 QList<std::shared_ptr<CodeEmitter>> LibiioEmitter::create(LibiioVersion version)
 {
 	return {std::make_shared<LibiioEmitter>(version, QString::fromLatin1(codegen::C)),
-		std::make_shared<LibiioEmitter>(version, QString::fromLatin1(codegen::Python)),
-		std::make_shared<LibiioEmitter>(version, QString::fromLatin1(codegen::CSharp))};
+		std::make_shared<LibiioEmitter>(version, QString::fromLatin1(codegen::Python))};
 }
 
 QString LibiioEmitter::library() const { return QString::fromLatin1(LIBRARY); }
@@ -1156,10 +1059,6 @@ QString LibiioEmitter::description() const
 		return v1 ? QStringLiteral("libiio v1 API, Python bindings (pylibiio 1.x, module iio)")
 			  : QStringLiteral("libiio v0 API, Python bindings (pylibiio 0.2x, module iio)");
 	}
-	if(m_language == QLatin1String(codegen::CSharp)) {
-		return v1 ? QStringLiteral("libiio v1 API, C# bindings (libiio-sharp 1.x, namespace iio)")
-			  : QStringLiteral("libiio v0 API, C# bindings (libiio-sharp 0.2x, namespace iio)");
-	}
 	return v1 ? QStringLiteral("libiio v1 API (link with -liio)")
 		  : QStringLiteral("libiio v0 API (link with -liio)");
 }
@@ -1168,9 +1067,6 @@ QStringList LibiioEmitter::headers(EmitContext &) const
 {
 	if(m_language == QLatin1String(codegen::Python)) {
 		return {QStringLiteral("import iio")};
-	}
-	if(m_language == QLatin1String(codegen::CSharp)) {
-		return {QStringLiteral("using System;"), QStringLiteral("using iio;")};
 	}
 	return {QStringLiteral("#include <stdbool.h>"), QStringLiteral("#include <stdint.h>"),
 		QStringLiteral("#include <stdio.h>"), QStringLiteral("#include <string.h>"),
@@ -1189,8 +1085,6 @@ QString LibiioEmitter::prologue(EmitContext &ctx) const
 	}
 	if(g.py) {
 		out << QStringLiteral("ctx = iio.Context(%1)").arg(g.s(uri));
-	} else if(g.cs) {
-		out << QStringLiteral("Context ctx = new Context(%1);").arg(g.s(uri));
 	} else if(g.v1) {
 		out << QStringLiteral("struct iio_context *ctx = iio_create_context(NULL, %1);").arg(g.s(uri))
 		    << QStringLiteral("if (iio_err(ctx)) {")
@@ -1226,16 +1120,12 @@ QString LibiioEmitter::epilogue(EmitContext &ctx) const
 		const QString var = it->section(QLatin1Char('|'), 1);
 		if(g.c) {
 			out << g.st(QStringLiteral("%1(%2)").arg(cRelease.value(kind), var));
-		} else if(g.py) {
-			out << QStringLiteral("del ") + var;
 		} else {
-			out << g.st(var + QStringLiteral(".Dispose()"));
+			out << QStringLiteral("del ") + var;
 		}
 	}
 	if(g.c) {
 		out << QStringLiteral("iio_context_destroy(ctx);");
-	} else if(g.cs) {
-		out << QStringLiteral("ctx.Dispose();");
 	}
 	return out.join(QLatin1Char('\n'));
 }
