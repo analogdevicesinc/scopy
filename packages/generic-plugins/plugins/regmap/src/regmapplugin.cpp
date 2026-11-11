@@ -419,7 +419,8 @@ bool RegmapPlugin::applyConfiguration(const RegisterMapToolConfig &config)
 	}
 
 	qDebug(CAT_REGMAP) << "CONNECTING TO DEVICE : " << config.target << "configured by" << config.provider;
-	return setupDevice(config.target, config.templatePath, config.bitsPerRow.value_or(8), read, write);
+	return setupDevice(config.target, config.templatePath, config.bitsPerRow.value_or(8), read, write,
+			   config.useRegisterDescriptionAsName, config.useBitFieldDescriptionAsName);
 }
 
 bool RegmapPlugin::createStrategies(const RegisterMapToolConfig &config, IRegisterReadStrategy *&read,
@@ -481,7 +482,9 @@ bool RegmapPlugin::createIioStrategies(const QString &device, uint32_t addressSp
 }
 
 bool RegmapPlugin::setupDevice(const QString &device, const QString &templatePath, int bitsPerRow,
-			       IRegisterReadStrategy *read, IRegisterWriteStrategy *write)
+			       IRegisterReadStrategy *read, IRegisterWriteStrategy *write,
+			       std::optional<bool> useRegisterDescriptionAsName,
+			       std::optional<bool> useBitFieldDescriptionAsName)
 {
 	if(!registerMapTool) {
 		delete read;
@@ -499,6 +502,13 @@ bool RegmapPlugin::setupDevice(const QString &device, const QString &templatePat
 		RegisterMapTemplateOptions options = RegisterMapTemplateOptions::fromConfig(
 			Utils::getJsonTemplate(QFileInfo(templatePath).fileName()));
 		options.bitsPerRow = bitsPerRow;
+		// a plugin's own options win over regmap-config.json
+		if(useRegisterDescriptionAsName) {
+			options.useRegisterDescriptionAsName = *useRegisterDescriptionAsName;
+		}
+		if(useBitFieldDescriptionAsName) {
+			options.useBitFieldDescriptionAsName = *useBitFieldDescriptionAsName;
+		}
 		if(!RegisterMapTemplateLoader::load(templatePath, options, registerMapTemplate) ||
 		   registerMapTemplate->getRegisterList()->isEmpty()) {
 			qWarning(CAT_REGMAP) << "No registers in template" << templatePath << "for device" << device;

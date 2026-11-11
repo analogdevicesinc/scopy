@@ -35,6 +35,7 @@
 #include <component/controller.h>
 #include <component/context.h>
 #include <component/device.h>
+#include <component/backends/iio/iioregisterreader.h>
 #include <pkg-manager/pkgmanager.h>
 
 #include "ad936x/ad936x.h"
@@ -193,6 +194,9 @@ bool Ad936xPlugin::onDisconnect()
 }
 
 namespace {
+// the HDL core registers are read and written above this address
+constexpr uint32_t AXI_CORE_ADDRESS_SPACE = 0x80000000;
+
 QString findPackageFile(const QString &dir, const QString &fileName)
 {
 	const QFileInfoList files = PkgManager::listFilesInfo({dir}, {fileName});
@@ -212,21 +216,35 @@ QList<RegisterMapToolConfig> Ad936xPlugin::registerMapConfiguration(const QVaria
 
 QList<RegisterMapToolConfig> Ad936xPlugin::iioRegmapConfiguration()
 {
-	// ad9361-phy (and ad9361-phy-B on FMCOMMS5): the shipped template, IIO read/write
+	// Every AD936X device with register access: ad9361-phy* with this package's template and its options,
+	// the cf-ad9361-* HDL cores with regmap's shared core templates in the AXI address space
 	QList<RegisterMapToolConfig> configs;
 	component::ContextHandle ctx = component::Controller::context(m_param);
 	if(!ctx) {
 		return configs;
 	}
-	const QString templatePath = findPackageFile("regmap-xml", "ad9361-phy.xml");
+	const QString phyTemplate = findPackageFile("ad936x-regmap", "ad9361-phy.xml");
+	const QString adcCoreTemplate = findPackageFile("regmap-xml", "adi_regmap_adc_v10_axi.xml");
+	const QString dacCoreTemplate = findPackageFile("regmap-xml", "adi_regmap_dac_v9_axi.xml");
 	for(component::Device *dev : ctx->findChildren<component::Device *>(Qt::FindDirectChildrenOnly)) {
-		if(dev->name().startsWith("ad9361-phy")) {
-			RegisterMapToolConfig config;
-			config.target = dev->name();
-			config.templatePath = templatePath;
-			config.access = RegisterMapToolConfig::IIO;
-			configs.append(config);
+		if(!dev->findChild<component::iio::IIORegisterReader *>()) {
+			continue;
 		}
+		RegisterMapToolConfig config;
+		config.target = dev->name();
+		config.access = RegisterMapToolConfig::IIO;
+		if(dev->name().startsWith("ad9361-phy")) {
+			config.templatePath = phyTemplate;
+			config.useRegisterDescriptionAsName = true;
+			config.useBitFieldDescriptionAsName = true;
+		} else if(dev->name().startsWith("cf-ad9361-")) {
+			const bool isDac = dev->name().startsWith("cf-ad9361-dds-core");
+			config.templatePath = isDac ? dacCoreTemplate : adcCoreTemplate;
+			config.addressSpace = AXI_CORE_ADDRESS_SPACE;
+		} else {
+			continue;
+		}
+		configs.append(config);
 	}
 	return configs;
 }

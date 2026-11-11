@@ -1,11 +1,6 @@
 {
     "spi": [
         {
-            "file_name": "ad9361-phy.xml",
-            "use_register_description_as_name": true,
-            "use_bitfield_description_as_name": true
-        },
-        {
             "file_name": "adis16505-2.xml",
             "bits_per_row": 16
         }

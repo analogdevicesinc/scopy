@@ -109,8 +109,11 @@ private:
 			      IRegisterWriteStrategy *&write);
 	bool createIioStrategies(const QString &device, uint32_t addressSpace, IRegisterReadStrategy *&read,
 				 IRegisterWriteStrategy *&write);
+	// The swaps, when set, win over regmap-config.json
 	bool setupDevice(const QString &device, const QString &templatePath, int bitsPerRow,
-			 IRegisterReadStrategy *read, IRegisterWriteStrategy *write);
+			 IRegisterReadStrategy *read, IRegisterWriteStrategy *write,
+			 std::optional<bool> useRegisterDescriptionAsName = {},
+			 std::optional<bool> useBitFieldDescriptionAsName = {});
 };
 } // namespace regmap
 } // namespace scopy

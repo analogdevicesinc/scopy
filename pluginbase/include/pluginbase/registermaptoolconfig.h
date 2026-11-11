@@ -47,10 +47,12 @@ struct RegisterMapToolConfig
 	QString target;	      ///< the device name in the register map
 	QString templatePath; ///< register XML path, empty for no template
 	Access access = IIO;
-	QString filePath;		      ///< CSV path, used when access is File
-	std::optional<int> bitsPerRow;	      ///< empty: the value from regmap-config.json
-	std::optional<uint32_t> addressSpace; ///< empty: the value from regmap-config.json
-	QString provider;		      ///< name of the plugin that answered, filled in by the device
+	QString filePath;				  ///< CSV path, used when access is File
+	std::optional<int> bitsPerRow;			  ///< empty: the value from regmap-config.json
+	std::optional<uint32_t> addressSpace;		  ///< empty: the value from regmap-config.json
+	std::optional<bool> useRegisterDescriptionAsName; ///< empty: the value from regmap-config.json
+	std::optional<bool> useBitFieldDescriptionAsName; ///< empty: the value from regmap-config.json
+	QString provider;				  ///< name of the plugin that answered, filled in by the device
 
 	// Access as text, for JSON data ("iio", "file", "none")
 	static QString accessToString(Access access)

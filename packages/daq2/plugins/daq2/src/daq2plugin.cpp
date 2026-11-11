@@ -34,9 +34,46 @@
 #include <component/controller.h>
 #include <component/context.h>
 #include <component/device.h>
+#include <component/backends/iio/iioregisterreader.h>
+#include <pkg-manager/pkgmanager.h>
 
 Q_LOGGING_CATEGORY(CAT_DAQ2PLUGIN, "Daq2Plugin")
 using namespace scopy::daq2;
+
+namespace {
+QString findPackageFile(const QString &dir, const QString &fileName)
+{
+	const QFileInfoList files = scopy::PkgManager::listFilesInfo({dir}, {fileName});
+	if(files.isEmpty()) {
+		qWarning(CAT_DAQ2PLUGIN) << "File" << fileName << "not found in" << dir;
+		return "";
+	}
+	return files.first().absoluteFilePath();
+}
+} // namespace
+
+QList<scopy::RegisterMapToolConfig> Daq2Plugin::registerMapConfiguration(const QVariantMap &query)
+{
+	Q_UNUSED(query)
+	// device name -> this package's template: the converter registers are reached through the HDL device
+	const QMap<QString, QString> templates = {{"axi-ad9144-hpc", "ad9144.xml"}, {"axi-ad9680-hpc", "ad9680.xml"}};
+	QList<RegisterMapToolConfig> configs;
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx) {
+		return configs;
+	}
+	for(component::Device *dev : ctx->findChildren<component::Device *>(Qt::FindDirectChildrenOnly)) {
+		if(!templates.contains(dev->name()) || !dev->findChild<component::iio::IIORegisterReader *>()) {
+			continue;
+		}
+		RegisterMapToolConfig config;
+		config.target = dev->name();
+		config.templatePath = findPackageFile("daq2-regmap", templates.value(dev->name()));
+		config.access = RegisterMapToolConfig::IIO;
+		configs.append(config);
+	}
+	return configs;
+}
 
 bool Daq2Plugin::compatible(QString m_param, QString category)
 {

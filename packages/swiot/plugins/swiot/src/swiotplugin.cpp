@@ -33,6 +33,8 @@
 #include <component/attribute.h>
 #include <component/attributereader.h>
 #include <component/ping.h>
+#include <component/backends/iio/iioregisterreader.h>
+#include <pkg-manager/pkgmanager.h>
 
 #include <qcorotask.h>
 
@@ -376,6 +378,41 @@ void SWIOTPlugin::initApi()
 QString SWIOTPlugin::description() { return "Adds functionality specific to SWIOT1L board"; }
 
 QString SWIOTPlugin::pkgName() { return SWIOT_PKG_NAME; }
+
+namespace {
+QString findPackageFile(const QString &dir, const QString &fileName)
+{
+	const QFileInfoList files = scopy::PkgManager::listFilesInfo({dir}, {fileName});
+	if(files.isEmpty()) {
+		qWarning(CAT_SWIOT) << "File" << fileName << "not found in" << dir;
+		return "";
+	}
+	return files.first().absoluteFilePath();
+}
+} // namespace
+
+QList<scopy::RegisterMapToolConfig> SWIOTPlugin::registerMapConfiguration(const QVariantMap &query)
+{
+	Q_UNUSED(query)
+	// device name -> this package's template; the devices exist only in runtime mode
+	const QMap<QString, QString> templates = {{"ad74413r", "ad74413r.xml"}, {"max14906", "MAX14906.xml"}};
+	QList<RegisterMapToolConfig> configs;
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx) {
+		return configs;
+	}
+	for(component::Device *dev : ctx->findChildren<component::Device *>(Qt::FindDirectChildrenOnly)) {
+		if(!templates.contains(dev->name()) || !dev->findChild<component::iio::IIORegisterReader *>()) {
+			continue;
+		}
+		RegisterMapToolConfig config;
+		config.target = dev->name();
+		config.templatePath = findPackageFile("swiot-regmap", templates.value(dev->name()));
+		config.access = RegisterMapToolConfig::IIO;
+		configs.append(config);
+	}
+	return configs;
+}
 
 void SWIOTPlugin::initMetadata()
 {

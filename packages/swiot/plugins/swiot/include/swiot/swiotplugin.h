@@ -38,15 +38,17 @@
 #include <tutorialbuilder.h>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
+#include <pluginbase/registermaptoolconfig.h>
 
 namespace scopy::swiot {
 
 class SWIOT_API;
 
-class SCOPY_SWIOT_EXPORT SWIOTPlugin : public QObject, public PluginBase
+class SCOPY_SWIOT_EXPORT SWIOTPlugin : public QObject, public PluginBase, public IRegisterMapConfigProvider
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;
+	Q_INTERFACES(scopy::IRegisterMapConfigProvider)
 	friend class SWIOT_API;
 
 public:
@@ -60,6 +62,10 @@ public:
 	void initMetadata() override;
 	QString description() override;
 	QString pkgName() override;
+
+	// IRegisterMapConfigProvider: the AD74413R and MAX14906 templates of this package, runtime mode only.
+	// Uses only the parameter and the IIO context, never this plugin's onConnect.
+	QList<RegisterMapToolConfig> registerMapConfiguration(const QVariantMap &query = {}) override;
 
 public Q_SLOTS:
 	bool onConnect() override;

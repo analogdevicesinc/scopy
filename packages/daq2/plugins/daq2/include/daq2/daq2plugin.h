@@ -28,6 +28,7 @@
 #include <QObject>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
+#include <pluginbase/registermaptoolconfig.h>
 #include <component/controller.h>
 
 namespace scopy::daq2 {
@@ -40,10 +41,11 @@ class IIOWidgetGroup;
 
 namespace scopy::daq2 {
 
-class SCOPY_DAQ2_EXPORT Daq2Plugin : public QObject, public PluginBase
+class SCOPY_DAQ2_EXPORT Daq2Plugin : public QObject, public PluginBase, public IRegisterMapConfigProvider
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;
+	Q_INTERFACES(scopy::IRegisterMapConfigProvider)
 
 public:
 	bool compatible(QString m_param, QString category) override;
@@ -54,6 +56,10 @@ public:
 	void initMetadata() override;
 	QString description() override;
 	QString displayName() override;
+
+	// IRegisterMapConfigProvider: the AD9144 and AD9680 templates of this package for their HDL devices.
+	// Uses only the parameter and the IIO context, never this plugin's onConnect.
+	QList<RegisterMapToolConfig> registerMapConfiguration(const QVariantMap &query = {}) override;
 
 public Q_SLOTS:
 	bool onConnect() override;
