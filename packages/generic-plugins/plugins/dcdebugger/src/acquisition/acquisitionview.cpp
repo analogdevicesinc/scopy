@@ -321,7 +321,7 @@ void AcquisitionView::buildPlot()
 
 	m_table = new MeasurementsTable(this);
 	auto *splitter = new QSplitter(Qt::Vertical, this);
-	splitter->setChildrenCollapsible(false);
+	splitter->setChildrenCollapsible(true);
 	splitter->addWidget(m_plot);
 	splitter->addWidget(m_table);
 	splitter->setStretchFactor(0, 4);

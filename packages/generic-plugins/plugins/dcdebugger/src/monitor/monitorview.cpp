@@ -381,7 +381,7 @@ QWidget *MonitorView::buildChannelMenu(Entry &e)
 void MonitorView::buildPlots()
 {
 	auto *splitter = new QSplitter(Qt::Vertical, this);
-	splitter->setChildrenCollapsible(false);
+	splitter->setChildrenCollapsible(true);
 
 	auto *plotsArea = new QWidget(splitter);
 	auto *plotsLay = new QVBoxLayout(plotsArea);

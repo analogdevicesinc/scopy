@@ -31,6 +31,7 @@
 class QModelIndex;
 class QSortFilterProxyModel;
 class QStackedWidget;
+class QTimer;
 class QTreeView;
 
 namespace scopy {
@@ -43,11 +44,13 @@ class Connection;
 }
 
 namespace scopy::dcdebugger {
+class BottomPaneHost;
 class CommandLogView;
 class ComponentTreeModel;
 class NodePanel;
 
-// Tree of every component of the connection (left) + the control panel of the selected node (right).
+// Tree of every component of the connection (left) + the control panel of the selected node (right),
+// over a bottom bar of output panes (the command log; hidden until its tab is clicked).
 class SCOPY_DCDEBUGGER_EXPORT DCDebuggerTool : public QWidget
 {
 	Q_OBJECT
@@ -55,7 +58,12 @@ public:
 	explicit DCDebuggerTool(component::Connection *conn, QWidget *parent = nullptr);
 	~DCDebuggerTool() override;
 
+	static constexpr const char *LOG_PANE = "log";
+	// Throttle of the entry count shown on the "Log" tab.
+	static constexpr int LOG_TAB_UPDATE_MS = 250;
+
 	CommandLogView *commandLog() const { return m_log; }
+	BottomPaneHost *bottomPanes() const { return m_bottomPanes; }
 
 public Q_SLOTS:
 	void rebuild();
@@ -74,6 +82,7 @@ private:
 	void selectIndex(const QModelIndex &sourceIndex);
 	void readAttributes(const QList<QObject *> &objects);
 	void clearPanels();
+	void updateLogTab();
 	QString panelKey(const QModelIndex &sourceIndex) const;
 
 	QPointer<component::Connection> m_conn;
@@ -84,6 +93,8 @@ private:
 	QSortFilterProxyModel *m_proxy;
 	QStackedWidget *m_panels;
 	CommandLogView *m_log;
+	BottomPaneHost *m_bottomPanes;
+	QTimer *m_logTabTimer;
 	QWidget *m_emptyPanel;
 	QHash<QString, NodePanel *> m_panelCache;
 	bool m_bulkExpand = false;

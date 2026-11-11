@@ -1,0 +1,33 @@
+/* Bottom pane tabs: grey while their pane is closed, the primary colour while it is open. */
+QPushButton[&&property&&=true] {
+	min-height: &unit_2&;
+	max-height: &unit_2&;
+	padding-left: &padding_2&;
+	padding-right: &padding_2&;
+	border: none;
+	border-radius: &radius_1&;
+	background-color: &interactive_subtle_idle&;
+	color: &content_inverse&;
+	font-size: &font_size_0_5&;
+	font-weight: bold;
+}
+QPushButton[&&property&&=true]:hover {
+	background-color: &interactive_subtle_hover&;
+	color: &content_inverse&;
+}
+QPushButton[&&property&&=true]:pressed {
+	background-color: &interactive_subtle_pressed&;
+	color: &content_inverse&;
+}
+QPushButton[&&property&&=true]:checked {
+	background-color: &interactive_primary_idle&;
+	color: &content_inverse&;
+}
+QPushButton[&&property&&=true]:checked:hover {
+	background-color: &interactive_primary_hover&;
+	color: &content_inverse&;
+}
+QPushButton[&&property&&=true]:checked:pressed {
+	background-color: &interactive_primary_pressed&;
+	color: &content_inverse&;
+}

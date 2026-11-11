@@ -61,7 +61,7 @@ AttributesSection::AttributesSection(const QString &title, const QList<component
 	}
 
 	for(component::Attribute *attr : attributes) {
-		IIOWidget *w = IIOWidgetBuilder(section).attribute(attr).buildSingle();
+		IIOWidget *w = IIOWidgetBuilder(section).attribute(attr).manualReadWrite(true).buildSingle();
 		if(!w) {
 			continue;
 		}

@@ -22,15 +22,18 @@
 #include "nodepanel.h"
 #include "ping/pingview.h"
 
-#include <QCheckBox>
+#include <QAbstractButton>
 #include <QLabel>
+#include <QLineEdit>
 #include <QPushButton>
 #include <QSignalSpy>
-#include <QSpinBox>
 #include <QTabWidget>
 #include <QtTest>
 
+#include <algorithm>
 #include <component/ping.h>
+#include <menuonoffswitch.h>
+#include <menuspinbox.h>
 #include <qcoro/qcorotask.h>
 
 using namespace scopy;
@@ -61,8 +64,9 @@ public:
 
 struct Ui
 {
-	QCheckBox *monitoring;
-	QSpinBox *period;
+	MenuOnOffSwitch *monitoringSwitch;
+	QAbstractButton *monitoring; // its toggle
+	gui::MenuSpinbox *period;
 	QPushButton *pingNow;
 	QLabel *result;
 	QLabel *checkedAt;
@@ -71,18 +75,39 @@ struct Ui
 
 Ui ui(QWidget *view)
 {
-	Ui u{view->findChild<QCheckBox *>("pingMonitoring"), view->findChild<QSpinBox *>("pingPeriod"),
-	     view->findChild<QPushButton *>("pingNow"),	     view->findChild<QLabel *>("pingResult"),
-	     view->findChild<QLabel *>("pingCheckedAt"),     view->findChild<QLabel *>("pingLost")};
+	auto *sw = view->findChild<MenuOnOffSwitch *>("pingMonitoring");
+	Ui u{sw,
+	     sw ? sw->onOffswitch() : nullptr,
+	     view->findChild<gui::MenuSpinbox *>("pingPeriod"),
+	     view->findChild<QPushButton *>("pingNow"),
+	     view->findChild<QLabel *>("pingResult"),
+	     view->findChild<QLabel *>("pingCheckedAt"),
+	     view->findChild<QLabel *>("pingLost")};
 	return u;
 }
 
-void setPeriod(QSpinBox *spin, int ms)
+// The text field of the spinbox.
+QLineEdit *periodEdit(gui::MenuSpinbox *spin) { return spin->findChild<QLineEdit *>(); }
+
+// The +/- buttons of the (vertical) spinbox: "+" sits above "-". The view must be shown.
+QPushButton *periodButton(gui::MenuSpinbox *spin, bool plus)
 {
-	spin->setFocus();
-	spin->selectAll();
-	QTest::keyClicks(spin, QString::number(ms));
-	QTest::keyClick(spin, Qt::Key_Return);
+	QList<QPushButton *> buttons = spin->findChildren<QPushButton *>(QString(), Qt::FindDirectChildrenOnly);
+	if(buttons.size() != 2) {
+		return nullptr;
+	}
+	std::sort(buttons.begin(), buttons.end(), [](QPushButton *a, QPushButton *b) { return a->y() < b->y(); });
+	return plus ? buttons.first() : buttons.last();
+}
+
+// Types `ms` into the field (replacing it) and commits with Enter.
+void setPeriod(gui::MenuSpinbox *spin, int ms)
+{
+	QLineEdit *edit = periodEdit(spin);
+	edit->setFocus();
+	edit->selectAll();
+	QTest::keyClicks(edit, QString::number(ms));
+	QTest::keyClick(edit, Qt::Key_Return);
 }
 
 } // namespace
@@ -111,11 +136,12 @@ void TST_PingView::initialStopped()
 	const Ui u = ui(&v);
 	QVERIFY(u.monitoring && u.period && u.pingNow && u.result && u.checkedAt && u.lost);
 	QVERIFY(!u.monitoring->isChecked());
-	QCOMPARE(u.period->value(), component::Ping::DEFAULT_INTERVAL_MS);
+	QCOMPARE(u.period->value(), double(component::Ping::DEFAULT_INTERVAL_MS));
+	QCOMPARE(periodEdit(u.period)->text(), QStringLiteral("2000"));
 	QCOMPARE(u.result->text(), QStringLiteral("—"));
 	QCOMPARE(u.checkedAt->text(), QStringLiteral("—"));
 	QVERIFY(u.lost->isHidden());
-	QVERIFY(u.monitoring->toolTip().contains("disables automatic disconnect detection"));
+	QVERIFY(u.monitoringSwitch->toolTip().contains("disables automatic disconnect detection"));
 	// Opening the panel imposes nothing.
 	QVERIFY(!p.isMonitoring());
 	QCOMPARE(p.checks, 0);
@@ -128,7 +154,7 @@ void TST_PingView::initialStarted()
 	PingView v(&p);
 	const Ui u = ui(&v);
 	QVERIFY(u.monitoring->isChecked());
-	QCOMPARE(u.period->value(), 5000);
+	QCOMPARE(u.period->value(), 5000.0);
 	QVERIFY(p.isMonitoring());
 	QCOMPARE(p.intervalMs(), 5000);
 }
@@ -138,10 +164,20 @@ void TST_PingView::periodRange()
 	FakePing p;
 	PingView v(&p);
 	const Ui u = ui(&v);
-	QCOMPARE(u.period->minimum(), 100);
-	QCOMPARE(u.period->maximum(), 60000);
-	QCOMPARE(u.period->singleStep(), 100);
-	QCOMPARE(u.period->suffix(), QStringLiteral(" ms"));
+	QCOMPARE(u.period->min(), 100.0);
+	QCOMPARE(u.period->max(), 60000.0);
+	QCOMPARE(u.period->unit(), QStringLiteral("ms"));
+	auto *fixed = dynamic_cast<gui::IncrementStrategyFixed *>(u.period->incrementStrategy());
+	QVERIFY(fixed);
+	QCOMPARE(fixed->k(), 100.0);
+	// The one scale is ms itself: a step is 100 ms whatever the value.
+	QCOMPARE(fixed->increment(2000), 2100.0);
+	QCOMPARE(fixed->decrement(60000), 59900.0);
+	// Out of range values are clamped.
+	u.period->setValueSilent(10);
+	QCOMPARE(u.period->value(), 100.0);
+	u.period->setValueSilent(1e6);
+	QCOMPARE(u.period->value(), 60000.0);
 }
 
 void TST_PingView::externalChangesFollowed()
@@ -155,13 +191,18 @@ void TST_PingView::externalChangesFollowed()
 
 	p.stopMonitoring(); // e.g. another plugin pausing it during an acquisition
 	QVERIFY(!u.monitoring->isChecked());
+	QSignalSpy interval(&p, &component::Ping::intervalChanged);
+	QSignalSpy spin(u.period, &gui::MenuSpinbox::valueChanged);
 	p.setIntervalMs(700);
-	QCOMPARE(u.period->value(), 700);
+	QCOMPARE(u.period->value(), 700.0);
+	QCOMPARE(periodEdit(u.period)->text(), QStringLiteral("700"));
 	p.startMonitoring(1500);
 	QVERIFY(u.monitoring->isChecked());
-	QCOMPARE(u.period->value(), 1500);
+	QCOMPARE(u.period->value(), 1500.0);
 	// Following the Ping does not write back to it.
 	QCOMPARE(mon.count(), 2);
+	QCOMPARE(interval.count(), 2);
+	QCOMPARE(spin.count(), 0);
 	QCOMPARE(p.intervalMs(), 1500);
 }
 
@@ -193,9 +234,16 @@ void TST_PingView::spinboxDrivesInterval()
 	QVERIFY(!p.isMonitoring()); // stopped: only stored
 
 	p.startMonitoring(3000);
-	u.period->stepUp();
+	QPushButton *plus = periodButton(u.period, true);
+	QPushButton *minus = periodButton(u.period, false);
+	QVERIFY(plus && minus);
+	plus->click();
 	QCOMPARE(p.intervalMs(), 3100);
+	QCOMPARE(u.period->value(), 3100.0);
 	QVERIFY(p.isMonitoring());
+	minus->click();
+	minus->click();
+	QCOMPARE(p.intervalMs(), 2900);
 }
 
 void TST_PingView::typingDoesNotApply()
@@ -206,19 +254,25 @@ void TST_PingView::typingDoesNotApply()
 	QVERIFY(QTest::qWaitForWindowExposed(&v));
 	const Ui u = ui(&v);
 	QSignalSpy interval(&p, &component::Ping::intervalChanged);
-	u.period->setFocus();
-	u.period->selectAll();
-	QTest::keyClicks(u.period, "4500");
+	QLineEdit *edit = periodEdit(u.period);
+	QVERIFY(edit);
+	edit->setFocus();
+	edit->selectAll();
+	QTest::keyClicks(edit, "4500");
 	QCOMPARE(interval.count(), 0); // not while typing
 	QCOMPARE(p.intervalMs(), component::Ping::DEFAULT_INTERVAL_MS);
-	QTest::keyClick(u.period, Qt::Key_Return);
+	QTest::keyClick(edit, Qt::Key_Return);
 	QCOMPARE(interval.count(), 1);
 	QCOMPARE(p.intervalMs(), 4500);
 
-	// Out of range input is corrected to the nearest bound when committed.
+	// Out of range input is clamped to the nearest bound when committed.
 	setPeriod(u.period, 45);
 	QCOMPARE(p.intervalMs(), 100);
-	QCOMPARE(u.period->value(), 100);
+	QCOMPARE(u.period->value(), 100.0);
+	QCOMPARE(edit->text(), QStringLiteral("100"));
+	setPeriod(u.period, 90000);
+	QCOMPARE(p.intervalMs(), 60000);
+	QCOMPARE(u.period->value(), 60000.0);
 }
 
 void TST_PingView::pingNowShowsResult()
@@ -269,8 +323,9 @@ void TST_PingView::survivesPingDestruction()
 	QVERIFY(!u.period->isEnabled());
 	QVERIFY(!u.pingNow->isEnabled());
 	// The controls are inert now.
-	u.monitoring->setEnabled(true);
+	u.monitoringSwitch->setEnabled(true);
 	u.monitoring->click();
+	u.period->setEnabled(true);
 	u.period->setValue(900);
 	u.pingNow->setEnabled(true);
 	u.pingNow->click();

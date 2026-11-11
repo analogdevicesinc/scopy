@@ -25,8 +25,8 @@
 
 #include <QAbstractButton>
 #include <QAction>
-#include <QCheckBox>
 #include <QClipboard>
+#include <QFrame>
 #include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QHeaderView>
@@ -34,7 +34,6 @@
 #include <QLineEdit>
 #include <QMenu>
 #include <QPushButton>
-#include <QSignalBlocker>
 #include <QTreeView>
 #include <QVBoxLayout>
 
@@ -83,27 +82,45 @@ CommandLogView::CommandLogView(QWidget *parent)
 	m_model->setCollapseAfter(intPreference(COLLAPSE_PREF, DEFAULT_COLLAPSE_AFTER));
 	m_model->setErrorColor(QColor(Style::getAttribute(json::theme::content_error)));
 
+	// Instrument look, like the node panel above: one grey, rounded pane (basicComponent) holding
+	// the controls, the filter strip (a lighter shade, logFilterBar) and the table (a darker
+	// shade, logTable); the actions are primary buttons (basicButton).
 	auto *lay = new QVBoxLayout(this);
 	lay->setContentsMargins(0, 0, 0, 0);
-	m_tool = new ToolTemplate(this);
+	auto *pane = new QFrame(this);
+	Style::setStyle(pane, style::properties::widget::basicComponent);
+	auto *paneLay = new QVBoxLayout(pane);
+	paneLay->setContentsMargins(6, 6, 6, 6);
+	lay->addWidget(pane);
+	m_tool = new ToolTemplate(pane);
+	// ToolTemplate fills its plain containers (".QWidget") background_subtle; let the pane show.
+	Style::setBackgroundColor(m_tool, QStringLiteral("transparent"));
 	m_tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_tool->topContainer()->setVisible(true);
 	m_tool->centralContainer()->setVisible(true);
 	m_tool->topContainerMenuControl()->setVisible(false);
-	lay->addWidget(m_tool);
+	paneLay->addWidget(m_tool);
 
-	// Top: "Log commands" + status on the left, the actions on the right.
-	m_log = new QCheckBox("Log commands", this);
+	// Top left: "Log commands" over "Follow", then the status; the actions on the right.
+	m_log = new MenuOnOffSwitch("Log commands", this);
 	m_log->setToolTip("Record the library calls of every command of this connection");
 	m_log->setEnabled(false); // until a monitor is bound
+	m_follow = new MenuOnOffSwitch("Follow", this);
+	m_follow->onOffswitch()->setChecked(true);
+	m_follow->setToolTip("Scroll to the newest command");
+	auto *switches = new QWidget(this);
+	auto *switchLay = new QVBoxLayout(switches);
+	switchLay->setContentsMargins(0, 0, 0, 0);
+	switchLay->setSpacing(4);
+	// One column as wide as the wider switch: labels left-aligned, the toggles lined up.
+	switchLay->addWidget(m_log);
+	switchLay->addWidget(m_follow);
+	switches->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	m_status = new QLabel(this);
 	Style::setStyle(m_status, style::properties::label::subtle);
 	m_pauseBtn = new QPushButton("Pause", this);
 	m_pauseBtn->setCheckable(true);
 	m_pauseBtn->setToolTip("Freeze the table; recording continues");
-	m_follow = new MenuOnOffSwitch("Follow", this);
-	m_follow->onOffswitch()->setChecked(true);
-	m_follow->setToolTip("Scroll to the newest command");
 	m_clearBtn = new QPushButton("Clear", this);
 	m_clearBtn->setToolTip("Forget every recorded command");
 	m_exportBtn = new QPushButton("Export...", this);
@@ -112,12 +129,11 @@ CommandLogView::CommandLogView(QWidget *parent)
 	m_generateBtn->setEnabled(false);
 	m_generateBtn->setToolTip("Code generation from the log is not available yet");
 	for(QPushButton *b : {m_pauseBtn, m_clearBtn, m_exportBtn, m_generateBtn}) {
-		Style::setStyle(b, style::properties::dcdebugger::topButton);
+		Style::setStyle(b, style::properties::button::basicButton);
 		b->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	}
-	m_tool->addWidgetToTopContainerHelper(m_log, TTA_LEFT);
+	m_tool->addWidgetToTopContainerHelper(switches, TTA_LEFT);
 	m_tool->addWidgetToTopContainerHelper(m_status, TTA_LEFT);
-	m_tool->addWidgetToTopContainerHelper(m_follow, TTA_RIGHT);
 	m_tool->addWidgetToTopContainerHelper(m_pauseBtn, TTA_RIGHT);
 	m_tool->addWidgetToTopContainerHelper(m_clearBtn, TTA_RIGHT);
 	m_tool->addWidgetToTopContainerHelper(m_exportBtn, TTA_RIGHT);
@@ -143,8 +159,7 @@ CommandLogView::CommandLogView(QWidget *parent)
 	m_tree->setColumnWidth(CommandLogModel::OperationColumn, 220);
 	m_tree->setColumnWidth(CommandLogModel::ArgsColumn, 240);
 	m_tree->setColumnWidth(CommandLogModel::ValueColumn, 200);
-	Style::setStyle(m_tree, style::properties::dcdebugger::treeView);
-	Style::setStyle(m_tree->header(), style::properties::dcdebugger::headerView);
+	Style::setStyle(m_tree, style::properties::dcdebugger::logTable);
 	clay->addWidget(m_tree, 1);
 	m_tool->addWidgetToCentralContainerHelper(central);
 
@@ -159,9 +174,10 @@ CommandLogView::CommandLogView(QWidget *parent)
 	connect(m_copyAllAction, &QAction::triggered, this, &CommandLogView::copyVisibleRows);
 	connect(m_tree, &QWidget::customContextMenuRequested, this, &CommandLogView::showContextMenu);
 
-	connect(m_log, &QAbstractButton::toggled, this, [this](bool on) {
-		// User action: drive this connection's monitor (not persisted).
-		if(m_monitor) {
+	connect(m_log->onOffswitch(), &QAbstractButton::toggled, this, [this](bool on) {
+		// User action: drive this connection's monitor (not persisted). Not a signal blocker on
+		// the way back (onEnabledChanged): the switch animates its thumb from toggled.
+		if(m_monitor && m_monitor->isEnabled() != on) {
 			m_monitor->setEnabled(on);
 		}
 	});
@@ -190,14 +206,18 @@ CommandLogView::~CommandLogView() = default;
 
 QWidget *CommandLogView::buildFilters(QWidget *parent)
 {
-	auto *w = new QWidget(parent);
+	// A QFrame, not a plain QWidget: the ToolTemplate's ".QWidget" background does not reach it.
+	auto *w = new QFrame(parent);
+	Style::setStyle(w, style::properties::widget::basicComponent);
 	auto *lay = new QHBoxLayout(w);
-	lay->setContentsMargins(0, 0, 0, 0);
+	lay->setContentsMargins(4, 4, 4, 4);
 	lay->setSpacing(10);
 	m_component = filterEdit("Filter component", w, lay);
 	m_library = filterEdit("Filter library", w, lay);
 	m_function = filterEdit("Filter function", w, lay);
 	m_errorsOnly = new MenuOnOffSwitch("Errors only", w);
+	m_errorsOnly->setToolTip("Show only the commands with a failed call");
+	m_errorsOnly->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	lay->addWidget(m_errorsOnly);
 	for(QLineEdit *e : {m_component, m_library, m_function}) {
 		connect(e, &QLineEdit::textChanged, this, &CommandLogView::applyFilter);
@@ -233,6 +253,8 @@ component::CommandMonitor *CommandLogView::monitor() const { return m_monitor.da
 
 QString CommandLogView::statusText() const { return m_status->text(); }
 
+bool CommandLogView::isRecording() const { return m_recording; }
+
 void CommandLogView::applyFilter()
 {
 	CommandLogFilter f;
@@ -259,9 +281,12 @@ void CommandLogView::onRowClicked(const QModelIndex &index)
 void CommandLogView::onEnabledChanged(bool enabled)
 {
 	// Follows the monitor whoever turns it (script, disconnect).
-	QSignalBlocker block(m_log);
-	m_log->setChecked(enabled);
+	m_log->onOffswitch()->setChecked(enabled); // no echo: the toggled handler skips equal states
 	updateStatus();
+	if(m_recording != enabled) {
+		m_recording = enabled;
+		Q_EMIT recordingChanged(enabled);
+	}
 }
 
 void CommandLogView::onMonitorDestroyed()

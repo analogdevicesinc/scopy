@@ -1,0 +1,55 @@
+/* The command log table: framed like the component tree (treeView / headerView), on a darker
+   shade than the log pane around it, with a light grid between the cells. */
+QTreeView[&&property&&=true] {
+	border: &border_width& solid &interactive_subtle_disabled&;
+	border-radius: &radius_1&;
+	background-color: &background_subtle&;
+	show-decoration-selected: 1;
+	color: &content_default&;
+}
+
+QTreeView[&&property&&=true] QHeaderView {
+	background-color: &background_primary&;
+	border: none;
+}
+
+QTreeView[&&property&&=true] QHeaderView::section {
+	background-color: &background_primary&;
+	border: none;
+	border-right: 1px solid &interactive_subtle_disabled&;
+	border-bottom: 1px solid &content_subtle&;
+	padding-left: &padding_1&;
+	height: 26px;
+	color: &content_default&;
+	font-size: &font_size_0_5&;
+	font-weight: bold;
+}
+
+QTreeView[&&property&&=true]::item {
+	border-right: 1px solid &interactive_subtle_disabled&;
+	border-bottom: 1px solid &interactive_subtle_disabled&;
+	padding-left: &padding_1&;
+}
+
+QTreeView[&&property&&=true]::item:selected {
+	background-color: &interactive_primary_idle&;
+	color: &content_inverse&;
+}
+
+QTreeView[&&property&&=true]::branch {
+	border-bottom: 1px solid &interactive_subtle_disabled&;
+}
+
+QTreeView[&&property&&=true]::branch:selected {
+	background-color: &interactive_primary_idle&;
+}
+
+QTreeView[&&property&&=true]::branch:open:has-children:!has-siblings,
+QTreeView[&&property&&=true]::branch:open:has-children:has-siblings {
+	border-image: url(&svg_arrow_down&);
+}
+
+QTreeView[&&property&&=true]::branch:has-children:!has-siblings:closed,
+QTreeView[&&property&&=true]::branch:closed:has-children:has-siblings {
+	border-image: url(&svg_arrow_right&);
+}

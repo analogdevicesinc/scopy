@@ -1,0 +1,6 @@
+/* The filter row of the command log: a strip a shade lighter than the log pane. */
+QFrame[&&property&&=true] {
+	background-color: &interactive_subtle_disabled&;
+	border: none;
+	border-radius: &radius_1&;
+}

@@ -22,8 +22,10 @@
 #include "dcdebuggertool.h"
 
 #include "acquisition/streamacquisition.h"
+#include "bottompanehost.h"
 #include "generation/streamgeneration.h"
 #include "componenttreemodel.h"
+#include "log/commandlogmodel.h"
 #include "log/commandlogview.h"
 #include "nodepanel.h"
 
@@ -34,6 +36,7 @@
 #include <QSortFilterProxyModel>
 #include <QSplitter>
 #include <QStackedWidget>
+#include <QTimer>
 #include <QTreeView>
 #include <QVBoxLayout>
 
@@ -67,7 +70,7 @@ DCDebuggerTool::DCDebuggerTool(component::Connection *conn, QWidget *parent)
 	lay->addWidget(m_tool);
 
 	auto *splitter = new QSplitter(Qt::Horizontal, this);
-	splitter->setChildrenCollapsible(false);
+	splitter->setChildrenCollapsible(true);
 
 	auto *treeContainer = new QWidget(splitter);
 	Style::setBackgroundColor(treeContainer, json::theme::background_subtle);
@@ -89,26 +92,42 @@ DCDebuggerTool::DCDebuggerTool(component::Connection *conn, QWidget *parent)
 	splitter->setStretchFactor(0, 3);
 	splitter->setStretchFactor(1, 2);
 
-	// Bottom: the command log of this connection.
-	auto *vsplitter = new QSplitter(Qt::Vertical, this);
-	m_log = new CommandLogView(vsplitter);
+	// Bottom: the output panes; for now the command log of this connection.
+	m_bottomPanes = new BottomPaneHost(splitter, this);
+	m_log = new CommandLogView();
 	if(m_conn) {
 		m_log->setUri(m_conn->uri());
 		// Every view (context) of the connection shares this one monitor.
 		m_log->setMonitor(component::CommandMonitor::of(m_conn));
 	}
 	connect(m_log, &CommandLogView::nodeRequested, this, &DCDebuggerTool::selectOrigin);
-	vsplitter->addWidget(splitter);
-	vsplitter->addWidget(m_log);
-	vsplitter->setChildrenCollapsible(false);
-	vsplitter->setStretchFactor(0, 3);
-	vsplitter->setStretchFactor(1, 1);
-	m_tool->addWidgetToCentralContainerHelper(vsplitter);
+	m_bottomPanes->addPane(LOG_PANE, "Log", m_log);
+	m_tool->addWidgetToCentralContainerHelper(m_bottomPanes);
+
+	// The tab shows recording (at once) and the entry count (throttled), also while hidden.
+	m_logTabTimer = new QTimer(this);
+	m_logTabTimer->setSingleShot(true);
+	m_logTabTimer->setInterval(LOG_TAB_UPDATE_MS);
+	connect(m_logTabTimer, &QTimer::timeout, this, &DCDebuggerTool::updateLogTab);
+	connect(m_log->model(), &CommandLogModel::entryCountChanged, this, [this]() {
+		if(!m_logTabTimer->isActive()) {
+			m_logTabTimer->start();
+		}
+	});
+	connect(m_log, &CommandLogView::recordingChanged, this, &DCDebuggerTool::updateLogTab);
+	updateLogTab();
 
 	m_model->setConnection(m_conn);
 }
 
-DCDebuggerTool::~DCDebuggerTool() { clear(); }
+DCDebuggerTool::~DCDebuggerTool()
+{
+	// The log goes away with the children, after this object's own members.
+	m_logTabTimer->stop();
+	disconnect(m_log, nullptr, this, nullptr);
+	disconnect(m_log->model(), nullptr, this, nullptr);
+	clear();
+}
 
 void DCDebuggerTool::buildTree(QWidget *parent)
 {
@@ -177,6 +196,13 @@ void DCDebuggerTool::clearPanels()
 		delete p;
 	}
 	m_panelCache.clear();
+}
+
+void DCDebuggerTool::updateLogTab()
+{
+	const int count = m_log->model()->entryCount();
+	m_bottomPanes->setPaneBadge(LOG_PANE, count > 0 ? QString::number(count) : QString());
+	m_bottomPanes->setPaneIndicator(LOG_PANE, m_log->isRecording(), "Recording commands");
 }
 
 void DCDebuggerTool::expandDefault()

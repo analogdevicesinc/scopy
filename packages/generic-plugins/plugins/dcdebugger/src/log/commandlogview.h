@@ -29,7 +29,6 @@
 #include <QWidget>
 
 class QAction;
-class QCheckBox;
 class QLabel;
 class QLineEdit;
 class QModelIndex;
@@ -49,7 +48,7 @@ namespace scopy::dcdebugger {
 class CommandLogModel;
 
 // Command log of the debugger: the library calls every command of one connection issued (its
-// CommandMonitor), with the "Log commands" checkbox (drives that monitor's setEnabled both ways;
+// CommandMonitor), with the "Log commands" switch (drives that monitor's setEnabled both ways;
 // per connection, not persisted), pause, clear, filters, follow tail and CSV export. A click on a
 // row asks for the node that issued the command. The rows outlive the monitor (disconnect).
 // Ctrl+C / context menu copy the selected rows (or all visible ones) as tab-separated text.
@@ -68,7 +67,7 @@ public:
 	explicit CommandLogView(QWidget *parent = nullptr);
 	~CommandLogView() override;
 
-	// Binds the log and the checkbox to one connection's monitor (nullptr: unbound, checkbox
+	// Binds the log and the switch to one connection's monitor (nullptr: unbound, switch
 	// disabled). Dropped automatically when the monitor is destroyed; the rows are kept.
 	void setMonitor(component::CommandMonitor *monitor);
 	component::CommandMonitor *monitor() const;
@@ -78,10 +77,13 @@ public:
 
 	CommandLogModel *model() const { return m_model; }
 	QTreeView *tree() const { return m_tree; }
-	QCheckBox *logCheckBox() const { return m_log; }
+	// "Log commands": its onOffswitch() is checked while the monitor records.
+	MenuOnOffSwitch *logSwitch() const { return m_log; }
 	QPushButton *pauseButton() const { return m_pauseBtn; }
 	QString statusText() const;
 	QAction *copyAction() const { return m_copyAction; }
+	// The bound monitor records (follows its enabledChanged and destruction).
+	bool isRecording() const;
 
 	// Tab-separated lines of the selected (resp. all) rows the table shows: filtered, and children
 	// only under expanded rows. Empty when there is nothing to copy.
@@ -94,6 +96,8 @@ public:
 Q_SIGNALS:
 	// The node that issued the clicked row (origin path, backend id, node identity).
 	void nodeRequested(const QString &origin, const QString &backendId, quintptr object);
+	// isRecording() changed: the monitor was turned, bound, unbound or destroyed.
+	void recordingChanged(bool recording);
 
 private:
 	QWidget *buildFilters(QWidget *parent);
@@ -111,7 +115,7 @@ private:
 	ToolTemplate *m_tool;
 	QLabel *m_status;
 	QPointer<component::CommandMonitor> m_monitor;
-	QCheckBox *m_log;
+	MenuOnOffSwitch *m_log;
 	QPushButton *m_pauseBtn;
 	MenuOnOffSwitch *m_follow;
 	QPushButton *m_clearBtn;
@@ -124,6 +128,7 @@ private:
 	QTreeView *m_tree;
 	QAction *m_copyAction;
 	QAction *m_copyAllAction;
+	bool m_recording = false;
 };
 
 } // namespace scopy::dcdebugger

@@ -27,14 +27,18 @@
 #include <QPointer>
 #include <QWidget>
 
-class QCheckBox;
 class QLabel;
 class QPushButton;
-class QSpinBox;
 
-namespace scopy::component {
+namespace scopy {
+class MenuOnOffSwitch;
+namespace gui {
+class MenuSpinbox;
+}
+namespace component {
 class Ping;
 }
+} // namespace scopy
 
 namespace scopy::dcdebugger {
 
@@ -66,8 +70,8 @@ private:
 	void updateStatus();
 
 	QPointer<component::Ping> m_ping;
-	QCheckBox *m_monitoring;
-	QSpinBox *m_period;
+	MenuOnOffSwitch *m_monitoring;
+	gui::MenuSpinbox *m_period; // in ms
 	QPushButton *m_pingNowBtn;
 	QLabel *m_result;
 	QLabel *m_checkedAt;

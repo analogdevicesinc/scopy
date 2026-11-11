@@ -1,0 +1,4 @@
+*[&&property&&=true] {
+	background-color: &background_subtle&;
+	border-top: &border_width& solid &interactive_subtle_disabled&;
+}

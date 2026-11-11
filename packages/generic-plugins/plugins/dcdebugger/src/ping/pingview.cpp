@@ -21,16 +21,17 @@
 
 #include "pingview.h"
 
-#include <QCheckBox>
+#include <QAbstractButton>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
-#include <QSignalBlocker>
-#include <QSpinBox>
 #include <QVBoxLayout>
 
+#include <cmath>
 #include <component/ping.h>
+#include <menuonoffswitch.h>
 #include <menusectionwidget.h>
+#include <menuspinbox.h>
 #include <qcoro/qcorotask.h>
 #include <style.h>
 
@@ -107,15 +108,19 @@ PingView::PingView(component::Ping *ping, QWidget *parent)
 		connect(m_ping, &QObject::destroyed, this, &PingView::refresh, Qt::QueuedConnection);
 	}
 
-	connect(m_monitoring, &QCheckBox::toggled, this, [this](bool on) {
-		if(m_ping) {
+	// Both follow the Ping without signal blockers (the switch animates from toggled): a change
+	// is only written back when it differs from the Ping, so following it never echoes.
+	connect(m_monitoring->onOffswitch(), &QAbstractButton::toggled, this, [this](bool on) {
+		if(m_ping && m_ping->isMonitoring() != on) {
 			m_ping->setMonitoring(on);
 		}
 		updateControls(); // the Ping may refuse or clamp: show what it did
 	});
-	// keyboardTracking is off: applied on Enter / focus out / arrows, not on every keystroke.
-	connect(m_period, &QSpinBox::valueChanged, this, [this](int ms) {
-		if(m_ping) {
+	// MenuSpinbox commits on Enter / focus out / its +- buttons, not on every keystroke, and
+	// clamps to its range.
+	connect(m_period, &gui::MenuSpinbox::valueChanged, this, [this](double value) {
+		const int ms = int(std::lround(value));
+		if(m_ping && m_ping->intervalMs() != ms) {
 			m_ping->setIntervalMs(ms);
 		}
 		updateControls();
@@ -133,26 +138,31 @@ QWidget *PingView::buildControlSection(QWidget *parent)
 	lay->addWidget(sectionTitle("Control", section));
 
 	QHBoxLayout *monRow = row(section, lay, QString(), nullptr);
-	m_monitoring = onSection(new QCheckBox("Monitoring", section));
+	m_monitoring = onSection(new MenuOnOffSwitch("Monitoring", section));
 	m_monitoring->setObjectName("pingMonitoring");
 	m_monitoring->setToolTip(MONITORING_HINT);
+	m_monitoring->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	auto *hint = onSection(new QLabel(MONITORING_HINT, section));
 	hint->setObjectName("pingHint");
 	Style::setStyle(hint, style::properties::label::subtle);
 	monRow->addWidget(m_monitoring);
 	monRow->addWidget(hint, 1);
 
-	QHBoxLayout *periodRow = row(section, lay, "Period", nullptr);
-	m_period = new QSpinBox(section);
+	// Like the monitor's period, but in ms with a fixed step: one "ms" scale (factor 1), so the
+	// value is the interval itself and the +- buttons move it by PERIOD_STEP_MS.
+	m_period = onSection(new gui::MenuSpinbox("Period", component::Ping::DEFAULT_INTERVAL_MS, "ms", MIN_PERIOD_MS,
+						  MAX_PERIOD_MS, true, false, false, section));
 	m_period->setObjectName("pingPeriod");
-	m_period->setRange(MIN_PERIOD_MS, MAX_PERIOD_MS);
-	m_period->setSingleStep(PERIOD_STEP_MS);
-	m_period->setSuffix(" ms");
-	m_period->setKeyboardTracking(false);
-	m_period->setCorrectionMode(QAbstractSpinBox::CorrectToNearestValue);
-	m_period->setToolTip("Period of the reachability check while monitoring");
-	periodRow->addWidget(m_period);
-	periodRow->addStretch();
+	m_period->setScaleList(QList<gui::UnitPrefix>{{QString(), 1.0}});
+	m_period->setScaleRange(1, 1); // setScaleList keeps the scales inside [min, max]: none here
+	m_period->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
+	if(auto *fixed = dynamic_cast<gui::IncrementStrategyFixed *>(m_period->incrementStrategy())) {
+		fixed->setK(PERIOD_STEP_MS);
+	}
+	m_period->setValueSilent(m_ping ? m_ping->intervalMs() : component::Ping::DEFAULT_INTERVAL_MS);
+	// Its own tooltip shows the value; the explanation goes on the info icon.
+	m_period->setInfoMessage("Period of the reachability check while monitoring");
+	lay->addWidget(m_period);
 
 	QHBoxLayout *btnRow = row(section, lay, QString(), nullptr);
 	m_pingNowBtn = new QPushButton("Ping now", section);
@@ -206,11 +216,9 @@ void PingView::updateControls()
 	if(!alive) {
 		return;
 	}
-	const QSignalBlocker b1(m_monitoring);
-	m_monitoring->setChecked(m_ping->isMonitoring());
-	if(m_period->value() != m_ping->intervalMs()) {
-		const QSignalBlocker b2(m_period);
-		m_period->setValue(m_ping->intervalMs());
+	m_monitoring->onOffswitch()->setChecked(m_ping->isMonitoring()); // no echo: see the toggled handler
+	if(int(std::lround(m_period->value())) != m_ping->intervalMs()) {
+		m_period->setValueSilent(m_ping->intervalMs());
 	}
 }
 
