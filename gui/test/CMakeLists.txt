@@ -26,4 +26,4 @@ cmake_minimum_required(VERSION 3.16)
 include(ScopyTest)
 
 # tst_test1.cpp is deliberately not listed: it is a license header with no test in it.
-setup_scopy_tests(waterfalldata)
+setup_scopy_tests(waterfalldata rangepresetscaler)

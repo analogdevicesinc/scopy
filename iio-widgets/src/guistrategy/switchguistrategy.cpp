@@ -38,6 +38,10 @@ SwitchAttrUi::SwitchAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidge
 	Q_EMIT requestData();
 
 	connect(m_menuBigSwitch, &QPushButton::clicked, this, [this]() {
+		if(m_optionsList->size() < 2) {
+			qWarning(CAT_SWITCHGUISTRATEGY) << "Clicked before any options arrived, ignoring";
+			return;
+		}
 		QString currentSelection = (m_menuBigSwitch->isChecked()) ? m_optionsList->at(0) : m_optionsList->at(1);
 		Q_EMIT emitData(currentSelection);
 	});
@@ -47,9 +51,16 @@ SwitchAttrUi::~SwitchAttrUi() { delete m_optionsList; }
 
 QWidget *SwitchAttrUi::ui() { return m_ui; }
 
+void SwitchAttrUi::setCustomTitle(QString title) { Q_UNUSED(title) }
+
+void SwitchAttrUi::setInfoMessage(QString infoMessage) { m_menuBigSwitch->setToolTip(infoMessage); }
+
 bool SwitchAttrUi::isValid()
 {
 	if(m_recipe.channel != nullptr && m_recipe.data != "" && m_recipe.iioDataOptions != "") {
+		return true;
+	}
+	if(m_recipe.attribute != nullptr && m_recipe.data != "" && m_recipe.constDataOptions != "") {
 		return true;
 	}
 	return false;
@@ -69,11 +80,8 @@ void SwitchAttrUi::receiveData(QString currentData, QString optionalData)
 	*m_optionsList = optionsList;
 	m_menuBigSwitch->setOnText(optionsList[0]);
 	m_menuBigSwitch->setOffText(optionsList[1]);
-	if(optionsList[0] == QString(currentData)) {
-		m_menuBigSwitch->setChecked(true);
-	} else {
-		m_menuBigSwitch->setChecked(false);
-	}
+	m_menuBigSwitch->setChecked(optionsList[0] == QString(currentData));
+	m_menuBigSwitch->update();
 
 	Q_EMIT displayedNewData(currentData, optionalData);
 }

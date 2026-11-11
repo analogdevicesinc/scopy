@@ -36,7 +36,7 @@ int CmdLineHandler::handle(QCommandLineParser &parser, ScopyMainWindow_API &scop
 	QString param = parser.value("connect");
 	if(!param.isEmpty()) {
 		QString deviceID = "";
-		deviceID = scopyApi.addDevice("", param);
+		deviceID = scopyApi.addDevice(param);
 		scopyApi.connectDevice(deviceID);
 		QString tool = parser.value("tool");
 		if(!tool.isEmpty()) {

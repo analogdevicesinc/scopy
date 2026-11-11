@@ -29,6 +29,7 @@
 #include <QButtonGroup>
 #include <QComboBox>
 #include <QStackedWidget>
+#include <QPointer>
 
 namespace scopy {
 class SCOPY_CORE_EXPORT WhatsNewOverlay : public QWidget
@@ -49,7 +50,7 @@ private:
 
 	QStackedWidget *m_carouselWidget;
 	QComboBox *m_versionCb;
-	gui::TintedOverlay *m_tintedOverlay;
+	QPointer<gui::TintedOverlay> m_tintedOverlay;
 };
 } // namespace scopy
 #endif // WHATSNEWOVERLAY_H
