@@ -106,6 +106,13 @@ public:
 	static QStringList csvColumns();
 	QString toCsv() const;
 
+	// The entries behind `rows`, oldest first: a top row gives every entry it shows, a folded
+	// row's child its entry, a call row (child of a multi-call command) that call only (several
+	// call rows of one command: those calls, in order; the command row too: the whole command).
+	QList<CommandLogEntry> entriesFor(const QModelIndexList &rows) const;
+	// The entries behind every row (filtered; frozen while paused), oldest first.
+	QList<CommandLogEntry> visibleEntries() const;
+
 	// A row as shown, one text per column (folded: "×N" and min / avg / max); empty if invalid.
 	QStringList rowFields(const QModelIndex &index) const;
 	// One tab-separated line of rowFields() per row, in display order (any column of a row counts once).

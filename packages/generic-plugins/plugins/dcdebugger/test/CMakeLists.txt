@@ -32,6 +32,7 @@ set(DCDEBUGGER_TESTS
     commandlog
     pingview
     bottompanes
+    codegenerator
 )
 setup_scopy_tests(${DCDEBUGGER_TESTS})
 foreach(t ${DCDEBUGGER_TESTS})

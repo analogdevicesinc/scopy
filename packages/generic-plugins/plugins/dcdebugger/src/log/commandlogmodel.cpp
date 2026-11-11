@@ -22,6 +22,8 @@
 #include "commandlogmodel.h"
 
 #include <QDateTime>
+#include <QMap>
+#include <QSet>
 
 #include <algorithm>
 #include <limits>
@@ -215,6 +217,76 @@ QString CommandLogModel::toCsv() const
 		}
 	}
 	return csv;
+}
+
+QList<CommandLogEntry> CommandLogModel::entriesFor(const QModelIndexList &rows) const
+{
+	QMap<qint64, QList<int>> picked; // seq → selected call indexes (empty: the whole entry)
+	QSet<qint64> whole;
+	for(const QModelIndex &i : rows) {
+		if(!i.isValid() || i.model() != this) {
+			continue;
+		}
+		if(i.internalId() == 0) {
+			if(i.row() < m_rows.size()) {
+				for(qint64 seq : m_rows[i.row()].seqs) {
+					whole.insert(seq);
+					picked[seq];
+				}
+			}
+			continue;
+		}
+		const Row *p = rowById(i.internalId());
+		if(!p) {
+			continue;
+		}
+		if(p->folded) {
+			if(i.row() < p->seqs.size()) {
+				whole.insert(p->seqs[i.row()]);
+				picked[p->seqs[i.row()]];
+			}
+			continue;
+		}
+		QList<int> &calls = picked[p->seqs.first()];
+		if(!calls.contains(i.row())) {
+			calls.append(i.row());
+		}
+	}
+	QList<CommandLogEntry> out;
+	for(auto it = picked.cbegin(); it != picked.cend(); ++it) {
+		const CommandLogEntry *e = entryBySeq(it.key());
+		if(!e) {
+			continue;
+		}
+		if(whole.contains(it.key())) {
+			out.append(*e);
+			continue;
+		}
+		CommandLogEntry part = *e;
+		QList<int> idx = it.value();
+		std::sort(idx.begin(), idx.end());
+		part.calls.clear();
+		for(int c : std::as_const(idx)) {
+			if(c < e->calls.size()) {
+				part.calls.append(e->calls[c]);
+			}
+		}
+		out.append(part);
+	}
+	return out;
+}
+
+QList<CommandLogEntry> CommandLogModel::visibleEntries() const
+{
+	QList<CommandLogEntry> out;
+	for(const Row &r : m_rows) {
+		for(qint64 seq : r.seqs) {
+			if(const CommandLogEntry *e = entryBySeq(seq)) {
+				out.append(*e);
+			}
+		}
+	}
+	return out;
 }
 
 QStringList CommandLogModel::rowFields(const QModelIndex &index) const

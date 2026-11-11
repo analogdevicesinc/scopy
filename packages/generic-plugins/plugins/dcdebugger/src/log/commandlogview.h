@@ -24,11 +24,17 @@
 
 #include "scopy-dcdebugger_export.h"
 
+#include <QList>
+#include <QModelIndexList>
 #include <QPointer>
 #include <QString>
 #include <QWidget>
 
+#include <core/callrecord.h>
+
 class QAction;
+class QSplitter;
+class QTimer;
 class QLabel;
 class QLineEdit;
 class QModelIndex;
@@ -45,6 +51,7 @@ class CommandMonitor;
 }
 
 namespace scopy::dcdebugger {
+class CodeGeneratorPanel;
 class CommandLogModel;
 
 // Command log of the debugger: the library calls every command of one connection issued (its
@@ -52,6 +59,8 @@ class CommandLogModel;
 // per connection, not persisted), pause, clear, filters, follow tail and CSV export. A click on a
 // row asks for the node that issued the command. The rows outlive the monitor (disconnect).
 // Ctrl+C / context menu copy the selected rows (or all visible ones) as tab-separated text.
+// "Generate code..." (toolbar toggle, context menu) opens a side panel with the script of the
+// selected rows (none selected: every visible row); it follows the selection and the log.
 class SCOPY_DCDEBUGGER_EXPORT CommandLogView : public QWidget
 {
 	Q_OBJECT
@@ -93,6 +102,17 @@ public:
 	void copySelectedRows();
 	void copyVisibleRows();
 
+	// Code generation: the panel, its toggle and context menu action; what it generates from
+	// (the entries of the selected rows shown, or of every visible row when none is selected).
+	CodeGeneratorPanel *codeGenerator() const { return m_codegen; }
+	QPushButton *generateButton() const { return m_generateBtn; }
+	QAction *generateAction() const { return m_generateAction; }
+	QList<CommandLogEntry> generationEntries() const;
+	bool isCodeGeneratorShown() const;
+	void showCodeGenerator(bool show = true);
+	// Feeds the panel now (it otherwise follows the log with a short delay).
+	void refreshCodeGenerator();
+
 Q_SIGNALS:
 	// The node that issued the clicked row (origin path, backend id, node identity).
 	void nodeRequested(const QString &origin, const QString &backendId, quintptr object);
@@ -110,6 +130,8 @@ private:
 	bool isShown(const QModelIndex &index) const;
 	void copyText(const QString &text);
 	void updateStatus();
+	QModelIndexList shownSelectedRows() const;
+	void scheduleCodeGenerator();
 
 	CommandLogModel *m_model;
 	ToolTemplate *m_tool;
@@ -128,6 +150,10 @@ private:
 	QTreeView *m_tree;
 	QAction *m_copyAction;
 	QAction *m_copyAllAction;
+	QAction *m_generateAction;
+	QSplitter *m_split;
+	CodeGeneratorPanel *m_codegen;
+	QTimer *m_codegenTimer;
 	bool m_recording = false;
 };
 

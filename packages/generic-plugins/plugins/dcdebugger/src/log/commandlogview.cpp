@@ -21,6 +21,7 @@
 
 #include "commandlogview.h"
 
+#include "codegeneratorpanel.h"
 #include "commandlogmodel.h"
 
 #include <QAbstractButton>
@@ -30,10 +31,13 @@
 #include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QHeaderView>
+#include <QItemSelectionModel>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMenu>
 #include <QPushButton>
+#include <QSplitter>
+#include <QTimer>
 #include <QTreeView>
 #include <QVBoxLayout>
 
@@ -126,8 +130,8 @@ CommandLogView::CommandLogView(QWidget *parent)
 	m_exportBtn = new QPushButton("Export...", this);
 	m_exportBtn->setToolTip("Save the filtered calls as CSV");
 	m_generateBtn = new QPushButton("Generate code...", this);
-	m_generateBtn->setEnabled(false);
-	m_generateBtn->setToolTip("Code generation from the log is not available yet");
+	m_generateBtn->setCheckable(true);
+	m_generateBtn->setToolTip("Show the script repeating the selected rows (none selected: every visible row)");
 	for(QPushButton *b : {m_pauseBtn, m_clearBtn, m_exportBtn, m_generateBtn}) {
 		Style::setStyle(b, style::properties::button::basicButton);
 		b->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -160,7 +164,18 @@ CommandLogView::CommandLogView(QWidget *parent)
 	m_tree->setColumnWidth(CommandLogModel::ArgsColumn, 240);
 	m_tree->setColumnWidth(CommandLogModel::ValueColumn, 200);
 	Style::setStyle(m_tree, style::properties::dcdebugger::logTable);
-	clay->addWidget(m_tree, 1);
+	// The code generator sits right of the table, hidden until asked for.
+	// Like every splitter of the debugger, both sides collapse: a panel dragged fully closed is
+	// hidden (its toggle unchecked).
+	m_split = new QSplitter(Qt::Horizontal, central);
+	m_split->addWidget(m_tree);
+	m_codegen = new CodeGeneratorPanel(m_split);
+	m_codegen->setMinimumWidth(360);
+	m_codegen->setVisible(false);
+	m_split->addWidget(m_codegen);
+	m_split->setStretchFactor(0, 3);
+	m_split->setStretchFactor(1, 2);
+	clay->addWidget(m_split, 1);
 	m_tool->addWidgetToCentralContainerHelper(central);
 
 	// Copy: Ctrl+C while the table has focus, and the context menu.
@@ -169,10 +184,36 @@ CommandLogView::CommandLogView(QWidget *parent)
 	m_copyAction->setShortcutContext(Qt::WidgetShortcut);
 	m_tree->addAction(m_copyAction);
 	m_copyAllAction = new QAction("Copy all visible", m_tree);
+	m_generateAction = new QAction("Generate code...", m_tree);
 	m_tree->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(m_copyAction, &QAction::triggered, this, &CommandLogView::copySelectedRows);
 	connect(m_copyAllAction, &QAction::triggered, this, &CommandLogView::copyVisibleRows);
 	connect(m_tree, &QWidget::customContextMenuRequested, this, &CommandLogView::showContextMenu);
+
+	// Code generation follows the selection at once and the log (appends, filters) with a delay.
+	m_codegenTimer = new QTimer(this);
+	m_codegenTimer->setSingleShot(true);
+	m_codegenTimer->setInterval(400);
+	connect(m_codegenTimer, &QTimer::timeout, this, &CommandLogView::refreshCodeGenerator);
+	connect(m_generateBtn, &QPushButton::toggled, this, [this](bool on) { showCodeGenerator(on); });
+	connect(m_split, &QSplitter::splitterMoved, this, [this] {
+		if(isCodeGeneratorShown() && m_split->sizes().value(1) == 0) {
+			showCodeGenerator(false);
+		}
+	});
+	connect(m_generateAction, &QAction::triggered, this, [this] { showCodeGenerator(true); });
+	connect(m_tree->selectionModel(), &QItemSelectionModel::selectionChanged, this, [this] {
+		if(isCodeGeneratorShown()) {
+			refreshCodeGenerator();
+		}
+	});
+	connect(m_tree, &QTreeView::expanded, this, &CommandLogView::scheduleCodeGenerator);
+	connect(m_tree, &QTreeView::collapsed, this, &CommandLogView::scheduleCodeGenerator);
+	for(auto sig : {&QAbstractItemModel::rowsInserted, &QAbstractItemModel::rowsRemoved}) {
+		connect(m_model, sig, this, &CommandLogView::scheduleCodeGenerator);
+	}
+	connect(m_model, &QAbstractItemModel::modelReset, this, &CommandLogView::scheduleCodeGenerator);
+	connect(m_model, &QAbstractItemModel::dataChanged, this, &CommandLogView::scheduleCodeGenerator);
 
 	connect(m_log->onOffswitch(), &QAbstractButton::toggled, this, [this](bool on) {
 		// User action: drive this connection's monitor (not persisted). Not a signal blocker on
@@ -312,7 +353,7 @@ bool CommandLogView::isShown(const QModelIndex &index) const
 	return !parent.isValid() || m_tree->isExpanded(parent);
 }
 
-QString CommandLogView::selectedRowsText() const
+QModelIndexList CommandLogView::shownSelectedRows() const
 {
 	QModelIndexList rows;
 	for(const QModelIndex &i : m_tree->selectionModel()->selectedRows()) {
@@ -320,7 +361,59 @@ QString CommandLogView::selectedRowsText() const
 			rows.append(i);
 		}
 	}
-	return m_model->rowsText(rows);
+	return rows;
+}
+
+QString CommandLogView::selectedRowsText() const { return m_model->rowsText(shownSelectedRows()); }
+
+QList<CommandLogEntry> CommandLogView::generationEntries() const
+{
+	const QModelIndexList rows = shownSelectedRows();
+	return rows.isEmpty() ? m_model->visibleEntries() : m_model->entriesFor(rows);
+}
+
+bool CommandLogView::isCodeGeneratorShown() const { return !m_codegen->isHidden(); }
+
+void CommandLogView::showCodeGenerator(bool show)
+{
+	if(m_generateBtn->isChecked() != show) {
+		m_generateBtn->setChecked(show); // toggled → back here
+		return;
+	}
+	m_codegen->setVisible(show);
+	if(show) {
+		// Reopened after being dragged closed: give it its share back.
+		const QList<int> sizes = m_split->sizes();
+		if(sizes.size() == 2 && sizes[1] == 0 && sizes[0] > 0) {
+			m_split->setSizes({sizes[0] * 3 / 5, sizes[0] * 2 / 5});
+		}
+		refreshCodeGenerator();
+	} else {
+		m_codegenTimer->stop();
+	}
+}
+
+void CommandLogView::scheduleCodeGenerator()
+{
+	if(isCodeGeneratorShown() && !m_codegenTimer->isActive()) {
+		m_codegenTimer->start();
+	}
+}
+
+void CommandLogView::refreshCodeGenerator()
+{
+	m_codegenTimer->stop();
+	const QModelIndexList rows = shownSelectedRows();
+	const QList<CommandLogEntry> entries = rows.isEmpty() ? m_model->visibleEntries() : m_model->entriesFor(rows);
+	QString scope;
+	if(entries.isEmpty()) {
+		scope = QStringLiteral("Nothing to generate: the log is empty");
+	} else if(rows.isEmpty()) {
+		scope = QStringLiteral("Every visible row: %1 command(s)").arg(entries.size());
+	} else {
+		scope = QStringLiteral("%1 selected row(s): %2 command(s)").arg(rows.size()).arg(entries.size());
+	}
+	m_codegen->setEntries(entries, scope);
 }
 
 QString CommandLogView::visibleRowsText() const
@@ -354,9 +447,12 @@ void CommandLogView::showContextMenu(const QPoint &pos)
 {
 	m_copyAction->setEnabled(m_tree->selectionModel()->hasSelection());
 	m_copyAllAction->setEnabled(m_model->rowCount() > 0);
+	m_generateAction->setEnabled(m_model->rowCount() > 0);
 	QMenu menu(this);
 	menu.addAction(m_copyAction);
 	menu.addAction(m_copyAllAction);
+	menu.addSeparator();
+	menu.addAction(m_generateAction);
 	menu.exec(m_tree->viewport()->mapToGlobal(pos));
 	m_copyAction->setEnabled(true); // the shortcut stays live (a no-op without a selection)
 }
