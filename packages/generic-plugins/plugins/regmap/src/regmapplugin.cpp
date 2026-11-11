@@ -68,6 +68,7 @@
 
 #if defined __APPLE__
 #include <QApplication>
+#include <algorithm>
 #endif
 
 using namespace scopy;
@@ -266,7 +267,13 @@ void RegmapPlugin::reconfigure()
 	if(m_device) {
 		provided = m_device->requestRegisterMapConfiguration();
 	}
-	const QList<RegisterMapToolConfig> configs = mergeConfigurations(defaultConfiguration(), provided);
+	// plugin-configured devices first, then the generic register map for the rest
+	const QList<RegisterMapToolConfig> configured = resolveProviders(provided);
+	QSet<QString> covered;
+	for(const RegisterMapToolConfig &config : configured) {
+		covered.insert(config.target);
+	}
+	const QList<RegisterMapToolConfig> configs = inContextOrder(genericConfiguration(covered) + configured);
 
 	clearToolConfiguration();
 	for(const RegisterMapToolConfig &config : configs) {
@@ -276,7 +283,7 @@ void RegmapPlugin::reconfigure()
 
 bool RegmapPlugin::isDongle() const { return m_category == DongleDeviceManager::CATEGORY; }
 
-QList<RegisterMapToolConfig> RegmapPlugin::defaultConfiguration()
+QList<RegisterMapToolConfig> RegmapPlugin::genericConfiguration(const QSet<QString> &covered)
 {
 	QList<RegisterMapToolConfig> configs;
 	component::ContextHandle ctx = component::Controller::context(m_param);
@@ -289,15 +296,21 @@ QList<RegisterMapToolConfig> RegmapPlugin::defaultConfiguration()
 	const QList<component::iio::IIODevice *> devices =
 		ctx->findChildren<component::iio::IIODevice *>(Qt::FindDirectChildrenOnly);
 	for(component::iio::IIODevice *dev : devices) {
+		// a device a plugin configures gets nothing from the generic register map
+		if(covered.contains(dev->name())) {
+			continue;
+		}
 		if(dev->findChild<component::iio::IIORegisterReader *>()) {
 			qDebug(CAT_REGMAP) << "DEVICE FOUND " << dev->name();
-			configs.append(defaultEntry(dev->name(), xmlFiles));
+			configs.append(genericEntry(dev->name(), xmlFiles));
 		}
 	}
 	return configs;
 }
 
-RegisterMapToolConfig RegmapPlugin::defaultEntry(const QString &devName, const QFileInfoList &xmlFiles)
+bool RegmapPlugin::isGeneric(const RegisterMapToolConfig &config) const { return config.provider == m_name; }
+
+RegisterMapToolConfig RegmapPlugin::genericEntry(const QString &devName, const QFileInfoList &xmlFiles)
 {
 	RegisterMapToolConfig config;
 	config.target = devName;
@@ -325,7 +338,7 @@ RegisterMapToolConfig RegmapPlugin::defaultEntry(const QString &devName, const Q
 bool RegmapPlugin::configureTool(const QString &device, const QString &templatePath, IRegisterReadStrategy *read,
 				 IRegisterWriteStrategy *write)
 {
-	const RegisterMapToolConfig defaults = defaultEntry(device, Utils::setXmlPath());
+	const RegisterMapToolConfig defaults = genericEntry(device, Utils::setXmlPath());
 	if(!read || !write) {
 		IRegisterReadStrategy *defaultRead = nullptr;
 		IRegisterWriteStrategy *defaultWrite = nullptr;
@@ -365,49 +378,59 @@ int RegmapPlugin::providerPriority(const QString &provider)
 	return p ? p->metadata().value("priority").toInt() : 0;
 }
 
-QList<RegisterMapToolConfig> RegmapPlugin::mergeConfigurations(const QList<RegisterMapToolConfig> &defaults,
-							       const QList<RegisterMapToolConfig> &provided)
+QList<RegisterMapToolConfig> RegmapPlugin::resolveProviders(const QList<RegisterMapToolConfig> &provided)
 {
-	// A provider entry replaces the default for its device only, a device only a provider knows is added,
-	// and between two providers the higher priority wins.
-	QList<RegisterMapToolConfig> merged = defaults;
+	// One entry per device, applied as the plugin gave it: no fill-in from regmap's defaults.
+	// Between two providers the higher priority wins.
+	QList<RegisterMapToolConfig> resolved;
 	QMap<QString, int> providerPrio; // target -> priority of the provider that configured it
-	const QFileInfoList xmlFiles = Utils::setXmlPath();
 
-	for(RegisterMapToolConfig config : provided) {
+	for(const RegisterMapToolConfig &config : provided) {
 		if(config.target.isEmpty()) {
 			continue;
 		}
-		// bitsPerRow and addressSpace are optional, regmap-config.json gives them as today
-		const RegisterMapToolConfig jsonDefaults = defaultEntry(config.target, xmlFiles);
-		if(!config.bitsPerRow) {
-			config.bitsPerRow = jsonDefaults.bitsPerRow;
-		}
-		if(!config.addressSpace) {
-			config.addressSpace = jsonDefaults.addressSpace;
-		}
-
 		const int prio = providerPriority(config.provider);
 		int idx = -1;
-		for(int i = 0; i < merged.size(); i++) {
-			if(merged[i].target == config.target) {
+		for(int i = 0; i < resolved.size(); i++) {
+			if(resolved[i].target == config.target) {
 				idx = i;
 				break;
 			}
 		}
 
 		if(idx < 0) {
-			merged.append(config);
+			resolved.append(config);
 			providerPrio.insert(config.target, prio);
-		} else if(!providerPrio.contains(config.target) || prio > providerPrio.value(config.target)) {
-			merged[idx] = config;
+		} else if(prio > providerPrio.value(config.target)) {
+			resolved[idx] = config;
 			providerPrio.insert(config.target, prio);
 		} else {
 			qInfo(CAT_REGMAP) << "Ignoring" << config.provider << "for" << config.target << ":"
-					  << merged[idx].provider << "has a higher priority";
+					  << resolved[idx].provider << "has a higher priority";
 		}
 	}
-	return merged;
+	return resolved;
+}
+
+QList<RegisterMapToolConfig> RegmapPlugin::inContextOrder(QList<RegisterMapToolConfig> configs)
+{
+	QStringList order;
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(ctx) {
+		for(component::iio::IIODevice *dev :
+		    ctx->findChildren<component::iio::IIODevice *>(Qt::FindDirectChildrenOnly)) {
+			order.append(dev->name());
+		}
+	}
+	// devices only a provider knows (not in the context) go last, in the order they were given
+	auto rank = [&order](const RegisterMapToolConfig &config) {
+		const int idx = order.indexOf(config.target);
+		return idx < 0 ? order.size() : idx;
+	};
+	std::stable_sort(
+		configs.begin(), configs.end(),
+		[&rank](const RegisterMapToolConfig &a, const RegisterMapToolConfig &b) { return rank(a) < rank(b); });
+	return configs;
 }
 
 bool RegmapPlugin::applyConfiguration(const RegisterMapToolConfig &config)
@@ -418,8 +441,14 @@ bool RegmapPlugin::applyConfiguration(const RegisterMapToolConfig &config)
 		return false;
 	}
 
-	qDebug(CAT_REGMAP) << "CONNECTING TO DEVICE : " << config.target << "configured by" << config.provider;
-	return setupDevice(config.target, config.templatePath, config.bitsPerRow.value_or(8), read, write,
+	const bool generic = isGeneric(config);
+	if(generic) {
+		qInfo(CAT_REGMAP) << "Register map" << config.target << ": generic";
+	} else {
+		qInfo(CAT_REGMAP) << "Register map" << config.target << ": configured by" << config.provider;
+	}
+	// a plugin does the configuration it needs: its entry gets nothing from regmap-config.json
+	return setupDevice(config.target, config.templatePath, config.bitsPerRow.value_or(8), read, write, generic,
 			   config.useRegisterDescriptionAsName, config.useBitFieldDescriptionAsName);
 }
 
@@ -482,7 +511,7 @@ bool RegmapPlugin::createIioStrategies(const QString &device, uint32_t addressSp
 }
 
 bool RegmapPlugin::setupDevice(const QString &device, const QString &templatePath, int bitsPerRow,
-			       IRegisterReadStrategy *read, IRegisterWriteStrategy *write,
+			       IRegisterReadStrategy *read, IRegisterWriteStrategy *write, bool useRegmapConfig,
 			       std::optional<bool> useRegisterDescriptionAsName,
 			       std::optional<bool> useBitFieldDescriptionAsName)
 {
@@ -498,11 +527,14 @@ bool RegmapPlugin::setupDevice(const QString &device, const QString &templatePat
 	RegisterMapTemplate *registerMapTemplate = nullptr;
 	if(!templatePath.isEmpty()) {
 		registerMapTemplate = new RegisterMapTemplate();
-		// regmap-config.json settings for this template file; the configured bitsPerRow wins, as before
-		RegisterMapTemplateOptions options = RegisterMapTemplateOptions::fromConfig(
-			Utils::getJsonTemplate(QFileInfo(templatePath).fileName()));
+		// generic and API paths: regmap-config.json settings for this template file. A plugin entry: only the
+		// plugin's own options. The configured bitsPerRow wins, as before.
+		RegisterMapTemplateOptions options;
+		if(useRegmapConfig) {
+			options = RegisterMapTemplateOptions::fromConfig(
+				Utils::getJsonTemplate(QFileInfo(templatePath).fileName()));
+		}
 		options.bitsPerRow = bitsPerRow;
-		// a plugin's own options win over regmap-config.json
 		if(useRegisterDescriptionAsName) {
 			options.useRegisterDescriptionAsName = *useRegisterDescriptionAsName;
 		}
