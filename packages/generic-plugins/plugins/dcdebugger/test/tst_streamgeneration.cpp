@@ -49,9 +49,10 @@ private Q_SLOTS:
 void TST_StreamGeneration::snapKeepsWholePeriods()
 {
 	QCOMPARE(snapFrequency(1000, 100e3, 8192), std::round(1000 * 8192 / 100e3) * 100e3 / 8192);
-	QCOMPARE(snapFrequency(1, 100e3, 1000), 100.0);	 // at least one period
-	QCOMPARE(snapFrequency(1e9, 100e3, 1000), 50e3); // at most Nyquist
-	QCOMPARE(snapFrequency(1000, 0, 1000), 1000.0);	 // unknown rate: unchanged
+	QCOMPARE(snapFrequency(1, 100e3, 1000), 100.0);		       // at least one period
+	QCOMPARE(snapFrequency(1e9, 100e3, 1000), 499 * 100e3 / 1000); // below Nyquist: one period under it
+	QCOMPARE(snapFrequency(1e9, 100e3, 999), 499 * 100e3 / 999);   // odd: the last whole period under it
+	QCOMPARE(snapFrequency(1000, 0, 1000), 1000.0);		       // unknown rate: unchanged
 	QCOMPARE(snapFrequency(0, 1e3, 100), 0.0);
 }
 

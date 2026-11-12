@@ -23,6 +23,7 @@
 
 #include "nodepanel.h"
 #include "streamutils.h"
+#include "waveform.h"
 
 #include <QButtonGroup>
 #include <QCheckBox>
@@ -82,6 +83,9 @@ gui::MenuSpinbox *makeSpin(const QString &name, double value, const QString &uni
 		fixed->setK(step);
 	}
 	sb->setScalingEnabled(false);
+	// Hidden, the unit prefix still scales the step (0.05 x milli per click): unit only.
+	sb->setScaleList(QList<gui::UnitPrefix>{{QString(), 1.0}});
+	sb->setScaleRange(1, 1); // setScaleList keeps the scales inside [min, max]
 	return sb;
 }
 } // namespace
@@ -292,7 +296,19 @@ QWidget *GeneratorView::buildChannelMenu(ChannelControls &ctrl, int index, const
 
 	connect(ctrl.waveform->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this,
 		&GeneratorView::scheduleApply);
-	for(gui::MenuSpinbox *sb : {ctrl.frequency, ctrl.amplitude, ctrl.offset, ctrl.phase}) {
+	m_shownFrequency.insert(ctrl.id, tone.frequency);
+	// A 1-2-5 step smaller than half a period would snap back to the same frequency: step by
+	// at least one period.
+	connect(ctrl.frequency, &gui::MenuSpinbox::valueChanged, this,
+		[this, sb = ctrl.frequency, id = ctrl.id](double value) {
+			const double f = steppedFrequency(id, value);
+			if(std::abs(f - value) > 1e-9) {
+				sb->setValueSilent(f);
+			}
+			m_shownFrequency.insert(id, f);
+			scheduleApply();
+		});
+	for(gui::MenuSpinbox *sb : {ctrl.amplitude, ctrl.offset, ctrl.phase}) {
 		connect(sb, &gui::MenuSpinbox::valueChanged, this, &GeneratorView::scheduleApply);
 	}
 
@@ -332,6 +348,32 @@ double GeneratorView::sampleRate() const
 	return m_manualRate ? m_manualRate->value() : 0;
 }
 
+double GeneratorView::frequencyStep() const
+{
+	const double fs = sampleRate();
+	const double samples = std::max(2.0, m_samples->value());
+	return fs > 0 ? fs / samples : 0;
+}
+
+double GeneratorView::steppedFrequency(const QString &id, double requested) const
+{
+	const double fs = sampleRate();
+	const int samples = int(std::max(2.0, m_samples->value()));
+	const double step = frequencyStep();
+	const double f = snapFrequency(requested, fs, samples);
+	const double shown = m_shownFrequency.value(id);
+	if(step <= 0 || std::abs(f - shown) >= step / 2) {
+		return f;
+	}
+	if(requested > shown) {
+		return snapFrequency(shown + step, fs, samples); // capped below Nyquist
+	}
+	if(requested < shown) {
+		return snapFrequency(std::max(step, shown - step), fs, samples); // one period at least
+	}
+	return f;
+}
+
 void GeneratorView::scheduleApply() { m_applyTimer->start(); }
 
 void GeneratorView::apply()
@@ -353,13 +395,19 @@ void GeneratorView::apply()
 	m_gen->setCyclic(m_cyclic->onOffswitch()->isChecked());
 	m_gen->setTones(tones);
 
-	// Show the frequency that is actually generated.
+	// Show the frequency that is actually generated; below one period there is none.
 	const QHash<QString, ToneSpec> snapped = m_gen->snappedTones();
+	const double step = frequencyStep();
 	for(const ChannelControls &ctrl : std::as_const(m_channels)) {
 		const double f = snapped.value(ctrl.id).frequency;
+		if(step > 0) {
+			ctrl.frequency->setMinValue(step);
+			ctrl.frequency->setMaxValue(snapFrequency(sampleRate(), sampleRate(), int(m_gen->samples())));
+		}
 		if(std::abs(f - ctrl.frequency->value()) > 1e-9) {
 			ctrl.frequency->setValueSilent(f);
 		}
+		m_shownFrequency.insert(ctrl.id, f);
 		ctrl.frequency->setToolTip(
 			QStringLiteral("Generated: %1 Hz (whole periods in the buffer)").arg(f, 0, 'f', 3));
 	}

@@ -24,6 +24,7 @@
 
 #include "streamgeneration.h"
 
+#include <QHash>
 #include <QMap>
 #include <QPointer>
 #include <QWidget>
@@ -86,6 +87,11 @@ private:
 	void onRunningChanged(bool running);
 	void setStatus(const QString &text, bool error = false);
 	double sampleRate() const;
+	// One period in the buffer: the frequency resolution (0 while the rate is unknown).
+	double frequencyStep() const;
+	// The frequency a change of the channel's spinbox to `requested` generates: snapped to whole
+	// periods, but at least one period away from the shown one in the direction of the change.
+	double steppedFrequency(const QString &id, double requested) const;
 
 	QPointer<component::OutputStream> m_stream;
 	StreamGeneration *m_gen;
@@ -101,6 +107,7 @@ private:
 	QList<ChannelControls> m_channels;
 	PlotWidget *m_plot;
 	QMap<QString, PlotChannel *> m_plotChannels;
+	QHash<QString, double> m_shownFrequency; // per channel id, what its spinbox shows
 	QTimer *m_applyTimer;
 };
 

@@ -52,7 +52,7 @@ struct ToneSpec
 };
 
 // The frequency closest to `frequency` with a whole number of periods in `samples` at `fs`, so a
-// replayed buffer has no seam (at least one period when frequency > 0).
+// replayed buffer has no seam (at least one period when frequency > 0, below Nyquist).
 SCOPY_DCDEBUGGER_EXPORT double snapFrequency(double frequency, double fs, int samples);
 
 // `samples` values of the tone in full-scale units, clamped to [-1, 1]. The frequency is used as

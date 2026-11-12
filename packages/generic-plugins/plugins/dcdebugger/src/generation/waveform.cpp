@@ -33,7 +33,9 @@ double scopy::dcdebugger::snapFrequency(double frequency, double fs, int samples
 	if(fs <= 0 || samples <= 0 || frequency <= 0) {
 		return std::max(0.0, frequency);
 	}
-	const double maxCycles = std::floor(samples / 2.0); // stay at or below Nyquist
+	// Below Nyquist: at fs / 2 the tone has 2 samples per period and depends on its phase (a sine
+	// at phase 0 samples as all zeros).
+	const double maxCycles = std::floor((samples - 1) / 2.0);
 	const double cycles = std::clamp(std::round(frequency * samples / fs), 1.0, std::max(1.0, maxCycles));
 	return cycles * fs / samples;
 }
