@@ -26,7 +26,6 @@
 #include <QPointer>
 #include <QWidget>
 
-class QEvent;
 class QLineEdit;
 
 namespace scopy {
@@ -55,9 +54,6 @@ public Q_SLOTS:
 	void refresh();
 	// Reads the attributes ReadPolicy allows on selection (all, or the ones never read nor cached).
 	void autoRefresh();
-
-protected:
-	bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
 	void applyFilter(const QString &text);

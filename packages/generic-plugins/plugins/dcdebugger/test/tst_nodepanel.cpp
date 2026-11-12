@@ -57,7 +57,7 @@ private Q_SLOTS:
 	void cachedAttributeIsNotReadOnSelection_data();
 	void cachedAttributeIsNotReadOnSelection();
 	void cachedValueIsShown();
-	void uncachedAttributeIsAutoReadOnce();
+	void policyAutoReadsUncachedOnce();
 	void failedAutoReadIsNotRetried();
 	void refreshButtonAlwaysReads();
 	void readButtonOfTheWidgetReads();
@@ -93,7 +93,8 @@ void TST_NodePanel::init()
 {
 	Preferences::init(ReadPolicy::PREF, QString::fromLatin1(ReadPolicy::ONLY_UNCACHED));
 	setMode(ReadPolicy::ONLY_UNCACHED);
-	// The widgets must not read on their own, whatever the lazy loading preference says.
+	// An IIOWidget reads its attribute once on its own: when built with lazy loading off (here, so the
+	// counts are deterministic), on its first show with it on.
 	Preferences::set("iiowidgets_use_lazy_loading", false);
 
 	m_conn = new Connection("fake:0", "fake");
@@ -174,32 +175,34 @@ void TST_NodePanel::generalInfoStartsExpanded()
 void TST_NodePanel::cachedAttributeIsNotReadOnSelection_data()
 {
 	QTest::addColumn<bool>("lazyLoading");
-	QTest::newRow("lazy loading off") << false;
-	QTest::newRow("lazy loading on") << true;
+	QTest::addColumn<int>("builtReads");
+	QTest::newRow("lazy loading off") << false << 1;
+	QTest::newRow("lazy loading on") << true << 0;
 }
 
 void TST_NodePanel::cachedAttributeIsNotReadOnSelection()
 {
 	QFETCH(bool, lazyLoading);
+	QFETCH(int, builtReads);
 	Preferences::set("iiowidgets_use_lazy_loading", lazyLoading);
-	// Only "b" is uncached: showing the panel reads it, not "a".
+	// Each widget reads its attribute once (built or first shown); that read caches "b", so the
+	// selection adds no read.
 	NodePanel *panel = devicePanel();
-	QCOMPARE(totalReads(), 0); // building reads nothing
+	QCOMPARE(m_ra->reads, builtReads);
+	QCOMPARE(m_rb->reads, builtReads);
 	panel->show();
 	QVERIFY(QTest::qWaitForWindowExposed(panel));
-	QCOMPARE(m_ra->reads, 0);
+	QCOMPARE(m_ra->reads, 1);
 	QCOMPARE(m_rb->reads, 1);
-	// The lazy loading preference is the user's again.
-	QCOMPARE(Preferences::get("iiowidgets_use_lazy_loading").toBool(), lazyLoading);
 	delete panel;
 }
 
 void TST_NodePanel::cachedValueIsShown()
 {
+	// Lazy loading on: the widgets read nothing until shown, yet show what is cached.
+	Preferences::set("iiowidgets_use_lazy_loading", true);
+	m_b->setCachedValue("beta");
 	NodePanel *panel = devicePanel();
-	m_b->setCachedValue("beta"); // nothing to read then
-	panel->show();
-	QVERIFY(QTest::qWaitForWindowExposed(panel));
 	QCOMPARE(totalReads(), 0);
 	QStringList texts;
 	for(QLineEdit *e : panel->findChildren<QLineEdit *>()) {
@@ -210,37 +213,41 @@ void TST_NodePanel::cachedValueIsShown()
 	delete panel;
 }
 
-void TST_NodePanel::uncachedAttributeIsAutoReadOnce()
+void TST_NodePanel::policyAutoReadsUncachedOnce()
 {
-	NodePanel *panel = devicePanel();
-	panel->show();
-	QVERIFY(QTest::qWaitForWindowExposed(panel));
-	QCOMPARE(m_rb->reads, 1);
-	QCOMPARE(m_b->cachedValue(), QString("20"));
-	// Selected again, and again in a new panel: cached now, nothing to read.
-	panel->hide();
-	panel->show();
-	NodePanel *second = devicePanel();
-	second->show();
-	QCOMPARE(totalReads(), 1);
-	delete second;
-	delete panel;
+	QVERIFY(!ReadPolicy::takeAutoRead(m_a)); // cached
+	QVERIFY(ReadPolicy::takeAutoRead(m_b));	 // uncached, first time
+	QVERIFY(!ReadPolicy::takeAutoRead(m_b)); // once, even while still uncached
+
+	// Suppressed (log navigation): no read, and the one automatic read is not used up.
+	Attribute *c = makeAttribute(m_dev, "c", "30");
+	{
+		ReadPolicy::Suppress suppress;
+		QVERIFY(!ReadPolicy::takeAutoRead(c));
+	}
+	QVERIFY(ReadPolicy::takeAutoRead(c));
+
+	setMode(ReadPolicy::EVERY_SELECTION);
+	QVERIFY(ReadPolicy::takeAutoRead(m_a));
+	QVERIFY(ReadPolicy::takeAutoRead(m_a));
+	QVERIFY(ReadPolicy::takeAutoRead(m_b));
 }
 
 void TST_NodePanel::failedAutoReadIsNotRetried()
 {
 	m_rb->fail = true;
 	NodePanel *panel = devicePanel();
+	QCOMPARE(m_rb->reads, 1); // the widget's own read
 	panel->show();
 	QVERIFY(QTest::qWaitForWindowExposed(panel));
-	QCOMPARE(m_rb->reads, 1);
+	QCOMPARE(m_rb->reads, 2); // still uncached: the one automatic read
 	QVERIFY(m_b->cachedValue().isEmpty());
 	panel->hide();
 	panel->show();
-	NodePanel *second = devicePanel();
+	NodePanel *second = devicePanel(); // its widgets read on their own
 	second->show();
-	QCOMPARE(m_rb->reads, 1); // never auto-read twice
-	QCOMPARE(m_ra->reads, 0);
+	QCOMPARE(m_rb->reads, 3); // never auto-read twice
+	QCOMPARE(m_ra->reads, 2);
 	delete second;
 	delete panel;
 }
@@ -250,15 +257,16 @@ void TST_NodePanel::refreshButtonAlwaysReads()
 	NodePanel *panel = devicePanel();
 	panel->show();
 	QVERIFY(QTest::qWaitForWindowExposed(panel));
-	QCOMPARE(totalReads(), 1);
+	const int a0 = m_ra->reads;
+	const int b0 = m_rb->reads;
 	auto *refresh = panel->findChild<AnimatedRefreshBtn *>();
 	QVERIFY(refresh);
 	refresh->click();
-	QCOMPARE(m_ra->reads, 1); // cached or not
-	QCOMPARE(m_rb->reads, 2);
+	QCOMPARE(m_ra->reads, a0 + 1); // cached or not
+	QCOMPARE(m_rb->reads, b0 + 1);
 	refresh->click();
-	QCOMPARE(m_ra->reads, 2);
-	QCOMPARE(m_rb->reads, 3);
+	QCOMPARE(m_ra->reads, a0 + 2);
+	QCOMPARE(m_rb->reads, b0 + 2);
 	delete panel;
 }
 
@@ -281,15 +289,15 @@ void TST_NodePanel::everySelectionReadsEachTime()
 {
 	setMode(ReadPolicy::EVERY_SELECTION);
 	NodePanel *panel = devicePanel();
-	QCOMPARE(totalReads(), 0);
+	QCOMPARE(totalReads(), 2); // the widgets' own reads
 	panel->show();
 	QVERIFY(QTest::qWaitForWindowExposed(panel));
-	QCOMPARE(m_ra->reads, 1);
-	QCOMPARE(m_rb->reads, 1);
-	panel->hide();
-	panel->show();
 	QCOMPARE(m_ra->reads, 2);
 	QCOMPARE(m_rb->reads, 2);
+	panel->hide();
+	panel->show();
+	QCOMPARE(m_ra->reads, 3);
+	QCOMPARE(m_rb->reads, 3);
 	delete panel;
 }
 
@@ -300,8 +308,9 @@ void TST_NodePanel::treeSelectionFollowsThePolicy_data()
 	QTest::addColumn<int>("selectB");
 	QTest::addColumn<int>("expandA");
 	QTest::addColumn<int>("expandB");
-	QTest::newRow("only uncached") << QString(ReadPolicy::ONLY_UNCACHED) << 0 << 1 << 0 << 1;
-	QTest::newRow("every selection") << QString(ReadPolicy::EVERY_SELECTION) << 1 << 1 << 2 << 2;
+	// Selecting builds the panel: its widgets read each attribute once, then the policy applies.
+	QTest::newRow("only uncached") << QString(ReadPolicy::ONLY_UNCACHED) << 1 << 2 << 1 << 2;
+	QTest::newRow("every selection") << QString(ReadPolicy::EVERY_SELECTION) << 2 << 2 << 3 << 3;
 }
 
 void TST_NodePanel::treeSelectionFollowsThePolicy()
@@ -312,6 +321,7 @@ void TST_NodePanel::treeSelectionFollowsThePolicy()
 	QFETCH(int, expandA);
 	QFETCH(int, expandB);
 	setMode(mode.toLatin1().constData());
+	m_rb->fail = true; // "b" stays uncached
 	showTool();
 	QCOMPARE(totalReads(), 0);
 
@@ -331,20 +341,21 @@ void TST_NodePanel::treeSelectionFollowsThePolicy()
 
 void TST_NodePanel::preferenceChangeAppliesOnNextSelection()
 {
+	m_rb->fail = true; // "b" stays uncached
 	showTool();
-	selectNode(m_dev);
-	QCOMPARE(m_ra->reads, 0);
-	QCOMPARE(m_rb->reads, 1);
-	setMode(ReadPolicy::EVERY_SELECTION);
-	selectNode(m_ctx);
-	selectNode(m_dev);
+	selectNode(m_dev); // the widgets' own reads, then the automatic read of "b"
 	QCOMPARE(m_ra->reads, 1);
 	QCOMPARE(m_rb->reads, 2);
+	setMode(ReadPolicy::EVERY_SELECTION);
+	selectNode(m_ctx);
+	selectNode(m_dev); // the panel is reused: no widget reads
+	QCOMPARE(m_ra->reads, 2);
+	QCOMPARE(m_rb->reads, 3);
 	setMode(ReadPolicy::ONLY_UNCACHED);
 	selectNode(m_ctx);
 	selectNode(m_dev);
-	QCOMPARE(m_ra->reads, 1);
-	QCOMPARE(m_rb->reads, 2);
+	QCOMPARE(m_ra->reads, 2);
+	QCOMPARE(m_rb->reads, 3);
 }
 
 void TST_NodePanel::logNavigationDoesNotRead_data()
@@ -353,8 +364,8 @@ void TST_NodePanel::logNavigationDoesNotRead_data()
 	QTest::addColumn<int>("afterA");
 	QTest::addColumn<int>("afterB");
 	// Selecting the device afterwards: the navigation did not use up the one automatic read of "b".
-	QTest::newRow("only uncached") << QString(ReadPolicy::ONLY_UNCACHED) << 0 << 1;
-	QTest::newRow("every selection") << QString(ReadPolicy::EVERY_SELECTION) << 1 << 1;
+	QTest::newRow("only uncached") << QString(ReadPolicy::ONLY_UNCACHED) << 1 << 3;
+	QTest::newRow("every selection") << QString(ReadPolicy::EVERY_SELECTION) << 2 << 3;
 }
 
 void TST_NodePanel::logNavigationDoesNotRead()
@@ -363,24 +374,27 @@ void TST_NodePanel::logNavigationDoesNotRead()
 	QFETCH(int, afterA);
 	QFETCH(int, afterB);
 	setMode(mode.toLatin1().constData());
+	m_rb->fail = true; // "b" stays uncached
 	showTool();
 	selectNode(m_ctx);
 	QCOMPARE(totalReads(), 0);
 
-	// A click on a log row of "b": deep in a collapsed group, whose panel was never shown.
+	// A click on a log row of "b": deep in a collapsed group, whose panel was never shown. Only the
+	// new panel's widget reads (on its own), the policy adds nothing.
 	const CommandOrigin o = CommandMonitor::originOf(m_b);
 	Q_EMIT m_tool->commandLog()->nodeRequested(o.path, o.backendId, o.object);
 	QTest::qWait(50);
 	QCOMPARE(currentNode(), m_b);
 	QCOMPARE(m_ra->reads, 0);
-	QCOMPARE(m_rb->reads, 0);
+	QCOMPARE(m_rb->reads, 1);
 
-	// The row of an attribute of the already shown panel's node, and of the device itself.
+	// The row of the device itself: its new panel's widgets read, nothing more.
 	const CommandOrigin d = CommandMonitor::originOf(m_dev);
 	Q_EMIT m_tool->commandLog()->nodeRequested(d.path, d.backendId, d.object);
 	QTest::qWait(50);
 	QCOMPARE(currentNode(), m_dev);
-	QCOMPARE(totalReads(), 0);
+	QCOMPARE(m_ra->reads, 1);
+	QCOMPARE(m_rb->reads, 2);
 
 	// Normal selection reads again.
 	selectNode(m_ctx);

@@ -76,8 +76,8 @@ bool DCDebuggerPlugin::loadPreferencesPage()
 
 	generalSection->contentLayout()->addWidget(PREFERENCE_COMBO(
 		p, ReadPolicy::PREF, "Read attributes on selection",
-		"Choose when selecting a node or expanding a group reads its attributes from the device. \"Only "
-		"when not cached\" reads an attribute once, if it has no cached value yet; \"On every selection\" "
+		"Choose when selecting a node or expanding a group reads its attributes from the device. \"First "
+		"selection only\" reads an attribute once, if it has no cached value yet; \"On every selection\" "
 		"reads them each time. The Refresh button and the per-attribute read buttons always read.",
 		ReadPolicy::options(), generalSection));
 	return true;

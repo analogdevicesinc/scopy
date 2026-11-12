@@ -39,7 +39,7 @@ class SCOPY_DCDEBUGGER_EXPORT ReadPolicy
 public:
 	static constexpr const char *PREF = "dcdebugger_read_on_selection";
 	// Read what has no cached value, once.
-	static constexpr const char *ONLY_UNCACHED = "Only when not cached";
+	static constexpr const char *ONLY_UNCACHED = "First selection only";
 	// Read every attribute each time its node is selected.
 	static constexpr const char *EVERY_SELECTION = "On every selection";
 
