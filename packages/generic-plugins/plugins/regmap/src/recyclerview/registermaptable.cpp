@@ -23,6 +23,8 @@
 
 #include "../logging_categories.h"
 #include "recyclerview.hpp"
+#include "../registermapaccess.hpp"
+#include "../registermapdatastore.hpp"
 
 #include <QLabel>
 
@@ -120,6 +122,8 @@ void RegisterMapTable::setRegisterSelected(uint32_t address)
 	}
 }
 
+void RegisterMapTable::setDataStore(const RegisterMapDataStore *store) { m_store = store; }
+
 void RegisterMapTable::generateWidget(int index)
 {
 	qDebug(CAT_REGISTER_MAP_TABLE) << "Generate new widget";
@@ -131,5 +135,12 @@ void RegisterMapTable::generateWidget(int index)
 			 &RegisterMapTable::registerSelected);
 
 	registersMap->insert(index, registerSimpleWidget);
+	// a new row shows what the store has; no entry, nothing changes (N/R)
+	const component::RegisterData *entry = m_store ? m_store->get(index) : nullptr;
+	if(entry && entry->value) {
+		registerSimpleWidget->valueUpdated(*entry->value);
+	} else if(entry && entry->error) {
+		registerSimpleWidget->errorUpdated(RegisterMapAccess::errorText(*entry->error));
+	}
 	Q_EMIT widgetGenerated(index, registerSimpleWidget);
 }

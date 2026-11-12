@@ -140,6 +140,8 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 		registerMapTableLayout->addWidget(tableHeadWidget);
 
 		registerMapTableWidget = new RegisterMapTable(registerMapTemplate->getRegisterList(), this);
+		// null for a template-only device
+		registerMapTableWidget->setDataStore(registerMapStore);
 		registerMapTable->setProperty("tutorial_name", "REGISTER_MAP");
 
 		QWidget *aux = registerMapTableWidget->getWidget();

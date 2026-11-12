@@ -30,6 +30,7 @@
 namespace scopy::regmap {
 class RegisterModel;
 class RegisterSimpleWidget;
+class RegisterMapDataStore;
 class RecyclerView;
 
 class RegisterMapTable : public IRecyclerViewAdapter
@@ -45,6 +46,8 @@ public:
 	void errorUpdated(uint32_t address, const QString &error);
 	void scrollTo(uint32_t index);
 	void setRegisterSelected(uint32_t address);
+	// rows read their latest value from the store when they are created
+	void setDataStore(const RegisterMapDataStore *store);
 
 	// IRecyclerViewAdapter interface
 	void generateWidget(int index);
@@ -58,6 +61,7 @@ private:
 	QMap<uint32_t, RegisterModel *> *registerModels;
 	QMap<uint32_t, RegisterSimpleWidget *> *registersMap;
 	uint32_t selectedAddress;
+	const RegisterMapDataStore *m_store = nullptr;
 };
 } // namespace scopy::regmap
 #endif // REGISTERMAPTABLE_H
