@@ -307,6 +307,8 @@ void DCDebuggerTool::onFilterChanged(const QString &text)
 
 void DCDebuggerTool::selectOrigin(const QString &origin, const QString &backendId, quintptr object)
 {
+	// Following a log row only navigates: expanding the tree or showing the panel reads nothing.
+	ReadPolicy::Suppress passive;
 	selectIndex(m_model->indexOfOrigin(origin, backendId, object));
 }
 

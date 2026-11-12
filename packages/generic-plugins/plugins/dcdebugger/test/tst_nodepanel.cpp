@@ -22,6 +22,7 @@
 #include "componenttreemodel.h"
 #include "dcdebuggertool.h"
 #include "fakestream.h"
+#include "log/commandlogview.h"
 #include "nodepanel.h"
 #include "readpolicy.h"
 
@@ -32,6 +33,7 @@
 #include <QtTest>
 
 #include <component/attribute.h>
+#include <component/commandmonitor.h>
 #include <component/connection.h>
 #include <component/context.h>
 #include <component/device.h>
@@ -63,6 +65,8 @@ private Q_SLOTS:
 	void treeSelectionFollowsThePolicy_data();
 	void treeSelectionFollowsThePolicy();
 	void preferenceChangeAppliesOnNextSelection();
+	void logNavigationDoesNotRead_data();
+	void logNavigationDoesNotRead();
 
 private:
 	static void setMode(const char *mode) { Preferences::set(ReadPolicy::PREF, QString::fromLatin1(mode)); }
@@ -341,6 +345,48 @@ void TST_NodePanel::preferenceChangeAppliesOnNextSelection()
 	selectNode(m_dev);
 	QCOMPARE(m_ra->reads, 1);
 	QCOMPARE(m_rb->reads, 2);
+}
+
+void TST_NodePanel::logNavigationDoesNotRead_data()
+{
+	QTest::addColumn<QString>("mode");
+	QTest::addColumn<int>("afterA");
+	QTest::addColumn<int>("afterB");
+	// Selecting the device afterwards: the navigation did not use up the one automatic read of "b".
+	QTest::newRow("only uncached") << QString(ReadPolicy::ONLY_UNCACHED) << 0 << 1;
+	QTest::newRow("every selection") << QString(ReadPolicy::EVERY_SELECTION) << 1 << 1;
+}
+
+void TST_NodePanel::logNavigationDoesNotRead()
+{
+	QFETCH(QString, mode);
+	QFETCH(int, afterA);
+	QFETCH(int, afterB);
+	setMode(mode.toLatin1().constData());
+	showTool();
+	selectNode(m_ctx);
+	QCOMPARE(totalReads(), 0);
+
+	// A click on a log row of "b": deep in a collapsed group, whose panel was never shown.
+	const CommandOrigin o = CommandMonitor::originOf(m_b);
+	Q_EMIT m_tool->commandLog()->nodeRequested(o.path, o.backendId, o.object);
+	QTest::qWait(50);
+	QCOMPARE(currentNode(), m_b);
+	QCOMPARE(m_ra->reads, 0);
+	QCOMPARE(m_rb->reads, 0);
+
+	// The row of an attribute of the already shown panel's node, and of the device itself.
+	const CommandOrigin d = CommandMonitor::originOf(m_dev);
+	Q_EMIT m_tool->commandLog()->nodeRequested(d.path, d.backendId, d.object);
+	QTest::qWait(50);
+	QCOMPARE(currentNode(), m_dev);
+	QCOMPARE(totalReads(), 0);
+
+	// Normal selection reads again.
+	selectNode(m_ctx);
+	selectNode(m_dev);
+	QCOMPARE(m_ra->reads, afterA);
+	QCOMPARE(m_rb->reads, afterB);
 }
 
 QTEST_MAIN(TST_NodePanel)
