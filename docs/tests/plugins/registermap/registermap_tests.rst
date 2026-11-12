@@ -1963,7 +1963,8 @@ Test 35 : Address missing from the CSV file
 
 **RBP:** P2
 
-**Description:** Verify that reading an address that is not in the CSV file shows an error.
+**Description:** Verify that reading an address that is not in the CSV file shows an error, and that the error is
+shown in place of the value.
 
 **OS:** ANY
 
@@ -1974,7 +1975,17 @@ Test 35 : Address missing from the CSV file
     1. Select device ``eprom1``
     2. Type ``0x8`` in the address field and press Read (``0x008`` is not in the template)
         - **Expected result:** The status bar shows
-          ``Register map eprom1: no value for address 0x8 in the register values file``
+          ``Register map eprom1 0x8: no value for address 0x8 in <path of eprom1.csv> (-2)``
+        - **Expected result:** The value field shows ``err``. Its tooltip shows the same error text.
+        - **Actual result:**
+    3. Remove the line of address ``0x1`` from ``eprom1.csv``, select register ``0x1`` in the table and press Read
+        - **Expected result:** The register's value in the table shows ``err``, and its tooltip shows the error
+          text. The bitfields of that row and the detailed bitfields show ``N/R``
+        - **Expected result:** Pressing Write while the value field shows ``err`` writes nothing; the status bar
+          shows ``Register map: "err" is not a hex value, write skipped``
+        - **Actual result:**
+    4. Put the line of address ``0x1`` back and press Read
+        - **Expected result:** The table and the value field show the value again, with no error tooltip
         - **Actual result:**
 
 ..

@@ -36,13 +36,13 @@
 //   TST.REGMAP.EEPROM_CSV_WRITE         - Write on eprom1 changes the CSV and reads back
 //   TST.REGMAP.EEPROM_TEMPLATE_ONLY     - eprom2: template works, read/write is refused
 //   TST.REGMAP.EEPROM_READ_WRITE_ONLY   - eprom3: CSV read/write without a template
-//   TST.REGMAP.EEPROM_MISSING_ADDRESS   - An address missing from the CSV gives no value
+//   TST.REGMAP.EEPROM_MISSING_ADDRESS   - An address missing from the CSV is stored as an error (-ENOENT), no value
 //   TST.REGMAP.DONGLE_SWITCH_DEVICE     - Switch device (board 2), Sync, Configure: only eprom4, still connected
 //   TST.REGMAP.DONGLE_EPROM4_READ_WRITE - eprom4 loads its JSON template and reads and writes its own CSV (eprom4.csv)
 //   TST.REGMAP.DONGLE_SWITCH_BACK       - Switch back to board 1, Sync, Configure: eprom1..3 again
 //
-// The status bar message of TST.REGMAP.EEPROM_MISSING_ADDRESS and the hidden controls of
-// TST.REGMAP.EEPROM_TEMPLATE_ONLY are checked by hand (see registermap_tests.rst).
+// The status bar message and the "err" cell (error in its tooltip) of TST.REGMAP.EEPROM_MISSING_ADDRESS, and the
+// hidden controls of TST.REGMAP.EEPROM_TEMPLATE_ONLY are checked by hand (see registermap_tests.rst).
 //
 // ============================================================
 
@@ -75,12 +75,20 @@ var EPROM4_POC_REG_VALUE = 0x4b;
 var EPROM4_WRITE_ADDR = "0x1";
 var EPROM4_WRITE_VALUE = 0x55;
 
-// Reads an address and returns the cached value as a number, or null if nothing was read
+// A failed read is stored and returned as "ERROR: <message> (<code>)"
+var ERROR_PREFIX = "ERROR: ";
+var ENOENT_CODE = "(-2)";
+
+function isError(text) {
+    return text.indexOf(ERROR_PREFIX) === 0;
+}
+
+// Reads an address and returns the stored value as a number, or null if nothing was read or the read failed
 function readValue(addr) {
     regmap.readRegister(addr);
     msleep(500);
     var text = regmap.getValueOfRegister(addr);
-    if (!text) {
+    if (!text || isError(text)) {
         return null;
     }
     return parseInt(text, 16);
@@ -409,10 +417,17 @@ TestFramework.runTest("TST.REGMAP.EEPROM_MISSING_ADDRESS", function() {
         return "Failed to set device eprom1";
     }
 
-    var value = readValue(EPROM1_MISSING_ADDR);
-    printToConsole("  " + EPROM1_MISSING_ADDR + " = " + (value === null ? "not read" : toHex(value)));
-    if (value !== null) {
-        return "Address " + EPROM1_MISSING_ADDR + " is not in the CSV but returned " + toHex(value);
+    var readText = regmap.readRegister(EPROM1_MISSING_ADDR);
+    msleep(500);
+    var storedText = regmap.getValueOfRegister(EPROM1_MISSING_ADDR);
+    printToConsole("  readRegister(" + EPROM1_MISSING_ADDR + ") = " + readText);
+    printToConsole("  getValueOfRegister(" + EPROM1_MISSING_ADDR + ") = " + storedText);
+    // the read returns the error, and the store keeps it in place of a value
+    if (!isError(readText) || readText.indexOf(ENOENT_CODE) === -1) {
+        return "Expected an -ENOENT error for " + EPROM1_MISSING_ADDR + ", got: " + readText;
+    }
+    if (storedText !== readText) {
+        return "The stored entry should hold the same error, got: " + storedText;
     }
     return true;
 });
