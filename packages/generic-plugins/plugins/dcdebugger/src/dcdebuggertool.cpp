@@ -28,6 +28,7 @@
 #include "log/commandlogmodel.h"
 #include "log/commandlogview.h"
 #include "nodepanel.h"
+#include "readpolicy.h"
 
 #include <QCursor>
 #include <QHeaderView>
@@ -273,7 +274,7 @@ void DCDebuggerTool::onClicked(const QModelIndex &proxyIndex)
 
 void DCDebuggerTool::onExpanded(const QModelIndex &proxyIndex)
 {
-	// Attribute values are read lazily, when their group is opened.
+	// Attribute values are read (as the read policy allows) when their group is opened.
 	const QModelIndex src = m_proxy->mapToSource(proxyIndex);
 	if(!m_bulkExpand && m_model->isGroup(src)) {
 		readAttributes(m_model->childObjects(src));
@@ -284,7 +285,7 @@ void DCDebuggerTool::readAttributes(const QList<QObject *> &objects)
 {
 	for(QObject *obj : objects) {
 		auto *attr = qobject_cast<component::Attribute *>(obj);
-		if(attr && attr->readCapability()) {
+		if(ReadPolicy::takeAutoRead(attr)) {
 			attr->readCapability()->readAsync();
 		}
 	}

@@ -22,15 +22,21 @@
 #include "attributessection.h"
 
 #include "nodepanel.h"
+#include "readpolicy.h"
 
+#include <QEvent>
 #include <QLineEdit>
+#include <QSignalBlocker>
 #include <QVBoxLayout>
 
 #include <component/attribute.h>
 #include <iiowidget.h>
 #include <iiowidgetbuilder.h>
+#include <datastrategy/datastrategyinterface.h>
+#include <guistrategy/guistrategyinterface.h>
 #include <menusectionwidget.h>
 #include <mousewheelwidgetguard.h>
+#include <pluginbase/preferences.h>
 #include <style.h>
 
 using namespace scopy;
@@ -39,6 +45,29 @@ using namespace scopy::dcdebugger;
 namespace {
 // Lists shorter than this get no filter box.
 constexpr int FILTER_THRESHOLD = 8;
+
+// An IIOWidget reads its attribute when built or on its first show (lazy loading), whatever the
+// read policy says: build with lazy loading on and drop the first show (see eventFilter), so that
+// only the policy and the explicit read buttons read.
+class LazyLoadOn
+{
+public:
+	LazyLoadOn()
+		: m_previous(Preferences::get(KEY))
+	{
+		set(true);
+	}
+	~LazyLoadOn() { set(m_previous); }
+
+private:
+	void set(const QVariant &v)
+	{
+		QSignalBlocker quiet(Preferences::GetInstance());
+		Preferences::set(KEY, v);
+	}
+	static constexpr const char *KEY = "iiowidgets_use_lazy_loading";
+	QVariant m_previous;
+};
 } // namespace
 
 AttributesSection::AttributesSection(const QString &title, const QList<component::Attribute *> &attributes,
@@ -60,14 +89,22 @@ AttributesSection::AttributesSection(const QString &title, const QList<component
 		connect(m_filter, &QLineEdit::textChanged, this, &AttributesSection::applyFilter);
 	}
 
+	LazyLoadOn lazy;
 	for(component::Attribute *attr : attributes) {
 		IIOWidget *w = IIOWidgetBuilder(section).attribute(attr).manualReadWrite(true).buildSingle();
 		if(!w) {
 			continue;
 		}
+		w->installEventFilter(this);
 		w->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 		section->contentLayout()->addWidget(w);
 		m_widgets.append({attr->name(), w});
+		m_attributes.append(attr);
+		// Nothing is read here: show what is cached.
+		if(!attr->cachedValue().isEmpty()) {
+			DataStrategyInterface *ds = w->getDataStrategy();
+			w->getUiStrategy()->receiveData(ds->data(), ds->optionalData());
+		}
 	}
 
 	// Scrolling the panel must not change combo / spin values under the cursor.
@@ -75,10 +112,28 @@ AttributesSection::AttributesSection(const QString &title, const QList<component
 	guard->installEventRecursively(section);
 }
 
+bool AttributesSection::eventFilter(QObject *watched, QEvent *event)
+{
+	// The first show of an IIOWidget is its lazy-loading read.
+	if(event->type() == QEvent::Show) {
+		return true;
+	}
+	return QWidget::eventFilter(watched, event);
+}
+
 void AttributesSection::refresh()
 {
 	for(const auto &w : std::as_const(m_widgets)) {
 		w.second->readAsync();
+	}
+}
+
+void AttributesSection::autoRefresh()
+{
+	for(int i = 0; i < m_widgets.size(); ++i) {
+		if(m_attributes[i] && ReadPolicy::takeAutoRead(m_attributes[i])) {
+			m_widgets[i].second->readAsync();
+		}
 	}
 }
 

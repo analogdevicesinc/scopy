@@ -26,6 +26,7 @@
 #include <QPointer>
 #include <QWidget>
 
+class QEvent;
 class QLineEdit;
 
 namespace scopy {
@@ -52,11 +53,17 @@ public:
 public Q_SLOTS:
 	// Re-reads every attribute from the device.
 	void refresh();
+	// Reads the attributes ReadPolicy allows on selection (all, or the ones never read nor cached).
+	void autoRefresh();
+
+protected:
+	bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
 	void applyFilter(const QString &text);
 
 	QList<QPair<QString, IIOWidget *>> m_widgets;
+	QList<QPointer<component::Attribute>> m_attributes; // parallel to m_widgets
 	QLineEdit *m_filter = nullptr;
 };
 

@@ -59,10 +59,14 @@ public:
 	void setMainView(const QString &title, QWidget *view);
 
 public Q_SLOTS:
+	// The Refresh button: everything re-reads from the device.
 	virtual void refresh();
 
 Q_SIGNALS:
+	// The Refresh button was used.
 	void refreshRequested();
+	// The panel was shown (node selected): sections update, reading only what ReadPolicy allows.
+	void selected();
 	void pathSelected(QObject *node);
 
 protected:

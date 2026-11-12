@@ -215,7 +215,7 @@ void NodePanel::refresh() { Q_EMIT refreshRequested(); }
 void NodePanel::showEvent(QShowEvent *event)
 {
 	QWidget::showEvent(event);
-	refresh();
+	Q_EMIT selected();
 }
 
 PropertiesSection::PropertiesSection(QObject *node, QWidget *parent)
@@ -301,6 +301,7 @@ void addAttributes(NodePanel *panel, const QString &title, const QList<component
 {
 	auto *section = new AttributesSection(title, attrs, panel);
 	QObject::connect(panel, &NodePanel::refreshRequested, section, &AttributesSection::refresh);
+	QObject::connect(panel, &NodePanel::selected, section, &AttributesSection::autoRefresh);
 	panel->addSection(section);
 }
 } // namespace
@@ -319,6 +320,7 @@ NodePanel *scopy::dcdebugger::createNodePanel(QObject *node, NodeKind kind, cons
 		}
 		auto *members = new ChildrenSection("Members", children, panel);
 		QObject::connect(panel, &NodePanel::refreshRequested, members, &ChildrenSection::refresh);
+		QObject::connect(panel, &NodePanel::selected, members, &ChildrenSection::refresh);
 		panel->addSection(members);
 		return panel;
 	}
@@ -338,6 +340,7 @@ NodePanel *scopy::dcdebugger::createNodePanel(QObject *node, NodeKind kind, cons
 	}
 	auto *props = new PropertiesSection(node, panel);
 	QObject::connect(panel, &NodePanel::refreshRequested, props, &PropertiesSection::refresh);
+	QObject::connect(panel, &NodePanel::selected, props, &PropertiesSection::refresh);
 	panel->addSection(props);
 
 	if(auto *in = qobject_cast<component::InputStream *>(node)) {
@@ -347,6 +350,7 @@ NodePanel *scopy::dcdebugger::createNodePanel(QObject *node, NodeKind kind, cons
 	} else if(auto *ping = qobject_cast<component::Ping *>(node)) {
 		auto *view = new PingView(ping, panel);
 		QObject::connect(panel, &NodePanel::refreshRequested, view, &PingView::refresh);
+		QObject::connect(panel, &NodePanel::selected, view, &PingView::refresh);
 		panel->setMainView("Ping", view);
 	} else if((kind == NodeKind::Context || kind == NodeKind::Device) &&
 		  !MonitorView::monitorableChannels(node).isEmpty()) {

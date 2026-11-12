@@ -23,17 +23,24 @@
 
 #include "dcdebuggertool.h"
 #include "log/commandlogview.h"
+#include "readpolicy.h"
 
 #include <QLabel>
 #include <QLoggingCategory>
+#include <QSpacerItem>
+#include <QVBoxLayout>
 
 #include <component/commandmonitor.h>
 #include <component/connection.h>
 #include <component/context.h>
 #include <core/deviceimpl.h>
 #include <deviceiconbuilder.h>
+#include <pluginbase/preferences.h>
+#include <gui/preferenceshelper.h>
 #include <scopy-dcdebugger_config.h>
 #include <style.h>
+#include <widgets/menucollapsesection.h>
+#include <widgets/menusectionwidget.h>
 
 Q_LOGGING_CATEGORY(CAT_DCDEBUGGERPLUGIN, "DCDebuggerPlugin")
 
@@ -44,7 +51,37 @@ namespace {
 const char *const TOOL_ID = "dcdebugger";
 } // namespace
 
-void DCDebuggerPlugin::init() { CommandLogView::initPreferences(); }
+void DCDebuggerPlugin::init()
+{
+	CommandLogView::initPreferences();
+	ReadPolicy::initPreferences();
+}
+
+bool DCDebuggerPlugin::loadPreferencesPage()
+{
+	Preferences *p = Preferences::GetInstance();
+
+	m_preferencesPage = new QWidget();
+	QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
+
+	MenuSectionWidget *generalWidget = new MenuSectionWidget(m_preferencesPage);
+	MenuCollapseSection *generalSection = new MenuCollapseSection(
+		"General", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, generalWidget);
+	generalWidget->contentLayout()->setSpacing(10);
+	generalWidget->contentLayout()->addWidget(generalSection);
+	generalSection->contentLayout()->setSpacing(10);
+	lay->setContentsMargins(0, 0, 0, 0);
+	lay->addWidget(generalWidget);
+	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+	generalSection->contentLayout()->addWidget(PREFERENCE_COMBO(
+		p, ReadPolicy::PREF, "Read attributes on selection",
+		"Choose when selecting a node or expanding a group reads its attributes from the device. \"Only "
+		"when not cached\" reads an attribute once, if it has no cached value yet; \"On every selection\" "
+		"reads them each time. The Refresh button and the per-attribute read buttons always read.",
+		ReadPolicy::options(), generalSection));
+	return true;
+}
 
 bool DCDebuggerPlugin::compatible(QString m_param, QString category)
 {
