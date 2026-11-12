@@ -29,15 +29,15 @@
 #include <gui/widgets/menucollapsesection.h>
 
 #include <component/controller.h>
+#include <component/regmap/iregisterreadstrategy.h>
 #include <qcoro/qcorotask.h>
+
+#include <QPointer>
 
 namespace scopy {
 namespace component {
 class Device;
 class Attribute;
-namespace iio {
-class IIORegisterReader;
-}
 } // namespace component
 
 namespace swiot {
@@ -96,7 +96,8 @@ private:
 
 	component::Device *m_device;
 	component::Device *m_swiot;
-	component::iio::IIORegisterReader *m_registerReader;
+	// the device controller's read strategy of the device (address space 0); the device owns it
+	QPointer<component::IRegisterReadStrategy> m_registerReader;
 
 	uint32_t m_faultNumeric = 0;
 	QVector<uint32_t> m_registers;

@@ -25,7 +25,7 @@
 #include <component/device.h>
 #include <component/attribute.h>
 #include <component/attributereader.h>
-#include <component/backends/iio/iioregisterreader.h>
+#include <component/regmap/registerstrategies.h>
 
 #include <qcorotask.h>
 
@@ -47,7 +47,6 @@ FaultsDevice::FaultsDevice(const QString &name, QString path, QString uri, QVect
 	, m_name(name.toUpper())
 	, m_device(nullptr)
 	, m_swiot(nullptr)
-	, m_registerReader(nullptr)
 	, m_registers(registers)
 {
 	QVBoxLayout *layout = new QVBoxLayout(this);
@@ -190,16 +189,32 @@ QCoro::Task<void> FaultsDevice::readRegisters()
 		qCritical(CAT_SWIOT_FAULTS) << m_name << "has no register-read capability.";
 		co_return;
 	}
-	for(int i = 0; i < m_registers.size(); i++) {
-		uint32_t address = m_registers.at(i);
-		auto r = co_await m_registerReader->readAsync(address);
-		if(!r) {
-			qCritical(CAT_SWIOT_FAULTS) << m_name << "faults register could not be read.";
-			continue;
+	QVector<component::RegisterData> request;
+	for(uint32_t address : std::as_const(m_registers)) {
+		request.append(component::RegisterData{address});
+	}
+	// the fault registers in one range call; every register comes back with its own status
+	QPointer<FaultsDevice> self(this);
+	const QVector<component::RegisterData> results = co_await m_registerReader->readRange(request);
+	if(!self) {
+		co_return;
+	}
+
+	// the fault value is made of all the registers: if one failed, nothing is updated
+	QStringList failed;
+	for(const component::RegisterData &r : results) {
+		if(!r.isOk() || !r.value) {
+			failed.append(QString("0x%1").arg(r.address, 0, 16));
 		}
-		uint32_t reg = r.value();
-		qDebug(CAT_SWIOT_FAULTS) << m_name << "faults register read val:" << reg;
-		Q_EMIT faultRegisterRead(i, reg);
+	}
+	if(!failed.isEmpty() || results.size() != m_registers.size()) {
+		qCritical(CAT_SWIOT_FAULTS) << m_name << "the read failed for the following registers:"
+					    << failed.join(", ");
+		co_return;
+	}
+	for(int i = 0; i < results.size(); i++) {
+		qDebug(CAT_SWIOT_FAULTS) << m_name << "faults register read val:" << *results[i].value;
+		Q_EMIT faultRegisterRead(i, *results[i].value);
 	}
 }
 
@@ -212,7 +227,7 @@ void FaultsDevice::establishConnection(QString name)
 	m_device = m_context->findChild<component::Device *>(name);
 	m_swiot = m_context->findChild<component::Device *>("swiot");
 	if(m_device) {
-		m_registerReader = m_device->findChild<component::iio::IIORegisterReader *>();
+		m_registerReader = component::registerStrategies(m_device, 0).read;
 	}
 }
 
