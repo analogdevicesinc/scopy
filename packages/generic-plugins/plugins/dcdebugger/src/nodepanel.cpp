@@ -22,8 +22,10 @@
 #include "nodepanel.h"
 
 #include "acquisition/acquisitionview.h"
+#include "acquisition/streamacquisition.h"
 #include "attributessection.h"
 #include "generation/generatorview.h"
+#include "generation/streamgeneration.h"
 #include "monitor/monitorview.h"
 #include "ping/pingview.h"
 #include "registers/registerview.h"
@@ -32,6 +34,7 @@
 #include <QHeaderView>
 #include <QLabel>
 #include <QMetaProperty>
+#include <QSet>
 #include <QScrollArea>
 #include <QTabWidget>
 #include <QTableWidget>
@@ -41,6 +44,8 @@
 #include <component/inputstream.h>
 #include <component/outputstream.h>
 #include <component/ping.h>
+#include <gui/docking/dockablearea.h>
+#include <gui/docking/dockwrapper.h>
 #include <menusectionwidget.h>
 #include <style.h>
 #include <widgets/animatedrefreshbtn.h>
@@ -143,6 +148,12 @@ NodePanel::NodePanel(QObject *node, NodeKind kind, const QString &title, const Q
 	, m_node(node)
 	, m_kind(kind)
 {
+	QStringList names;
+	for(const PathTitle::Segment &s : path) {
+		names.append(s.first);
+	}
+	m_path = names.isEmpty() ? title : names.join(QLatin1Char('/'));
+
 	m_layout = new QVBoxLayout(this);
 	m_layout->setContentsMargins(0, 0, 0, 0);
 	m_layout->setSpacing(6);
@@ -198,16 +209,92 @@ NodePanel::NodePanel(QObject *node, NodeKind kind, const QString &title, const Q
 
 void NodePanel::addSection(QWidget *section) { m_sections->insertWidget(m_sections->count() - 1, section); }
 
+NodePanel::~NodePanel()
+{
+	// A floating dock is a window of its own, not a child of the panel: it would outlive it.
+	for(DockWrapperInterface *dock : std::as_const(m_docks)) {
+		delete dynamic_cast<QWidget *>(dock);
+	}
+}
+
 void NodePanel::setMainView(const QString &title, QWidget *view)
 {
-	if(!m_tabs) {
+	if(!m_tabs && !m_area) {
 		m_layout->removeWidget(m_sectionsArea);
-		m_tabs = new QTabWidget(this);
-		m_tabs->addTab(m_sectionsArea, "Attributes");
-		m_layout->addWidget(m_tabs, 1);
+		// The docks: KDDockWidgets when available and preferred (their own area: they only dock
+		// with each other), else the classic tabs.
+		DockableAreaInterface *area = createDockableArea(this);
+		if(dynamic_cast<classic::DockableArea *>(area)) {
+			delete area->asWidget();
+			m_tabs = new QTabWidget(this);
+			m_tabs->addTab(m_sectionsArea, "Attributes");
+			m_layout->addWidget(m_tabs, 1);
+		} else {
+			m_area = area;
+			m_layout->addWidget(m_area->asWidget(), 1);
+			addDock("Attributes", m_sectionsArea);
+		}
+	}
+	if(m_area) {
+		addDock(title, view);
+		return;
 	}
 	m_tabs->insertTab(m_tabs->count() - 1, view, title);
 	m_tabs->setCurrentIndex(0);
+}
+
+void NodePanel::addDock(const QString &title, QWidget *widget)
+{
+	DockWrapperInterface *dock = createDockWrapper(title);
+	dock->setTitle(title);
+	dock->setInnerWidget(widget);
+	if(m_docks.isEmpty()) {
+		m_area->addDockWrapper(dock, DockableAreaInterface::Direction_RIGHT);
+		m_docks.append(dock);
+		return;
+	}
+	m_docks.append(dock);
+#ifdef USE_KDDOCKWIDGETS
+	// Tabbed with the attributes, like the classic tabs; the first view is the current tab.
+	auto *first = dynamic_cast<KDDockWidgets::QtWidgets::DockWidget *>(m_docks.first());
+	auto *added = dynamic_cast<KDDockWidgets::QtWidgets::DockWidget *>(dock);
+	if(first && added) {
+		added->setAffinities(first->affinities());
+		first->addDockWidgetAsTab(added);
+		if(auto *firstView = dynamic_cast<KDDockWidgets::QtWidgets::DockWidget *>(m_docks.value(1))) {
+			firstView->setAsCurrentTab();
+		}
+		return;
+	}
+#endif
+	m_area->addDockWrapper(dock, DockableAreaInterface::Direction_RIGHT);
+}
+
+void NodePanel::shutdown()
+{
+	// Floating docks are not children of the panel: look in them too.
+	QList<QWidget *> roots{this};
+	for(DockWrapperInterface *dock : std::as_const(m_docks)) {
+		if(auto *w = dynamic_cast<QWidget *>(dock)) {
+			roots.append(w);
+		}
+	}
+	QSet<StreamAcquisition *> acquisitions;
+	QSet<StreamGeneration *> generations;
+	for(QWidget *root : std::as_const(roots)) {
+		for(StreamAcquisition *acq : root->findChildren<StreamAcquisition *>()) {
+			acquisitions.insert(acq);
+		}
+		for(StreamGeneration *gen : root->findChildren<StreamGeneration *>()) {
+			generations.insert(gen);
+		}
+	}
+	for(StreamAcquisition *acq : std::as_const(acquisitions)) {
+		acq->shutdown();
+	}
+	for(StreamGeneration *gen : std::as_const(generations)) {
+		gen->shutdown();
+	}
 }
 
 void NodePanel::refresh() { Q_EMIT refreshRequested(); }

@@ -21,9 +21,7 @@
 
 #include "dcdebuggertool.h"
 
-#include "acquisition/streamacquisition.h"
 #include "bottompanehost.h"
-#include "generation/streamgeneration.h"
 #include "componenttreemodel.h"
 #include "log/commandlogmodel.h"
 #include "log/commandlogview.h"
@@ -188,12 +186,7 @@ void DCDebuggerTool::clearPanels()
 	m_panels->setCurrentWidget(m_emptyPanel);
 	for(NodePanel *p : std::as_const(m_panelCache)) {
 		// Running acquisitions close their streams before the tree can go away.
-		for(StreamAcquisition *acq : p->findChildren<StreamAcquisition *>()) {
-			acq->shutdown();
-		}
-		for(StreamGeneration *gen : p->findChildren<StreamGeneration *>()) {
-			gen->shutdown();
-		}
+		p->shutdown();
 		m_panels->removeWidget(p);
 		delete p;
 	}

@@ -37,8 +37,10 @@ class QTabWidget;
 class QVBoxLayout;
 
 namespace scopy {
+class DockableAreaInterface;
+class DockWrapperInterface;
 class MenuSectionCollapseWidget;
-}
+} // namespace scopy
 
 namespace scopy::dcdebugger {
 
@@ -50,13 +52,18 @@ class NodePanel : public QWidget
 public:
 	NodePanel(QObject *node, NodeKind kind, const QString &title, const QList<PathTitle::Segment> &path,
 		  QWidget *parent = nullptr);
+	~NodePanel() override;
 
 	QObject *node() const { return m_node; }
 	NodeKind kind() const { return m_kind; }
 	void addSection(QWidget *section);
 	// Puts `view` in a first tab; the sections move to a second "Attributes" tab.
-	// Tabs before "Attributes"; may be called once per view.
+	// Tabs before "Attributes"; may be called once per view. With docking (KDDockWidgets) every
+	// view and the attributes are docks instead, tabbed at first: they can be split side by side
+	// or floated.
 	void setMainView(const QString &title, QWidget *view);
+	// Stops the acquisitions / generations of the panel, docked or floating.
+	void shutdown();
 
 public Q_SLOTS:
 	// The Refresh button: everything re-reads from the device.
@@ -75,10 +82,15 @@ protected:
 private:
 	QPointer<QObject> m_node;
 	NodeKind m_kind;
+	QString m_path; // "ip:192.168.2.1/iio/cf-ad9361-lpc", for the dock titles
 	QVBoxLayout *m_layout;
 	QWidget *m_sectionsArea;
 	QTabWidget *m_tabs = nullptr;
+	DockableAreaInterface *m_area = nullptr;
+	QList<DockWrapperInterface *> m_docks; // the attributes first, then the views
 	QVBoxLayout *m_sections;
+
+	void addDock(const QString &title, QWidget *widget);
 };
 
 // Q_PROPERTY values (+ class and tags) of one component, read from its metaobject.
