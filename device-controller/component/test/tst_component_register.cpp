@@ -21,6 +21,10 @@
 
 #include "component/backends/iio/iioregisterreader.h"
 #include "component/backends/iio/iioregisterwriter.h"
+#include "component/backends/iio/regmap/iioregisterreadstrategy.h"
+#include "component/backends/iio/regmap/iioregisterwritestrategy.h"
+#include "component/device.h"
+#include "component/regmap/registerstrategies.h"
 #include "core/pooledcmdexecutor.h"
 #include "iioutil/ideviceops.h"
 
@@ -30,6 +34,7 @@
 #include <qcoro/qcorofuture.h>
 
 using namespace scopy;
+using namespace scopy::component;
 using namespace scopy::component::iio;
 
 namespace {
@@ -40,6 +45,7 @@ class FakeDeviceOps : public scopy::iio::IDeviceOps
 {
 public:
 	QHash<uint32_t, uint32_t> regs;
+	QList<uint32_t> calls; // every address sent to the device
 
 	QString id(scopy::iio::DeviceHandle) const override { return {}; }
 	QString name(scopy::iio::DeviceHandle) const override { return {}; }
@@ -64,6 +70,7 @@ public:
 
 	scopy::Result<uint32_t> regRead(scopy::iio::DeviceHandle, uint32_t addr) override
 	{
+		calls.append(addr);
 		if(addr == 0xdead) {
 			return scopy::Unexpected{scopy::Error{-EIO, QStringLiteral("bad addr")}};
 		}
@@ -71,6 +78,7 @@ public:
 	}
 	scopy::Result<void> regWrite(scopy::iio::DeviceHandle, uint32_t addr, uint32_t val) override
 	{
+		calls.append(addr);
 		if(addr == 0xdead) {
 			return scopy::Unexpected{scopy::Error{-EIO, QStringLiteral("bad addr")}};
 		}
@@ -89,6 +97,10 @@ private Q_SLOTS:
 	void writeThenReadBack();
 	void readEmitsSucceeded();
 	void failurePaths();
+	void strategyReadRangeCarriesOn();
+	void strategyWriteRangeCarriesOn();
+	void strategyAddressSpace();
+	void strategiesPerAddressSpace();
 };
 
 void TstComponentRegister::writeThenReadBack()
@@ -136,6 +148,104 @@ void TstComponentRegister::failurePaths()
 	QVERIFY(!QCoro::waitFor(writer.writeAsync(0xdead, 1)));
 	QCOMPARE(rfail.count(), 1);
 	QCOMPARE(wfail.count(), 1);
+}
+
+void TstComponentRegister::strategyReadRangeCarriesOn()
+{
+	PooledCmdExecutor exec(1);
+	FakeDeviceOps ops;
+	ops.regs.insert(0x1, 0x11);
+	ops.regs.insert(0x5, 0x55);
+	scopy::iio::DeviceHandle dh{reinterpret_cast<void *>(0x1)};
+	IIORegisterReader reader(&ops, dh, &exec);
+	IIORegisterReadStrategy strategy(&reader, 0);
+
+	// not contiguous, with a failing register in the middle
+	const QVector<RegisterData> results =
+		QCoro::waitFor(strategy.readRange({RegisterData{0x5}, RegisterData{0xdead}, RegisterData{0x1}}));
+	QCOMPARE(results.size(), 3);
+	QCOMPARE(results[0].address, 0x5u);
+	QVERIFY(results[0].isOk());
+	QCOMPARE(*results[0].value, 0x55u);
+	QCOMPARE(results[1].address, 0xdeadu);
+	QVERIFY(results[1].isError());
+	QVERIFY(!results[1].value);
+	QCOMPARE(results[1].error->code, -EIO);
+	QCOMPARE(results[2].address, 0x1u);
+	QVERIFY(results[2].isOk());
+	QCOMPARE(*results[2].value, 0x11u);
+	QVERIFY(results[2].completedAt.isValid());
+}
+
+void TstComponentRegister::strategyWriteRangeCarriesOn()
+{
+	PooledCmdExecutor exec(1);
+	FakeDeviceOps ops;
+	scopy::iio::DeviceHandle dh{reinterpret_cast<void *>(0x1)};
+	IIORegisterWriter writer(&ops, dh, &exec);
+	IIORegisterWriteStrategy strategy(&writer, 0);
+
+	const QVector<RegisterData> results = QCoro::waitFor(strategy.writeRange(
+		{RegisterData{0x1, 0xa}, RegisterData{0xdead, 0xb}, RegisterData{0x3, 0xc}, RegisterData{0x4}}));
+	QCOMPARE(results.size(), 4);
+	QVERIFY(results[0].isOk());
+	QCOMPARE(*results[0].value, 0xau);
+	QVERIFY(results[1].isError());
+	// the write after the failed one is still attempted
+	QVERIFY(results[2].isOk());
+	QCOMPARE(ops.regs.value(0x3), 0xcu);
+	// no value to write
+	QVERIFY(results[3].isError());
+	QCOMPARE(results[3].error->code, -EINVAL);
+	QCOMPARE(ops.calls, (QList<uint32_t>{0x1, 0xdead, 0x3}));
+}
+
+void TstComponentRegister::strategyAddressSpace()
+{
+	PooledCmdExecutor exec(1);
+	FakeDeviceOps ops;
+	ops.regs.insert(0x80000004, 0x44);
+	scopy::iio::DeviceHandle dh{reinterpret_cast<void *>(0x1)};
+	IIORegisterReader reader(&ops, dh, &exec);
+	IIORegisterWriter writer(&ops, dh, &exec);
+	IIORegisterReadStrategy read(&reader, 0x80000000);
+	IIORegisterWriteStrategy write(&writer, 0x80000000);
+
+	// the space goes to the device only, the results keep the template address
+	const RegisterData r = QCoro::waitFor(read.read(RegisterData{0x4}));
+	QCOMPARE(r.address, 0x4u);
+	QCOMPARE(*r.value, 0x44u);
+	const RegisterData w = QCoro::waitFor(write.write(RegisterData{0x8, 0x1}));
+	QCOMPARE(w.address, 0x8u);
+	QVERIFY(w.isOk());
+	QCOMPARE(ops.calls, (QList<uint32_t>{0x80000004, 0x80000008}));
+}
+
+void TstComponentRegister::strategiesPerAddressSpace()
+{
+	PooledCmdExecutor exec(1);
+	FakeDeviceOps ops;
+	scopy::iio::DeviceHandle dh{reinterpret_cast<void *>(0x1)};
+	scopy::component::Device device;
+	new IIORegisterReader(&ops, dh, &exec, &device);
+	new IIORegisterWriter(&ops, dh, &exec, &device);
+
+	const RegisterStrategies plain = registerStrategies(&device, 0);
+	QVERIFY(plain.read && plain.write);
+	// asked again: the same pair
+	const RegisterStrategies again = registerStrategies(&device, 0);
+	QCOMPARE(again.read.data(), plain.read.data());
+	QCOMPARE(again.write.data(), plain.write.data());
+	// another address space: its own pair, owned by the device
+	const RegisterStrategies axi = registerStrategies(&device, 0x80000000);
+	QVERIFY(axi.read && axi.read != plain.read);
+	QCOMPARE(axi.read->parent(), &device);
+	QCOMPARE(device.findChildren<IRegisterReadStrategy *>().size(), 2);
+
+	// a device with no register access has none
+	scopy::component::Device noRegs;
+	const RegisterStrategies none = registerStrategies(&noRegs, 0);
+	QVERIFY(!none.read && !none.write);
 }
 
 QTEST_MAIN(TstComponentRegister)

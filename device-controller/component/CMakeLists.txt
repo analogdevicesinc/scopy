@@ -20,8 +20,24 @@
 
 # component — identity/capability component tree (Context/Device/Channel/Attribute), the Controller + backend context
 # factories, and the IIO backend leaves. Depends on core and iio-utils.
-file(GLOB COMPONENT_HEADERS include/component/*.h include/component/backends/iio/*.h)
-file(GLOB COMPONENT_SOURCES src/*.cpp src/backends/iio/*.cpp)
+file(
+	GLOB
+	COMPONENT_HEADERS
+	include/component/*.h
+	include/component/regmap/*.h
+	include/component/backends/iio/*.h
+	include/component/backends/iio/regmap/*.h
+	include/component/backends/file/regmap/*.h
+)
+file(
+	GLOB
+	COMPONENT_SOURCES
+	src/*.cpp
+	src/regmap/*.cpp
+	src/backends/iio/*.cpp
+	src/backends/iio/regmap/*.cpp
+	src/backends/file/regmap/*.cpp
+)
 
 add_library(component SHARED ${COMPONENT_HEADERS} ${COMPONENT_SOURCES})
 

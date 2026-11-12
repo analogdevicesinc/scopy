@@ -36,6 +36,8 @@
 #include "component/backends/iio/iioscanelement.h"
 #include "component/backends/iio/iiotrigger.h"
 #include "component/backends/iio/iiotriggerable.h"
+#include "component/backends/iio/regmap/iioregisterreadstrategy.h"
+#include "component/backends/iio/regmap/iioregisterwritestrategy.h"
 
 #include "iioutil/iattrops.h"
 #include "iioutil/ibackend.h"
@@ -176,8 +178,11 @@ void IIOComponentBuilder::buildDebugAttributes(IIODevice *dev, ICmdExecutor *exe
 
 	// Register access — only where the device exposes a debug/register plane.
 	if(hasRegAccess) {
-		new IIORegisterReader(devOps, dh, executor, dev);
-		new IIORegisterWriter(devOps, dh, executor, dev);
+		auto *reader = new IIORegisterReader(devOps, dh, executor, dev);
+		auto *writer = new IIORegisterWriter(devOps, dh, executor, dev);
+		// the default register strategies (address space 0); other spaces are made on request
+		new IIORegisterReadStrategy(reader, 0, dev);
+		new IIORegisterWriteStrategy(writer, 0, dev);
 	}
 }
 
