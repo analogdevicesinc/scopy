@@ -46,7 +46,7 @@ void RegMap_API::write(const QString &addr, const QString &val)
 	uint32_t address = Utils::convertQStringToUint32(addr);
 	uint32_t value = Utils::convertQStringToUint32(val);
 	// a real sync call: waits for a busy register, then writes and reads back
-	QCoro::waitFor(devRegMap->registerMapValues->writeThenReadWhenIdle(address, {value}));
+	QCoro::waitFor(devRegMap->registerMapAccess->writeThenReadWhenIdle(address, value));
 }
 
 void RegMap_API::writeBitField(const QString &addr, const QString &val)
@@ -138,8 +138,8 @@ void RegMap_API::readInterval(QString startAddr, QString stopAddr)
 	}
 	uint32_t start = Utils::convertQStringToUint32(startAddr);
 	uint32_t stop = Utils::convertQStringToUint32(stopAddr);
-	// a real sync call: waits for busy registers, one read per address
-	QCoro::waitFor(devRegMap->registerMapValues->readRange(start, stop, true));
+	// a real sync call: waits for busy registers, then reads the range in one strategy call
+	QCoro::waitFor(devRegMap->registerMapAccess->readRange(start, stop, true));
 }
 
 bool RegMap_API::enableAutoread(bool enable)
@@ -178,8 +178,8 @@ void RegMap_API::registerDump(const QString &filePath)
 		qWarning(CAT_REGMAP_API) << "Device" << getDevice() << "has no read/write, registerDump ignored";
 		return;
 	}
-	// writes the values read so far, as before
-	QCoro::waitFor(devRegMap->registerMapValues->dump(filePath));
+	// writes the Ok values read so far, as before
+	QCoro::waitFor(devRegMap->registerMapAccess->dump(filePath));
 }
 
 void RegMap_API::setPath(const QString &filePath)
@@ -205,8 +205,8 @@ void RegMap_API::writeFromFile(const QString &filePath)
 		return;
 	}
 	setPath(filePath);
-	// a real sync call: every line is written and read back, waiting for busy registers
-	QCoro::waitFor(devRegMap->registerMapValues->writeFromFile(filePath, true));
+	// a real sync call: the lines are written in one range and read back, waiting for busy registers
+	QCoro::waitFor(devRegMap->registerMapAccess->writeFromFile(filePath, true));
 }
 
 QString RegMap_API::readRegister(const QString &addr)
@@ -221,17 +221,12 @@ QString RegMap_API::readRegister(const QString &addr)
 		return "";
 	}
 	// a real sync call: returns the value just read, in the value field's format
-	auto r = QCoro::waitFor(devRegMap->registerMapValues->readWhenIdle(Utils::convertQStringToUint32(addr)));
-	if(!r || r.value().isEmpty()) {
+	const component::RegisterData r =
+		QCoro::waitFor(devRegMap->registerMapAccess->readWhenIdle(Utils::convertQStringToUint32(addr)));
+	if(!r.isOk() || !r.value) {
 		return "";
 	}
-	int width = 8;
-	RegisterModel *reg0 =
-		devRegMap->registerMapTemplate ? devRegMap->registerMapTemplate->getRegisterTemplate(0) : nullptr;
-	if(reg0) {
-		width = reg0->getWidth();
-	}
-	return Utils::convertToHexa(r.value().first(), width);
+	return Utils::convertToHexa(*r.value, devRegMap->registerWidth());
 }
 
 QString RegMap_API::getValueOfRegister(const QString &addr)
@@ -246,8 +241,9 @@ QString RegMap_API::getValueOfRegister(const QString &addr)
 		return "";
 	}
 	uint32_t address = Utils::convertQStringToUint32(addr);
-	if(devRegMap->registerMapValues->hasValue(address)) {
-		return Utils::convertToHexa(devRegMap->registerMapValues->getValueOfRegister(address), 16);
+	const component::RegisterData *entry = devRegMap->registerMapStore->get(address);
+	if(entry && entry->value) {
+		return Utils::convertToHexa(*entry->value, 16);
 	}
 	qWarning(CAT_REGMAP_API) << "Value not read";
 	return "";

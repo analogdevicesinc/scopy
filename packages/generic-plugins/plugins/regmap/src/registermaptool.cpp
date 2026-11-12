@@ -29,9 +29,7 @@
 #include <deviceregistermap.hpp>
 #include <registermapsettingsmenu.hpp>
 #include <registermaptemplate.hpp>
-#include <registermapvalues.hpp>
-#include <registermapvalues.hpp>
-#include <registermapvalues.hpp>
+#include <registermapaccess.hpp>
 #include <regmapstylehelper.hpp>
 #include <searchbarwidget.hpp>
 #include <style.h>
@@ -39,8 +37,6 @@
 #include <toolbuttons.h>
 #include <tutorialbuilder.h>
 
-#include <readwrite/fileregisterreadstrategy.hpp>
-#include <readwrite/fileregisterwritestrategy.hpp>
 #include <style_properties.h>
 
 #include <pluginbase/preferences.h>
@@ -134,15 +130,15 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 RegisterMapTool::~RegisterMapTool() { delete deviceList; }
 
 void RegisterMapTool::addDevice(QString devName, RegisterMapTemplate *registerMapTemplate,
-				RegisterMapValues *registerMapValues)
+				RegisterMapAccess *registerMapAccess)
 {
 
-	DeviceRegisterMap *regMap = new DeviceRegisterMap(registerMapTemplate, registerMapValues, this);
+	DeviceRegisterMap *regMap = new DeviceRegisterMap(registerMapTemplate, registerMapAccess, this);
 	if(registerMapTemplate) {
 		registerMapTemplate->setParent(regMap);
 	}
-	if(registerMapValues) {
-		registerMapValues->setParent(regMap);
+	if(registerMapAccess) {
+		registerMapAccess->setParent(regMap);
 	}
 	deviceList->insert(devName, regMap);
 	tool->addWidgetToCentralContainerHelper(regMap);

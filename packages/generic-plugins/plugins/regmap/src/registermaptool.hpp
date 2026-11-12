@@ -37,7 +37,7 @@ class TutorialBuilder;
 }
 namespace regmap {
 
-class RegisterMapValues;
+class RegisterMapAccess;
 
 class DeviceRegisterMap;
 
@@ -55,7 +55,7 @@ public:
 
 	// The register map takes ownership of the template and the values.
 	void addDevice(QString devName, RegisterMapTemplate *registerMapTemplate = nullptr,
-		       RegisterMapValues *registerMapValues = nullptr);
+		       RegisterMapAccess *registerMapAccess = nullptr);
 	bool hasDevice(const QString &devName) const;
 	bool removeDevice(const QString &devName);
 	void clear();

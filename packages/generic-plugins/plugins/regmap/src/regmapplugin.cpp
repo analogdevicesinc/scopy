@@ -23,8 +23,8 @@
 #include "regmapplugin.h"
 #include "utils.hpp"
 
+#include "registermapaccess.hpp"
 #include "registermaptemplate.hpp"
-#include "registermapvalues.hpp"
 #include "regmapplugin.h"
 #include "templates/registermaptemplateloader.hpp"
 #include <QLabel>
@@ -39,21 +39,16 @@
 #include <registermaptool.hpp>
 #include <style.h>
 #include <stylehelper.h>
-#include <readwrite/componentregisterreadstrategy.hpp>
-#include <readwrite/componentregisterwritestrategy.hpp>
 #include <component/controller.h>
 #include <component/context.h>
 #include <component/backends/iio/iiodevice.h>
 #include <component/backends/iio/iioregisterreader.h>
-#include <component/backends/iio/iioregisterwriter.h>
 #include <pluginbase/messagebroker.h>
 #include <pluginbase/preferences.h>
 #include <gui/preferenceshelper.h>
 #include <core/deviceinfopage.h>
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
-#include <readwrite/fileregisterreadstrategy.hpp>
-#include <readwrite/fileregisterwritestrategy.hpp>
 #include "logging_categories.h"
 #include <regmap_api.h>
 #include <deviceiconbuilder.h>
@@ -335,29 +330,26 @@ RegisterMapToolConfig RegmapPlugin::genericEntry(const QString &devName, const Q
 	return config;
 }
 
-bool RegmapPlugin::configureTool(const QString &device, const QString &templatePath, IRegisterReadStrategy *read,
-				 IRegisterWriteStrategy *write)
+bool RegmapPlugin::configureTool(const QString &device, const QString &templatePath,
+				 component::IRegisterReadStrategy *read, component::IRegisterWriteStrategy *write)
 {
 	const RegisterMapToolConfig defaults = genericEntry(device, Utils::setXmlPath());
+	// read back only when both come from the same place: the device's IIO pair, or both from the caller
+	const bool readBack = (read == nullptr) == (write == nullptr);
 	if(!read || !write) {
-		IRegisterReadStrategy *defaultRead = nullptr;
-		IRegisterWriteStrategy *defaultWrite = nullptr;
-		if(!createIioStrategies(device, defaults.addressSpace.value_or(0), defaultRead, defaultWrite)) {
+		component::RegisterStrategies iio;
+		if(!findIioStrategies(device, defaults.addressSpace.value_or(0), iio)) {
 			qWarning(CAT_REGMAP) << "No default read/write for device" << device;
 			return false;
 		}
-		if(read) {
-			delete defaultRead;
-		} else {
-			read = defaultRead;
+		if(!read) {
+			read = iio.read;
 		}
-		if(write) {
-			delete defaultWrite;
-		} else {
-			write = defaultWrite;
+		if(!write) {
+			write = iio.write;
 		}
 	}
-	return setupDevice(device, templatePath, defaults.bitsPerRow.value_or(8), read, write);
+	return setupDevice(device, templatePath, defaults.bitsPerRow.value_or(8), read, write, readBack);
 }
 
 void RegmapPlugin::clearToolConfiguration(const QString &device)
@@ -435,9 +427,8 @@ QList<RegisterMapToolConfig> RegmapPlugin::inContextOrder(QList<RegisterMapToolC
 
 bool RegmapPlugin::applyConfiguration(const RegisterMapToolConfig &config)
 {
-	IRegisterReadStrategy *read = nullptr;
-	IRegisterWriteStrategy *write = nullptr;
-	if(!createStrategies(config, read, write)) {
+	component::RegisterStrategies strategies;
+	if(!findStrategies(config, strategies)) {
 		return false;
 	}
 
@@ -447,20 +438,20 @@ bool RegmapPlugin::applyConfiguration(const RegisterMapToolConfig &config)
 	} else {
 		qInfo(CAT_REGMAP) << "Register map" << config.target << ": configured by" << config.provider;
 	}
-	// a plugin does the configuration it needs: its entry gets nothing from regmap-config.json
-	return setupDevice(config.target, config.templatePath, config.bitsPerRow.value_or(8), read, write, generic,
-			   config.useRegisterDescriptionAsName, config.useBitFieldDescriptionAsName);
+	// one access for the reader and the writer, so they are the same type and a write is read back.
+	// A plugin does the configuration it needs: its entry gets nothing from regmap-config.json.
+	return setupDevice(config.target, config.templatePath, config.bitsPerRow.value_or(8), strategies.read,
+			   strategies.write, true, generic, config.useRegisterDescriptionAsName,
+			   config.useBitFieldDescriptionAsName);
 }
 
-bool RegmapPlugin::createStrategies(const RegisterMapToolConfig &config, IRegisterReadStrategy *&read,
-				    IRegisterWriteStrategy *&write)
+bool RegmapPlugin::findStrategies(const RegisterMapToolConfig &config, component::RegisterStrategies &strategies)
 {
-	read = nullptr;
-	write = nullptr;
+	strategies = {};
 
 	switch(config.access) {
 	case RegisterMapToolConfig::IIO:
-		return createIioStrategies(config.target, config.addressSpace.value_or(0), read, write);
+		return findIioStrategies(config.target, config.addressSpace.value_or(0), strategies);
 	case RegisterMapToolConfig::None:
 		return true;
 	case RegisterMapToolConfig::File: {
@@ -469,8 +460,7 @@ bool RegmapPlugin::createStrategies(const RegisterMapToolConfig &config, IRegist
 				<< "Register values file" << config.filePath << "not found for device" << config.target;
 			return false;
 		}
-		read = new FileRegisterReadStrategy(config.filePath);
-		write = new FileRegisterWriteStrategy(config.filePath);
+		strategies = component::fileRegisterStrategies(config.filePath);
 		return true;
 	}
 	}
@@ -478,8 +468,8 @@ bool RegmapPlugin::createStrategies(const RegisterMapToolConfig &config, IRegist
 	return false;
 }
 
-bool RegmapPlugin::createIioStrategies(const QString &device, uint32_t addressSpace, IRegisterReadStrategy *&read,
-				       IRegisterWriteStrategy *&write)
+bool RegmapPlugin::findIioStrategies(const QString &device, uint32_t addressSpace,
+				     component::RegisterStrategies &strategies)
 {
 	component::ContextHandle ctx = component::Controller::context(m_param);
 	if(!ctx) {
@@ -492,32 +482,20 @@ bool RegmapPlugin::createIioStrategies(const QString &device, uint32_t addressSp
 		if(dev->name() != device) {
 			continue;
 		}
-		component::iio::IIORegisterReader *reader = dev->findChild<component::iio::IIORegisterReader *>();
-		if(!reader) {
-			return false;
-		}
-		ComponentRegisterReadStrategy *readStrategy = new ComponentRegisterReadStrategy(reader);
-		ComponentRegisterWriteStrategy *writeStrategy =
-			new ComponentRegisterWriteStrategy(dev->findChild<component::iio::IIORegisterWriter *>());
-		if(addressSpace) {
-			readStrategy->setAddressSpace(addressSpace);
-			writeStrategy->setAddressSpace(addressSpace);
-		}
-		read = readStrategy;
-		write = writeStrategy;
-		return true;
+		// the device's pair for this address space; the device controller owns it
+		strategies = component::registerStrategies(dev, addressSpace);
+		return strategies.read != nullptr;
 	}
 	return false;
 }
 
 bool RegmapPlugin::setupDevice(const QString &device, const QString &templatePath, int bitsPerRow,
-			       IRegisterReadStrategy *read, IRegisterWriteStrategy *write, bool useRegmapConfig,
+			       component::IRegisterReadStrategy *read, component::IRegisterWriteStrategy *write,
+			       bool readBack, bool useRegmapConfig,
 			       std::optional<bool> useRegisterDescriptionAsName,
 			       std::optional<bool> useBitFieldDescriptionAsName)
 {
 	if(!registerMapTool) {
-		delete read;
-		delete write;
 		return false;
 	}
 	if(registerMapTool->hasDevice(device)) {
@@ -549,22 +527,14 @@ bool RegmapPlugin::setupDevice(const QString &device, const QString &templatePat
 		}
 	}
 
-	// no read and no write strategy: template only, the register map has no values
-	RegisterMapValues *registerMapValues = nullptr;
+	// no read and no write strategy: template only, the register map has no values.
+	// The access only holds the strategies: they stay the device controller's.
+	RegisterMapAccess *registerMapAccess = nullptr;
 	if(read || write) {
-		registerMapValues = new RegisterMapValues();
-		registerMapValues->setDeviceName(device);
-		if(read) {
-			read->setParent(registerMapValues);
-			registerMapValues->setReadStrategy(read);
-		}
-		if(write) {
-			write->setParent(registerMapValues);
-			registerMapValues->setWriteStrategy(write);
-		}
+		registerMapAccess = new RegisterMapAccess(read, write, readBack, device);
 	}
 
-	registerMapTool->addDevice(device, registerMapTemplate, registerMapValues);
+	registerMapTool->addDevice(device, registerMapTemplate, registerMapAccess);
 	return true;
 }
 
@@ -588,12 +558,6 @@ QString RegmapPlugin::displayName() { return REGMAP_PLUGIN_DISPLAY_NAME; }
 QString RegmapPlugin::pkgName() { return REGMAP_PKG_NAME; }
 
 QWidget *RegmapPlugin::getTool() { return m_registerMapWidget; }
-
-void RegmapPlugin::generateDevice(QString xmlPath, QString devName, IRegisterReadStrategy *readStrategy,
-				  IRegisterWriteStrategy *writeStrategy, int bitsPerRow)
-{
-	setupDevice(devName, xmlPath, bitsPerRow, readStrategy, writeStrategy);
-}
 
 void RegmapPlugin::initApi()
 {

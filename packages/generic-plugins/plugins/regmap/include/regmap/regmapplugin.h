@@ -36,8 +36,7 @@
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 
-#include "readwrite/iregisterreadstrategy.hpp"
-#include "readwrite/iregisterwritestrategy.hpp"
+#include <component/regmap/registerstrategies.h>
 
 namespace Ui {}
 
@@ -70,17 +69,16 @@ public:
 
 	QWidget *getTool();
 
-	void generateDevice(QString xmlPath, QString devName, IRegisterReadStrategy *readStrategy,
-			    IRegisterWriteStrategy *writeStrategy, int bitsPerRow = 8);
-
 	// The generic register map as data: one entry per IIO device with register access that no plugin
 	// configures, with regmap's own template and regmap-config.json options. Builds no widgets.
 	QList<RegisterMapToolConfig> genericConfiguration(const QSet<QString> &covered = {});
 
 	// Template and read/write are independent. An empty path means no template.
-	// A null read/write means the default IIO strategy of that device. Regmap takes ownership.
-	bool configureTool(const QString &device, const QString &templatePath, IRegisterReadStrategy *read = nullptr,
-			   IRegisterWriteStrategy *write = nullptr);
+	// A null read/write means the default IIO strategy of that device. The strategies stay the caller's (from
+	// the device controller); a write is read back when both come from the same place.
+	bool configureTool(const QString &device, const QString &templatePath,
+			   component::IRegisterReadStrategy *read = nullptr,
+			   component::IRegisterWriteStrategy *write = nullptr);
 
 	// Removes one device, or every device when called with no argument.
 	void clearToolConfiguration(const QString &device = {});
@@ -110,15 +108,15 @@ private:
 	bool isGeneric(const RegisterMapToolConfig &config) const;
 	int providerPriority(const QString &provider);
 	bool applyConfiguration(const RegisterMapToolConfig &config);
-	// Maps the access to strategies. None gives two null strategies.
-	bool createStrategies(const RegisterMapToolConfig &config, IRegisterReadStrategy *&read,
-			      IRegisterWriteStrategy *&write);
-	bool createIioStrategies(const QString &device, uint32_t addressSpace, IRegisterReadStrategy *&read,
-				 IRegisterWriteStrategy *&write);
+	// Takes the strategies of the access from the device controller. None gives two null strategies.
+	bool findStrategies(const RegisterMapToolConfig &config, component::RegisterStrategies &strategies);
+	bool findIioStrategies(const QString &device, uint32_t addressSpace, component::RegisterStrategies &strategies);
+	// readBack: the reader and the writer are the same type, so a write is read back.
 	// useRegmapConfig: the template's regmap-config.json options apply (generic and API paths, not plugin
 	// entries). The swaps, when set, win over them.
 	bool setupDevice(const QString &device, const QString &templatePath, int bitsPerRow,
-			 IRegisterReadStrategy *read, IRegisterWriteStrategy *write, bool useRegmapConfig = true,
+			 component::IRegisterReadStrategy *read, component::IRegisterWriteStrategy *write,
+			 bool readBack = true, bool useRegmapConfig = true,
 			 std::optional<bool> useRegisterDescriptionAsName = {},
 			 std::optional<bool> useBitFieldDescriptionAsName = {});
 };

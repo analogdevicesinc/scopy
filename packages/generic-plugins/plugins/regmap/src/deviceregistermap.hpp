@@ -38,7 +38,8 @@ class QDockWidget;
 namespace scopy::regmap {
 class RegisterMapTemplate;
 class RegisterModel;
-class RegisterMapValues;
+class RegisterMapAccess;
+class RegisterMapDataStore;
 class RegisterDetailedWidget;
 class RegisterController;
 class SearchBarWidget;
@@ -50,7 +51,7 @@ class SCOPY_REGMAP_EXPORT DeviceRegisterMap : public QWidget
 	Q_OBJECT
 public:
 	explicit DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate = nullptr,
-				   RegisterMapValues *registerMapValues = nullptr, QWidget *parent = nullptr);
+				   RegisterMapAccess *registerMapAccess = nullptr, QWidget *parent = nullptr);
 	~DeviceRegisterMap();
 
 	void registerChanged(RegisterModel *regModel);
@@ -76,7 +77,8 @@ private:
 	bool autoread = false;
 	QVBoxLayout *layout;
 	RegisterMapTemplate *registerMapTemplate;
-	RegisterMapValues *registerMapValues;
+	RegisterMapAccess *registerMapAccess;
+	RegisterMapDataStore *registerMapStore = nullptr;
 	RegisterController *registerController = nullptr;
 
 	RegisterMapTable *registerMapTableWidget = nullptr;
@@ -84,6 +86,10 @@ private:
 
 	RegisterDetailedWidget *registerDetailedWidget = nullptr;
 	void initSettings();
+	// shows the latest read result of a register: the table row, and the value field and bitfields if selected
+	void showRegisterData(uint32_t address);
+	uint32_t selectedAddress();
+	int registerWidth();
 	int selectedRegister;
 
 	void initTutorial();

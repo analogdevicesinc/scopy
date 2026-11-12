@@ -56,16 +56,12 @@ file(
 	src/register/*.hpp
 	src/register/bitfield/*.cpp
 	src/register/bitfield/*.hpp
-	src/readwrite/*.cpp
-	src/readwrite/*.hpp
 	src/recyclerview/*.cpp
 	src/recyclerview/*.hpp
 	src/templates/*.cpp
 	src/templates/*.hpp
 )
-file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp
-     include/${SCOPY_MODULE}/readwrite/*.hpp
-)
+file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
 file(GLOB UI_LIST ui/*.ui)
 
 qt_add_resources(PROJECT_RESOURCES resources/resources.qrc)

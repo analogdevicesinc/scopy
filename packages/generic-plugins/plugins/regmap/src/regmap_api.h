@@ -28,11 +28,11 @@
 #include <deviceregistermap.hpp>
 #include <registermaptool.hpp>
 #include <register/registermodel.hpp>
-#include <registermapvalues.hpp>
+#include <registermapaccess.hpp>
+#include <registermapdatastore.hpp>
 #include <recyclerview/registermaptable.hpp>
 #include <utils.hpp>
 #include <register/bitfield/bitfieldmodel.hpp>
-#include <readwrite/fileregisterreadstrategy.hpp>
 #include <registermapsettingsmenu.hpp>
 #include <registercontroller.hpp>
 #include <register/registerdetailedwidget.hpp>
