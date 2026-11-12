@@ -35,7 +35,7 @@ class Connection;
 
 namespace scopy::dcdebugger {
 
-// Three-column (name / value / info) view of one connection's component tree. Children of a
+// Two-column (name / value) view of one connection's component tree. Children of a
 // node are listed under group rows of the same kind ("Devices (3)", "Attributes (12)", ...).
 // Values follow the components live (Attribute::valueChanged, Stream::openedChanged, ...).
 class SCOPY_DCDEBUGGER_EXPORT ComponentTreeModel : public QStandardItemModel
@@ -46,7 +46,6 @@ public:
 	{
 		NameColumn = 0,
 		ValueColumn,
-		InfoColumn,
 		ColumnCount
 	};
 	enum Role
@@ -80,8 +79,8 @@ Q_SIGNALS:
 private:
 	void addNode(QStandardItem *parent, QObject *obj, NodeKind kind);
 	void addChildren(QStandardItem *item, QObject *obj);
-	void watch(QObject *obj, NodeKind kind, QStandardItem *valueItem, QStandardItem *infoItem);
-	QList<QStandardItem *> makeRow(const QString &name, const QString &value, const QString &info) const;
+	void watch(QObject *obj, NodeKind kind, QStandardItem *valueItem);
+	QList<QStandardItem *> makeRow(const QString &name, const QString &value) const;
 
 	QPointer<component::Connection> m_conn;
 	// Context of every live-update connection of the current build; deleted on rebuild.

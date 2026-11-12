@@ -82,7 +82,7 @@ class PropertiesSection : public QWidget
 {
 	Q_OBJECT
 public:
-	PropertiesSection(QObject *node, bool collapsed, QWidget *parent = nullptr);
+	PropertiesSection(QObject *node, QWidget *parent = nullptr);
 	void refresh();
 
 private:

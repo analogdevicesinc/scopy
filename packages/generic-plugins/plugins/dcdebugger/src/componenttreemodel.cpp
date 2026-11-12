@@ -38,7 +38,7 @@ ComponentTreeModel::ComponentTreeModel(QObject *parent)
 	: QStandardItemModel(parent)
 {
 	setColumnCount(ColumnCount);
-	setHorizontalHeaderLabels({"Name", "Value", "Info"});
+	setHorizontalHeaderLabels({"Name", "Value"});
 }
 
 ComponentTreeModel::~ComponentTreeModel() { delete m_watchers; }
@@ -68,9 +68,9 @@ void ComponentTreeModel::rebuild()
 	Q_EMIT rebuilt();
 }
 
-QList<QStandardItem *> ComponentTreeModel::makeRow(const QString &name, const QString &value, const QString &info) const
+QList<QStandardItem *> ComponentTreeModel::makeRow(const QString &name, const QString &value) const
 {
-	QList<QStandardItem *> row = {new QStandardItem(name), new QStandardItem(value), new QStandardItem(info)};
+	QList<QStandardItem *> row = {new QStandardItem(name), new QStandardItem(value)};
 	for(QStandardItem *it : row) {
 		it->setEditable(false);
 	}
@@ -80,13 +80,12 @@ QList<QStandardItem *> ComponentTreeModel::makeRow(const QString &name, const QS
 
 void ComponentTreeModel::addNode(QStandardItem *parent, QObject *obj, NodeKind kind)
 {
-	QList<QStandardItem *> row = makeRow(ComponentNode::name(obj, kind), ComponentNode::value(obj, kind),
-					     ComponentNode::info(obj, kind));
+	QList<QStandardItem *> row = makeRow(ComponentNode::name(obj, kind), ComponentNode::value(obj, kind));
 	row[NameColumn]->setData(int(kind), KindRole);
 	parent->appendRow(row);
 	m_objects.insert(row[NameColumn], obj);
 	m_items.insert(obj, row[NameColumn]);
-	watch(obj, kind, row[ValueColumn], row[InfoColumn]);
+	watch(obj, kind, row[ValueColumn]);
 	addChildren(row[NameColumn], obj);
 }
 
@@ -116,8 +115,8 @@ void ComponentTreeModel::addChildren(QStandardItem *item, QObject *obj)
 	});
 
 	for(const Group &g : std::as_const(groups)) {
-		QList<QStandardItem *> row = makeRow(QStringLiteral("%1 (%2)").arg(g.name).arg(g.members.size()),
-						     QString(), ComponentNode::kindName(NodeKind::Group));
+		QList<QStandardItem *> row =
+			makeRow(QStringLiteral("%1 (%2)").arg(g.name).arg(g.members.size()), QString());
 		row[NameColumn]->setData(int(NodeKind::Group), KindRole);
 		row[NameColumn]->setData(g.name, GroupNameRole);
 		item->appendRow(row);
@@ -127,7 +126,7 @@ void ComponentTreeModel::addChildren(QStandardItem *item, QObject *obj)
 	}
 }
 
-void ComponentTreeModel::watch(QObject *obj, NodeKind kind, QStandardItem *valueItem, QStandardItem *infoItem)
+void ComponentTreeModel::watch(QObject *obj, NodeKind kind, QStandardItem *valueItem)
 {
 	auto refresh = [obj, kind, valueItem]() {
 		const QString v = ComponentNode::value(obj, kind);
@@ -152,12 +151,6 @@ void ComponentTreeModel::watch(QObject *obj, NodeKind kind, QStandardItem *value
 		break;
 	case NodeKind::ScanElement:
 		connect(static_cast<ScanElement *>(obj), &ScanElement::enabledChanged, m_watchers, refresh);
-		break;
-	case NodeKind::Channel:
-		if(Attribute *dir = ComponentNode::directionAttribute(obj)) {
-			connect(dir, &Attribute::valueChanged, m_watchers,
-				[obj, kind, infoItem]() { infoItem->setText(ComponentNode::info(obj, kind)); });
-		}
 		break;
 	default:
 		break;

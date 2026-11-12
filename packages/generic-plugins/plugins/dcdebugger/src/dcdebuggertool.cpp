@@ -155,7 +155,6 @@ void DCDebuggerTool::buildTree(QWidget *parent)
 	m_tree->header()->setStretchLastSection(true);
 	m_tree->header()->setSectionResizeMode(QHeaderView::Interactive);
 	m_tree->setColumnWidth(ComponentTreeModel::NameColumn, 320);
-	m_tree->setColumnWidth(ComponentTreeModel::ValueColumn, 240);
 	Style::setStyle(m_tree, style::properties::dcdebugger::treeView);
 	Style::setStyle(m_tree->header(), style::properties::dcdebugger::headerView);
 	lay->addWidget(m_tree);

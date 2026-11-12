@@ -218,13 +218,13 @@ void NodePanel::showEvent(QShowEvent *event)
 	refresh();
 }
 
-PropertiesSection::PropertiesSection(QObject *node, bool collapsed, QWidget *parent)
+PropertiesSection::PropertiesSection(QObject *node, QWidget *parent)
 	: QWidget(parent)
 	, m_node(node)
 {
 	auto *lay = new QVBoxLayout(this);
 	lay->setContentsMargins(0, 0, 0, 0);
-	auto *section = makeSection("General info", this, collapsed);
+	auto *section = makeSection("General info", this);
 	m_table = makeTable({"Property", "Value"}, section);
 	section->contentLayout()->addWidget(m_table);
 	lay->addWidget(section);
@@ -336,7 +336,7 @@ NodePanel *scopy::dcdebugger::createNodePanel(QObject *node, NodeKind kind, cons
 							  : QStringLiteral("Attributes (%1)").arg(attrs.size()),
 			      attrs);
 	}
-	auto *props = new PropertiesSection(node, kind != NodeKind::Attribute && !attrs.isEmpty(), panel);
+	auto *props = new PropertiesSection(node, panel);
 	QObject::connect(panel, &NodePanel::refreshRequested, props, &PropertiesSection::refresh);
 	panel->addSection(props);
 

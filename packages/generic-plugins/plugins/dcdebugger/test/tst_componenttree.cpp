@@ -46,7 +46,7 @@ private Q_SLOTS:
 	void groupsAreOrdered();
 	void pathSkipsGroups();
 	void attributeValueFollowsCache();
-	void channelInfoFollowsDirectionAttribute();
+	void hasNoInfoColumn();
 	void childObjectsWalkGroups();
 	void indexOfOriginFindsTheIssuer();
 
@@ -112,7 +112,6 @@ void TST_ComponentTree::rootIsConnection()
 	const QModelIndex root = m_model->index(0, 0);
 	QCOMPARE(root.data().toString(), QString("test:0"));
 	QCOMPARE(root.siblingAtColumn(ComponentTreeModel::ValueColumn).data().toString(), QString("test"));
-	QCOMPARE(root.siblingAtColumn(ComponentTreeModel::InfoColumn).data().toString(), QString("Connection"));
 	QCOMPARE(m_model->kindAt(root), NodeKind::Connection);
 	QCOMPARE(m_model->objectAt(root), m_conn);
 	// The connection's command monitor is not a component: only the views group is listed.
@@ -136,7 +135,7 @@ void TST_ComponentTree::childrenAreGrouped()
 	QVERIFY(child(dev, "Channels (2)").isValid());
 	QVERIFY(child(dev, "QObject (1)").isValid());
 	const QModelIndex ch = child(child(dev, "Channels (2)"), "voltage0");
-	QCOMPARE(ch.siblingAtColumn(ComponentTreeModel::InfoColumn).data().toString(), QString("Channel (input)"));
+	QVERIFY(ch.isValid());
 	QVERIFY(child(ch, "Attributes (1)").isValid());
 }
 
@@ -159,7 +158,6 @@ void TST_ComponentTree::pathSkipsGroups()
 	QCOMPARE(names, QStringList({"test:0", "iio", "dev0", "sampling_frequency"}));
 	QCOMPARE(path.first().second, m_conn);
 	QCOMPARE(path.last().second, m_attr);
-	QCOMPARE(attr.siblingAtColumn(ComponentTreeModel::InfoColumn).data().toString(), QString("Attribute (ro)"));
 }
 
 void TST_ComponentTree::attributeValueFollowsCache()
@@ -169,22 +167,13 @@ void TST_ComponentTree::attributeValueFollowsCache()
 	QCOMPARE(value.data().toString(), QString("1000000 Hz"));
 }
 
-void TST_ComponentTree::channelInfoFollowsDirectionAttribute()
+void TST_ComponentTree::hasNoInfoColumn()
 {
-	auto *gpio = new Channel(m_dev);
-	gpio->setId("gpio0");
-	auto *dir = new Attribute(gpio);
-	dir->setName("direction");
-	dir->setCachedValue("in");
-	addTag(dir, tags::Direction);
-	delete m_model;
-	m_model = new ComponentTreeModel();
-	m_model->setConnection(m_conn);
-
-	const QModelIndex info = m_model->indexOf(gpio).siblingAtColumn(ComponentTreeModel::InfoColumn);
-	QCOMPARE(info.data().toString(), QString("Channel (in)"));
-	dir->setCachedValue("out");
-	QCOMPARE(info.data().toString(), QString("Channel (out)"));
+	QCOMPARE(m_model->columnCount(), 2);
+	QCOMPARE(m_model->headerData(0, Qt::Horizontal).toString(), QString("Name"));
+	QCOMPARE(m_model->headerData(1, Qt::Horizontal).toString(), QString("Value"));
+	const QModelIndex dev = m_model->indexOf(m_dev);
+	QVERIFY(!m_model->index(0, 2, dev).isValid());
 }
 
 void TST_ComponentTree::childObjectsWalkGroups()

@@ -31,6 +31,7 @@ set(DCDEBUGGER_TESTS
     monitorview
     commandlog
     pingview
+    nodepanel
     bottompanes
     codegenerator
     logscreenshots

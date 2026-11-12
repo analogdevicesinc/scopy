@@ -130,9 +130,17 @@ void TST_AcquisitionUi::selectStream() { selectNode(m_stream); }
 
 void TST_AcquisitionUi::selectNode(QObject *node)
 {
-	auto *tree = m_tool->findChild<QTreeView *>();
 	auto *model = m_tool->findChild<ComponentTreeModel *>();
-	QVERIFY(tree && model);
+	QVERIFY(model);
+	// The command log has a tree view too: take the one over the component tree.
+	QTreeView *tree = nullptr;
+	for(QTreeView *t : m_tool->findChildren<QTreeView *>()) {
+		if(qobject_cast<QAbstractProxyModel *>(t->model())) {
+			tree = t;
+			break;
+		}
+	}
+	QVERIFY(tree);
 	const QModelIndex src = model->indexOf(node);
 	QVERIFY(src.isValid());
 	auto *proxy = qobject_cast<QAbstractProxyModel *>(tree->model());
