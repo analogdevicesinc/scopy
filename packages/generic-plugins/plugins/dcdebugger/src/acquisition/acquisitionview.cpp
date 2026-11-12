@@ -835,8 +835,8 @@ void AcquisitionView::exportData()
 void AcquisitionView::onRunningChanged(bool running)
 {
 	if(!running) {
-		QSignalBlocker runBlock(m_runBtn);
-		QSignalBlocker singleBlock(m_singleBtn);
+		// Not signal-blocked: the buttons switch their text ("Stop" back to "Run" / "Single") on
+		// toggled. The handlers above only stop an acquisition that is no longer running.
 		m_runBtn->setChecked(false);
 		m_singleBtn->setChecked(false);
 		m_runBtn->setEnabled(true);
