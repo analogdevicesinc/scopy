@@ -240,9 +240,20 @@ QString CodeEmitterRegistry::exportScript(const QList<CommandLogEntry> &entries,
 
 	// Calls, in time order; repeats of a call sequence fold into a loop.
 	const int n = items.size();
+	// A loop emits its first period only: a call returning a new handle each time (a block,
+	// a buffer) must not fold, or only the first handle gets a variable and the calls on the
+	// others are left unresolved.
+	auto sameHandleOut = [](const CallRecord &x, const CallRecord &y) {
+		if(x.outKind != CallArg::Handle && y.outKind != CallArg::Handle) {
+			return true;
+		}
+		return x.outKind == y.outKind && x.out.value<quintptr>() == y.out.value<quintptr>();
+	};
 	auto samePeriod = [&](int a, int b, int p) {
 		for(int q = 0; q < p; ++q) {
-			if(!callAt(a + q).sameCall(callAt(b + q))) {
+			const CallRecord &x = callAt(a + q);
+			const CallRecord &y = callAt(b + q);
+			if(!x.sameCall(y) || !sameHandleOut(x, y)) {
 				return false;
 			}
 		}
