@@ -21,6 +21,8 @@
 
 #include "bottompanehost.h"
 
+#include "splitterpane.h"
+
 #include <QEvent>
 #include <QFrame>
 #include <QGuiApplication>
@@ -54,17 +56,20 @@ BottomPaneHost::BottomPaneHost(QWidget *mainWidget, QWidget *parent)
 	lay->setSpacing(0);
 
 	m_splitter = new QSplitter(Qt::Vertical, this);
-	// Either side may be dragged away completely; a collapsed pane closes (see syncFromSplitter).
+	// Either side may be dragged away completely, smoothly: the main widget (the tree | panel
+	// splitter of SplitterPanes) and the pane area have no minimum height. A pane dragged down to
+	// nothing closes (see syncFromSplitter).
 	m_splitter->setChildrenCollapsible(true);
 	m_splitter->addWidget(mainWidget);
 
 	// The pane area: the open pane, inset from the tool edges like the panel above it.
-	m_paneArea = new QWidget(m_splitter);
-	auto *areaLay = new QVBoxLayout(m_paneArea);
+	auto *areaContent = new QWidget();
+	auto *areaLay = new QVBoxLayout(areaContent);
 	areaLay->setContentsMargins(6, 0, 6, 6);
 	areaLay->setSpacing(0);
-	m_stack = new QStackedWidget(m_paneArea);
+	m_stack = new QStackedWidget(areaContent);
 	areaLay->addWidget(m_stack, 1);
+	m_paneArea = new SplitterPane(areaContent, m_splitter);
 	m_splitter->addWidget(m_paneArea);
 	m_splitter->setStretchFactor(0, 1);
 	m_splitter->setStretchFactor(1, 0);

@@ -28,6 +28,7 @@
 #include "log/commandlogmodel.h"
 #include "log/commandlogview.h"
 #include "nodepanel.h"
+#include "splitterpane.h"
 #include "readpolicy.h"
 
 #include <QCursor>
@@ -70,14 +71,15 @@ DCDebuggerTool::DCDebuggerTool(component::Connection *conn, QWidget *parent)
 	m_tool->centralContainer()->setVisible(true);
 	lay->addWidget(m_tool);
 
+	// Both sides are SplitterPanes: the handle moves smoothly over the whole width.
 	auto *splitter = new QSplitter(Qt::Horizontal, this);
 	splitter->setChildrenCollapsible(true);
 
-	auto *treeContainer = new QWidget(splitter);
+	auto *treeContainer = new QWidget();
 	Style::setBackgroundColor(treeContainer, json::theme::background_subtle);
 	buildTree(treeContainer);
 
-	auto *panelContainer = new QWidget(splitter);
+	auto *panelContainer = new QWidget();
 	auto *panelLay = new QVBoxLayout(panelContainer);
 	panelLay->setContentsMargins(6, 6, 6, 6);
 	m_panels = new QStackedWidget(panelContainer);
@@ -88,8 +90,8 @@ DCDebuggerTool::DCDebuggerTool(component::Connection *conn, QWidget *parent)
 	m_panels->addWidget(m_emptyPanel);
 	panelLay->addWidget(m_panels);
 
-	splitter->addWidget(treeContainer);
-	splitter->addWidget(panelContainer);
+	splitter->addWidget(new SplitterPane(treeContainer, splitter));
+	splitter->addWidget(new SplitterPane(panelContainer, splitter));
 	splitter->setStretchFactor(0, 3);
 	splitter->setStretchFactor(1, 2);
 
