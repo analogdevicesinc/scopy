@@ -37,6 +37,8 @@ public:
 	explicit RegisterDetailedWidget(RegisterModel *regModel, QWidget *parent = nullptr);
 
 	void updateBitFieldsValue(uint32_t value);
+	// the latest read failed: no read value on any bitfield
+	void clearBitFieldsValue();
 	QString getBitFieldsValue();
 
 private:

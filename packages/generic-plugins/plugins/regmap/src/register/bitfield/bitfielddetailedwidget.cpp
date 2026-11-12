@@ -218,6 +218,8 @@ void BitFieldDetailedWidget::updateValue(QString newValue)
 	}
 }
 
+void BitFieldDetailedWidget::clearReadValue() { lastReadValue->setText("N/R"); }
+
 void BitFieldDetailedWidget::registerValueUpdated(QString newValue)
 {
 	lastReadValue->setText(newValue);

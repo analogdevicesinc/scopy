@@ -117,6 +117,13 @@ RegisterDetailedWidget::RegisterDetailedWidget(RegisterModel *regModel, QWidget 
 	}
 }
 
+void RegisterDetailedWidget::clearBitFieldsValue()
+{
+	for(BitFieldDetailedWidget *bitField : *bitFieldList) {
+		bitField->clearReadValue();
+	}
+}
+
 void RegisterDetailedWidget::updateBitFieldsValue(uint32_t value)
 {
 	int regOffset = 0;

@@ -42,6 +42,7 @@ public:
 	QWidget *getWidget();
 	void setFilters(QList<uint32_t> filters);
 	void valueUpdated(uint32_t address, uint32_t value);
+	void errorUpdated(uint32_t address, const QString &error);
 	void scrollTo(uint32_t index);
 	void setRegisterSelected(uint32_t address);
 

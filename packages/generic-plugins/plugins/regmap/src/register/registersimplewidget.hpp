@@ -46,6 +46,8 @@ public:
 	~RegisterSimpleWidget();
 
 	void valueUpdated(uint32_t value);
+	// the latest read failed: "err" in place of the value, the error in the tooltip, no bitfield values
+	void errorUpdated(const QString &error);
 	void setRegisterSelected(bool selected);
 
 	RegisterModel *getRegisterModel() const;
@@ -61,6 +63,7 @@ private:
 	QLabel *registerNameLabel;
 	QLabel *registerAddressLabl;
 	RegisterModel *registerModel;
+	bool selected = false;
 
 protected:
 	bool eventFilter(QObject *object, QEvent *event) override;

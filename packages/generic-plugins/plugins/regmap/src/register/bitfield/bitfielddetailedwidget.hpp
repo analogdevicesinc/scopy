@@ -50,6 +50,8 @@ public:
 	QString getToolTip() const;
 	void updateValue(QString newValue);
 	void registerValueUpdated(QString newValue);
+	// the latest read failed: no value read
+	void clearReadValue();
 	QString getValue();
 
 	int getWidth() const;

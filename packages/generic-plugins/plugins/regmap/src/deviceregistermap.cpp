@@ -248,7 +248,12 @@ void DeviceRegisterMap::registerChanged(RegisterModel *regModel)
 	QObject::connect(registerDetailedWidget, &RegisterDetailedWidget::bitFieldValueChanged, registerController,
 			 &RegisterController::registerValueChanged);
 	QObject::connect(registerController, &RegisterController::valueChanged, this, [this](QString val) {
-		registerDetailedWidget->updateBitFieldsValue(Utils::convertQStringToUint32(val));
+		// "err" and "N/R" have no bitfields to show
+		bool ok = false;
+		const uint32_t value = val.trimmed().toUInt(&ok, 16);
+		if(ok) {
+			registerDetailedWidget->updateBitFieldsValue(value);
+		}
 	});
 
 	if(registerMapStore) {
@@ -259,6 +264,8 @@ void DeviceRegisterMap::registerChanged(RegisterModel *regModel)
 		if(entry && entry->value) {
 			registerDetailedWidget->updateBitFieldsValue(*entry->value);
 			registerController->registerValueChanged(Utils::convertToHexa(*entry->value, regModel->getWidth()));
+		} else if(entry && entry->error) {
+			registerController->registerErrorChanged(RegisterMapAccess::errorText(*entry->error));
 		}
 	}
 }
@@ -266,7 +273,14 @@ void DeviceRegisterMap::registerChanged(RegisterModel *regModel)
 void DeviceRegisterMap::showRegisterData(uint32_t address)
 {
 	const component::RegisterData *entry = registerMapStore->get(address);
-	if(!entry || !entry->value) {
+	if(!entry) {
+		return;
+	}
+	if(!entry->value) {
+		// the latest read failed: the error is shown in place of the value
+		if(entry->error) {
+			showRegisterError(address, RegisterMapAccess::errorText(*entry->error));
+		}
 		return;
 	}
 	const uint32_t value = *entry->value;
@@ -280,6 +294,20 @@ void DeviceRegisterMap::showRegisterData(uint32_t address)
 	registerController->registerValueChanged(Utils::convertToHexa(value, registerWidth()));
 	if(registerDetailedWidget) {
 		registerDetailedWidget->updateBitFieldsValue(value);
+	}
+}
+
+void DeviceRegisterMap::showRegisterError(uint32_t address, const QString &error)
+{
+	if(registerMapTemplate) {
+		registerMapTableWidget->errorUpdated(address, error);
+	}
+	if(address != selectedAddress()) {
+		return;
+	}
+	registerController->registerErrorChanged(error);
+	if(registerDetailedWidget) {
+		registerDetailedWidget->clearBitFieldsValue();
 	}
 }
 

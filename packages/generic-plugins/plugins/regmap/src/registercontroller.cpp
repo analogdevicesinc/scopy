@@ -40,6 +40,8 @@
 #include <style.h>
 #include "style_properties.h"
 
+#include <pluginbase/statusbarmanager.h>
+
 using namespace scopy;
 using namespace regmap;
 
@@ -112,7 +114,14 @@ RegisterController::RegisterController(QWidget *parent)
 	// request write on register
 	QObject::connect(writeButton, &QPushButton::clicked, this, [this]() {
 		uint32_t address = addressPicker->value();
-		uint32_t value = Utils::convertQStringToUint32(regValue->text());
+		// "err", "N/R" or a typo would be written as 0
+		bool ok = false;
+		uint32_t value = regValue->text().trimmed().toUInt(&ok, 16);
+		if(!ok) {
+			StatusBarManager::pushMessage(
+				QString("Register map: \"%1\" is not a hex value, write skipped").arg(regValue->text()));
+			return;
+		}
 		Q_EMIT requestWrite(address, value);
 	});
 
@@ -144,7 +153,17 @@ void RegisterController::registerChanged(uint32_t address)
 	}
 }
 
-void RegisterController::registerValueChanged(QString value) { regValue->setText(value); }
+void RegisterController::registerValueChanged(QString value)
+{
+	regValue->setToolTip("");
+	regValue->setText(value);
+}
+
+void RegisterController::registerErrorChanged(const QString &error)
+{
+	regValue->setToolTip(error);
+	regValue->setText(REGISTER_ERROR_TEXT);
+}
 
 QString RegisterController::getAddress() { return addressPicker->text(); }
 

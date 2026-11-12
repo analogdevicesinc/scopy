@@ -161,15 +161,31 @@ void RegisterSimpleWidget::valueUpdated(uint32_t value)
 		}
 	}
 	this->value->setText(Utils::convertToHexa(value, registerModel->getWidth()));
+	this->value->setToolTip("");
 	RegmapStyleHelper::applyRegisterValueColorPreferences(this);
+}
+
+void RegisterSimpleWidget::errorUpdated(const QString &error)
+{
+	for(BitFieldSimpleWidget *bitField : *bitFields) {
+		bitField->blockSignals(true);
+		bitField->updateValue("N/R");
+		bitField->blockSignals(false);
+	}
+	value->setText(REGISTER_ERROR_TEXT);
+	value->setToolTip(error);
+	// no value to color: back to the plain style, keeping the selection
+	value->setStyleSheet("");
+	RegmapStyleHelper::toggleSelectedRegister(regBaseInfoWidget, selected);
 }
 
 void RegisterSimpleWidget::setRegisterSelected(bool selected)
 {
+	this->selected = selected;
 
 	RegmapStyleHelper::toggleSelectedRegister(regBaseInfoWidget, selected);
 
-	if(value->text() != "N/R" && !selected) {
+	if(RegmapStyleHelper::showsValue(value->text()) && !selected) {
 		RegmapStyleHelper::applyRegisterValueColorPreferences(this);
 	}
 

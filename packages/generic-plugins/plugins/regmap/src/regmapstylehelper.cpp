@@ -60,6 +60,8 @@ void RegmapStyleHelper::regmapSettingsMenu(RegisterMapSettingsMenu *settings, QS
 	Style::setStyle(settings->hexaPrefix2, style::properties::label::menuBig);
 }
 
+bool RegmapStyleHelper::showsValue(const QString &text) { return text != "N/R" && text != REGISTER_ERROR_TEXT; }
+
 void RegmapStyleHelper::toggleSelectedRegister(QWidget *widget, bool toggle)
 {
 	QString styleSheet = "";
@@ -75,7 +77,7 @@ void RegmapStyleHelper::toggleSelectedRegister(QWidget *widget, bool toggle)
 void RegmapStyleHelper::applyBitfieldValueColorPreferences(BitFieldSimpleWidget *widget)
 {
 	{
-		if(widget->value->text() != "N/R") {
+		if(showsValue(widget->value->text())) {
 			scopy::Preferences *p = scopy::Preferences::GetInstance();
 			QString background = p->get("regmap_color_by_value").toString();
 
@@ -87,6 +89,9 @@ void RegmapStyleHelper::applyBitfieldValueColorPreferences(BitFieldSimpleWidget 
 			if(background.contains("Bitfield text")) {
 				widget->value->setStyleSheet("color: " + getColorBasedOnValue(widget->value->text()));
 			}
+		} else {
+			widget->mainFrame->setStyleSheet("");
+			widget->value->setStyleSheet("");
 		}
 	}
 }
@@ -94,7 +99,7 @@ void RegmapStyleHelper::applyBitfieldValueColorPreferences(BitFieldSimpleWidget 
 void RegmapStyleHelper::applyRegisterValueColorPreferences(RegisterSimpleWidget *widget)
 {
 
-	if(widget->value->text() != "N/R") {
+	if(showsValue(widget->value->text())) {
 		scopy::Preferences *p = scopy::Preferences::GetInstance();
 		QString background = p->get("regmap_color_by_value").toString();
 
@@ -151,7 +156,7 @@ void RegmapStyleHelper::BitFieldSimpleWidgetStyle(BitFieldSimpleWidget *widget, 
 	Style::setStyle(widget->mainFrame, style::properties::regmap::hoverWidget, true, true);
 	Style::setStyle(widget->mainFrame, style::properties::regmap::bitfieldSimpleWidget);
 
-	if(widget->value->text() != "N/R") {
+	if(showsValue(widget->value->text())) {
 		RegmapStyleHelper::applyBitfieldValueColorPreferences(widget);
 	}
 }
@@ -186,7 +191,7 @@ void RegmapStyleHelper::RegisterSimpleWidgetStyle(RegisterSimpleWidget *widget, 
 
 	widget->setStyleSheet(style);
 
-	if(widget->value->text() != "N/R") {
+	if(showsValue(widget->value->text())) {
 		RegmapStyleHelper::applyRegisterValueColorPreferences(widget);
 	}
 }

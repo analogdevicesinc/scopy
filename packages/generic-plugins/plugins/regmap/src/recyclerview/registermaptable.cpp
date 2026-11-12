@@ -84,6 +84,13 @@ void RegisterMapTable::valueUpdated(uint32_t address, uint32_t value)
 	}
 }
 
+void RegisterMapTable::errorUpdated(uint32_t address, const QString &error)
+{
+	if(registersMap->contains(address)) {
+		registersMap->value(address)->errorUpdated(error);
+	}
+}
+
 void RegisterMapTable::scrollTo(uint32_t index)
 {
 	if(registerModels->keys().contains(index)) {

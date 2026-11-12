@@ -45,6 +45,9 @@ namespace scopy::regmap {
 
 class RegisterMapSettingsMenu;
 
+// shown in place of the value when the latest read of a register failed (the error is in the tooltip)
+inline const QString REGISTER_ERROR_TEXT = "err";
+
 class RegmapStyleHelper
 {
 protected:
@@ -66,6 +69,8 @@ public:
 	static void applyBitfieldValueColorPreferences(BitFieldSimpleWidget *widget);
 	static void applyRegisterValueColorPreferences(RegisterSimpleWidget *widget);
 	static QString getColorBasedOnValue(QString value);
+	// false for "N/R" and for an error: there is no value to color
+	static bool showsValue(const QString &text);
 
 private:
 	QMap<QString, QString> colorMap;

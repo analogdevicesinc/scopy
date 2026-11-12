@@ -223,10 +223,13 @@ QString RegMap_API::readRegister(const QString &addr)
 	// a real sync call: returns the value just read, in the value field's format
 	const component::RegisterData r =
 		QCoro::waitFor(devRegMap->registerMapAccess->readWhenIdle(Utils::convertQStringToUint32(addr)));
-	if(!r.isOk() || !r.value) {
-		return "";
+	if(r.isOk() && r.value) {
+		return Utils::convertToHexa(*r.value, devRegMap->registerWidth());
 	}
-	return Utils::convertToHexa(*r.value, devRegMap->registerWidth());
+	if(r.error) {
+		return "ERROR: " + RegisterMapAccess::errorText(*r.error);
+	}
+	return "";
 }
 
 QString RegMap_API::getValueOfRegister(const QString &addr)
@@ -244,6 +247,10 @@ QString RegMap_API::getValueOfRegister(const QString &addr)
 	const component::RegisterData *entry = devRegMap->registerMapStore->get(address);
 	if(entry && entry->value) {
 		return Utils::convertToHexa(*entry->value, 16);
+	}
+	// the latest read failed
+	if(entry && entry->error) {
+		return "ERROR: " + RegisterMapAccess::errorText(*entry->error);
 	}
 	qWarning(CAT_REGMAP_API) << "Value not read";
 	return "";

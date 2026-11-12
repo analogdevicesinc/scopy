@@ -88,6 +88,7 @@ private:
 	void initSettings();
 	// shows the latest read result of a register: the table row, and the value field and bitfields if selected
 	void showRegisterData(uint32_t address);
+	void showRegisterError(uint32_t address, const QString &error);
 	uint32_t selectedAddress();
 	int registerWidth();
 	int selectedRegister;

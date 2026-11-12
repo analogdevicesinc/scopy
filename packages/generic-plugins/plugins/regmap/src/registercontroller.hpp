@@ -53,6 +53,8 @@ public:
 
 	void registerChanged(uint32_t address);
 	void registerValueChanged(QString value);
+	// the latest read failed: "err" in the value field, the error in its tooltip
+	void registerErrorChanged(const QString &error);
 	QString getAddress();
 	void setHasMap(bool hasMap);
 	// Read and Write are disabled while the selected register is busy

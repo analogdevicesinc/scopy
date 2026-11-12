@@ -136,6 +136,7 @@ private Q_SLOTS:
 	void mixedPairHasNoReadBack();
 	void dumpWritesOkEntries();
 	void noStrategy();
+	void errorText();
 };
 
 void TstRegisterMapAccess::rangeRefreshesOnce()
@@ -305,6 +306,16 @@ void TstRegisterMapAccess::noStrategy()
 	const RegisterData w = QCoro::waitFor(access.writeThenRead(0x1, 0x1));
 	QCOMPARE(w.error->code, -ENOTSUP);
 	QVERIFY(!access.store()->get(0x1));
+}
+
+void TstRegisterMapAccess::errorText()
+{
+	// the text of the tooltip, the status bar and the JS API
+	QCOMPARE(RegisterMapAccess::errorText(Error{-ENOENT, "no value for address 0x7"}),
+		 QString("no value for address 0x7 (-2)"));
+	// no message: the errno text, no code added
+	const Error noMessage{-EIO, ""};
+	QCOMPARE(RegisterMapAccess::errorText(noMessage), noMessage.errorString());
 }
 
 QTEST_MAIN(TstRegisterMapAccess)
