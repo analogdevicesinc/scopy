@@ -190,6 +190,8 @@ void TimeCurve::setVisible(bool visible)
 	}
 }
 
+bool TimeCurve::isVisible() const { return m_ch->isEnabled(); }
+
 QColor TimeCurve::color() const { return m_ch->pen().color(); }
 
 void TimeCurve::pull()
@@ -362,6 +364,7 @@ void TimePlot::setRelative(bool relative)
 	m_relative = relative;
 	applyLabels();
 	m_plot->replot();
+	Q_EMIT settingsChanged();
 }
 
 void TimePlot::setStartTime(double ms)
@@ -376,6 +379,7 @@ void TimePlot::setTimeFormat(const QString &format)
 	m_format = format.isEmpty() ? QStringLiteral("hh:mm:ss") : format;
 	applyLabels();
 	m_plot->replot();
+	Q_EMIT settingsChanged();
 }
 
 void TimePlot::setSpan(double seconds)
@@ -385,15 +389,21 @@ void TimePlot::setSpan(double seconds)
 	applyLabels();
 	applyXWindow();
 	m_plot->replot();
+	Q_EMIT settingsChanged();
 }
 
-void TimePlot::setHistory(double seconds) { m_history = std::max(seconds, m_span); }
+void TimePlot::setHistory(double seconds)
+{
+	m_history = std::max(seconds, m_span);
+	Q_EMIT settingsChanged();
+}
 
 void TimePlot::setLive(bool live)
 {
 	m_live = live;
 	applyXWindow();
 	m_plot->replot();
+	Q_EMIT settingsChanged();
 }
 
 void TimePlot::setAutoscale(bool on)
@@ -401,6 +411,7 @@ void TimePlot::setAutoscale(bool on)
 	m_autoscale = on;
 	applyAutoscale();
 	m_plot->replot();
+	Q_EMIT settingsChanged();
 }
 
 double TimePlot::yMin() const { return m_plot->yAxis()->min(); }
@@ -414,6 +425,7 @@ void TimePlot::setYRange(double min, double max)
 	}
 	m_plot->yAxis()->setInterval(min, max);
 	m_plot->replot();
+	Q_EMIT settingsChanged();
 }
 
 void TimePlot::setShowLegend(bool on)
@@ -425,6 +437,7 @@ void TimePlot::setShowLegend(bool on)
 	if(!m_legend.isNull()) {
 		m_legend->setVisible(on);
 	}
+	Q_EMIT settingsChanged();
 }
 
 void TimePlot::update()

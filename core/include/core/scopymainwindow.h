@@ -89,6 +89,11 @@ private Q_SLOTS:
 	void handleScriptingToolRequest();
 
 private:
+	// Plugins that own global tools, and their part of a setup file.
+	QList<Plugin *> globalPlugins() const;
+	void saveGlobalPlugins(QSettings &s);
+	void loadGlobalPlugins(QSettings &s);
+
 	ScopyAboutPage *about;
 	ScopyPreferencesPage *prefPage;
 	ScopyHomePage *hp;

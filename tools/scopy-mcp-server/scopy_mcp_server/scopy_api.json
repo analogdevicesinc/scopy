@@ -40,7 +40,8 @@
       "regmap",
       "iioExplorer",
       "datalogger",
-      "acq"
+      "acq",
+      "multiacq"
     ],
     "pqmon": [
       "pqm"
@@ -6769,6 +6770,21 @@
           "doc": "Engine mode: \"continuous\" or \"triggered\". Triggered waits for a fire only with the trigger block enabled; without it, single() is one plain cycle. Refused while running."
         },
         {
+          "name": "setPlotBufferStarts",
+          "args": [
+            {
+              "name": "uuid",
+              "type": "int"
+            },
+            {
+              "name": "on",
+              "type": "bool"
+            }
+          ],
+          "returns": "void",
+          "doc": "Show/hide a strip of labelled blocks along the bottom of a plot, one per acquired buffer, and a dashed vertical line at each boundary between buffers."
+        },
+        {
           "name": "setPlotChannelColor",
           "args": [
             {
@@ -7503,6 +7519,450 @@
           "element_type": "int"
         }
       ]
+    },
+    "multiacq": {
+      "methods": [
+        {
+          "name": "addCurve",
+          "args": [
+            {
+              "name": "uuid",
+              "type": "int"
+            },
+            {
+              "name": "uri",
+              "type": "QString"
+            },
+            {
+              "name": "channel",
+              "type": "QString"
+            }
+          ],
+          "returns": "bool",
+          "doc": "Put a channel on a plot, enabling the channel on its device if it is not."
+        },
+        {
+          "name": "addDevice",
+          "args": [
+            {
+              "name": "uri",
+              "type": "QString"
+            }
+          ],
+          "returns": "QString",
+          "doc": "Connect a device by URI (a bare address is taken as \"ip:\"). \"\" on success, else the reason."
+        },
+        {
+          "name": "addPlot",
+          "args": [
+            {
+              "name": "name",
+              "type": "QString"
+            }
+          ],
+          "returns": "int",
+          "doc": "Add a plot; empty name = \"Plot N\". Returns its uuid."
+        },
+        {
+          "name": "clear",
+          "args": [],
+          "returns": "void",
+          "doc": "Clear every plot and restart the relative time."
+        },
+        {
+          "name": "getChannels",
+          "args": [
+            {
+              "name": "uri",
+              "type": "QString"
+            }
+          ],
+          "returns": "QVariantList",
+          "doc": "A device's channels: [{id, enabled, mode, attribute, scaled, attributes[], bufferable, scalable, description}]. mode is \"polled\" (one attribute read per interval) or \"buffered\"."
+        },
+        {
+          "name": "getDevices",
+          "args": [],
+          "returns": "QVariantList",
+          "doc": "Added devices: [{uri, name, model, enabled, online, readIntervalMs, iioDevices[]}]."
+        },
+        {
+          "name": "getIioDevices",
+          "args": [
+            {
+              "name": "uri",
+              "type": "QString"
+            }
+          ],
+          "returns": "QVariantList",
+          "doc": "A device's IIO devices: [{name, bufferable, hasRate, rateOverride}]."
+        },
+        {
+          "name": "getLoadReport",
+          "args": [],
+          "returns": "QStringList",
+          "doc": "What the last scopy.loadSetup() / File > Load could not restore; empty when nothing was skipped."
+        },
+        {
+          "name": "getPlots",
+          "args": [],
+          "returns": "QVariantList",
+          "doc": "All plots: [{uuid, name, legend, timeLabels (\"relative\"|\"timeofday\"), timeFormat, span, history, live, autoscale, yMin, yMax, curves[{uri, channel, name, color, visible}]}]. span and history are in seconds."
+        },
+        {
+          "name": "isRunning",
+          "args": [],
+          "returns": "bool",
+          "doc": "True while acquiring."
+        },
+        {
+          "name": "removeCurve",
+          "args": [
+            {
+              "name": "uuid",
+              "type": "int"
+            },
+            {
+              "name": "uri",
+              "type": "QString"
+            },
+            {
+              "name": "channel",
+              "type": "QString"
+            }
+          ],
+          "returns": "bool",
+          "doc": "Take a channel off a plot."
+        },
+        {
+          "name": "removeDevice",
+          "args": [
+            {
+              "name": "uri",
+              "type": "QString"
+            }
+          ],
+          "returns": "bool",
+          "doc": "Remove a device and its curves."
+        },
+        {
+          "name": "removePlot",
+          "args": [
+            {
+              "name": "uuid",
+              "type": "int"
+            }
+          ],
+          "returns": "bool",
+          "doc": "Remove a plot and its curves."
+        },
+        {
+          "name": "run",
+          "args": [],
+          "returns": "void",
+          "doc": "Start acquiring from every enabled device; runs until stop()."
+        },
+        {
+          "name": "setAutoscale",
+          "args": [
+            {
+              "name": "uuid",
+              "type": "int"
+            },
+            {
+              "name": "on",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool",
+          "doc": "Turn Y autoscale on/off."
+        },
+        {
+          "name": "setChannelAttribute",
+          "args": [
+            {
+              "name": "uri",
+              "type": "QString"
+            },
+            {
+              "name": "channel",
+              "type": "QString"
+            },
+            {
+              "name": "attribute",
+              "type": "QString"
+            }
+          ],
+          "returns": "bool",
+          "doc": "The attribute a polled channel reads, one of its attributes[]."
+        },
+        {
+          "name": "setChannelEnabled",
+          "args": [
+            {
+              "name": "uri",
+              "type": "QString"
+            },
+            {
+              "name": "channel",
+              "type": "QString"
+            },
+            {
+              "name": "en",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool",
+          "doc": "Enable/disable reading a channel. All start disabled."
+        },
+        {
+          "name": "setChannelMode",
+          "args": [
+            {
+              "name": "uri",
+              "type": "QString"
+            },
+            {
+              "name": "channel",
+              "type": "QString"
+            },
+            {
+              "name": "mode",
+              "type": "QString"
+            }
+          ],
+          "returns": "bool",
+          "doc": "Read a channel \"polled\" (from an attribute) or \"buffered\" (from the device buffer)."
+        },
+        {
+          "name": "setChannelScaled",
+          "args": [
+            {
+              "name": "uri",
+              "type": "QString"
+            },
+            {
+              "name": "channel",
+              "type": "QString"
+            },
+            {
+              "name": "scaled",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool",
+          "doc": "Plot (raw + offset) * scale instead of the plain reading, where the channel is scalable."
+        },
+        {
+          "name": "setCurveVisible",
+          "args": [
+            {
+              "name": "uuid",
+              "type": "int"
+            },
+            {
+              "name": "uri",
+              "type": "QString"
+            },
+            {
+              "name": "channel",
+              "type": "QString"
+            },
+            {
+              "name": "visible",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool",
+          "doc": "Show/hide a curve."
+        },
+        {
+          "name": "setDeviceEnabled",
+          "args": [
+            {
+              "name": "uri",
+              "type": "QString"
+            },
+            {
+              "name": "en",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool",
+          "doc": "Enable/disable a device; a disabled one is not read."
+        },
+        {
+          "name": "setHistory",
+          "args": [
+            {
+              "name": "uuid",
+              "type": "int"
+            },
+            {
+              "name": "seconds",
+              "type": "double"
+            }
+          ],
+          "returns": "bool",
+          "doc": "Seconds of data kept for scrolling back, at least the span."
+        },
+        {
+          "name": "setLive",
+          "args": [
+            {
+              "name": "uuid",
+              "type": "int"
+            },
+            {
+              "name": "on",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool",
+          "doc": "Follow the current time; off, the X axis stays put."
+        },
+        {
+          "name": "setPlotLegend",
+          "args": [
+            {
+              "name": "uuid",
+              "type": "int"
+            },
+            {
+              "name": "on",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool",
+          "doc": "Show/hide a plot's legend."
+        },
+        {
+          "name": "setPlotName",
+          "args": [
+            {
+              "name": "uuid",
+              "type": "int"
+            },
+            {
+              "name": "name",
+              "type": "QString"
+            }
+          ],
+          "returns": "bool",
+          "doc": "Rename a plot."
+        },
+        {
+          "name": "setRateOverride",
+          "args": [
+            {
+              "name": "uri",
+              "type": "QString"
+            },
+            {
+              "name": "iioDevice",
+              "type": "QString"
+            },
+            {
+              "name": "hz",
+              "type": "double"
+            }
+          ],
+          "returns": "bool",
+          "doc": "For a bufferable IIO device that publishes no sampling_frequency: the rate its buffer samples are spaced at, Hz. 0 spreads them over the time between refills."
+        },
+        {
+          "name": "setReadInterval",
+          "args": [
+            {
+              "name": "uri",
+              "type": "QString"
+            },
+            {
+              "name": "ms",
+              "type": "int"
+            }
+          ],
+          "returns": "bool",
+          "doc": "How often attribute-read (\"polled\") channels are read, in ms (>= 1)."
+        },
+        {
+          "name": "setSpan",
+          "args": [
+            {
+              "name": "uuid",
+              "type": "int"
+            },
+            {
+              "name": "seconds",
+              "type": "double"
+            }
+          ],
+          "returns": "bool",
+          "doc": "Seconds shown across the plot; history grows to at least this."
+        },
+        {
+          "name": "setTimeFormat",
+          "args": [
+            {
+              "name": "uuid",
+              "type": "int"
+            },
+            {
+              "name": "format",
+              "type": "QString"
+            }
+          ],
+          "returns": "bool",
+          "doc": "X label format, e.g. \"hh:mm:ss\", \"mm:ss.zzz\", \"dd.MM hh:mm\"."
+        },
+        {
+          "name": "setTimeLabels",
+          "args": [
+            {
+              "name": "uuid",
+              "type": "int"
+            },
+            {
+              "name": "labels",
+              "type": "QString"
+            }
+          ],
+          "returns": "bool",
+          "doc": "X labels: \"relative\" (time since start) or \"timeofday\"."
+        },
+        {
+          "name": "setYRange",
+          "args": [
+            {
+              "name": "uuid",
+              "type": "int"
+            },
+            {
+              "name": "min",
+              "type": "double"
+            },
+            {
+              "name": "max",
+              "type": "double"
+            }
+          ],
+          "returns": "bool",
+          "doc": "Fix the Y axis to [min, max]; turns autoscale off."
+        },
+        {
+          "name": "single",
+          "args": [],
+          "returns": "void",
+          "doc": "One acquisition cycle."
+        },
+        {
+          "name": "stop",
+          "args": [],
+          "returns": "void",
+          "doc": "Stop acquiring."
+        }
+      ],
+      "doc": "MultiDevice Acq: channels of several devices on time plots sharing one wall-clock axis. Devices are added by URI and addressed by it; their channels by id \"<iio device>:<channel>\" (e.g. \"adxl345:accel_x\"), as getChannels() lists them; plots by uuid, as getPlots() lists them. Channel and device settings take effect on the next run; a running tool restarts by itself. Whole setups are saved and loaded with scopy.saveSetup()/scopy.loadSetup(): add the devices first, then load; getLoadReport() tells what the last load skipped."
     },
     "regmap": {
       "methods": [

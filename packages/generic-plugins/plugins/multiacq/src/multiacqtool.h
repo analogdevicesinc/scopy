@@ -28,8 +28,10 @@
 #include <QList>
 #include <QMap>
 #include <QPointer>
+#include <QStringList>
 #include <QWidget>
 
+class QSettings;
 class QTimer;
 
 namespace scopy {
@@ -56,12 +58,50 @@ class TimePlot;
 // The tool: an acquisition engine with no device of its own. The reader adds devices by
 // URI, each one an IioSource, then adds time plots and puts any device's channels on any
 // plot. Nothing is created until asked for.
+//
+// The public calls below are what the reader's controls do, for the scripting API and for
+// setup files; the controls follow whatever they change.
 class MultiAcqTool : public QWidget
 {
 	Q_OBJECT
 public:
 	explicit MultiAcqTool(ToolMenuEntry *tme, QWidget *parent = nullptr);
 	~MultiAcqTool() override;
+
+	// Devices, one per URI.
+	QList<IioSource *> sources() const;
+	IioSource *sourceByUri(const QString &uri) const;
+	// Connects the URI (a bare address is taken as "ip:"). Empty on success, else what went wrong.
+	QString addDevice(const QString &uri);
+	void removeDevice(IioSource *src);
+
+	QList<TimePlot *> plots() const;
+	TimePlot *plotByUuid(quint32 uuid) const;
+	// An empty name gets "Plot N".
+	TimePlot *addPlot(const QString &name);
+	void removePlot(TimePlot *plot);
+	// Puts a device channel on a plot; an invalid colour takes the one least used there. The
+	// existing curve if it is there already, null if the key names no channel.
+	TimeCurve *addChannel(TimePlot *plot, const scopy::acq::DataKey &yKey, const QColor &color = QColor());
+	void removeChannel(TimePlot *plot, TimeCurve *curve);
+	TimeCurve *curve(TimePlot *plot, const scopy::acq::DataKey &yKey) const;
+	// Through the curve's rail switch, so the switch shows it.
+	void setCurveVisible(TimePlot *plot, TimeCurve *curve, bool visible);
+
+	void run();
+	void stop();
+	void single();
+	bool isRunning() const;
+	void clearData();
+
+	// The tool's part of a setup file. Each saved device goes to the added one with its URI and
+	// board, else to its URI connected now if the same board answers there, else to any added
+	// one of the same board, and gets its saved config; the saved plots replace the current
+	// ones. Saved devices that match nothing are skipped, with their curves.
+	void saveSettings(QSettings &s) const;
+	void loadSettings(QSettings &s);
+	// What the last load could not restore; empty when it restored everything.
+	QStringList loadReport() const { return m_loadReport; }
 
 private:
 	struct DeviceEntry
@@ -87,17 +127,10 @@ private:
 	void setupPlotsRail();
 	void setupFrameTimer();
 
-	// Empty on success, else what went wrong.
-	QString addDevice(const QString &uri);
-	void removeDevice(IioSource *src);
 	QWidget *createDevicePage(IioSource *src);
 
-	TimePlot *addPlot(const QString &name);
-	void removePlot(TimePlot *plot);
 	QWidget *createPlotPage(PlotEntry *entry);
 	PlotEntry *plotEntry(TimePlot *plot) const;
-	void addChannel(TimePlot *plot, const scopy::acq::DataKey &yKey);
-	void removeChannel(TimePlot *plot, TimeCurve *curve);
 	QColor nextColor(TimePlot *plot) const;
 	void refreshPickers();
 	void fillPicker(MenuCombo *picker) const;
@@ -106,9 +139,11 @@ private:
 	QString channelLabel(const scopy::acq::DataKey &yKey) const;
 	QString nextSourceId() const;
 	QString deviceName(scopy::component::Context *ctx, const QString &uri) const;
+	// Whether `src` is the board a setup saved as `model` with these IIO devices.
+	static bool sameBoard(IioSource *src, const QString &model, const QStringList &iioDevices);
+	static QStringList iioDeviceNames(IioSource *src);
 	// Restarts the engine, for changes that only apply at start.
 	void scheduleRestart();
-	void clearData();
 	void setStartTime(double ms);
 	void updatePlots();
 
@@ -125,6 +160,7 @@ private:
 	bool m_needStartTime{true};
 	double m_startTime{0.0};
 	quint32 m_plotUuid{0};
+	QStringList m_loadReport;
 };
 
 } // namespace multiacq

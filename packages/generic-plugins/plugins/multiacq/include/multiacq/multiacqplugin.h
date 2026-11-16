@@ -34,6 +34,7 @@
 namespace scopy::multiacq {
 
 class MultiAcqTool;
+class MultiAcq_API;
 
 // A plugin that belongs to no device: compatible() is always false, so it is never cloned
 // for one. Its one tool comes through globalToolList() instead, and connects to the devices
@@ -46,6 +47,10 @@ class SCOPY_MULTIACQ_EXPORT MultiAcqPlugin : public QObject, public PluginBase
 public:
 	bool compatible(QString param, QString category) override;
 	QList<ToolMenuEntry *> globalToolList() override;
+	void unload() override;
+	// The tool's part of a Scopy setup file (File > Save / Load, scopy.saveSetup/loadSetup).
+	void saveSettings(QSettings &s) override;
+	void loadSettings(QSettings &s) override;
 	void initMetadata() override;
 	QString description() override;
 	QString pkgName() override;
@@ -59,6 +64,7 @@ public Q_SLOTS:
 
 private:
 	QPointer<MultiAcqTool> m_tool;
+	MultiAcq_API *m_api{nullptr};
 };
 
 } // namespace scopy::multiacq

@@ -97,6 +97,7 @@ public:
 	PlotChannel *plotChannel() const { return m_ch; }
 	// Hidden curves are not drawn and do not count for autoscale.
 	void setVisible(bool visible);
+	bool isVisible() const;
 
 	void pull();
 	// Drop everything older than `minTime`; past `maxPoints`, thin the older samples instead of
@@ -174,6 +175,8 @@ public:
 Q_SIGNALS:
 	void nameChanged(QString name);
 	void yRangeChanged(double min, double max);
+	// Any of the view settings changed: labels, span, history, live, autoscale, range, legend.
+	void settingsChanged();
 
 private:
 	// Pushes format and reference to the formatter and drops the cached labels.

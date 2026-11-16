@@ -245,6 +245,51 @@ QString IioSource::formula(const ChannelDesc &ch, const ChannelConfig &cfg)
 	return ch.hasScale ? QStringLiteral("%1 × scale").arg(raw) : QStringLiteral("%1 + offset").arg(raw);
 }
 
+QString IioSource::modeName(Mode mode)
+{
+	return mode == Mode::Buffered ? QStringLiteral("buffered") : QStringLiteral("polled");
+}
+
+bool IioSource::modeFromName(const QString &name, Mode &mode)
+{
+	for(Mode m : {Mode::Polled, Mode::Buffered}) {
+		if(name.compare(modeName(m), Qt::CaseInsensitive) == 0) {
+			mode = m;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool IioSource::supports(const ChannelDesc &ch, const ChannelConfig &cfg)
+{
+	if(cfg.mode == Mode::Buffered) {
+		return ch.bufferable;
+	}
+	return ch.attributes.contains(cfg.attribute);
+}
+
+const IioSource::ChannelDesc *IioSource::channelDesc(const QString &channelId) const
+{
+	for(const DeviceDesc &dev : m_descs) {
+		for(const ChannelDesc &ch : dev.channels) {
+			if(ch.channelId == channelId) {
+				return &ch;
+			}
+		}
+	}
+	return nullptr;
+}
+
+void IioSource::setChannelEnabled(const QString &channelId, bool en)
+{
+	if(isChannelEnabled(channelId) == en) {
+		return;
+	}
+	enableChannel(channelId, en);
+	Q_EMIT configChanged();
+}
+
 IioSource::ChannelConfig IioSource::config(const QString &channelId) const
 {
 	QMutexLocker lk(&m_cfgMutex);
@@ -285,7 +330,10 @@ void IioSource::setRateOverride(const QString &device, double hz)
 void IioSource::setReadIntervalMs(int ms)
 {
 	// Read by the lanes every tick, so no restart is needed.
-	m_readIntervalMs = qMax(1, ms);
+	ms = qMax(1, ms);
+	if(m_readIntervalMs.exchange(ms) != ms) {
+		Q_EMIT readIntervalChanged(ms);
+	}
 }
 
 void IioSource::onStart()
@@ -660,6 +708,8 @@ QWidget *IioSource::createSettingsWidget(QWidget *parent)
 	interval->setToolTip(tr("How often attribute-read channels are read"));
 	connect(interval, &gui::MenuSpinbox::valueChanged, this,
 		[this](double s) { setReadIntervalMs(static_cast<int>(s * 1000)); });
+	connect(this, &IioSource::readIntervalChanged, interval,
+		[interval](int ms) { interval->setValueSilent(ms / 1000.0); });
 	lay->addWidget(interval);
 
 	for(const DeviceDesc &dev : std::as_const(m_descs)) {
@@ -689,6 +739,9 @@ QWidget *IioSource::createSettingsWidget(QWidget *parent)
 			const QString name = dev.name;
 			connect(rate, &gui::MenuSpinbox::valueChanged, this,
 				[this, name](double hz) { setRateOverride(name, hz); });
+			// Set from a script or a loaded setup too.
+			connect(this, &IioSource::configChanged, rate,
+				[this, rate, name]() { rate->setValueSilent(rateOverride(name)); });
 			section->contentLayout()->addWidget(rate);
 		}
 		for(const ChannelDesc &ch : dev.channels) {
@@ -772,10 +825,11 @@ QWidget *IioSource::createChannelSettings(const ChannelDesc &ch, QWidget *parent
 	show();
 
 	connect(cb, &QCheckBox::toggled, this, [this, channelId, show](bool en) {
-		enableChannel(channelId, en);
+		setChannelEnabled(channelId, en);
 		show();
-		Q_EMIT configChanged();
 	});
+	// A script or a loaded setup can change the config behind the controls.
+	connect(this, &IioSource::configChanged, w, show);
 	connect(this, &SourceBlock::channelEnabledChanged, cb, [cb, channelId, show](const QString &id, bool en) {
 		if(id == channelId) {
 			QSignalBlocker b(cb);

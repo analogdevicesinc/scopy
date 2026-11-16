@@ -548,12 +548,13 @@ bool ScopyMainWindow_API::saveSetup(QString filename, QString path)
 {
 	Q_ASSERT(m_w->dm != nullptr);
 	bool setupSaved = false;
-	if(!m_w->dm->connectedDev.isEmpty()) {
+	// Global tools hold state of their own, with or without a connected device.
+	if(!m_w->dm->connectedDev.isEmpty() || !m_w->globalPlugins().isEmpty()) {
 		m_w->save(path + "/" + filename);
 		qInfo(CAT_SCOPY_API) << "Setup saved at: " << path;
 		setupSaved = true;
 	} else {
-		qWarning(CAT_SCOPY_API) << "Unable to save setup: No device connected";
+		qWarning(CAT_SCOPY_API) << "Unable to save setup: No device connected and no global tool";
 	}
 	return setupSaved;
 }

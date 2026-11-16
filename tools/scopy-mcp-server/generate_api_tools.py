@@ -44,6 +44,7 @@ CLASS_TO_JSOBJ = {
     "IIOExplorerInstrument_API": "iioExplorer",
     "DataLogger_API": "datalogger",
     "Acquisition_API": "acq",
+    "MultiAcq_API": "multiacq",
     # PQM / SWIOT
     "PQM_API": "pqm",
     "SWIOT_API": "swiot",
@@ -79,7 +80,7 @@ PLUGIN_OBJECTS: dict[str, list[str]] = {
     "cn0540": ["cn0540"],
     "daq2": ["daq2"],
     "fmcomms11": ["fmcomms11"],
-    "generic-plugins": ["regmap", "iioExplorer", "datalogger", "acq"],
+    "generic-plugins": ["regmap", "iioExplorer", "datalogger", "acq", "multiacq"],
     "pqmon": ["pqm"],
     "swiot": ["swiot"],
     "m2k": ["osc", "spectrum", "network", "siggen", "logic", "pattern", "dio", "dmm", "power", "calib"],

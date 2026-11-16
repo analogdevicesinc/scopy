@@ -343,18 +343,70 @@ void ScopyMainWindow::load()
 
 void ScopyMainWindow::save(QString file)
 {
+	// A cancelled file dialog.
+	if(file.isEmpty()) {
+		return;
+	}
 	QSettings s(file, QSettings::Format::IniFormat);
 	saveSession(s);
 	dm->save(s);
+	saveGlobalPlugins(s);
 	ScopyTitleManager::setIniFileName(file);
 }
 
 void ScopyMainWindow::load(QString file)
 {
+	if(file.isEmpty()) {
+		return;
+	}
 	QSettings s(file, QSettings::Format::IniFormat);
 	loadSession(s);
 	dm->load(s);
+	// After the devices: a global tool may build on what they restored.
+	loadGlobalPlugins(s);
 	ScopyTitleManager::setIniFileName(file);
+}
+
+QList<Plugin *> ScopyMainWindow::globalPlugins() const
+{
+	QList<Plugin *> out;
+	if(!PluginRepository::GetInstance()) {
+		return out;
+	}
+	const QList<Plugin *> plugins = PluginRepository::getOriginalPlugins();
+	for(Plugin *p : plugins) {
+		if(!p->globalToolList().isEmpty()) {
+			out.append(p);
+		}
+	}
+	return out;
+}
+
+// Plugins with global tools belong to no device, so DeviceManager never saves them. Each
+// gets its own group under "global", cleared first so a file saved over keeps no stale keys.
+void ScopyMainWindow::saveGlobalPlugins(QSettings &s)
+{
+	const QList<Plugin *> plugins = globalPlugins();
+	for(Plugin *p : plugins) {
+		s.beginGroup("global");
+		s.beginGroup(p->name());
+		s.remove("");
+		p->saveSettings(s);
+		s.endGroup();
+		s.endGroup();
+	}
+}
+
+void ScopyMainWindow::loadGlobalPlugins(QSettings &s)
+{
+	const QList<Plugin *> plugins = globalPlugins();
+	for(Plugin *p : plugins) {
+		s.beginGroup("global");
+		s.beginGroup(p->name());
+		p->loadSettings(s);
+		s.endGroup();
+		s.endGroup();
+	}
 }
 
 void ScopyMainWindow::saveSession(QSettings &s)

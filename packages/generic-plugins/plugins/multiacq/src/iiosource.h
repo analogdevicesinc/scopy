@@ -117,6 +117,11 @@ public:
 	static QString formula(const ChannelDesc &ch, const ChannelConfig &cfg);
 	// One line for the settings page: the value plotted and the attributes it comes from.
 	static QString describe(const ChannelDesc &ch, const ChannelConfig &cfg);
+	// "polled" / "buffered", as scripts and setup files name them.
+	static QString modeName(Mode mode);
+	static bool modeFromName(const QString &name, Mode &mode);
+	// Whether the channel can be read that way: from an attribute it has, or from its buffer.
+	static bool supports(const ChannelDesc &ch, const ChannelConfig &cfg);
 
 	// `id` becomes the DataKey source id, so it must not contain '_'.
 	IioSource(const QString &id, const QString &uri, scopy::component::ContextHandle ctx,
@@ -127,11 +132,17 @@ public:
 	// What the reader sees; set once, before the engine runs.
 	QString displayName() const { return m_displayName.isEmpty() ? id() : m_displayName; }
 	void setDisplayName(const QString &name) { m_displayName = name; }
+	// The board, for matching a saved setup to it: its hw_model, empty when it publishes none.
+	QString model() const { return m_model; }
+	void setModel(const QString &model) { m_model = model; }
 	QList<DeviceDesc> devices() const { return m_descs; }
+	// Null when the device has no such channel.
+	const ChannelDesc *channelDesc(const QString &channelId) const;
 
 	static scopy::acq::DataKey timeKey(const QString &sourceId, const QString &channelId);
 
 	// GUI thread. All latched at the next start.
+	void setChannelEnabled(const QString &channelId, bool en);
 	ChannelConfig config(const QString &channelId) const;
 	void setConfig(const QString &channelId, const ChannelConfig &cfg);
 	// For a device that publishes no sampling_frequency: the rate its buffer samples are
@@ -156,6 +167,7 @@ public:
 Q_SIGNALS:
 	// A setting changed that only takes effect on the next start.
 	void configChanged();
+	void readIntervalChanged(int ms);
 	// From a lane thread; connect queued.
 	void onlineChanged(bool online);
 	// From a lane thread; connect queued. The rate `device`'s buffer samples are spaced at, and
@@ -212,6 +224,7 @@ private:
 
 	const QString m_uri;
 	QString m_displayName;
+	QString m_model;
 	scopy::component::ContextHandle m_ctx;
 	QList<Dev> m_devices;	     // fixed by discover()
 	QList<DeviceDesc> m_descs; // the same, for the UI

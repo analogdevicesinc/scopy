@@ -20,11 +20,13 @@
  */
 
 #include "multiacqplugin.h"
+#include "multiacq_api.h"
 #include "multiacqtool.h"
 #include "scopy-multiacq_config.h"
 
 #include <gui/style.h>
 #include <gui/style_attributes.h>
+#include <pluginbase/scopyjs.h>
 
 using namespace scopy;
 using namespace scopy::multiacq;
@@ -50,7 +52,35 @@ QList<ToolMenuEntry *> MultiAcqPlugin::globalToolList()
 	m_tool = new MultiAcqTool(tme);
 	tme->setTool(m_tool);
 	m_toolList.append(tme);
+
+	// The tool lives as long as Scopy does, so its API is there from the start.
+	m_api = new MultiAcq_API(m_tool, this);
+	m_api->setObjectName("multiacq");
+	ScopyJS::GetInstance()->registerApi(m_api);
 	return m_toolList;
+}
+
+void MultiAcqPlugin::unload()
+{
+	if(m_api) {
+		ScopyJS::GetInstance()->unregisterApi(m_api);
+		delete m_api;
+		m_api = nullptr;
+	}
+}
+
+void MultiAcqPlugin::saveSettings(QSettings &s)
+{
+	if(m_tool) {
+		m_tool->saveSettings(s);
+	}
+}
+
+void MultiAcqPlugin::loadSettings(QSettings &s)
+{
+	if(m_tool) {
+		m_tool->loadSettings(s);
+	}
 }
 
 void MultiAcqPlugin::initMetadata()
