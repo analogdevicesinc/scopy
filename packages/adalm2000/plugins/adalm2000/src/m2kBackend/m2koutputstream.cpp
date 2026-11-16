@@ -43,7 +43,8 @@ using namespace libm2k::analog;
 static constexpr short PROBE_RAW_LOW = 0;
 static constexpr short PROBE_RAW_HIGH = 1000;
 static constexpr short PROBE_RAW_VERIFY = -2000;
-static constexpr double AFFINE_TOLERANCE_V = 1e-6;
+// convertRawToVolts quantizes to the DAC's 12-bit step (~2.44 mV over 10 V): allow ~1 LSB.
+static constexpr double AFFINE_TOLERANCE_V = 0.003;
 
 M2kOutputStream::M2kOutputStream(void *resource, M2kAnalogOut *aout, ICmdExecutor *executor, QObject *parent)
 	: component::OutputStream(parent)
@@ -119,6 +120,8 @@ QCoro::Task<CommandResponse<void>> M2kOutputStream::openAsync(const component::S
 
 	// One grouped command: libm2k documents no thread safety (D13).
 	auto *cmd = new M2kCallCommand<void>(m_resource, [aout, channels, cyclic, kernelBuffers, scales]() {
+		// Drop any buffer left attached by a previous run, as the old signal generator does.
+		aout->cancelBuffer();
 		for(int i = 0; i < M2kOutputStream::HW_CHANNELS; ++i) {
 			aout->enableChannel(static_cast<unsigned>(i), channels.contains(i));
 		}
@@ -201,23 +204,24 @@ QCoro::Task<CommandResponse<void>> M2kOutputStream::pushAsync()
 		co_return CommandResponse<void>(QUuid(), Unexpected{Error{-EIO, QStringLiteral("stream not open")}});
 	}
 
-	M2kAnalogOut *aout = m_aout;
+	// Decode the raw buffer to volts and push one buffer per DAC (empty when disabled): the
+	// pushRaw / pushRawInterleaved paths intermittently leave the DACs idle on hardware, while
+	// push(std::vector<std::vector<double>>) -- what the old signal generator uses -- does not.
 	const QList<int> channels = m_config.enabledChannels;
-	const unsigned samples = static_cast<unsigned>(m_config.samplesCount);
-	// Copy: the push runs on a worker thread, and writeFormat() stays writable to
-	// the caller. A snapshot keeps a mid-push edit from tearing the pushed data.
-	auto payload = std::make_shared<std::vector<short>>(m_buffer.begin(), m_buffer.end());
-
-	auto *cmd = new M2kCallCommand<void>(m_resource, [aout, channels, samples, payload]() {
-		if(channels.size() == 1) {
-			// One channel: a per-channel push addresses it unambiguously, where
-			// pushRawInterleaved with nb_channels=1 would not say which DAC.
-			aout->pushRaw(static_cast<unsigned>(channels.first()), *payload);
-			return;
+	const size_t samples = m_config.samplesCount;
+	const qsizetype width = channels.size();
+	auto payload = std::make_shared<std::vector<std::vector<double>>>(HW_CHANNELS);
+	for(qsizetype k = 0; k < width && k < m_scales.size(); ++k) {
+		const stream::ChannelScale &cs = m_scales.at(k);
+		std::vector<double> &out = (*payload)[static_cast<size_t>(channels.at(k))];
+		out.resize(samples);
+		for(size_t i = 0; i < samples; ++i) {
+			out[i] = cs.scale * double(m_buffer.at(static_cast<qsizetype>(i) * width + k)) + cs.offset;
 		}
-		const unsigned nbChannels = static_cast<unsigned>(channels.size());
-		aout->pushRawInterleaved(payload->data(), nbChannels, samples * nbChannels);
-	});
+	}
+
+	M2kAnalogOut *aout = m_aout;
+	auto *cmd = new M2kCallCommand<void>(m_resource, [aout, payload]() { aout->push(*payload); });
 
 	co_return co_await finishPush(cmd);
 }
