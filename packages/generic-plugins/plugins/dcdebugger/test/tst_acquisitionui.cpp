@@ -28,6 +28,7 @@
 #include <QDoubleSpinBox>
 #include <QLabel>
 #include <QMainWindow>
+#include <QTabWidget>
 #include <QTableWidget>
 #include <QPushButton>
 #include <QTreeView>
@@ -146,6 +147,12 @@ void TST_AcquisitionUi::selectNode(QObject *node)
 	auto *proxy = qobject_cast<QAbstractProxyModel *>(tree->model());
 	tree->scrollTo(proxy->mapFromSource(src));
 	tree->setCurrentIndex(proxy->mapFromSource(src));
+	// The panel opens on its Attributes tab: show the view (the first tab).
+	for(QTabWidget *tabs : m_tool->findChildren<QTabWidget *>()) {
+		if(tabs->isVisible()) {
+			tabs->setCurrentIndex(0);
+		}
+	}
 	QTest::qWait(50);
 }
 

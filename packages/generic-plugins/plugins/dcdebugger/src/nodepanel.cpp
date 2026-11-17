@@ -240,7 +240,7 @@ void NodePanel::setMainView(const QString &title, QWidget *view)
 		return;
 	}
 	m_tabs->insertTab(m_tabs->count() - 1, view, title);
-	m_tabs->setCurrentIndex(0);
+	m_tabs->setCurrentWidget(m_sectionsArea);
 }
 
 void NodePanel::addDock(const QString &title, QWidget *widget)
@@ -255,15 +255,13 @@ void NodePanel::addDock(const QString &title, QWidget *widget)
 	}
 	m_docks.append(dock);
 #ifdef USE_KDDOCKWIDGETS
-	// Tabbed with the attributes, like the classic tabs; the first view is the current tab.
+	// Tabbed with the attributes, like the classic tabs; the attributes stay the current tab.
 	auto *first = dynamic_cast<KDDockWidgets::QtWidgets::DockWidget *>(m_docks.first());
 	auto *added = dynamic_cast<KDDockWidgets::QtWidgets::DockWidget *>(dock);
 	if(first && added) {
 		added->setAffinities(first->affinities());
 		first->addDockWidgetAsTab(added);
-		if(auto *firstView = dynamic_cast<KDDockWidgets::QtWidgets::DockWidget *>(m_docks.value(1))) {
-			firstView->setAsCurrentTab();
-		}
+		first->setAsCurrentTab();
 		return;
 	}
 #endif

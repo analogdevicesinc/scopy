@@ -57,8 +57,8 @@ public:
 	QObject *node() const { return m_node; }
 	NodeKind kind() const { return m_kind; }
 	void addSection(QWidget *section);
-	// Puts `view` in a first tab; the sections move to a second "Attributes" tab.
-	// Tabs before "Attributes"; may be called once per view. With docking (KDDockWidgets) every
+	// Puts `view` in a tab before the "Attributes" tab the sections move to; the attributes stay
+	// the current tab. May be called once per view. With docking (KDDockWidgets) every
 	// view and the attributes are docks instead, tabbed at first: they can be split side by side
 	// or floated.
 	void setMainView(const QString &title, QWidget *view);
