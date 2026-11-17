@@ -30,6 +30,7 @@
 #include "readpolicy.h"
 
 #include <QCursor>
+#include <climits>
 #include <QHeaderView>
 #include <QLabel>
 #include <QLineEdit>
@@ -87,11 +88,19 @@ DCDebuggerTool::DCDebuggerTool(component::Connection *conn, QWidget *parent)
 	Style::setStyle(m_emptyPanel, style::properties::label::subtle);
 	m_panels->addWidget(m_emptyPanel);
 	panelLay->addWidget(m_panels);
+	// Only the shown panel sizes the stack: a large cached one must not make the others scroll.
+	connect(m_panels, &QStackedWidget::currentChanged, this, [this](int current) {
+		for(int i = 0; i < m_panels->count(); ++i) {
+			const auto policy = i == current ? QSizePolicy::Preferred : QSizePolicy::Ignored;
+			m_panels->widget(i)->setSizePolicy(policy, policy);
+		}
+	});
 
 	splitter->addWidget(new SplitterPane(treeContainer, splitter));
 	splitter->addWidget(new SplitterPane(panelContainer, splitter));
-	splitter->setStretchFactor(0, 3);
-	splitter->setStretchFactor(1, 2);
+	splitter->setStretchFactor(0, 1);
+	splitter->setStretchFactor(1, 1);
+	splitter->setSizes({INT_MAX / 2, INT_MAX / 2});
 
 	// Bottom: the output panes; for now the command log of this connection.
 	m_bottomPanes = new BottomPaneHost(splitter, this);

@@ -29,6 +29,7 @@
 #include "monitor/monitorview.h"
 #include "ping/pingview.h"
 #include "registers/registerview.h"
+#include "splitterpane.h"
 
 #include <QHBoxLayout>
 #include <QHeaderView>
@@ -235,11 +236,14 @@ void NodePanel::setMainView(const QString &title, QWidget *view)
 			addDock("Attributes", m_sectionsArea);
 		}
 	}
+	// No minimum of its own: a large view (plots, menus) scrolls inside its tab instead of
+	// growing the panel, which would scroll even on the attributes tab.
+	auto *page = new SplitterPane(view, this);
 	if(m_area) {
-		addDock(title, view);
+		addDock(title, page);
 		return;
 	}
-	m_tabs->insertTab(m_tabs->count() - 1, view, title);
+	m_tabs->insertTab(m_tabs->count() - 1, page, title);
 	m_tabs->setCurrentWidget(m_sectionsArea);
 }
 
