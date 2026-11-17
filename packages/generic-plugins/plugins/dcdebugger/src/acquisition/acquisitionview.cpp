@@ -51,6 +51,7 @@
 #include <iiowidget.h>
 #include <iiowidgetbuilder.h>
 #include <menucombo.h>
+#include <menucontrolbutton.h>
 #include <menuonoffswitch.h>
 #include <menusectionwidget.h>
 #include <menuspinbox.h>
@@ -65,6 +66,7 @@
 #include <stylehelper.h>
 #include <toolbuttons.h>
 #include <tooltemplate.h>
+#include <verticalchannelmanager.h>
 
 using namespace scopy;
 using namespace scopy::dcdebugger;
@@ -72,6 +74,7 @@ using namespace scopy::component;
 
 namespace {
 const char *const SETTINGS_KEY = "settings";
+const char *const CHANNELS_KEY = "channels";
 } // namespace
 
 AcquisitionView::AcquisitionView(InputStream *stream, QWidget *parent)
@@ -94,7 +97,7 @@ AcquisitionView::AcquisitionView(InputStream *stream, QWidget *parent)
 	m_tool->topContainerMenuControl()->setVisible(false);
 	lay->addWidget(m_tool);
 	// Channels | plot | menus, resizable; a side dragged to the edge hides.
-	m_sides = new SideSplitter(0, 300, this);
+	m_sides = new SideSplitter(200, 300, this);
 	m_tool->addWidgetToCentralContainerHelper(m_sides);
 
 	m_status = new QLabel("Stopped", this);
@@ -115,6 +118,7 @@ AcquisitionView::AcquisitionView(InputStream *stream, QWidget *parent)
 	connect(m_exportBtn, &QPushButton::clicked, this, &AcquisitionView::exportData);
 	m_tool->addWidgetToTopContainerHelper(gearBtn, TTA_RIGHT);
 
+	buildChannels();
 	m_sides->rightStack()->add(SETTINGS_KEY, buildSettings(this));
 	connect(gearBtn, &QPushButton::toggled, m_sides, &SideSplitter::setRightOpen);
 	connect(m_sides, &SideSplitter::rightOpenChanged, gearBtn, &QAbstractButton::setChecked);
@@ -179,28 +183,6 @@ QWidget *AcquisitionView::buildAcquisitionSection(QWidget *parent)
 		lay->addWidget(devLabel);
 	}
 
-	// One colored checkbox per scan element; the plot channel shares the color.
-	const QList<ScanElement *> elems = m_acq->scanElements();
-	const QList<int> enabled = m_acq->enabledChannels();
-	auto *chLabel = new QLabel(QStringLiteral("Channels (%1)").arg(elems.size()), section);
-	Style::setStyle(chLabel, style::properties::label::subtle);
-	lay->addWidget(chLabel);
-	for(int i = 0; i < elems.size(); ++i) {
-		ScanElement *el = elems[i];
-		auto *box = new QCheckBox(displayName(el->id()), section);
-		StyleHelper::ColoredSquareCheckbox(box, QColor(StyleHelper::getChannelColor(i)));
-		box->setChecked(enabled.contains(int(el->index())));
-		lay->addWidget(box);
-		m_channelBoxes.insert(el->id(), box);
-		m_channelIndex.insert(el->id(), int(el->index()));
-		connect(box, &QCheckBox::toggled, this, &AcquisitionView::applyChannelSelection);
-	}
-	if(elems.isEmpty()) {
-		auto *none = new QLabel("This stream exposes no scan elements.", section);
-		none->setWordWrap(true);
-		lay->addWidget(none);
-	}
-
 	m_samples = new gui::MenuSpinbox("Samples", double(m_acq->samples()), "", 2, 4 * 1024 * 1024, true, false,
 					 false, section);
 	m_samples->setIncrementMode(gui::MenuSpinbox::IS_POW2);
@@ -227,6 +209,51 @@ QWidget *AcquisitionView::buildAcquisitionSection(QWidget *parent)
 		lay->addWidget(buildHardwareTrigger(section));
 	}
 	return section;
+}
+
+void AcquisitionView::buildChannels()
+{
+	// The channel list on the left, as in the Scopy instruments: one colored checkbox per scan
+	// element (the plot channel shares the color), in a group whose switch toggles them all.
+	auto *vcm = new VerticalChannelManager(this);
+	const QList<ScanElement *> elems = m_acq->scanElements();
+	const QList<int> enabled = m_acq->enabledChannels();
+	QString name = QStringLiteral("Channels");
+	if(auto *dev = qobject_cast<Device *>(m_stream->parent())) {
+		name = dev->name().isEmpty() ? dev->id() : dev->name();
+	}
+	auto *group = new CollapsableMenuControlButton(vcm);
+	group->getControlBtn()->setName(name);
+	group->getControlBtn()->button()->setVisible(false);
+	group->getControlBtn()->setCheckable(false);
+	group->enableOnOffSwitch(true);
+	group->onOffSwitch()->setChecked(!enabled.isEmpty());
+	vcm->add(group);
+	for(int i = 0; i < elems.size(); ++i) {
+		ScanElement *el = elems[i];
+		auto *btn = new MenuControlButton(group);
+		btn->setName(displayName(el->id()));
+		btn->setCheckBoxStyle(MenuControlButton::CS_CIRCLE);
+		btn->setColor(QColor(StyleHelper::getChannelColor(i)));
+		btn->button()->setVisible(false);
+		btn->setCheckable(false);
+		btn->enableToolTip(true);
+		btn->checkBox()->setChecked(enabled.contains(int(el->index())));
+		group->add(btn);
+		QCheckBox *box = btn->checkBox();
+		// No channel menu: a click on the row toggles the channel.
+		connect(btn, &QAbstractButton::clicked, box, &QCheckBox::toggle);
+		connect(group->onOffSwitch(), &QAbstractButton::toggled, box, &QCheckBox::setChecked);
+		connect(box, &QCheckBox::toggled, this, &AcquisitionView::applyChannelSelection);
+		m_channelBoxes.insert(el->id(), box);
+		m_channelIndex.insert(el->id(), int(el->index()));
+	}
+	if(elems.isEmpty()) {
+		auto *none = new QLabel("This stream exposes no scan elements.", vcm);
+		none->setWordWrap(true);
+		vcm->add(none);
+	}
+	m_sides->leftStack()->add(CHANNELS_KEY, vcm);
 }
 
 QWidget *AcquisitionView::buildHardwareTrigger(QWidget *parent)

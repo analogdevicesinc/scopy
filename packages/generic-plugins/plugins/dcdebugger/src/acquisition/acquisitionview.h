@@ -86,6 +86,7 @@ private:
 	void applyAxes(double xlo, double xhi, double ylo, double yhi);
 	void applyFixedYRange();
 	void exportData();
+	void buildChannels();
 	QWidget *buildAcquisitionSection(QWidget *parent);
 	QWidget *buildSoftwareTriggerSection(QWidget *parent);
 	QWidget *buildHardwareTrigger(QWidget *parent);
