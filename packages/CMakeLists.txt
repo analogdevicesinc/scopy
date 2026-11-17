@@ -34,6 +34,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	include(ScopyWindowsInstaller)
 endif()
 include(PackageUtils)
+include(ScopyDependencyChecks)
 
 if(DISABLE_ALL_PACKAGES MATCHES ON)
 	enable_all_packages(${CMAKE_CURRENT_SOURCE_DIR} OFF)
@@ -50,4 +51,7 @@ endif()
 foreach(pkg ${SCOPY_DC_DISABLED_PACKAGES})
 	set(ENABLE_PACKAGE_${pkg} OFF CACHE BOOL "Enable ${pkg} package" FORCE)
 endforeach()
+
+scopy_require_libm2k_libiio_match(adalm2000)
+
 add_packages(${CMAKE_CURRENT_SOURCE_DIR} ${SCOPY_PACKAGE_BUILD_PATH})
