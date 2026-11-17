@@ -47,7 +47,7 @@ class SCOPY_DCDEBUGGER_EXPORT BottomPaneHost : public QWidget
 {
 	Q_OBJECT
 public:
-	static constexpr int DEFAULT_PANE_HEIGHT = 280;
+	static constexpr int DEFAULT_PANE_HEIGHT = 380;
 
 	explicit BottomPaneHost(QWidget *mainWidget, QWidget *parent = nullptr);
 	~BottomPaneHost() override;
