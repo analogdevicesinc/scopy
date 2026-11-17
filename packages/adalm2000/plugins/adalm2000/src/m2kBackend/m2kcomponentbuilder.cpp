@@ -27,6 +27,7 @@
 #include "m2kinputstream.h"
 #include "m2koutputstream.h"
 #include "m2kping.h"
+#include "m2kscanelement.h"
 
 #include "component/attribute.h"
 #include "component/channel.h"
@@ -434,7 +435,10 @@ bool buildAnalogIn(component::Context *ctx, libm2k::context::M2k *m2k, ICmdExecu
 		addAnalogTriggerDeviceAttrs(analogIn, trig, probeTriggerCaps(trig), m2k, executor);
 	}
 
-	new M2kInputStream(m2k, ain, executor, analogIn);
+	auto *in = new M2kInputStream(m2k, ain, executor, analogIn);
+	for(int i = 0; i < 2; ++i) {
+		new M2kScanElement(i, false, in);
+	}
 	return true;
 }
 
@@ -549,7 +553,10 @@ void buildAnalogOut(component::Context *ctx, libm2k::context::M2k *m2k, ICmdExec
 		buildAnalogOutChannel(analogOut, aout, m2k, static_cast<int>(i), executor);
 	}
 
-	new M2kOutputStream(m2k, aout, executor, analogOut);
+	auto *out = new M2kOutputStream(m2k, aout, executor, analogOut);
+	for(unsigned int i = 0; i < channels; ++i) {
+		new M2kScanElement(static_cast<long>(i), true, out);
+	}
 }
 
 void addRail(component::Device *dev, libm2k::analog::M2kPowerSupply *supply, void *resource, int index, double minV,
@@ -924,8 +931,12 @@ void buildDigital(component::Context *ctx, libm2k::context::M2k *m2k, ICmdExecut
 		addDigitalTriggerDeviceAttrs(digitalDev, trig, probeTriggerCaps(trig), m2k, executor);
 	}
 
-	new M2kDigitalInputStream(m2k, digital, executor, digitalDev);
-	new M2kDigitalOutputStream(m2k, digital, executor, digitalDev);
+	auto *din = new M2kDigitalInputStream(m2k, digital, executor, digitalDev);
+	auto *dout = new M2kDigitalOutputStream(m2k, digital, executor, digitalDev);
+	for(int pin = 0; pin < dio::PIN_COUNT; ++pin) {
+		new M2kScanElement(pin, false, din);
+		new M2kScanElement(pin, true, dout);
+	}
 }
 
 void buildContextDevice(component::Context *ctx, libm2k::context::M2k *m2k, ICmdExecutor *executor)
