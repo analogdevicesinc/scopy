@@ -683,14 +683,14 @@ void MonitorView::render()
 	// Every plot is shown, with or without curves; all follow the same history window.
 	for(int p = 0; p < plots; ++p) {
 		PlotWidget *pw = m_plots[p];
-		if(pw->navigator()->isZoomed()) {
-			continue;
-		}
-		pw->xAxis()->setInterval(-history, 0);
-		if(used[p] && lo[p] <= hi[p]) {
-			const double span =
-				hi[p] > lo[p] ? hi[p] - lo[p] : std::max(1e-9, std::abs(hi[p]) * 0.01 + 1e-9);
-			pw->yAxis()->setInterval(lo[p] - span * 0.1, hi[p] + span * 0.1);
+		// Zoomed / panned: the axes are the user's, the curves still update under them.
+		if(!pw->navigator()->isZoomed()) {
+			pw->xAxis()->setInterval(-history, 0);
+			if(used[p] && lo[p] <= hi[p]) {
+				const double span =
+					hi[p] > lo[p] ? hi[p] - lo[p] : std::max(1e-9, std::abs(hi[p]) * 0.01 + 1e-9);
+				pw->yAxis()->setInterval(lo[p] - span * 0.1, hi[p] + span * 0.1);
+			}
 		}
 		pw->replot();
 	}
