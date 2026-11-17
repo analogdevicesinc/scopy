@@ -139,6 +139,7 @@ MonitorView::MonitorView(QObject *root, QWidget *parent)
 		}
 	});
 	connect(m_monitor, &AttributeMonitor::ticked, this, [this]() { m_dirty = true; });
+	connect(m_monitor, &AttributeMonitor::sampled, this, [this]() { m_dirty = true; });
 
 	auto *lay = new QVBoxLayout(this);
 	lay->setContentsMargins(0, 0, 0, 0);
@@ -649,7 +650,18 @@ MonitorView::Entry *MonitorView::entry(const QString &key)
 void MonitorView::render()
 {
 	m_dirty = false;
-	const double now = m_monitor->now();
+	// x = 0 is the newest sample of the enabled channels: the curves reach 0 and move one
+	// step per sample, at the poll period.
+	double now = std::numeric_limits<double>::lowest();
+	for(const Entry &e : std::as_const(m_entries)) {
+		const QVector<QPointF> s = m_monitor->isEnabled(e.key) ? m_monitor->samples(e.key) : QVector<QPointF>();
+		if(!s.isEmpty()) {
+			now = std::max(now, s.last().x());
+		}
+	}
+	if(now == std::numeric_limits<double>::lowest()) {
+		now = m_monitor->now();
+	}
 	const double history = m_monitor->history();
 	const int plots = plotCount();
 	QVector<double> lo(plots, std::numeric_limits<double>::max());
@@ -674,7 +686,7 @@ void MonitorView::render()
 			lo[e.plotIndex] = std::min(lo[e.plotIndex], s[i].y());
 			hi[e.plotIndex] = std::max(hi[e.plotIndex], s[i].y());
 		}
-		e.curve->setSamples(x.data(), y.data(), size_t(s.size()), true);
+		e.curve->setSamples(x.data(), y.data(), size_t(x.size()), true);
 		if(Attribute *src = m_monitor->source(e.key)) {
 			m_plots[e.plotIndex]->yAxis()->scaleDraw()->setUnitType(src->unit());
 		}
