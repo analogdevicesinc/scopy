@@ -23,6 +23,7 @@
 
 #include "acquisition/measurementstable.h"
 #include "nodepanel.h"
+#include "sidesplitter.h"
 
 #include <QButtonGroup>
 #include <QCheckBox>
@@ -148,12 +149,11 @@ MonitorView::MonitorView(QObject *root, QWidget *parent)
 	m_tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_tool->topContainer()->setVisible(true);
 	m_tool->centralContainer()->setVisible(true);
-	m_tool->rightContainer()->setVisible(true);
-	m_tool->leftContainer()->setVisible(true);
 	m_tool->topContainerMenuControl()->setVisible(false);
-	m_tool->setRightContainerWidth(300);
-	m_tool->setLeftContainerWidth(220);
 	lay->addWidget(m_tool);
+	// Channels | plot | menus, resizable; a side dragged to the edge hides.
+	m_sides = new SideSplitter(220, 300, this);
+	m_tool->addWidgetToCentralContainerHelper(m_sides);
 
 	m_status = new QLabel("Stopped", this);
 	Style::setStyle(m_status, style::properties::label::subtle);
@@ -168,13 +168,12 @@ MonitorView::MonitorView(QObject *root, QWidget *parent)
 	m_tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	m_tool->addWidgetToTopContainerHelper(m_clearBtn, TTA_RIGHT);
 	m_tool->addWidgetToTopContainerHelper(gearBtn, TTA_RIGHT);
-	m_tool->rightStack()->add(SETTINGS_KEY, buildSettings(this));
-	m_tool->openRightContainerHelper(true);
-	connect(gearBtn, &QPushButton::toggled, m_tool, &ToolTemplate::openRightContainerHelper);
+	m_sides->rightStack()->add(SETTINGS_KEY, buildSettings(this));
+	connect(gearBtn, &QPushButton::toggled, m_sides, &SideSplitter::setRightOpen);
+	connect(m_sides, &SideSplitter::rightOpenChanged, gearBtn, &QAbstractButton::setChecked);
 
 	buildPlots();
 	buildChannels();
-	m_tool->openLeftContainerHelper(true);
 
 	connect(m_runBtn, &QPushButton::toggled, this, [this](bool on) {
 		m_runBtn->setText(on ? "Stop" : "Start");
@@ -302,7 +301,7 @@ void MonitorView::buildChannels()
 	settingsBtn->setChecked(true);
 	vcm->addTop(settingsBtn);
 	m_menuGroup->addButton(settingsBtn);
-	connect(settingsBtn, &QAbstractButton::clicked, this, [this]() { m_tool->rightStack()->show(SETTINGS_KEY); });
+	connect(settingsBtn, &QAbstractButton::clicked, this, [this]() { m_sides->rightStack()->show(SETTINGS_KEY); });
 
 	QMap<QString, int> kinds; // channel kind -> plot, over the existing plots
 	QMap<Device *, CollapsableMenuControlButton *> groups;
@@ -351,7 +350,7 @@ void MonitorView::buildChannels()
 		m_menuGroup->addButton(e.button);
 		connect(group->onOffSwitch(), &QAbstractButton::toggled, e.button->checkBox(), &QCheckBox::setChecked);
 
-		m_tool->rightStack()->add(channelMenuKey(e.key), buildChannelMenu(e));
+		m_sides->rightStack()->add(channelMenuKey(e.key), buildChannelMenu(e));
 		m_entries.append(e);
 	}
 
@@ -359,7 +358,7 @@ void MonitorView::buildChannels()
 		applySource(e);
 		const QString key = e.key;
 		connect(e.button, &QAbstractButton::clicked, this,
-			[this, key]() { m_tool->rightStack()->show(channelMenuKey(key)); });
+			[this, key]() { m_sides->rightStack()->show(channelMenuKey(key)); });
 		connect(e.button->checkBox(), &QCheckBox::toggled, this, [this, key](bool on) {
 			Entry *en = entry(key);
 			m_monitor->setEnabled(key, on);
@@ -389,8 +388,8 @@ void MonitorView::buildChannels()
 		none->setWordWrap(true);
 		vcm->add(none);
 	}
-	m_tool->leftStack()->add(CHANNELS_KEY, vcm);
-	m_tool->rightStack()->show(SETTINGS_KEY);
+	m_sides->leftStack()->add(CHANNELS_KEY, vcm);
+	m_sides->rightStack()->show(SETTINGS_KEY);
 }
 
 QWidget *MonitorView::buildChannelMenu(Entry &e)
@@ -451,7 +450,7 @@ void MonitorView::buildPlots()
 	// Extra height goes to the plots; the table keeps its size (see applyInitialSizes()).
 	m_splitter->setStretchFactor(0, 1);
 	m_splitter->setStretchFactor(1, 0);
-	m_tool->addWidgetToCentralContainerHelper(m_splitter);
+	m_sides->setCentralWidget(m_splitter);
 
 	addPlot(); // there is always at least one plot
 }

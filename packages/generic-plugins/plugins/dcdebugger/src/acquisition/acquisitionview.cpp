@@ -23,6 +23,7 @@
 
 #include "measurementstable.h"
 #include "nodepanel.h"
+#include "sidesplitter.h"
 #include "streamutils.h"
 
 #include <QCheckBox>
@@ -90,10 +91,11 @@ AcquisitionView::AcquisitionView(InputStream *stream, QWidget *parent)
 	m_tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_tool->topContainer()->setVisible(true);
 	m_tool->centralContainer()->setVisible(true);
-	m_tool->rightContainer()->setVisible(true);
 	m_tool->topContainerMenuControl()->setVisible(false);
-	m_tool->setRightContainerWidth(300);
 	lay->addWidget(m_tool);
+	// Channels | plot | menus, resizable; a side dragged to the edge hides.
+	m_sides = new SideSplitter(0, 300, this);
+	m_tool->addWidgetToCentralContainerHelper(m_sides);
 
 	m_status = new QLabel("Stopped", this);
 	Style::setStyle(m_status, style::properties::label::subtle);
@@ -113,9 +115,9 @@ AcquisitionView::AcquisitionView(InputStream *stream, QWidget *parent)
 	connect(m_exportBtn, &QPushButton::clicked, this, &AcquisitionView::exportData);
 	m_tool->addWidgetToTopContainerHelper(gearBtn, TTA_RIGHT);
 
-	m_tool->rightStack()->add(SETTINGS_KEY, buildSettings(this));
-	m_tool->openRightContainerHelper(true);
-	connect(gearBtn, &QPushButton::toggled, m_tool, &ToolTemplate::openRightContainerHelper);
+	m_sides->rightStack()->add(SETTINGS_KEY, buildSettings(this));
+	connect(gearBtn, &QPushButton::toggled, m_sides, &SideSplitter::setRightOpen);
+	connect(m_sides, &SideSplitter::rightOpenChanged, gearBtn, &QAbstractButton::setChecked);
 
 	buildPlot();
 	applyChannelSelection();
@@ -326,7 +328,7 @@ void AcquisitionView::buildPlot()
 	splitter->addWidget(m_table);
 	splitter->setStretchFactor(0, 4);
 	splitter->setStretchFactor(1, 1);
-	m_tool->addWidgetToCentralContainerHelper(splitter);
+	m_sides->setCentralWidget(splitter);
 }
 
 void AcquisitionView::applyChannelSelection()

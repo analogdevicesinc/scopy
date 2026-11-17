@@ -22,6 +22,7 @@
 #include "generatorview.h"
 
 #include "nodepanel.h"
+#include "sidesplitter.h"
 #include "streamutils.h"
 #include "waveform.h"
 
@@ -108,12 +109,11 @@ GeneratorView::GeneratorView(OutputStream *stream, QWidget *parent)
 	m_tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_tool->topContainer()->setVisible(true);
 	m_tool->centralContainer()->setVisible(true);
-	m_tool->rightContainer()->setVisible(true);
-	m_tool->leftContainer()->setVisible(true);
 	m_tool->topContainerMenuControl()->setVisible(false);
-	m_tool->setRightContainerWidth(300);
-	m_tool->setLeftContainerWidth(200);
 	lay->addWidget(m_tool);
+	// Channels | plot | menus, resizable; a side dragged to the edge hides.
+	m_sides = new SideSplitter(200, 300, this);
+	m_tool->addWidgetToCentralContainerHelper(m_sides);
 
 	m_status = new QLabel("Stopped", this);
 	Style::setStyle(m_status, style::properties::label::subtle);
@@ -127,14 +127,13 @@ GeneratorView::GeneratorView(OutputStream *stream, QWidget *parent)
 	m_tool->addWidgetToTopContainerHelper(m_status, TTA_LEFT);
 	m_tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	m_tool->addWidgetToTopContainerHelper(gearBtn, TTA_RIGHT);
-	m_tool->rightStack()->add(SETTINGS_KEY, buildSettings(this));
-	m_tool->openRightContainerHelper(true);
-	connect(gearBtn, &QPushButton::toggled, m_tool, &ToolTemplate::openRightContainerHelper);
+	m_sides->rightStack()->add(SETTINGS_KEY, buildSettings(this));
+	connect(gearBtn, &QPushButton::toggled, m_sides, &SideSplitter::setRightOpen);
+	connect(m_sides, &SideSplitter::rightOpenChanged, gearBtn, &QAbstractButton::setChecked);
 
 	buildPreview();
 	buildChannels();
-	m_tool->openLeftContainerHelper(true);
-	m_tool->addWidgetToCentralContainerHelper(m_plot);
+	m_sides->setCentralWidget(m_plot);
 
 	connect(m_runBtn, &QPushButton::toggled, this, [this](bool on) {
 		if(on) {
@@ -240,7 +239,7 @@ void GeneratorView::buildChannels()
 	settingsBtn->setChecked(true);
 	vcm->addTop(settingsBtn);
 	m_menuGroup->addButton(settingsBtn);
-	connect(settingsBtn, &QAbstractButton::clicked, this, [this]() { m_tool->rightStack()->show(SETTINGS_KEY); });
+	connect(settingsBtn, &QAbstractButton::clicked, this, [this]() { m_sides->rightStack()->show(SETTINGS_KEY); });
 
 	const QList<ScanElement *> elems = m_gen->scanElements();
 	const QHash<QString, ToneSpec> tones = m_gen->tones();
@@ -262,14 +261,14 @@ void GeneratorView::buildChannels()
 		vcm->add(ctrl.button);
 		m_menuGroup->addButton(ctrl.button);
 
-		m_tool->rightStack()->add(channelMenuKey(id), buildChannelMenu(ctrl, i, tone));
+		m_sides->rightStack()->add(channelMenuKey(id), buildChannelMenu(ctrl, i, tone));
 		connect(ctrl.button, &QAbstractButton::clicked, this,
-			[this, id]() { m_tool->rightStack()->show(channelMenuKey(id)); });
+			[this, id]() { m_sides->rightStack()->show(channelMenuKey(id)); });
 		connect(ctrl.button->checkBox(), &QCheckBox::toggled, this, &GeneratorView::scheduleApply);
 		m_channels.append(ctrl);
 	}
-	m_tool->leftStack()->add(CHANNELS_KEY, vcm);
-	m_tool->rightStack()->show(SETTINGS_KEY);
+	m_sides->leftStack()->add(CHANNELS_KEY, vcm);
+	m_sides->rightStack()->show(SETTINGS_KEY);
 }
 
 QWidget *GeneratorView::buildChannelMenu(ChannelControls &ctrl, int index, const ToneSpec &tone)

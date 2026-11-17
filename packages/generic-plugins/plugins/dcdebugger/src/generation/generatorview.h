@@ -52,6 +52,7 @@ class OutputStream;
 } // namespace scopy::component
 
 namespace scopy::dcdebugger {
+class SideSplitter;
 
 // Generator tab of an OutputStream, laid out like the Scopy instruments: a channel list on the
 // left (enable + select), the selected channel's menu (waveform / frequency / amplitude / offset /
@@ -98,6 +99,7 @@ private:
 	component::Attribute *m_sampleRateAttr = nullptr;
 
 	ToolTemplate *m_tool;
+	SideSplitter *m_sides;
 	QPushButton *m_runBtn;
 	QLabel *m_status;
 	gui::MenuSpinbox *m_samples;

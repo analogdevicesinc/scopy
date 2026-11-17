@@ -57,6 +57,7 @@ class Channel;
 } // namespace scopy::component
 
 namespace scopy::dcdebugger {
+class SideSplitter;
 
 // Monitor tab of a Context or Device: polls one attribute per channel (like Data Monitor) and
 // plots its history. Scopy instrument layout: channel list on the left grouped by device (a
@@ -133,6 +134,7 @@ private:
 	QList<Entry> m_entries;
 
 	ToolTemplate *m_tool;
+	SideSplitter *m_sides;
 	QPushButton *m_runBtn;
 	QPushButton *m_clearBtn;
 	QLabel *m_status;

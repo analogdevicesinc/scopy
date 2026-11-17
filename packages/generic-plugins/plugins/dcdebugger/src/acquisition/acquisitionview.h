@@ -52,6 +52,7 @@ class Triggerable;
 } // namespace scopy::component
 
 namespace scopy::dcdebugger {
+class SideSplitter;
 class MeasurementsTable;
 struct MeasurementRow;
 
@@ -103,6 +104,7 @@ private:
 	component::Triggerable *m_triggerable = nullptr;
 
 	ToolTemplate *m_tool;
+	SideSplitter *m_sides;
 	QPushButton *m_runBtn;
 	QPushButton *m_singleBtn;
 	QLabel *m_status;
