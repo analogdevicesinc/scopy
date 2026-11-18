@@ -5,3 +5,13 @@ QLabel[&&property&&=true] {
 QLabel[&&property&&=true]:disabled {
 	color: grey;
 }
+QLabel[&&property&&="selected"] {
+	color: &content_inverse&;
+	font-weight: bold;
+	font-size: &font_size_0_5&;
+}
+QLabel[&&property&&="idle"] {
+	color: &content_default&;
+	font-weight: bold;
+	font-size: &font_size_0_5&;
+}
