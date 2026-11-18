@@ -66,7 +66,7 @@ public:
 	component::BackendId id() const override { return ID; }
 	component::ConnectionKind connectionKind() const override { return FakeProvider::KIND; }
 	bool compatible(const component::Connection &c) const override { return c.kind() == FakeProvider::KIND; }
-	component::Context *create(component::Connection &c) override;
+	component::Context *create(component::Connection &c, ICmdExecutor *executor) override;
 };
 
 } // namespace scopy

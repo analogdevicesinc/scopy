@@ -141,7 +141,7 @@ bool Controller::unregisterBackend(const BackendId &id)
 {
 	std::lock_guard<std::mutex> ctxLock(m_ctxMutex);
 	for(const ConnEntry &e : std::as_const(m_connections)) {
-		if(e.viewRefs.contains(id)) {
+		if(e.viewRefs.contains(id) || e.closingViews.contains(id)) {
 			qWarning(CAT_CONTROLLER) << "backend" << id << "still has open views";
 			return false;
 		}
@@ -264,7 +264,7 @@ Controller::ConnMap::iterator Controller::_openLocked(const QString &uri, const 
 
 void Controller::_closeIfUnused(ConnMap::iterator it)
 {
-	if(it->connRefs > 0 || !it->viewRefs.isEmpty()) {
+	if(it->connRefs > 0 || !it->viewRefs.isEmpty() || !it->closingViews.isEmpty()) {
 		return;
 	}
 	Connection *conn = it->conn;
@@ -299,17 +299,29 @@ void Controller::_releaseConnection(const QString &uri)
 
 ContextHandle Controller::_connectCtx(const QString &uri, const BackendId &backend, int maxThreads)
 {
-	std::lock_guard<std::mutex> lock(m_ctxMutex);
+	std::unique_lock<std::mutex> lock(m_ctxMutex);
 	std::shared_ptr<ContextBackend> b = _resolveBackend(backend);
 	if(!b) {
 		qWarning(CAT_CONTROLLER) << "unknown backend" << backend;
 		return ContextHandle();
 	}
+	const BackendId id = b->id();
+	// A released view of this backend is still draining: wait for it to be destroyed before
+	// building a new one (the backend may share native state per uri, e.g. libm2k).
+	for(auto c = m_connections.find(uri); c != m_connections.end() && c->closingViews.contains(id);
+	    c = m_connections.find(uri)) {
+		c->connRefs++; // pin the entry across the wait
+		m_viewClosedCv.wait(lock, [this, &uri, &id]() {
+			auto e = m_connections.find(uri);
+			return e == m_connections.end() || !e->closingViews.contains(id);
+		});
+		c = m_connections.find(uri);
+		c->connRefs--;
+	}
 	auto it = _openLocked(uri, b->connectionKind(), maxThreads);
 	if(it == m_connections.end()) {
 		return ContextHandle();
 	}
-	const BackendId id = b->id();
 	Connection *conn = it->conn;
 	if(!conn->backends().contains(id)) {
 		qWarning(CAT_CONTROLLER) << id << "is not compatible with" << uri;
@@ -318,18 +330,23 @@ ContextHandle Controller::_connectCtx(const QString &uri, const BackendId &backe
 	}
 	Context *ctx = conn->context(id);
 	if(!ctx) {
-		ctx = b->create(*conn);
+		// The view's own scope over the connection's executor, so releasing it can drain only
+		// this view's commands.
+		auto *scope = new ScopedExecutor(conn->executor());
+		ctx = b->create(*conn, scope);
 		if(!ctx) {
+			delete scope;
 			qWarning(CAT_CONTROLLER) << id << "failed to build a view on" << uri;
 			_closeIfUnused(it);
 			return ContextHandle();
 		}
+		scope->setParent(ctx);
 		ctx->setUri(uri);
 		// Built on the caller's thread; the connection lives on the Controller's.
 		if(ctx->thread() != conn->thread()) {
 			ctx->moveToThread(conn->thread());
 		}
-		conn->add(id, ctx);
+		conn->add(id, ctx, scope);
 		Q_EMIT contextCreated(conn, ctx);
 	}
 	it->viewRefs[id]++;
@@ -354,7 +371,7 @@ ContextHandle Controller::_acquireExisting(const QString &uri, const BackendId &
 
 void Controller::_releaseView(const QString &uri, const BackendId &backend)
 {
-	std::lock_guard<std::mutex> lock(m_ctxMutex);
+	std::unique_lock<std::mutex> lock(m_ctxMutex);
 	auto it = m_connections.find(uri);
 	if(it == m_connections.end() || !it->viewRefs.contains(backend)) {
 		return;
@@ -364,14 +381,44 @@ void Controller::_releaseView(const QString &uri, const BackendId &backend)
 	}
 	it->viewRefs.remove(backend);
 	Connection *conn = it->conn;
-	if(Context *ctx = conn->take(backend)) {
-		Q_EMIT contextDestroyed(conn, ctx);
-		if(std::shared_ptr<ContextBackend> b = this->backend(backend)) {
-			b->destroy(ctx);
-		}
-		ctx->deleteLater();
+	Context *ctx = conn->take(backend);
+	if(!ctx) {
+		_closeIfUnused(it);
+		return;
 	}
-	_closeIfUnused(it);
+	Q_EMIT contextDestroyed(conn, ctx);
+
+	auto *scope = dynamic_cast<ScopedExecutor *>(ctx->executor());
+	if(!scope) { // adopted views have no scope
+		lock.unlock();
+		_finishViewClose(uri, backend, ctx);
+		return;
+	}
+	// destroy() must not race the view's commands: drain first. The connection stays open
+	// until the view is gone.
+	it->closingViews.insert(backend, ctx);
+	lock.unlock();
+	// Sync: runs on the worker that finished the last command (or here, if none is left).
+	scope->shutdown().then(QtFuture::Launch::Sync,
+			       [this, uri, backend, ctx]() { _finishViewClose(uri, backend, ctx); });
+}
+
+void Controller::_finishViewClose(const QString &uri, const BackendId &backend, Context *ctx)
+{
+	if(std::shared_ptr<ContextBackend> b = this->backend(backend)) {
+		b->destroy(ctx);
+	}
+	ctx->deleteLater();
+	{
+		std::lock_guard<std::mutex> lock(m_ctxMutex);
+		auto it = m_connections.find(uri);
+		if(it != m_connections.end()) {
+			it->closingViews.remove(backend);
+			_closeIfUnused(it);
+		}
+	}
+	m_viewClosedCv.notify_all();
+	Q_EMIT viewClosed(uri, backend);
 }
 
 ContextHandle Controller::adopt(const QString &uri, Context *ctx, const BackendId &backend)

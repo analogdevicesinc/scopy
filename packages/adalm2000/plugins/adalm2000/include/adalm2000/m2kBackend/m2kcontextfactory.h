@@ -32,7 +32,9 @@ public:
 	component::BackendId id() const override { return ID; }
 	component::ConnectionKind connectionKind() const override;
 	bool compatible(const component::Connection &c) const override;
-	component::Context *create(component::Connection &c) override;
+	component::Context *create(component::Connection &c, ICmdExecutor *executor) override;
+	// libm2k is not thread-safe.
+	int maxThreads() const override { return 1; }
 	void destroy(component::Context *ctx) override;
 };
 

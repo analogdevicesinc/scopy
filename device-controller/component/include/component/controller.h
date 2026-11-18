@@ -25,11 +25,13 @@
 #include "component/connectionprovider.h"
 #include "component/context.h"
 #include "component/contextbackend.h"
+#include "component/scopedexecutor.h"
 
 #include <QList>
 #include <QMap>
 #include <QObject>
 #include <QString>
+#include <condition_variable>
 #include <memory>
 #include <mutex>
 #include "component/component_export.h"
@@ -161,7 +163,8 @@ public:
 	}
 
 	// The `backend` view of uri, built on first use; opens the connection if needed. An empty
-	// backend means "iio". Fails if the backend is not compatible with the connection.
+	// backend means "iio". Fails if the backend is not compatible with the connection. If that
+	// view is still closing (draining its commands), blocks until it is gone, then builds a new one.
 	static ContextHandle connectCtx(const QString &uri, const BackendId &backend = {}, int maxThreads = 1)
 	{
 		return GetInstance()->_connectCtx(uri, backend, maxThreads);
@@ -184,6 +187,8 @@ Q_SIGNALS:
 	void backendsChanged(scopy::component::Connection *conn);
 	void contextCreated(scopy::component::Connection *conn, scopy::component::Context *ctx);
 	void contextDestroyed(scopy::component::Connection *conn, scopy::component::Context *ctx);
+	// A released view finished draining and was destroyed. May be emitted from a worker thread.
+	void viewClosed(const QString &uri, const QString &backend);
 	void providerRegistered(const QString &kind);
 	void backendRegistered(const QString &id);
 	void backendUnregistered(const QString &id);
@@ -198,6 +203,8 @@ private:
 		int connRefs = 0;
 		int threads = 1;
 		QMap<BackendId, int> viewRefs;
+		// Released views still draining their commands; they keep the connection open.
+		QMap<BackendId, Context *> closingViews;
 	};
 	using ConnMap = QMap<QString, ConnEntry>;
 
@@ -206,6 +213,7 @@ private:
 	ContextHandle _acquireExisting(const QString &uri, const BackendId &backend);
 	void _releaseConnection(const QString &uri);
 	void _releaseView(const QString &uri, const BackendId &backend);
+	void _finishViewClose(const QString &uri, const BackendId &backend, Context *ctx);
 
 	// All under m_ctxMutex.
 	ConnMap::iterator _openLocked(const QString &uri, const ConnectionKind &kind, int maxThreads);
@@ -217,6 +225,8 @@ private:
 	static std::mutex mutex_;
 	// Lock order: m_ctxMutex, then m_registryMutex.
 	std::mutex m_ctxMutex;
+	// Signalled (under m_ctxMutex) when a closing view is gone.
+	std::condition_variable m_viewClosedCv;
 	ConnMap m_connections;
 	mutable std::mutex m_registryMutex;
 	QMap<ConnectionKind, std::shared_ptr<ConnectionProvider>> m_providers;

@@ -59,8 +59,8 @@ bool M2kContextFactory::compatible(const component::Connection &c) const
 	return true;
 }
 
-// The m2k view shares the connection's iio_context and executor.
-component::Context *M2kContextFactory::create(component::Connection &c)
+// The m2k view shares the connection's iio_context; its I/O goes through the view's executor.
+component::Context *M2kContextFactory::create(component::Connection &c, ICmdExecutor *executor)
 {
 	auto *conn = c.as<component::iio::IIOConnection>();
 	if(!conn || !conn->handle().ptr) {
@@ -99,8 +99,6 @@ component::Context *M2kContextFactory::create(component::Connection &c)
 	ctx->setUri(uri);
 	ctx->setM2k(m2k);
 	QObject::connect(&c, &component::Connection::lost, ctx, [ctx]() { ctx->setConnectionLost(); });
-
-	ICmdExecutor *executor = c.executor();
 
 	new M2kCalibration(
 		m2k, [m2k]() { return m2k->isCalibrated(); }, [m2k]() { return m2k->calibrate(); },
