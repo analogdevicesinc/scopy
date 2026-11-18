@@ -27,9 +27,13 @@
 #include "component/contextbackend.h"
 #include "component/controller.h"
 #include "component/device.h"
+#include "component/scopedexecutor.h"
+#include "core/command.h"
 #include "core/pooledcmdexecutor.h"
 
 #include <QPointer>
+#include <atomic>
+#include <QSemaphore>
 #include <QSignalSpy>
 #include <QTest>
 #include <QThread>
@@ -105,15 +109,48 @@ public:
 		return fc && (m_model.isEmpty() || fc->model == m_model);
 	}
 	int maxThreads() const override { return m_threads; }
-	Context *create(Connection &) override { return makeFakeTree(); }
+	Context *create(Connection &, ICmdExecutor *executor) override
+	{
+		created++;
+		lastExecutor = executor;
+		return makeFakeTree();
+	}
 	void destroy(Context *) override { destroyed++; }
-	int destroyed = 0;
+	std::atomic<int> created = 0;
+	std::atomic<int> destroyed = 0;
+	ICmdExecutor *lastExecutor = nullptr;
 
 private:
 	BackendId m_id;
 	ConnectionKind m_kind;
 	QString m_model;
 	int m_threads;
+};
+
+// Blocks in run() until released; records whether it ran.
+class BlockingCommand : public Command
+{
+	Q_OBJECT
+public:
+	explicit BlockingCommand(QSemaphore *gate = nullptr)
+		: Command(nullptr)
+		, m_gate(gate)
+	{}
+	QSemaphore entered;
+	std::atomic<bool> ran = false;
+
+protected:
+	void run() override
+	{
+		entered.release();
+		if(m_gate) {
+			m_gate->acquire();
+		}
+		ran = true;
+	}
+
+private:
+	QSemaphore *m_gate;
 };
 
 class TstComponentController : public QObject
@@ -136,6 +173,11 @@ private Q_SLOTS:
 	void otherKindOnOpenUriFails();
 	void openFromWorkerThreadMovesConnection();
 	void viewBuiltOnWorkerIsParentedToConnection();
+	void viewGetsItsOwnScope();
+	void releaseWaitsForRunningCommand();
+	void releaseCancelsQueuedCommands();
+	void releaseLeavesOtherViewsCommands();
+	void reconnectWaitsForClosingView();
 };
 
 void TstComponentController::initTestCase()
@@ -225,10 +267,11 @@ void TstComponentController::runtimeBackendBuildsTree()
 		QCOMPARE(h->findChildren<Attribute *>().size(), 2);
 		QCOMPARE(h->backend(), QString("fake-rt"));
 		QVERIFY(h->executor() != nullptr);
-		QCOMPARE(h->executor(), h.connection()->executor());
+		QVERIFY(dynamic_cast<ScopedExecutor *>(h->executor()));
+		QVERIFY(h->executor() != h.connection()->executor());
 		QVERIFY(static_cast<FakeConnection *>(h.connection())->started);
 	}
-	QCOMPARE(b->destroyed, 1);
+	QCOMPARE(b->destroyed.load(), 1);
 	QVERIFY(c->unregisterBackend("fake-rt"));
 	QVERIFY(!c->backends().contains("fake-rt"));
 }
@@ -306,12 +349,12 @@ void TstComponentController::viewsShareOneConnection()
 	// Dropping one view keeps the connection; the other view stays untouched.
 	again.reset();
 	ha.reset();
-	QCOMPARE(a->destroyed, 1);
+	QCOMPARE(a->destroyed.load(), 1);
 	QCOMPARE(closed.count(), 0);
 	QCOMPARE(hb.connection()->contexts().size(), 1);
 
 	hb.reset();
-	QCOMPARE(b->destroyed, 1);
+	QCOMPARE(b->destroyed.load(), 1);
 	QCOMPARE(closed.count(), 1);
 	QVERIFY(c->unregisterBackend("view-a"));
 	QVERIFY(c->unregisterBackend("view-b"));
@@ -431,6 +474,138 @@ void TstComponentController::viewBuiltOnWorkerIsParentedToConnection()
 	QCOMPARE(dev->thread(), c->thread());
 	ctx.reset();
 	QVERIFY(c->unregisterBackend("worker-view"));
+}
+
+void TstComponentController::viewGetsItsOwnScope()
+{
+	Controller *c = Controller::GetInstance();
+	auto b = std::make_shared<FakeBackend>("scope-view");
+	QVERIFY(c->registerBackend(b));
+	{
+		ContextHandle h = Controller::connectCtx("fake:scope", "scope-view");
+		QVERIFY(h);
+		QCOMPARE(b->lastExecutor, h->executor());
+		QVERIFY(dynamic_cast<ScopedExecutor *>(h->executor()));
+	}
+	QVERIFY(c->unregisterBackend("scope-view"));
+}
+
+void TstComponentController::releaseWaitsForRunningCommand()
+{
+	Controller *c = Controller::GetInstance();
+	auto b = std::make_shared<FakeBackend>("drain-run");
+	QVERIFY(c->registerBackend(b));
+	QSignalSpy closed(c, &Controller::connectionClosed);
+
+	QSemaphore gate;
+	BlockingCommand cmd(&gate);
+	{
+		ContextHandle h = Controller::connectCtx("fake:drainrun", "drain-run");
+		QVERIFY(h);
+		h->executor()->execute(&cmd);
+		QVERIFY(cmd.entered.tryAcquire(1, 5000));
+	}
+	// Released while running: no destroy, connection still open.
+	QCOMPARE(b->destroyed.load(), 0);
+	QCOMPARE(closed.count(), 0);
+
+	gate.release();
+	QTRY_COMPARE(b->destroyed.load(), 1);
+	QVERIFY(cmd.ran);
+	QTRY_COMPARE(closed.count(), 1);
+	QVERIFY(c->unregisterBackend("drain-run"));
+}
+
+void TstComponentController::releaseCancelsQueuedCommands()
+{
+	Controller *c = Controller::GetInstance();
+	auto b = std::make_shared<FakeBackend>("drain-queue", "fake", QString(), 1);
+	QVERIFY(c->registerBackend(b));
+
+	QSemaphore gate;
+	BlockingCommand running(&gate);
+	BlockingCommand queued;
+	{
+		ContextHandle h = Controller::connectCtx("fake:drainqueue", "drain-queue");
+		QVERIFY(h);
+		h->executor()->execute(&running);
+		QVERIFY(running.entered.tryAcquire(1, 5000));
+		h->executor()->execute(&queued);
+	}
+	gate.release();
+	QTRY_COMPARE(b->destroyed.load(), 1);
+	QVERIFY(running.ran);
+	QVERIFY(queued.isCancelled());
+	QVERIFY(!queued.ran);
+	QVERIFY(c->unregisterBackend("drain-queue"));
+}
+
+void TstComponentController::releaseLeavesOtherViewsCommands()
+{
+	Controller *c = Controller::GetInstance();
+	auto a = std::make_shared<FakeBackend>("drain-a", "fake", QString(), 1);
+	auto o = std::make_shared<FakeBackend>("drain-o", "fake", QString(), 1);
+	QVERIFY(c->registerBackend(a));
+	QVERIFY(c->registerBackend(o));
+
+	QSemaphore gate;
+	BlockingCommand running(&gate);
+	BlockingCommand other;
+	ContextHandle ho = Controller::connectCtx("fake:drainother", "drain-o");
+	QVERIFY(ho);
+	{
+		ContextHandle ha = Controller::connectCtx("fake:drainother", "drain-a");
+		QVERIFY(ha);
+		ha->executor()->execute(&running);
+		QVERIFY(running.entered.tryAcquire(1, 5000));
+		ho->executor()->execute(&other); // queued behind, on the shared serial executor
+	}
+	gate.release();
+	QTRY_COMPARE(a->destroyed.load(), 1);
+	QTRY_VERIFY(other.ran);
+	QVERIFY(!other.isCancelled());
+	QCOMPARE(o->destroyed.load(), 0);
+	ho.reset();
+	QTRY_COMPARE(o->destroyed.load(), 1);
+	QVERIFY(c->unregisterBackend("drain-a"));
+	QVERIFY(c->unregisterBackend("drain-o"));
+}
+
+void TstComponentController::reconnectWaitsForClosingView()
+{
+	Controller *c = Controller::GetInstance();
+	auto b = std::make_shared<FakeBackend>("drain-re");
+	QVERIFY(c->registerBackend(b));
+
+	QSemaphore gate;
+	BlockingCommand running(&gate);
+	{
+		ContextHandle h = Controller::connectCtx("fake:drainre", "drain-re");
+		QVERIFY(h);
+		h->executor()->execute(&running);
+		QVERIFY(running.entered.tryAcquire(1, 5000));
+	}
+	QCOMPARE(b->created.load(), 1);
+
+	ContextHandle again;
+	std::atomic<int> destroyedBeforeCreate = -1;
+	QThread *th = QThread::create([&]() {
+		again = Controller::connectCtx("fake:drainre", "drain-re");
+		destroyedBeforeCreate = b->destroyed.load();
+	});
+	th->start();
+	QVERIFY(!th->wait(200)); // blocked on the closing view
+	QCOMPARE(b->created.load(), 1);
+
+	gate.release();
+	QVERIFY(th->wait(5000));
+	delete th;
+	QVERIFY(again);
+	QCOMPARE(destroyedBeforeCreate.load(), 1);
+	QCOMPARE(b->created.load(), 2);
+	again.reset();
+	QTRY_COMPARE(b->destroyed.load(), 2);
+	QVERIFY(c->unregisterBackend("drain-re"));
 }
 
 QTEST_MAIN(TstComponentController)

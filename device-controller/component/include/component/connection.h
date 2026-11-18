@@ -77,8 +77,9 @@ public:
 	// Called by the Controller once the executor is set (e.g. start pinging).
 	virtual void start() {}
 
-	// Controller only. add() reparents ctx to this connection and injects the executor.
-	void add(const BackendId &id, Context *ctx);
+	// Controller only. add() reparents ctx to this connection and injects `executor` (the view's
+	// scope; the connection's executor when null).
+	void add(const BackendId &id, Context *ctx, ICmdExecutor *executor = nullptr);
 	Context *take(const BackendId &id);
 
 Q_SIGNALS:

@@ -33,7 +33,7 @@ ConnectionKind IIOCtxBackend::connectionKind() const { return IIOProvider::KIND;
 
 bool IIOCtxBackend::compatible(const Connection &c) const { return c.as<IIOConnection>() != nullptr; }
 
-Context *IIOCtxBackend::create(Connection &c)
+Context *IIOCtxBackend::create(Connection &c, ICmdExecutor *executor)
 {
 	auto *conn = c.as<IIOConnection>();
 	if(!conn) {
@@ -44,7 +44,7 @@ Context *IIOCtxBackend::create(Connection &c)
 	ctx->setDescription(conn->description());
 
 	IIOComponentBuilder builder(conn->backend(), conn->handle());
-	if(!builder.build(ctx, conn->executor())) {
+	if(!builder.build(ctx, executor)) {
 		delete ctx;
 		return nullptr;
 	}

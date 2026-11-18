@@ -71,11 +71,11 @@ BackendId Connection::backendOf(const Context *ctx) const
 	return {};
 }
 
-void Connection::add(const BackendId &id, Context *ctx)
+void Connection::add(const BackendId &id, Context *ctx, ICmdExecutor *executor)
 {
 	ctx->setParent(this);
 	ctx->setBackend(id);
-	ctx->setExecutor(m_executor);
+	ctx->setExecutor(executor ? executor : m_executor);
 	m_contexts.append({id, ctx});
 	Q_EMIT contextCreated(ctx);
 }

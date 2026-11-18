@@ -36,7 +36,7 @@ public:
 	BackendId id() const override { return ID; }
 	ConnectionKind connectionKind() const override;
 	bool compatible(const Connection &c) const override;
-	Context *create(Connection &c) override;
+	Context *create(Connection &c, ICmdExecutor *executor) override;
 };
 
 } // namespace scopy::component::iio

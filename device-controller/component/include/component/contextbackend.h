@@ -22,6 +22,7 @@
 #pragma once
 
 #include "component/connection.h"
+#include "core/icmdexecutor.h"
 
 namespace scopy::component {
 
@@ -45,10 +46,12 @@ public:
 	// 1 = this view needs a serial executor on the connection; -1 = no constraint.
 	virtual int maxThreads() const { return -1; }
 
-	// Builds the tree; drives I/O through c.executor(). The Controller parents the result to c.
-	virtual Context *create(Connection &c) = 0;
+	// Builds the tree; every leaf must drive its I/O through `executor` (this view's scope over
+	// the connection's executor), never c.executor(). The Controller parents the result to c.
+	virtual Context *create(Connection &c, ICmdExecutor *executor) = 0;
 
-	// Releases backend resources of a view before the Controller deletes it.
+	// Releases backend resources of a view before the Controller deletes it. Runs once none of
+	// the view's commands are queued or running, possibly on an executor worker thread.
 	virtual void destroy(Context *ctx) { Q_UNUSED(ctx); }
 };
 

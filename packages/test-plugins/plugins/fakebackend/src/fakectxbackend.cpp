@@ -103,8 +103,9 @@ DeviceMonitor *FakeProvider::monitor()
 	return m_monitor.get();
 }
 
-Context *FakeCtxBackend::create(Connection &c)
+Context *FakeCtxBackend::create(Connection &c, ICmdExecutor *executor)
 {
+	Q_UNUSED(executor) // attributes are answered synchronously
 	const QString uri = c.uri();
 	auto *ctx = new Context;
 	ctx->setName("fake");
