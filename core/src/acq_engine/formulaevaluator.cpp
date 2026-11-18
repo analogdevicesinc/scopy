@@ -155,7 +155,7 @@ bool FormulaEvaluator::evaluateBatch(int n, const QVector<const QVector<float> *
 			continue;
 		}
 		QJSValue jsArr = m_workerEngine->newArray(static_cast<uint>(n));
-		const int copyN = std::min((long long)n, in->size());
+		const int copyN = std::min<qsizetype>(n, in->size());
 		for(int i = 0; i < copyN; ++i)
 			jsArr.setProperty(static_cast<quint32>(i), static_cast<double>((*in)[i]));
 		for(int i = copyN; i < n; ++i)
