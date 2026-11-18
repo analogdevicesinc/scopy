@@ -22,7 +22,6 @@
 #include "m2kspectrumcontroller.h"
 
 #include "m2kanaloginsource.h"
-#include "m2kcalibration.h"
 #include "m2kcontext.h"
 
 #include <core/acq_engine/acquisitionengine.h>
@@ -38,8 +37,6 @@
 #include <core/acq_ui/acqwaterfallchannel.h>
 #include <core/acq_ui/filesourceblock.h>
 
-#include <component/ping.h>
-
 #include <gui/cursorcontroller.h>
 #include <gui/filemanager.h>
 #include <gui/docking/dockablearea.h>
@@ -51,11 +48,9 @@
 #include <gui/plotnavigator.hpp>
 #include <gui/plotwidget.h>
 #include <gui/printplotmanager.h>
-#include <gui/semiexclusivebuttongroup.h>
 #include <gui/style.h>
 #include <gui/waterfallplotwidget.h>
 #include <gui/widgets/cursorsettings.h>
-#include <gui/widgets/hoverwidget.h>
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menucombo.h>
 #include <gui/widgets/menucontrolbutton.h>
@@ -98,7 +93,6 @@ const QString kChannelsGroup = QStringLiteral("Channels");
 const QString kReferencesGroup = QStringLiteral("References");
 
 constexpr int kFrameIntervalMs = 16;
-constexpr int kMaxFps = 60;
 constexpr double kDbRange = 200.0;
 
 const QList<QPair<QString, PlotMarkerController::MarkerTypes>> kMarkerTypes = {
@@ -134,21 +128,13 @@ gui::MenuSpinbox *hzSpin(const QString &name, double v, double min, QWidget *par
 } // namespace
 
 M2kSpectrumController::M2kSpectrumController(ToolMenuEntry *tme, M2kContext *ctx, const QString &uri, QObject *parent)
-	: AcqInstrumentController(tme, parent)
-	, m_ctx(ctx)
-	, m_resourceKey(QStringLiteral("adalm2000-adc:") + uri)
+	: M2kInstrumentController(tme, ctx, QStringLiteral("adalm2000-adc:") + uri, tr("Spectrum Analyzer"), parent)
 	, m_fftSize(spec::fftSizes().at(spec::DEFAULT_FFT_INDEX))
-{
-	m_ui->setRunGuard([this]() { return claim(); });
-	m_ui->setBufferControlVisible(false);
-	m_ui->engine()->setMaxFPS(kMaxFps);
-	m_ui->shell()->setTargetFps(kMaxFps);
-}
+{}
 
 M2kSpectrumController::~M2kSpectrumController()
 {
 	AcqInstrumentController::stop();
-	release();
 	for(scopy::adc::AcqCurveChannel *c : m_curve) {
 		delete c;
 	}
@@ -247,33 +233,6 @@ void M2kSpectrumController::setupPlots()
 	setSpan(m_span);
 	onUnitsChanged(0);
 	general->click();
-}
-
-void M2kSpectrumController::addHoverButton(const QString &label, QWidget *content)
-{
-	InstrumentTemplate *it = m_ui->shell();
-	auto *btn = new QPushButton(label, it);
-	btn->setCheckable(true);
-	Style::setStyle(btn, style::properties::button::blueGrayButton);
-	Style::setStyle(btn, style::properties::label::menuMedium);
-	it->tool()->addWidgetToBottomContainerHelper(btn, TTA_RIGHT);
-	if(!m_hoverGroup) {
-		m_hoverGroup = new SemiExclusiveButtonGroup(this);
-	}
-	m_hoverGroup->addButton(btn);
-
-	content->setMinimumWidth(Style::getDimension(json::global::unit_6) * 2 +
-				 Style::getDimension(json::global::unit_4));
-	Style::setBackgroundColor(content, json::theme::background_primary);
-	auto *hover = new HoverWidget(content, btn, it);
-	hover->setStyleSheet(QStringLiteral("scopy--HoverWidget { background-color: transparent; }"));
-	hover->setAnchorPos(HP_TOPRIGHT);
-	hover->setContentPos(HP_TOPLEFT);
-	hover->setVisible(false);
-	connect(btn, &QAbstractButton::toggled, hover, [hover](bool on) {
-		hover->setVisible(on);
-		hover->raise();
-	});
 }
 
 void M2kSpectrumController::setupCenter()
@@ -703,24 +662,6 @@ QWidget *M2kSpectrumController::buildCursorsPage()
 	return page(section);
 }
 
-void M2kSpectrumController::setupCalibrationGate()
-{
-	auto *calibration = m_ctx ? m_ctx->findChild<M2kCalibration *>() : nullptr;
-	if(!calibration) {
-		return;
-	}
-	auto gate = [this](bool calibrating) {
-		m_calibrating = calibrating;
-		if(calibrating) {
-			AcqInstrumentController::stop();
-		}
-		updateRunEnabled();
-	};
-	connect(calibration, &M2kCalibration::started, this, [gate]() { gate(true); });
-	connect(calibration, &M2kCalibration::finished, this, [gate](bool) { gate(false); });
-	gate(calibration->isRunning());
-}
-
 void M2kSpectrumController::onStarted()
 {
 	for(scopy::adc::AcqChannel *c : allChannels()) {
@@ -773,9 +714,6 @@ void M2kSpectrumController::onStopped()
 	}
 	m_specPlot->replot();
 	m_wfPlot->replot();
-	if(!m_ui->engine()->isRunning()) {
-		release();
-	}
 }
 
 void M2kSpectrumController::restartIfRunning(const std::function<void()> &change)
@@ -1218,45 +1156,6 @@ void M2kSpectrumController::saveCsv(const QList<QPair<QString, DataKey>> &column
 	}
 	out.flush();
 	FileManagerHelper::saveDataToFile(m_ui, csv, tr("Export spectrum"));
-}
-
-bool M2kSpectrumController::claim()
-{
-	if(m_calibrating) {
-		StatusBarManager::pushMessage(tr("Spectrum Analyzer: wait for calibration to finish"));
-		return false;
-	}
-	if(!m_claimed) {
-		ResourceManager::open(m_resourceKey, this, true);
-		m_claimed = true;
-	}
-	if(auto *ping = m_ctx ? m_ctx->findChild<component::Ping *>(QString(), Qt::FindDirectChildrenOnly) : nullptr) {
-		if(ping->isMonitoring()) {
-			ping->stopMonitoring();
-			m_pingPaused = true;
-		}
-	}
-	return true;
-}
-
-void M2kSpectrumController::release()
-{
-	if(m_claimed) {
-		m_claimed = false;
-		ResourceManager::close(m_resourceKey);
-	}
-	if(m_pingPaused && m_ctx) {
-		m_pingPaused = false;
-		if(auto *ping = m_ctx->findChild<component::Ping *>(QString(), Qt::FindDirectChildrenOnly)) {
-			ping->startMonitoring();
-		}
-	}
-}
-
-void M2kSpectrumController::stop()
-{
-	m_claimed = false;
-	AcqInstrumentController::stop();
 }
 
 #include "moc_m2kspectrumcontroller.cpp"

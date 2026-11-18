@@ -21,6 +21,7 @@
 
 #include "m2kanaloginsource.h"
 
+#include "m2kattributeio.h"
 #include "m2kcomponentbuilder.h"
 #include "m2kcontext.h"
 #include "m2kinputstream.h"
@@ -28,14 +29,8 @@
 
 #include <core/acq_engine/datastore.h>
 
-#include <component/attribute.h>
-#include <component/attributereader.h>
-#include <component/attributewriter.h>
 #include <component/channel.h>
 #include <component/device.h>
-#include <component/navigation.h>
-
-#include <qcoro/qcorotask.h>
 
 #include <QLoggingCategory>
 
@@ -46,27 +41,6 @@ using namespace scopy::adalm2000;
 
 namespace {
 constexpr unsigned kKernelBuffers = 4;
-
-component::Attribute *attribute(QObject *node, const char *name)
-{
-	return node ? component::attributeByName(node, QString::fromLatin1(name)) : nullptr;
-}
-
-bool write(component::Attribute *attr, const QString &value)
-{
-	return attr && attr->writeCapability() && QCoro::waitFor(attr->writeCapability()->writeAsync(value));
-}
-
-std::optional<double> readDouble(component::Attribute *attr)
-{
-	if(!attr || !attr->readCapability()) {
-		return std::nullopt;
-	}
-	const auto resp = QCoro::waitFor(attr->readCapability()->readAsync());
-	bool ok = false;
-	const double value = resp ? QString::fromUtf8(resp.value()).toDouble(&ok) : 0.0;
-	return ok ? std::optional<double>(value) : std::nullopt;
-}
 } // namespace
 
 M2kAnalogInSource::M2kAnalogInSource(M2kContext *ctx, QObject *parent)
@@ -99,24 +73,25 @@ void M2kAnalogInSource::setLowRange(int ch, bool low)
 	if(ch < 0 || ch >= CHANNEL_COUNT) {
 		return;
 	}
-	component::Attribute *attr = attribute(m_chan[ch], "range");
-	if(!attr || !attr->writeCapability()) {
+	component::Attribute *range = attr::find(m_chan[ch], "range");
+	if(!range || !range->writeCapability()) {
 		qWarning(CAT_M2K_AIN_SOURCE) << channelId(ch) << "has no writable range attribute";
 		return;
 	}
 	m_lowRange[ch] = low;
-	attr->writeCapability()->writeAsync(low ? QLatin1String(PLUS_2_5V) : QLatin1String(PLUS_25V));
+	attr::post(range, low ? QLatin1String(PLUS_2_5V) : QLatin1String(PLUS_25V));
 	m_rangeDirty = true;
 }
 
 bool M2kAnalogInSource::open()
 {
-	const double maxRate = readDouble(attribute(m_dev, "maximum_samplerate")).value_or(spec::MAX_SAMPLE_RATE);
-	bool ok = write(attribute(m_dev, "sample_rate"), QString::number(maxRate, 'g', 12)) &&
-		write(attribute(m_dev, "oversampling_ratio"), QString::number(m_oversampling.load()));
+	const double maxRate =
+		attr::readDouble(attr::find(m_dev, "maximum_samplerate")).value_or(spec::MAX_SAMPLE_RATE);
+	bool ok = attr::write(attr::find(m_dev, "sample_rate"), QString::number(maxRate, 'g', 12)) &&
+		attr::write(attr::find(m_dev, "oversampling_ratio"), QString::number(m_oversampling.load()));
 	for(int ch = 0; ch < CHANNEL_COUNT; ++ch) {
-		ok = ok && write(attribute(m_chan[ch], "vertical_offset"), QStringLiteral("0")) &&
-			write(attribute(m_chan[ch], "trigger_mode"), QStringLiteral("always"));
+		ok = ok && attr::write(attr::find(m_chan[ch], "vertical_offset"), QStringLiteral("0")) &&
+			attr::write(attr::find(m_chan[ch], "trigger_mode"), QStringLiteral("ALWAYS"));
 	}
 	m_stream->setKernelBuffers(kKernelBuffers);
 	return ok && QCoro::waitFor(m_stream->openAsync({{0, 1}, bufferSize()}));
@@ -126,7 +101,7 @@ void M2kAnalogInSource::readFullScale()
 {
 	m_rangeDirty = false;
 	for(int ch = 0; ch < CHANNEL_COUNT; ++ch) {
-		if(const std::optional<double> lsb = readDouble(attribute(m_chan[ch], "scaling_factor"))) {
+		if(const std::optional<double> lsb = attr::readDouble(attr::find(m_chan[ch], "scaling_factor"))) {
 			Q_EMIT fullScaleChanged(ch, *lsb * spec::FULL_SCALE_COUNTS);
 		}
 	}
