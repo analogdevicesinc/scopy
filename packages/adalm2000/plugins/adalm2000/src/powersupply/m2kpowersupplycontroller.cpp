@@ -208,7 +208,7 @@ void M2kPowerSupplyController::shutdown()
 	stopPolling();
 
 	auto *m2kCtx = qobject_cast<M2kContext *>(m_ctx);
-	if(!m2kCtx || !m2kCtx->m2k() || !m2kCtx->executor()) {
+	if(!m2kCtx || !m2kCtx->m2k() || !m2kCtx->executor() || m2kCtx->connectionLost()) {
 		return;
 	}
 
