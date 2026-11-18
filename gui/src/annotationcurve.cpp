@@ -53,7 +53,9 @@ constexpr double kMaxRowHeightPx = 24.0;
 // Corner radius factor (r = height / kCornerRadiusDiv).
 constexpr double kCornerRadiusDiv = 4.0;
 // Chevron label geometry (per row).
-constexpr double kLabelHPadPx = 6.0;	// horizontal text padding inside label
+constexpr double kLabelHPadPx = 6.0;
+constexpr double kHandleClearPx =
+	28.0; // AxisHandle: 17 px glyph + 6 px margin, plus padding	// horizontal text padding inside label
 constexpr double kLabelChevronPx = 6.0; // width of the right-side ">" tip
 constexpr double kLabelGapPx = 2.0;	// gap after chevron before annotations
 
@@ -112,6 +114,15 @@ void AnnotationCurve::setSampleCount(quint64 n)
 	itemChanged();
 }
 
+void AnnotationCurve::setXTransform(double offset, double scale)
+{
+	if(m_xOffset == offset && m_xScale == scale)
+		return;
+	m_xOffset = offset;
+	m_xScale = scale;
+	itemChanged();
+}
+
 void AnnotationCurve::setBandTopScale(double yScaleValue)
 {
 	if(qFuzzyCompare(m_bandTopScale, yScaleValue))
@@ -131,12 +142,13 @@ void AnnotationCurve::setBandHeightPx(double heightPx)
 double AnnotationCurve::sampleToX(quint64 sample, const QwtScaleMap &xMap) const
 {
 	// Samples live in the axis's own coordinate system (the time-domain
-	// plot's x-axis is set to [0, sampleCount-1]). Returning the raw
-	// sample index lets xMap.transform() do the zoom-aware sample→pixel
-	// mapping; annotations that fall outside the visible range get
-	// clipped by Qwt's canvas rather than being squashed into it.
+	// plot's x-axis is set to [0, sampleCount-1], or its image under the x
+	// transform). Returning an axis value lets xMap.transform() do the
+	// zoom-aware sample→pixel mapping; annotations that fall outside the
+	// visible range get clipped by Qwt's canvas rather than being squashed
+	// into it.
 	Q_UNUSED(xMap);
-	return static_cast<double>(sample);
+	return m_xOffset + static_cast<double>(sample) * m_xScale;
 }
 
 QColor AnnotationCurve::colorFor(const QString &klass) const
@@ -198,8 +210,10 @@ void AnnotationCurve::draw(QPainter *painter, const QwtScaleMap &xMap, const Qwt
 		painter->setFont(titleFont);
 		const QFontMetrics tfm = painter->fontMetrics();
 		const double titleH = tfm.height() + 4.0;
-		const QRectF titleRect(canvasRect.left() + kLabelHPadPx, bandTopPx - titleH,
-				       canvasRect.width() - kLabelHPadPx * 2, titleH);
+		// Past the band's handle, which sits on the canvas's left edge at this height.
+		const double titleLeft = m_handle ? kHandleClearPx : kLabelHPadPx;
+		const QRectF titleRect(canvasRect.left() + titleLeft, bandTopPx - titleH,
+				       canvasRect.width() - titleLeft - kLabelHPadPx, titleH);
 		painter->setPen(Style::getColor(json::theme::content_default));
 		painter->drawText(titleRect, Qt::AlignLeft | Qt::AlignVCenter, m_title);
 		painter->restore();
