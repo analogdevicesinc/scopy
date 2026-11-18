@@ -277,9 +277,19 @@ CommandLogView::CommandLogView(QWidget *parent)
 	connect(m_clearBtn, &QPushButton::clicked, m_model, &CommandLogModel::clear);
 	connect(m_exportBtn, &QPushButton::clicked, this, &CommandLogView::exportCsv);
 	connect(m_model, &CommandLogModel::entryCountChanged, this, &CommandLogView::updateStatus);
-	connect(m_model, &QAbstractItemModel::rowsInserted, this, [this](const QModelIndex &parent) {
-		if(!parent.isValid() && m_follow->onOffswitch()->isChecked()) {
+	// Follow scrolls once per burst of appends: scrollToBottom() forces the tree's full layout,
+	// once per command it would stall the GUI at high command rates.
+	m_followTimer = new QTimer(this);
+	m_followTimer->setSingleShot(true);
+	m_followTimer->setInterval(FOLLOW_SCROLL_MS);
+	connect(m_followTimer, &QTimer::timeout, this, [this]() {
+		if(m_follow->onOffswitch()->isChecked()) {
 			m_tree->scrollToBottom();
+		}
+	});
+	connect(m_model, &QAbstractItemModel::rowsInserted, this, [this](const QModelIndex &parent) {
+		if(!parent.isValid() && m_follow->onOffswitch()->isChecked() && !m_followTimer->isActive()) {
+			m_followTimer->start();
 		}
 	});
 	connect(m_tree, &QTreeView::clicked, this, &CommandLogView::onRowClicked);

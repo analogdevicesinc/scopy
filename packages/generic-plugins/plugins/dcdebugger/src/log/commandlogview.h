@@ -75,6 +75,8 @@ public:
 	static constexpr const char *COLLAPSE_PREF = "dcdebugger_command_log_collapse_after";
 	static constexpr int DEFAULT_SIZE = 10000;
 	static constexpr int DEFAULT_COLLAPSE_AFTER = 10;
+	// Follow scrolls to the newest row at most this often.
+	static constexpr int FOLLOW_SCROLL_MS = 50;
 
 	// Preference defaults (Preferences::init: an existing value is kept).
 	static void initPreferences();
@@ -159,6 +161,7 @@ private:
 	MenuOnOffSwitch *m_log;
 	QPushButton *m_pauseBtn;
 	MenuOnOffSwitch *m_follow;
+	QTimer *m_followTimer;
 	QPushButton *m_clearBtn;
 	QPushButton *m_exportBtn;
 	QPushButton *m_generateBtn;
