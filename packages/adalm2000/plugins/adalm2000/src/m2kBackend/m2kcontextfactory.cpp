@@ -80,6 +80,13 @@ component::Context *M2kContextFactory::create(component::Connection &c)
 		return nullptr;
 	}
 
+	// libm2k caches contexts by uri: a stale entry is still bound to a previous iio_context.
+	if(m2k->getIioContext() != conn->handle().ptr) {
+		qWarning(CAT_M2K_CTX_FACTORY) << "m2kOpen returned a context bound to another iio_context for" << uri;
+		libm2k::context::contextClose(m2k, false);
+		return nullptr;
+	}
+
 	auto *ctx = new M2kContext;
 	ctx->setUri(uri);
 	ctx->setM2k(m2k);
@@ -97,4 +104,12 @@ component::Context *M2kContextFactory::create(component::Connection &c)
 		return nullptr;
 	}
 	return ctx;
+}
+
+// Called synchronously on release, before the connection (and its iio_context) is deleted.
+void M2kContextFactory::destroy(component::Context *ctx)
+{
+	if(auto *m2kCtx = qobject_cast<M2kContext *>(ctx)) {
+		m2kCtx->close();
+	}
 }
