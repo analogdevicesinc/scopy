@@ -39,6 +39,9 @@ PlotInfo::PlotInfo(QWidget *parent)
 	, m_bottomLeftInfo(new QWidget())
 	, m_bottomRightInfo(new QWidget())
 {
+	// The corner groups are hovers on the parent; this widget itself draws nothing but still
+	// sits at the parent's top-left corner, where it would eat the presses meant for the plot.
+	setAttribute(Qt::WA_TransparentForMouseEvents);
 	initLayouts();
 
 	connect(Preferences::GetInstance(), &Preferences::preferenceChanged, this,
