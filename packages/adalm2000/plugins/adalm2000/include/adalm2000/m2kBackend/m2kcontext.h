@@ -44,8 +44,13 @@ public:
 	libm2k::context::M2k *m2k() const { return m_m2k; }
 	void setM2k(libm2k::context::M2k *m2k) { m_m2k = m2k; }
 
+	// Set once the connection's ping fails; device I/O would only block on a dead link.
+	bool connectionLost() const { return m_connectionLost; }
+	void setConnectionLost() { m_connectionLost = true; }
+
 private:
 	libm2k::context::M2k *m_m2k = nullptr;
+	bool m_connectionLost = false;
 };
 
 } // namespace scopy::adalm2000

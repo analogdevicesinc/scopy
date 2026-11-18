@@ -98,7 +98,7 @@ void M2kVoltmeterController::release()
 	}
 	m_claimed = false;
 
-	if(m_ctx && m_ctx->m2k() && m_ctx->executor()) {
+	if(m_ctx && m_ctx->m2k() && m_ctx->executor() && !m_ctx->connectionLost()) {
 		libm2k::context::M2k *m2k = m_ctx->m2k();
 		auto *cmd = new M2kCallCommand<void>(m2k, [m2k]() { m2k->getAnalogIn()->setKernelBuffersCount(1); });
 		QCoro::waitFor(component::runCommand(

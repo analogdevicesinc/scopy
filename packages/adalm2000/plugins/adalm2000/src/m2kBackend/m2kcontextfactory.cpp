@@ -39,6 +39,9 @@ Q_LOGGING_CATEGORY(CAT_M2K_CTX_FACTORY, "M2kContextFactory")
 using namespace scopy;
 using namespace scopy::adalm2000;
 
+// libiio's default network/usb timeout.
+static constexpr unsigned int IIO_TIMEOUT_MS = 5000;
+
 component::ConnectionKind M2kContextFactory::connectionKind() const { return component::iio::IIOProvider::KIND; }
 
 bool M2kContextFactory::compatible(const component::Connection &c) const
@@ -87,9 +90,15 @@ component::Context *M2kContextFactory::create(component::Connection &c)
 		return nullptr;
 	}
 
+	// M2kImpl sets an infinite timeout on the iio_context it wraps. The context is the
+	// connection's, so restore a finite one: a pulled cable would otherwise block the
+	// shared executor (and the ping queued behind it) forever.
+	m2k->setTimeout(IIO_TIMEOUT_MS);
+
 	auto *ctx = new M2kContext;
 	ctx->setUri(uri);
 	ctx->setM2k(m2k);
+	QObject::connect(&c, &component::Connection::lost, ctx, [ctx]() { ctx->setConnectionLost(); });
 
 	ICmdExecutor *executor = c.executor();
 
