@@ -28,6 +28,7 @@
 #include <menusectionwidget.h>
 #include <deviceiconbuilder.h>
 #include <style.h>
+#include <component/connection.h>
 #include <component/controller.h>
 #include <component/device.h>
 #include <component/attribute.h>
@@ -179,7 +180,8 @@ bool SWIOTPlugin::onConnect()
 	if(!ctx) {
 		return false;
 	}
-	component::Ping *ping = ctx->findChild<component::Ping *>();
+	// The ping is the connection's, shared by every view built on it.
+	component::Ping *ping = ctx->connection() ? ctx->connection()->ping() : nullptr;
 	if(ping) {
 		ping->startMonitoring(PING_TIMEOUT_MS);
 	}

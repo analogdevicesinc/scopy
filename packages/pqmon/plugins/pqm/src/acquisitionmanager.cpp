@@ -25,6 +25,7 @@
 #include <component/attribute.h>
 #include <component/backends/iio/iioscanelement.h>
 #include <component/channel.h>
+#include <component/connection.h>
 #include <component/device.h>
 #include <component/ping.h>
 #include <component/streamview.h>
@@ -278,7 +279,8 @@ void AcquisitionManager::setConfigAttr(QMap<QString, QMap<QString, QString>> att
 
 void AcquisitionManager::startPing()
 {
-	component::Ping *ping = m_ctx->findChild<component::Ping *>();
+	component::Connection *conn = m_ctx ? m_ctx->connection() : nullptr;
+	component::Ping *ping = conn ? conn->ping() : nullptr;
 	if(!ping) {
 		return;
 	}
@@ -287,7 +289,8 @@ void AcquisitionManager::startPing()
 
 void AcquisitionManager::stopPing()
 {
-	component::Ping *ping = m_ctx->findChild<component::Ping *>();
+	component::Connection *conn = m_ctx ? m_ctx->connection() : nullptr;
+	component::Ping *ping = conn ? conn->ping() : nullptr;
 	if(!ping) {
 		return;
 	}
