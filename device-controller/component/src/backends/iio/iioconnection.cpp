@@ -55,7 +55,7 @@ IIOConnection::~IIOConnection()
 
 void IIOConnection::start()
 {
-	auto *ping = new IIOPing(m_backend->contextOps(), m_handle, executor(), this);
-	connect(ping, &Ping::connectionLost, this, &Connection::lost);
-	ping->startMonitoring(2000);
+	m_ping = new IIOPing(m_backend->contextOps(), m_handle, executor(), this);
+	connect(m_ping, &Ping::connectionLost, this, &Connection::lost);
+	m_ping->startMonitoring(2000);
 }

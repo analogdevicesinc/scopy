@@ -26,7 +26,6 @@
 #include "m2kdigitalstreams.h"
 #include "m2kinputstream.h"
 #include "m2koutputstream.h"
-#include "m2kping.h"
 #include "m2kscanelement.h"
 
 #include "component/attribute.h"
@@ -1091,9 +1090,6 @@ bool M2kComponentBuilder::build(component::Context *ctx, ICmdExecutor *executor)
 		qWarning(CAT_M2K_BUILDER) << "could not read identity:" << e.what();
 		m2kCtx->setDescription(QStringLiteral("ADALM2000"));
 	}
-
-	new M2kPing(
-		m2k, [m2k]() { return m2k->getLed(); }, executor, m2kCtx);
 
 	if(!buildAnalogIn(m2kCtx, m2k, executor)) {
 		return false;
