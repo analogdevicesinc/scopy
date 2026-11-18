@@ -86,7 +86,7 @@ public:
 	scopy::decoder::DecoderPanel *decoders() const;
 
 	// Single is one cycle, or with the trigger on, one fire: run until it stops itself.
-	void single();
+	virtual void single();
 
 protected:
 	// One step each of init(), in this order. An instrument with a fixed block set
@@ -98,6 +98,11 @@ protected:
 	virtual void setupTrigger();
 	virtual void setupDecoders();
 	virtual void setupAnalysisPanel();
+
+	// The decoder catalog, manager, panel and log tab, with no rail row and no plot wiring:
+	// what setupDecoders() builds before placing them. For an override that draws the
+	// decoders itself; decoders() is the panel afterwards.
+	void createDecoders();
 
 	QPointer<ToolMenuEntry> m_tme;
 	QPointer<AcqInstrument> m_ui;
