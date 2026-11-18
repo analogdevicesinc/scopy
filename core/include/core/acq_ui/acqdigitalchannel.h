@@ -72,6 +72,19 @@ public:
 
 	void reset() override;
 
+	// Sample i is drawn at offset + i * scale on the X axis, which then spans the plot
+	// window's duration in those units — seconds for a time axis. Without a call, X is the
+	// sample index.
+	void setXTransform(double offset, double scale);
+
+	// The extra chunk of history a re-anchored software-trigger window reads. On by default;
+	// an owner whose trigger is in hardware, so every buffer already arrives positioned,
+	// turns it off.
+	void setTriggerHeadroom(bool on);
+
+	// The band's vertical position, for an owner that lays the tracks out itself.
+	PlotAxisHandle *handle() const;
+
 protected:
 	void attachTo(AcqPlot *plot) override;
 	void detachFrom() override;
@@ -80,6 +93,7 @@ protected:
 
 	void onEnabledChanged(bool en) override;
 	void onColorChanged(const QColor &c) override;
+	void onNameChanged(const QString &n) override;
 
 	// Declines the pooled Y axis: the band hangs off a PlotAxisHandle on the plot's
 	// shared digital axis, so a private Y scale would be an axis nothing draws against.
@@ -95,6 +109,11 @@ private:
 	// Is a QPointer: AxisHandle parents itself to the canvas, so a canvas teardown
 	// takes it with no notice to us.
 	QPointer<PlotAxisHandle> m_handle;
+
+	bool m_triggerHeadroom{true};
+	double m_xOffset{0.0};
+	double m_xScale{1.0};
+	bool m_xTransformed{false};
 };
 
 } // namespace adc

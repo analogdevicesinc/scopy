@@ -81,6 +81,14 @@ public:
 
 	void reset() override;
 
+	// Same as AcqDigitalChannel::setXTransform: annotation offsets are sample indices.
+	void setXTransform(double offset, double scale);
+
+	// For an owner that lays the bands out itself: the band hangs below the handle, one
+	// 24 px row per annotation class seen so far.
+	PlotAxisHandle *handle() const;
+	int rowCount() const;
+
 protected:
 	void attachTo(AcqPlot *plot) override;
 	void detachFrom() override;
@@ -122,6 +130,10 @@ private:
 
 	QString m_lastTip;
 	QPoint m_lastTipGlobal;
+
+	double m_xOffset{0.0};
+	double m_xScale{1.0};
+	bool m_xTransformed{false};
 };
 
 } // namespace adc
