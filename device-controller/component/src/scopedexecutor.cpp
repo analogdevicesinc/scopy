@@ -40,7 +40,7 @@ QFuture<void> ScopedExecutor::execute(Command *cmd)
 	}
 	{
 		QMutexLocker lock(&m_mutex);
-		if(m_closing || !m_inner) {
+		if(m_closing || m_rejecting || !m_inner) {
 			cmd->cancel();
 			return QtFuture::makeReadyVoidFuture();
 		}
@@ -127,4 +127,19 @@ bool ScopedExecutor::isClosing() const
 {
 	QMutexLocker lock(&m_mutex);
 	return m_closing;
+}
+
+void ScopedExecutor::reject()
+{
+	QMutexLocker lock(&m_mutex);
+	m_rejecting = true;
+	for(Command *cmd : std::as_const(m_live)) {
+		cmd->cancel();
+	}
+}
+
+bool ScopedExecutor::isRejecting() const
+{
+	QMutexLocker lock(&m_mutex);
+	return m_rejecting;
 }

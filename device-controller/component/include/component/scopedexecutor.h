@@ -56,6 +56,10 @@ public:
 	QFuture<void> shutdown();
 	bool isClosing() const;
 
+	// The connection is lost: cancel the queued commands and fail new ones (-ECANCELED) at once
+	// instead of letting each wait for the I/O timeout. A running one still finishes.
+	void reject();
+	bool isRejecting() const;
 
 private:
 	void onFinished(Command *cmd);
@@ -64,6 +68,7 @@ private:
 	mutable QMutex m_mutex;
 	QSet<Command *> m_live; // queued + running
 	bool m_closing = false;
+	bool m_rejecting = false;
 	std::shared_ptr<QPromise<void>> m_drained;
 };
 

@@ -255,7 +255,19 @@ Controller::ConnMap::iterator Controller::_openLocked(const QString &uri, const 
 		conn->setParent(this);
 		conn->start();
 	}
-	connect(conn, &Connection::lost, this, [this, conn]() { Q_EMIT connectionLost(conn); });
+	connect(conn, &Connection::lost, this, [this, conn]() {
+		// Fail fast: on a dead link every queued command would otherwise wait for the I/O timeout.
+		{
+			std::lock_guard<std::mutex> lock(m_ctxMutex);
+			for(Context *ctx : conn->contexts()) {
+				if(auto *scope = dynamic_cast<ScopedExecutor *>(ctx->executor())) {
+					scope->reject();
+				}
+			}
+		}
+		conn->executor()->cancelAll(); // also the unscoped ones (closing views, ping)
+		Q_EMIT connectionLost(conn);
+	});
 
 	auto it = m_connections.insert(uri, ConnEntry{conn, 0, threads, {}});
 	Q_EMIT connectionOpened(conn);
