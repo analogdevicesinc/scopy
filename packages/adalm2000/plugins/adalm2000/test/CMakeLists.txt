@@ -40,6 +40,7 @@ macro(add_adalm2000_unit_test name)
 			${CMAKE_CURRENT_SOURCE_DIR}/../include/${SCOPY_MODULE}/powersupply
 			${CMAKE_CURRENT_SOURCE_DIR}/../include/${SCOPY_MODULE}/digitalio
 			${CMAKE_CURRENT_SOURCE_DIR}/../include/${SCOPY_MODULE}/spectrum
+			${CMAKE_CURRENT_SOURCE_DIR}/../include/${SCOPY_MODULE}/logic
 	)
 	target_link_libraries(
 		${_t}
@@ -91,6 +92,28 @@ add_adalm2000_unit_test(spectrumhw ${SPECTRUM_HW_SRC} ${SPECTRUM_HW_HDR})
 target_compile_definitions(${PROJECT_NAME}_test_spectrumhw PRIVATE SCOPY_ADALM2000_STATIC_DEFINE)
 target_link_libraries(
 	${PROJECT_NAME}_test_spectrumhw
+	PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
+		scopy-core
+		scopy-gui
+		scopy-pluginbase
+		libm2k::libm2k
+)
+
+# End-to-end Logic Analyzer against a board or iio-emu; skipped unless M2K_URI is set.
+file(
+	GLOB
+	LOGIC_HW_SRC
+	../src/m2kBackend/*.cpp
+	../src/logic/*.cpp
+	../src/m2kinstrumentcontroller.cpp
+	../src/m2ksource.cpp
+)
+file(GLOB LOGIC_HW_HDR ../include/${SCOPY_MODULE}/m2kBackend/*.h ../include/${SCOPY_MODULE}/logic/*.h)
+add_adalm2000_unit_test(logichw ${LOGIC_HW_SRC} ${LOGIC_HW_HDR})
+# The plugin sources live inside this executable, so their export macro must not expand to dllimport on Windows.
+target_compile_definitions(${PROJECT_NAME}_test_logichw PRIVATE SCOPY_ADALM2000_STATIC_DEFINE)
+target_link_libraries(
+	${PROJECT_NAME}_test_logichw
 	PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
 		scopy-core
 		scopy-gui
