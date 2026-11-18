@@ -77,7 +77,14 @@ setup_scopy_tests(pluginloader)
 
 # End-to-end Spectrum Analyzer pipeline against a board or iio-emu; skipped unless M2K_URI is set. The backend and
 # spectrum sources are compiled in for the same hidden-visibility reason as above.
-file(GLOB SPECTRUM_HW_SRC ../src/m2kBackend/*.cpp ../src/spectrum/*.cpp)
+file(
+	GLOB
+	SPECTRUM_HW_SRC
+	../src/m2kBackend/*.cpp
+	../src/spectrum/*.cpp
+	../src/m2kinstrumentcontroller.cpp
+	../src/m2ksource.cpp
+)
 file(GLOB SPECTRUM_HW_HDR ../include/${SCOPY_MODULE}/m2kBackend/*.h ../include/${SCOPY_MODULE}/spectrum/*.h)
 add_adalm2000_unit_test(spectrumhw ${SPECTRUM_HW_SRC} ${SPECTRUM_HW_HDR})
 # The plugin sources live inside this executable, so their export macro must not expand to dllimport on Windows.
