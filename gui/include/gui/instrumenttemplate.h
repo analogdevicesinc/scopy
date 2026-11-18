@@ -157,13 +157,22 @@ public:
 
 	// ---- channel rail --------------------------------------------------------
 
+	// Large is the default row; small is the same row with less padding and a smaller
+	// name, for instruments with many channels.
+	enum ChannelRowSize
+	{
+		CRS_LARGE,
+		CRS_SMALL
+	};
+
 	// A named, collapsible group of rows — Sources · Processors · Decoders · Plots.
 	// Repeat calls with the same title return the existing group.
 	MenuSectionCollapseWidget *addChannelGroup(const QString &title);
 
 	// One row: select · colour · name · gear. The row joins the rail's exclusive
 	// selection group; clicking it (or its gear) shows the menu page registered
-	// under `menuId`. Pass an empty menuId for a row with no page of its own.
+	// under `menuId`. Pass an empty menuId for a row with no page of its own: it then has
+	// no gear and cannot be selected.
 	// `indent` shifts the row right, which is how processor stacking is shown.
 	//
 	// `group` is any rail container — a group from addChannelGroup() or an expandable
@@ -172,12 +181,12 @@ public:
 	// everything that is not a plot channel wants: colour on the rail means "this is
 	// the curve you see in that colour", and a source or processor has no curve.
 	MenuControlButton *addChannelRow(CompositeWidget *group, const QString &name, const QColor &color,
-					 const QString &menuId, int indent = 0);
+					 const QString &menuId, int indent = 0, ChannelRowSize size = CRS_LARGE);
 
 	// Same row, but with an on/off switch instead of a radio — plots create and
 	// destroy rather than mute, so they get a switch.
 	MenuControlButton *addChannelSwitchRow(CompositeWidget *group, const QString &name, const QColor &color,
-					       const QString &menuId, int indent = 0);
+					       const QString &menuId, int indent = 0, ChannelRowSize size = CRS_LARGE);
 
 	// A row that is itself a container: the row on top, its children indented under
 	// it, and an arrow on the row that collapses them. This is how a source carries
@@ -248,7 +257,7 @@ private:
 	void configureChannelRow(MenuControlButton *row, QWidget *insert, CompositeWidget *group, const QString &name,
 				 const QColor &color, const QString &menuId, int indent);
 	MenuControlButton *makeChannelRow(CompositeWidget *group, const QString &name, const QColor &color,
-					  const QString &menuId, int indent, bool asSwitch);
+					  const QString &menuId, int indent, bool asSwitch, ChannelRowSize size);
 
 	ToolTemplate *m_tool;
 
