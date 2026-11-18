@@ -37,6 +37,10 @@ public:
 	{}
 	~M2kContext() override;
 
+	// Stops the streams and releases the libm2k context. Idempotent; must run before the
+	// connection's iio_context is destroyed.
+	void close();
+
 	libm2k::context::M2k *m2k() const { return m_m2k; }
 	void setM2k(libm2k::context::M2k *m2k) { m_m2k = m2k; }
 

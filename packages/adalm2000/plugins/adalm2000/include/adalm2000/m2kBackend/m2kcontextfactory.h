@@ -33,6 +33,7 @@ public:
 	component::ConnectionKind connectionKind() const override;
 	bool compatible(const component::Connection &c) const override;
 	component::Context *create(component::Connection &c) override;
+	void destroy(component::Context *ctx) override;
 };
 
 } // namespace scopy::adalm2000

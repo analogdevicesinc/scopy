@@ -32,7 +32,9 @@ Q_LOGGING_CATEGORY(CAT_M2K_CONTEXT, "M2kContext")
 
 using namespace scopy::adalm2000;
 
-M2kContext::~M2kContext()
+M2kContext::~M2kContext() { close(); }
+
+void M2kContext::close()
 {
 	const QList<M2kInputStream *> inputs = findChildren<M2kInputStream *>();
 	const QList<M2kDigitalInputStream *> digitalInputs = findChildren<M2kDigitalInputStream *>();
