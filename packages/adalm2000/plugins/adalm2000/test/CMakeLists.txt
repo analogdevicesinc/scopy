@@ -60,8 +60,6 @@ add_adalm2000_unit_test(
 	../include/adalm2000/m2kBackend/m2kattributewriter.h
 )
 
-add_adalm2000_unit_test(m2kping ../include/adalm2000/m2kBackend/m2kping.h)
-
 add_adalm2000_unit_test(voltmeterdsp)
 
 add_adalm2000_unit_test(powersupplymath)

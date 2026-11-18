@@ -32,6 +32,7 @@
 namespace scopy::component {
 
 class Context;
+class Ping;
 
 using BackendId = QString;
 using ConnectionKind = QString;
@@ -74,6 +75,10 @@ public:
 		return qobject_cast<const T *>(this);
 	}
 
+	// The link's reachability check, shared by every view; nullptr until start() or when the
+	// provider has none. Views pause it around long transfers instead of running their own.
+	Ping *ping() const { return m_ping; }
+
 	// Called by the Controller once the executor is set (e.g. start pinging).
 	virtual void start() {}
 
@@ -93,6 +98,7 @@ protected:
 	ICmdExecutor *m_executor = nullptr;
 	QList<BackendId> m_backends;
 	QList<QPair<BackendId, Context *>> m_contexts;
+	Ping *m_ping = nullptr;
 };
 
 } // namespace scopy::component

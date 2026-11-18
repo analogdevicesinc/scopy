@@ -24,6 +24,7 @@
 #include "m2kcontext.h"
 
 #include "component/capabilityexecutor.h"
+#include "component/connection.h"
 #include "component/ping.h"
 
 #include <pluginbase/statusbarmanager.h>
@@ -100,7 +101,10 @@ QCoro::Task<void> M2kVoltmeterReader::acquisitionLoop()
 	libm2k::context::M2k *m2k = m_ctx->m2k();
 	ICmdExecutor *exec = m_ctx->executor();
 
-	auto *ping = m_ctx->findChild<component::Ping *>(QString(), Qt::FindDirectChildrenOnly);
+	// The connection's ping, shared with the other views: pause it so it doesn't interleave
+	// with the refills.
+	component::Connection *conn = m_ctx->connection();
+	QPointer<component::Ping> ping = conn ? conn->ping() : nullptr;
 	m_pingWasMonitoring = ping && ping->isMonitoring();
 	if(m_pingWasMonitoring) {
 		ping->stopMonitoring();
