@@ -1056,7 +1056,9 @@ void invalidateInputsOnReconfigure(component::Context *ctx)
 			if(!writer) {
 				continue;
 			}
-			QObject::connect(writer, &component::AttributeWriter::writeSucceeded, ctx, invalidateInputs);
+			// Direct: the next refill must already see a reconfiguration made just before it.
+			QObject::connect(writer, &component::AttributeWriter::writeSucceeded, ctx, invalidateInputs,
+					 Qt::DirectConnection);
 		}
 	}
 
