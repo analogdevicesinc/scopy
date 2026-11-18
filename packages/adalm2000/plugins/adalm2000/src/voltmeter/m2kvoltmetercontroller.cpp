@@ -101,11 +101,12 @@ void M2kVoltmeterController::release()
 	if(m_ctx && m_ctx->m2k() && m_ctx->executor() && !m_ctx->connectionLost()) {
 		libm2k::context::M2k *m2k = m_ctx->m2k();
 		auto *cmd = new M2kCallCommand<void>(m2k, [m2k]() { m2k->getAnalogIn()->setKernelBuffersCount(1); });
-		QCoro::waitFor(component::runCommand(
+		// Unawaited: disconnect must not wait on device I/O; the view drains it before closing.
+		component::runCommand(
 			m_ctx->executor(), cmd, [](const scopy::Result<void> &) {},
 			[](const scopy::Error &e) {
 				qWarning(CAT_M2KVM_CONTROLLER) << "buffer-count restore failed:" << e.message;
-			}));
+			});
 	}
 
 	ResourceManager::close(m_key);

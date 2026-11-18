@@ -394,11 +394,12 @@ void M2kDigitalIoController::shutdown()
 			dig->setDirection(static_cast<DIO_CHANNEL>(i), DIO_DIRECTION::DIO_INPUT);
 		}
 	});
-	QCoro::waitFor(component::runCommand(
+	// Unawaited: disconnect must not wait on device I/O; the view drains it before closing.
+	component::runCommand(
 		m2kCtx->executor(), cmd, [](const scopy::Result<void> &) {},
 		[](const scopy::Error &e) {
 			qWarning(CAT_M2KDIO_CONTROLLER) << "releasing the pins failed:" << e.message;
-		}));
+		});
 }
 
 #include "moc_m2kdigitaliocontroller.cpp"

@@ -219,9 +219,10 @@ void M2kPowerSupplyController::shutdown()
 		supply->enableChannel(1, false);
 		supply->powerDownDacs(true);
 	});
-	QCoro::waitFor(component::runCommand(
+	// Unawaited: disconnect must not wait on device I/O; the view drains it before closing.
+	component::runCommand(
 		m2kCtx->executor(), cmd, [](const scopy::Result<void> &) {},
-		[](const scopy::Error &e) { qWarning(CAT_M2KPS_CONTROLLER) << "power-down failed:" << e.message; }));
+		[](const scopy::Error &e) { qWarning(CAT_M2KPS_CONTROLLER) << "power-down failed:" << e.message; });
 }
 
 #include "moc_m2kpowersupplycontroller.cpp"

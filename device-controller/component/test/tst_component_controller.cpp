@@ -178,6 +178,7 @@ private Q_SLOTS:
 	void releaseCancelsQueuedCommands();
 	void releaseLeavesOtherViewsCommands();
 	void reconnectWaitsForClosingView();
+	void lostConnectionFailsFast();
 };
 
 void TstComponentController::initTestCase()
@@ -606,6 +607,36 @@ void TstComponentController::reconnectWaitsForClosingView()
 	again.reset();
 	QTRY_COMPARE(b->destroyed.load(), 2);
 	QVERIFY(c->unregisterBackend("drain-re"));
+}
+
+void TstComponentController::lostConnectionFailsFast()
+{
+	Controller *c = Controller::GetInstance();
+	auto b = std::make_shared<FakeBackend>("lost-view", "fake", QString(), 1);
+	QVERIFY(c->registerBackend(b));
+
+	QSemaphore gate;
+	BlockingCommand running(&gate);
+	BlockingCommand queued;
+	BlockingCommand late;
+	{
+		ContextHandle h = Controller::connectCtx("fake:lost", "lost-view");
+		QVERIFY(h);
+		h->executor()->execute(&running);
+		QVERIFY(running.entered.tryAcquire(1, 5000));
+		h->executor()->execute(&queued);
+
+		Q_EMIT h.connection()->lost();
+		QVERIFY(queued.isCancelled());
+		QVERIFY(h->executor()->execute(&late).isFinished()); // rejected at once
+		QVERIFY(late.isCancelled());
+		gate.release();
+	}
+	QTRY_COMPARE(b->destroyed.load(), 1);
+	QVERIFY(running.ran);
+	QVERIFY(!queued.ran);
+	QVERIFY(!late.ran);
+	QVERIFY(c->unregisterBackend("lost-view"));
 }
 
 QTEST_MAIN(TstComponentController)
