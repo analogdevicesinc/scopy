@@ -107,6 +107,7 @@ void AcqDigitalChannel::attachTo(AcqPlot *plot)
 	PlotAxis *x = xAxis() ? xAxis()->plotAxis() : m_plot->xAxis();
 	m_item = new scopy::acq::DigitalCurveItem(name(), x, digAxis, m_handle.data());
 	m_item->setColor(color());
+	m_item->setXTransform(m_xOffset, m_xScale);
 	m_item->attach(m_plot->plot());
 }
 
@@ -144,7 +145,15 @@ DepthNeed AcqDigitalChannel::depthNeeded(int plotSize) const
 	// Same window as a curve: a digital track is one bit per sample over the same
 	// visible span — including the one extra chunk a re-anchored trigger window needs.
 	// See AcqCurveChannel::depthNeeded for why that chunk is not slack.
-	return DepthNeed::samples(static_cast<std::size_t>(qMax(1, plotSize)), /*extraChunks=*/1);
+	return DepthNeed::samples(static_cast<std::size_t>(qMax(1, plotSize)), m_triggerHeadroom ? 1 : 0);
+}
+
+void AcqDigitalChannel::setTriggerHeadroom(bool on)
+{
+	if(m_triggerHeadroom != on) {
+		m_triggerHeadroom = on;
+		requestReclaim();
+	}
 }
 
 void AcqDigitalChannel::readData(scopy::acq::DataStore *store, int plotSize)
@@ -161,7 +170,10 @@ void AcqDigitalChannel::readData(scopy::acq::DataStore *store, int plotSize)
 	// plot has no curve channel to set the shared axis for it, so without this the scale
 	// kept whatever width it was first given while the bands moved underneath it.
 	if(xAxis()) {
-		xAxis()->requestInterval(0.0, static_cast<double>(qMax(1, plotSize) - 1));
+		// A transformed axis spans the window's duration, so a time axis divides into round
+		// values; the sample index ends on the last sample.
+		const int span = m_xTransformed ? qMax(1, plotSize) : qMax(1, plotSize) - 1;
+		xAxis()->requestInterval(m_xOffset, m_xOffset + span * m_xScale);
 	}
 
 	// toBits owns its result, so unlike AcqCurveChannel's FloatView there is no
@@ -193,17 +205,30 @@ void AcqDigitalChannel::readData(scopy::acq::DataStore *store, int plotSize)
 	AcqPlot *owner = plotOwner();
 	if(owner && owner->wantsBufferEdges(this)) {
 		const double stride = static_cast<double>(qMax(1, plotSize)) / static_cast<double>(bits.size());
+		auto toX = [&](double i) { return m_xOffset + i * stride * m_xScale; };
 		QVector<double> edges;
 		if(const auto starts = bufferStartsFor(key(), bits.size())) {
-			edges.append(0.0);
+			edges.append(toX(0.0));
 			for(int p : *starts) {
-				edges.append(p * stride);
+				edges.append(toX(p));
 			}
-			edges.append((bits.size() - 1) * stride);
+			edges.append(toX(bits.size() - 1));
 		}
 		owner->setBufferEdges(this, edges);
 	}
 }
+
+void AcqDigitalChannel::setXTransform(double offset, double scale)
+{
+	m_xOffset = offset;
+	m_xScale = scale;
+	m_xTransformed = true;
+	if(m_item && !m_plot.isNull()) {
+		m_item->setXTransform(offset, scale);
+	}
+}
+
+PlotAxisHandle *AcqDigitalChannel::handle() const { return m_handle.data(); }
 
 void AcqDigitalChannel::reset()
 {
@@ -237,6 +262,13 @@ void AcqDigitalChannel::onColorChanged(const QColor &c)
 	}
 	if(!m_handle.isNull() && m_handle->handle()) {
 		m_handle->handle()->setColor(c);
+	}
+}
+
+void AcqDigitalChannel::onNameChanged(const QString &n)
+{
+	if(m_item && !m_plot.isNull()) {
+		m_item->setName(n);
 	}
 }
 

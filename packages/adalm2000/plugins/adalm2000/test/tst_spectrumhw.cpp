@@ -140,7 +140,7 @@ private Q_SLOTS:
 			QVERIFY(mode);
 			const auto value = QCoro::waitFor(mode->readCapability()->readAsync());
 			QVERIFY(value);
-			QCOMPARE(QString::fromUtf8(value.value()), QStringLiteral("always"));
+			QCOMPARE(QString::fromUtf8(value.value()), QStringLiteral("ALWAYS"));
 		}
 	}
 

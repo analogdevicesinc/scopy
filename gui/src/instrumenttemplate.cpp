@@ -468,7 +468,10 @@ void InstrumentTemplate::configureChannelRow(MenuControlButton *row, QWidget *in
 	// The gear glyph replaces the real gear button: the whole row opens the page, which
 	// is a larger and more forgiving target.
 	row->button()->setVisible(false);
-	row->setIconEnabled(true);
+	// A row with no page has nothing to select or open.
+	const bool hasPage = !menuId.isEmpty();
+	row->setIconEnabled(hasPage);
+	row->setCheckable(hasPage);
 	row->setOpenMenuChecksThis(true);
 	row->setDoubleClickToOpenMenu(false);
 	// MenuControlButton defaults to Maximum, which sizes it to its label and leaves the
@@ -484,12 +487,14 @@ void InstrumentTemplate::configureChannelRow(MenuControlButton *row, QWidget *in
 		row->layout()->setContentsMargins(m);
 	}
 
-	m_channelGroup->addButton(row);
+	if(hasPage) {
+		m_channelGroup->addButton(row);
+	}
 	if(group) {
 		group->add(insert);
 	}
 
-	if(!menuId.isEmpty()) {
+	if(hasPage) {
 		connect(row, &QAbstractButton::clicked, this, [this, menuId](bool b) {
 			if(b) {
 				showMenuPage(menuId);
@@ -499,9 +504,11 @@ void InstrumentTemplate::configureChannelRow(MenuControlButton *row, QWidget *in
 }
 
 MenuControlButton *InstrumentTemplate::makeChannelRow(CompositeWidget *group, const QString &name, const QColor &color,
-						      const QString &menuId, int indent, bool asSwitch)
+						      const QString &menuId, int indent, bool asSwitch,
+						      ChannelRowSize size)
 {
 	MenuControlButton *btn = new MenuControlButton();
+	btn->setSmall(size == CRS_SMALL);
 
 	if(asSwitch) {
 		// Plots create and destroy rather than mute, so the switch replaces the
@@ -517,15 +524,16 @@ MenuControlButton *InstrumentTemplate::makeChannelRow(CompositeWidget *group, co
 }
 
 MenuControlButton *InstrumentTemplate::addChannelRow(CompositeWidget *group, const QString &name, const QColor &color,
-						     const QString &menuId, int indent)
+						     const QString &menuId, int indent, ChannelRowSize size)
 {
-	return makeChannelRow(group, name, color, menuId, indent, false);
+	return makeChannelRow(group, name, color, menuId, indent, false, size);
 }
 
 MenuControlButton *InstrumentTemplate::addChannelSwitchRow(CompositeWidget *group, const QString &name,
-							   const QColor &color, const QString &menuId, int indent)
+							   const QColor &color, const QString &menuId, int indent,
+							   ChannelRowSize size)
 {
-	return makeChannelRow(group, name, color, menuId, indent, true);
+	return makeChannelRow(group, name, color, menuId, indent, true, size);
 }
 
 CollapsableMenuControlButton *InstrumentTemplate::addExpandableChannelRow(CompositeWidget *group, const QString &name,

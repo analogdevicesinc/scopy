@@ -48,6 +48,9 @@ public:
 
 	void updateSession();
 
+	// Only the X enable and lock: no Y cursors, no tracking, no readout dragging.
+	void setXOnly(bool xOnly);
+
 Q_SIGNALS:
 	void sessionUpdated();
 

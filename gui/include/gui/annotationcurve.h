@@ -79,6 +79,11 @@ public:
 	// endSample are used verbatim as x-axis data values.
 	void setSampleCount(quint64 n);
 
+	// Maps sample s to offset + s * scale on the x-axis, for an axis in other units.
+	void setXTransform(double offset, double scale);
+
+	int rowCount() const { return m_rows.size(); }
+
 	// Band placement. Top edge is expressed in the y-axis' scale
 	// coordinates so it moves with y-axis zoom/pan. Height is a fixed
 	// canvas-pixel value so annotation rows stay legible independent of
@@ -134,6 +139,8 @@ private:
 	QHash<QString, int> m_rowByClass;
 	QHash<QString, QColor> m_classColor;
 	quint64 m_sampleCount = 0;
+	double m_xOffset = 0.0;
+	double m_xScale = 1.0;
 
 	// Band geometry supplied by the caller.
 	// Default: place at y-scale 0 with a modest height so the item is

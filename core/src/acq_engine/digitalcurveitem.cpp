@@ -91,6 +91,24 @@ void DigitalCurveItem::setSampleCount(quint64 n)
 	itemChanged();
 }
 
+void DigitalCurveItem::setXTransform(double offset, double scale)
+{
+	if(m_xOffset == offset && m_xScale == scale)
+		return;
+	m_xOffset = offset;
+	m_xScale = scale;
+	itemChanged();
+}
+
+void DigitalCurveItem::setName(const QString &name)
+{
+	if(m_title == name)
+		return;
+	m_title = name;
+	setTitle(name);
+	itemChanged();
+}
+
 void DigitalCurveItem::setColor(const QColor &c)
 {
 	if(m_color == c)
@@ -138,28 +156,43 @@ void DigitalCurveItem::draw(QPainter *painter, const QwtScaleMap &xMap, const Qw
 		// Map sample index -> canvas x pixel. Samples occupy the full
 		// x-axis scale range [0..total-1], proportional layout across
 		// current view. No left-clamp — the label is drawn on top.
-		auto sampleToPx = [&](double sampleIndex) { return xMap.transform(sampleIndex); };
+		auto sampleToPx = [&](double sampleIndex) {
+			return xMap.transform(m_xOffset + sampleIndex * m_xScale);
+		};
 
 		const double sampleStride = static_cast<double>(total) / static_cast<double>(nSamples);
 
 		QVector<QPointF> pts;
 		pts.reserve(nSamples * 2 + 2);
 
-		double prevY = (m_samples[0] ? yHi : yLo);
-		pts.append(QPointF(sampleToPx(0.0), prevY));
+		double level = (m_samples[0] ? yHi : yLo);
+		pts.append(QPointF(sampleToPx(0.0), level));
 
+		// At most one edge per pixel column: further toggles there draw nothing new, and a
+		// fast signal over a long window would otherwise stroke millions of points per frame.
 		for(int i = 1; i < nSamples; ++i) {
-			const double x = sampleToPx(i * sampleStride);
 			const double y = (m_samples[i] ? yHi : yLo);
-			if(!qFuzzyCompare(y, prevY)) {
-				pts.append(QPointF(x, prevY));
-				pts.append(QPointF(x, y));
-				prevY = y;
+			if(y == level) {
+				continue;
 			}
+			level = y;
+			const double x = sampleToPx(i * sampleStride);
+			if(x - pts.last().x() < 1.0) {
+				continue;
+			}
+			const double before = (y == yHi ? yLo : yHi);
+			if(pts.last().y() != before) {
+				pts.append(QPointF(pts.last().x(), before));
+			}
+			pts.append(QPointF(x, before));
+			pts.append(QPointF(x, y));
 		}
 		// Trailing horizontal to the right edge of the wave area.
 		const double xEnd = sampleToPx((nSamples - 1) * sampleStride);
-		pts.append(QPointF(xEnd, prevY));
+		if(pts.last().y() != level) {
+			pts.append(QPointF(pts.last().x(), level));
+		}
+		pts.append(QPointF(xEnd, level));
 
 		painter->drawPolyline(pts.constData(), pts.size());
 	}

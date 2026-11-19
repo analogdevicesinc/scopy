@@ -63,7 +63,7 @@ MenuControlButton::MenuControlButton(QWidget *parent)
 
 	connect(this, &QAbstractButton::toggled, this, [this, iconPath](bool b) {
 		setDynamicProperty(this, "selected", b);
-		Style::setStyle(m_label, style::properties::label::menuMedium, b ? "selected" : "idle");
+		Style::setStyle(m_label, labelStyle(), b ? "selected" : "idle");
 		if(m_cs == CS_CIRCLE) {
 			Style::setStyle(m_chk, style::properties::checkbox::circleCB, b ? "selected" : "idle", true);
 		}
@@ -134,6 +134,22 @@ void MenuControlButton::enableToolTip(bool en)
 
 void MenuControlButton::setIconEnabled(bool en) { m_icon->setVisible(en); }
 
+void MenuControlButton::setSmall(bool small)
+{
+	m_small = small;
+	const int padding = small ? 4 : 16;
+	QMargins m = lay->contentsMargins();
+	m.setTop(padding);
+	m.setBottom(padding);
+	lay->setContentsMargins(m);
+	Style::setStyle(m_label, labelStyle(), isChecked() ? "selected" : "idle");
+}
+
+const char *MenuControlButton::labelStyle() const
+{
+	return m_small ? style::properties::label::menuSmall : style::properties::label::menuMedium;
+}
+
 void MenuControlButton::mouseDoubleClickEvent(QMouseEvent *e)
 {
 	if(e->button() == Qt::LeftButton) {
@@ -160,6 +176,8 @@ void MenuControlButton::mousePressEvent(QMouseEvent *e)
 
 QCheckBox *MenuControlButton::checkBox() { return m_chk; }
 
+QLabel *MenuControlButton::label() { return m_label; }
+
 QPushButton *MenuControlButton::button() { return m_btn; }
 
 QHBoxLayout *MenuControlButton::layout() { return lay; }
@@ -183,7 +201,7 @@ void MenuControlButton::applyStylesheet()
 		break;
 	}
 
-	Style::setStyle(m_label, style::properties::label::menuMedium, "idle");
+	Style::setStyle(m_label, labelStyle(), isChecked() ? "selected" : "idle");
 	StyleHelper::MenuControlButton(m_btn, "btn");
 }
 

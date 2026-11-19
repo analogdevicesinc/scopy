@@ -31,6 +31,9 @@ PlotAxisHandle::PlotAxisHandle(PlotWidget *plot, PlotAxis *ax)
 	, m_axis(ax)
 	, m_plot(plot->plot())
 {
+	// The handle the reader drags is m_handle, on the plot. This wrapper draws nothing but
+	// still sits at the plot widget's top-left corner, above the plot.
+	setAttribute(Qt::WA_TransparentForMouseEvents);
 	init();
 }
 

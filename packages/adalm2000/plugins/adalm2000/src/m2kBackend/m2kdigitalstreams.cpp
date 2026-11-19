@@ -183,8 +183,7 @@ QCoro::Task<CommandResponse<void>> M2kDigitalInputStream::refillAsync()
 	M2kDigital *digital = m_digital;
 	const unsigned samples = static_cast<unsigned>(m_config.samplesCount);
 	const unsigned kernelBuffers = m_kernelBuffers;
-	const bool restart = m_stale;
-	m_stale = false;
+	const bool restart = m_stale.exchange(false);
 	auto samplePtr = std::make_shared<const unsigned short *>(nullptr);
 
 	auto *cmd = new M2kCallCommand<void>(m_resource, [digital, samples, kernelBuffers, restart, samplePtr]() {

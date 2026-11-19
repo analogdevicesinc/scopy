@@ -38,7 +38,9 @@ class IIOWidgetGroup;
 }
 
 namespace scopy::adalm2000 {
+class Adalm2000Logic_API;
 class Adalm2000Spectrum_API;
+class M2kLogicController;
 class M2kSpectrumController;
 
 class SCOPY_ADALM2000_EXPORT Adalm2000Plugin : public QObject, public PluginBase
@@ -73,6 +75,8 @@ private:
 	QMetaObject::Connection m_calibrationFinishedConn;
 	M2kSpectrumController *m_spectrum = nullptr;
 	Adalm2000Spectrum_API *m_spectrumApi = nullptr;
+	M2kLogicController *m_logic = nullptr;
+	Adalm2000Logic_API *m_logicApi = nullptr;
 	component::ContextHandle m_context;
 };
 

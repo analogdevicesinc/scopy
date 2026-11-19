@@ -297,7 +297,7 @@ void AcqInstrumentController::setupTrigger()
 	connect(m_ui, &AcqInstrument::stopped, m_trigWidget, [this]() { m_trigWidget->setAcquisitionRunning(false); });
 }
 
-void AcqInstrumentController::setupDecoders()
+void AcqInstrumentController::createDecoders()
 {
 	scopy::acq::AcquisitionEngine *engine = m_ui->engine();
 	InstrumentTemplate *it = m_ui->shell();
@@ -325,11 +325,17 @@ void AcqInstrumentController::setupDecoders()
 							  m_ui, scopy::decoder::DecoderPanel::HostScrolls);
 	m_decoderPanel->setLogger(log);
 
+	m_ui->pipeline()->setDecoderManager(m_decoderMgr.get());
+}
+
+void AcqInstrumentController::setupDecoders()
+{
+	createDecoders();
+	InstrumentTemplate *it = m_ui->shell();
+
 	// A page with no one block behind it: the manager creates decoder blocks on demand.
 	addBlockRow(it->addChannelGroup(kProcessorsGroup), m_decoderPanel, tr("Decoders"), tr("DECODERS"),
 		    QStringLiteral("decoders"));
-
-	m_ui->pipeline()->setDecoderManager(m_decoderMgr.get());
 
 	// A decoder's output is drawn as an annotation channel; its X is the plot's own sample
 	// ramp, since annotation offsets are relative to the decoded window.

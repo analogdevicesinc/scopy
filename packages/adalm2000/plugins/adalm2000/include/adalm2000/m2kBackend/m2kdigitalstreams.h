@@ -28,6 +28,8 @@
 #include <QFuture>
 #include <QVector>
 
+#include <atomic>
+
 #include <cstdint>
 
 namespace libm2k::digital {
@@ -75,7 +77,7 @@ private:
 	scopy::ICmdExecutor *m_executor;
 	unsigned m_kernelBuffers = 4;
 	bool m_cancelRequested = false;
-	bool m_stale = false;
+	std::atomic<bool> m_stale{false};
 	QFuture<void> m_cancelFuture;
 	component::StreamFormat m_format;
 };

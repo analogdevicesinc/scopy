@@ -69,7 +69,11 @@ public:
 	void enableToolTip(bool en);
 	void setIconEnabled(bool en);
 
+	// Same widgets with less padding and a smaller name, for long lists of rows.
+	void setSmall(bool small);
+
 	QCheckBox *checkBox();
+	QLabel *label();
 	QPushButton *button();
 	QHBoxLayout *layout();
 
@@ -83,6 +87,7 @@ Q_SIGNALS:
 
 private:
 	void applyStylesheet();
+	const char *labelStyle() const;
 
 	int width;
 	bool m_toolTip;
@@ -93,6 +98,7 @@ private:
 	QPushButton *m_btn;
 	QLabel *m_icon;
 	CheckboxStyle m_cs;
+	bool m_small{false};
 	QMetaObject::Connection dblClickToOpenMenu;
 	QMetaObject::Connection openMenuChecksThis;
 

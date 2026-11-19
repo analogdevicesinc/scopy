@@ -47,6 +47,7 @@ namespace acq {
 // non-zero sampleCount is supplied via setSampleCount(), samples are laid out
 // proportionally across the current x-axis interval (same convention as
 // AnnotationCurve). Otherwise indices map to x-axis scale values verbatim.
+// setXTransform() maps index i to offset + i * scale, for an axis in other units.
 class SCOPY_CORE_EXPORT DigitalCurveItem : public QwtPlotItem
 {
 public:
@@ -60,7 +61,10 @@ public:
 	// Total sample count for proportional x-layout. 0 = verbatim mapping.
 	void setSampleCount(quint64 n);
 
+	void setXTransform(double offset, double scale);
+
 	void setColor(const QColor &c);
+	void setName(const QString &name);
 	QColor color() const { return m_color; }
 
 	// QwtPlotItem overrides
@@ -76,6 +80,8 @@ private:
 	QString m_title;
 	QVector<quint8> m_samples;
 	quint64 m_sampleCount = 0;
+	double m_xOffset = 0.0;
+	double m_xScale = 1.0;
 	QColor m_color;
 };
 

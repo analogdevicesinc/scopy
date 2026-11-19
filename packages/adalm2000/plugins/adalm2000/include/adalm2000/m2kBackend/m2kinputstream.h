@@ -27,6 +27,8 @@
 #include <QFuture>
 #include <QVector>
 
+#include <atomic>
+
 namespace libm2k::analog {
 class M2kAnalogIn;
 }
@@ -73,7 +75,7 @@ private:
 	scopy::ICmdExecutor *m_executor;
 	unsigned m_kernelBuffers = 4;
 	bool m_cancelRequested = false;
-	bool m_stale = false;
+	std::atomic<bool> m_stale{false};
 	QFuture<void> m_cancelFuture;
 	QVector<stream::ChannelScale> m_scales;
 	component::StreamFormat m_format;

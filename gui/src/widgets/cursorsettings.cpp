@@ -116,6 +116,18 @@ QAbstractButton *CursorSettings::getYLock() { return yLock->onOffswitch(); }
 
 QAbstractButton *CursorSettings::getReadoutsDrag() { return readoutsDrag->onOffswitch(); }
 
+void CursorSettings::setXOnly(bool xOnly)
+{
+	if(xOnly) {
+		getXTrack()->setChecked(false);
+		getYEn()->setChecked(false);
+		getReadoutsDrag()->setChecked(false);
+	}
+	xTrack->setVisible(!xOnly);
+	yControls->setVisible(!xOnly);
+	readoutsControls->setVisible(!xOnly);
+}
+
 void CursorSettings::initSession()
 {
 	getXEn()->setChecked(true);
