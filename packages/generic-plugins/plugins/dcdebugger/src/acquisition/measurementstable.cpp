@@ -23,9 +23,14 @@
 
 #include <QHeaderView>
 #include <QPixmap>
+#include <QSplitter>
+#include <QTimer>
+#include <QVBoxLayout>
 
 #include <cmath>
 
+#include <gui/docking/dockablearea.h>
+#include <gui/docking/dockwrapper.h>
 #include <style.h>
 
 using namespace scopy;
@@ -92,6 +97,75 @@ void MeasurementsTable::setRows(const QList<MeasurementRow> &rows, const QString
 			setItem(r, c + 1, item);
 		}
 	}
+}
+
+PlotMeasurementsArea::PlotMeasurementsArea(QWidget *plot, QTableWidget *table, QWidget *parent)
+	: QWidget(parent)
+	, m_table(table)
+{
+	auto *lay = new QVBoxLayout(this);
+	lay->setContentsMargins(0, 0, 0, 0);
+
+	DockableAreaInterface *area = createDockableArea(this);
+#ifdef USE_KDDOCKWIDGETS
+	if(auto *mw = dynamic_cast<KDDockWidgets::QtWidgets::MainWindow *>(area)) {
+		lay->addWidget(mw);
+		DockWrapperInterface *plotDock = createDockWrapper("Plot");
+		plotDock->setInnerWidget(plot);
+		area->addDockWrapper(plotDock, DockableAreaInterface::Direction_TOP);
+		DockWrapperInterface *tableDock = createDockWrapper("Measurements");
+		tableDock->setInnerWidget(table);
+		m_docks = {plotDock, tableDock};
+		// Added directly, not through the area: only this way it gets its initial height.
+		auto *dw = dynamic_cast<KDDockWidgets::QtWidgets::DockWidget *>(tableDock);
+		dw->setAffinities({mw->uniqueName()});
+		mw->addDockWidget(dw, KDDockWidgets::Location_OnBottom, nullptr,
+				  KDDockWidgets::InitialOption(QSize(0, tableHeight())));
+		return;
+	}
+#endif
+	delete area->asWidget();
+	m_splitter = new QSplitter(Qt::Vertical, this);
+	m_splitter->setChildrenCollapsible(true);
+	m_splitter->addWidget(plot);
+	m_splitter->addWidget(table);
+	m_splitter->setStretchFactor(0, 1);
+	m_splitter->setStretchFactor(1, 0);
+	lay->addWidget(m_splitter);
+}
+
+PlotMeasurementsArea::~PlotMeasurementsArea()
+{
+	// A floating dock is a window of its own, not a child of this area: it would outlive it.
+	for(DockWrapperInterface *dock : std::as_const(m_docks)) {
+		delete dynamic_cast<QWidget *>(dock);
+	}
+}
+
+void PlotMeasurementsArea::showEvent(QShowEvent *event)
+{
+	QWidget::showEvent(event);
+	if(m_splitter && !m_sized) {
+		// After the first layout pass, once the splitter has its real height.
+		QTimer::singleShot(0, this, &PlotMeasurementsArea::applyInitialSizes);
+	}
+}
+
+int PlotMeasurementsArea::tableHeight() const
+{
+	return m_table->horizontalHeader()->sizeHint().height() +
+		DefaultRows * m_table->verticalHeader()->defaultSectionSize() + 2 * m_table->frameWidth();
+}
+
+void PlotMeasurementsArea::applyInitialSizes()
+{
+	const int total = m_splitter->height() - m_splitter->handleWidth();
+	if(m_sized || total <= 0) {
+		return;
+	}
+	m_sized = true;
+	const int table = std::min(tableHeight(), total / 2);
+	m_splitter->setSizes({total - table, table});
 }
 
 #include "moc_measurementstable.cpp"

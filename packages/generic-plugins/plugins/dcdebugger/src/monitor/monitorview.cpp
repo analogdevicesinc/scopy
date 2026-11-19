@@ -33,9 +33,7 @@
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QScrollArea>
-#include <QShowEvent>
 #include <QSignalBlocker>
-#include <QSplitter>
 #include <QTableWidget>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -425,15 +423,12 @@ QWidget *MonitorView::buildChannelMenu(Entry &e)
 
 void MonitorView::buildPlots()
 {
-	m_splitter = new QSplitter(Qt::Vertical, this);
-	m_splitter->setChildrenCollapsible(true);
-
-	m_plotsArea = new QWidget(m_splitter);
+	m_plotsArea = new QWidget(this);
 	m_plotsLay = new QVBoxLayout(m_plotsArea);
 	m_plotsLay->setContentsMargins(0, 0, 0, 0);
 	m_plotsLay->setSpacing(6);
 
-	m_table = new QTableWidget(m_splitter);
+	m_table = new QTableWidget(this);
 	const QStringList headers = {"Channel", "Value", "Min", "Max", "Mean"};
 	m_table->setColumnCount(headers.size());
 	m_table->setHorizontalHeaderLabels(headers);
@@ -445,12 +440,7 @@ void MonitorView::buildPlots()
 	m_table->setFocusPolicy(Qt::NoFocus);
 	Style::setStyle(m_table, style::properties::widget::tableViewWidget);
 
-	m_splitter->addWidget(m_plotsArea);
-	m_splitter->addWidget(m_table);
-	// Extra height goes to the plots; the table keeps its size (see applyInitialSizes()).
-	m_splitter->setStretchFactor(0, 1);
-	m_splitter->setStretchFactor(1, 0);
-	m_sides->setCentralWidget(m_splitter);
+	m_sides->setCentralWidget(new PlotMeasurementsArea(m_plotsArea, m_table, this));
 
 	addPlot(); // there is always at least one plot
 }
@@ -579,26 +569,6 @@ void MonitorView::updatePlotControls()
 	if(m_removePlotBtn) {
 		m_removePlotBtn->setVisible(n > 1);
 	}
-}
-
-void MonitorView::showEvent(QShowEvent *event)
-{
-	QWidget::showEvent(event);
-	if(!m_sized) {
-		// After the first layout pass, once the splitter has its real height.
-		QTimer::singleShot(0, this, &MonitorView::applyInitialSizes);
-	}
-}
-
-void MonitorView::applyInitialSizes()
-{
-	const int total = m_splitter->height() - m_splitter->handleWidth();
-	if(m_sized || total <= 0) {
-		return;
-	}
-	m_sized = true;
-	const int table = std::min(MeasurementsHeight, total / 4);
-	m_splitter->setSizes({total - table, table});
 }
 
 void MonitorView::applySource(Entry &e)

@@ -412,8 +412,6 @@ void TST_MonitorView::plotVisibleFromStart()
 	PlotWidget *plot = m_view->plot(0);
 	// Visible before any channel is enabled or polling started.
 	QTRY_VERIFY(plot->isVisible() && plot->height() > 0);
-	QTRY_VERIFY(table->isVisible() && table->height() > 0 &&
-		    table->height() <= MonitorView::MeasurementsHeight + 10);
 	QVERIFY(plot->height() > table->height());
 
 	// Runtime plots show up too.

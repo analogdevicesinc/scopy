@@ -33,8 +33,6 @@
 class QButtonGroup;
 class QLabel;
 class QPushButton;
-class QShowEvent;
-class QSplitter;
 class QTableWidget;
 class QTimer;
 class QVBoxLayout;
@@ -77,7 +75,6 @@ public:
 	static QList<component::Channel *> monitorableChannels(QObject *root);
 	static constexpr int MaxPlots = 8;
 	// Initial height of the measurements table, at most a quarter of the view.
-	static constexpr int MeasurementsHeight = 140;
 
 	int plotCount() const { return int(m_plots.size()); }
 	PlotWidget *plot(int index) const;
@@ -93,9 +90,6 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void plotsChanged(int count);
-
-protected:
-	void showEvent(QShowEvent *event) override;
 
 private:
 	struct Entry
@@ -121,7 +115,6 @@ private:
 	void rebuildPlotsLayout();
 	void rebuildPlotCombos();
 	void updatePlotControls();
-	void applyInitialSizes();
 	void applySource(Entry &e);
 	void assignPlot(Entry &e, int plotIndex);
 	void render();
@@ -143,14 +136,12 @@ private:
 	MenuOnOffSwitch *m_scaled;
 	QButtonGroup *m_menuGroup;
 	QList<PlotWidget *> m_plots;
-	QSplitter *m_splitter = nullptr;
 	QWidget *m_plotsArea = nullptr;
 	QVBoxLayout *m_plotsLay = nullptr;
 	MenuCombo *m_plotSelect = nullptr; // the Plots section's plot list
 	QPushButton *m_addPlotBtn = nullptr;
 	QPushButton *m_removePlotBtn = nullptr;
 	int m_selectedPlot = 0; // selection of m_plotSelect, kept across its rebuilds
-	bool m_sized = false;
 	QTableWidget *m_table = nullptr;
 	QTimer *m_redraw;
 	bool m_dirty = false;

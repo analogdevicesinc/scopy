@@ -25,7 +25,14 @@
 #include "signalmath.h"
 
 #include <QColor>
+#include <QList>
 #include <QTableWidget>
+
+class QSplitter;
+
+namespace scopy {
+class DockWrapperInterface;
+}
 
 namespace scopy::dcdebugger {
 
@@ -44,6 +51,30 @@ class MeasurementsTable : public QTableWidget
 public:
 	explicit MeasurementsTable(QWidget *parent = nullptr);
 	void setRows(const QList<MeasurementRow> &rows, const QString &unit);
+};
+
+// A plot above its measurements table: two docks (KDDockWidgets when available and preferred), else a
+// vertical splitter. The table starts DefaultRows rows tall; extra height goes to the plot.
+class PlotMeasurementsArea : public QWidget
+{
+	Q_OBJECT
+public:
+	static constexpr int DefaultRows = 2;
+
+	PlotMeasurementsArea(QWidget *plot, QTableWidget *table, QWidget *parent = nullptr);
+	~PlotMeasurementsArea() override;
+
+protected:
+	void showEvent(QShowEvent *event) override;
+
+private:
+	int tableHeight() const;
+	void applyInitialSizes();
+
+	QTableWidget *m_table;
+	QSplitter *m_splitter = nullptr;
+	QList<DockWrapperInterface *> m_docks;
+	bool m_sized = false;
 };
 
 // v with an SI prefix and `unit`, e.g. 1.0008 kHz.

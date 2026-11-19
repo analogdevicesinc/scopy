@@ -33,7 +33,6 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QScrollArea>
-#include <QSplitter>
 #include <QSignalBlocker>
 #include <QVBoxLayout>
 
@@ -327,7 +326,11 @@ QWidget *AcquisitionView::buildSoftwareTriggerSection(QWidget *parent)
 
 void AcquisitionView::buildPlot()
 {
-	m_plot = new PlotWidget(this);
+	QWidget *wrapper = new QWidget(this);
+	QVBoxLayout *lay = new QVBoxLayout(wrapper);
+	lay->setContentsMargins(0, 0, 0, 0);
+
+	m_plot = new PlotWidget(wrapper);
 	m_plot->xAxis()->scaleDraw()->setFormatter(new MetricPrefixFormatter());
 	m_plot->xAxis()->scaleDraw()->setFloatPrecision(2);
 	m_plot->yAxis()->scaleDraw()->setFormatter(new MetricPrefixFormatter());
@@ -347,15 +350,10 @@ void AcquisitionView::buildPlot()
 		m_plotChannels.insert(elems[c]->id(), ch);
 	}
 	m_plot->replot();
+	lay->addWidget(m_plot);
 
 	m_table = new MeasurementsTable(this);
-	auto *splitter = new QSplitter(Qt::Vertical, this);
-	splitter->setChildrenCollapsible(true);
-	splitter->addWidget(m_plot);
-	splitter->addWidget(m_table);
-	splitter->setStretchFactor(0, 4);
-	splitter->setStretchFactor(1, 1);
-	m_sides->setCentralWidget(splitter);
+	m_sides->setCentralWidget(new PlotMeasurementsArea(wrapper, m_table, this));
 }
 
 void AcquisitionView::applyChannelSelection()
