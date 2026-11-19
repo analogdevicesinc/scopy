@@ -56,6 +56,8 @@ file(
 	src/powersupply/*.cc
 	src/digitalio/*.cpp
 	src/digitalio/*.cc
+	src/spectrum/*.cpp
+	src/spectrum/*.cc
 )
 file(
 	GLOB
@@ -70,6 +72,8 @@ file(
 	include/${SCOPY_MODULE}/powersupply/*.hpp
 	include/${SCOPY_MODULE}/digitalio/*.h
 	include/${SCOPY_MODULE}/digitalio/*.hpp
+	include/${SCOPY_MODULE}/spectrum/*.h
+	include/${SCOPY_MODULE}/spectrum/*.hpp
 )
 
 set(ENABLE_TESTING ON)
@@ -100,6 +104,7 @@ set(INCLUDE_DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/voltmeter
     ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/powersupply
     ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/digitalio
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/spectrum
 )
 
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -115,6 +120,7 @@ target_link_libraries(
 	       scopy-gui
 	       scopy-iioutil
 	       scopy-iio-widgets
+	       scopy-core
 	       component
 	       libm2k::libm2k
 )

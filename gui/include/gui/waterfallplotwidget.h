@@ -178,6 +178,7 @@ private:
 	QElapsedTimer m_rowTimer;
 	double m_secsPerRow;
 	int m_rowCount;
+	int m_pendingRows;
 	bool m_waterfallEnabled;
 	ChannelData *m_channel = nullptr;
 };
