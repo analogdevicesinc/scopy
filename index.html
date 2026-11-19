@@ -9,7 +9,7 @@
     <title>Scopy &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="_static/app.min.css?v=07ad7716" />
-    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=5b85fa78" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=7ca9c54f" />
     <script async="async" src="_static/app.umd.js?v=2fe15c61"></script>
     <link rel="icon" href="_static/scopy.png"/>
     <link rel="index" title="Index" href="genindex/" />
@@ -359,23 +359,17 @@ Content on this topic
 </div>
           <div class="body" role="main">
             
-  <section id="scopy">
+  <section class="hero" id="scopy">
 <h1>Scopy<a class="headerlink" href="#scopy" title="Link to this heading"></a></h1>
+<h1 class="rubric"><strong>Scopy</strong>: signal analysis on any IIO device</h1>
+<img alt="_images/screenshot-light.png" class="only-light window" src="_images/screenshot-light.png" />
+<img alt="_images/screenshot-dark.png" class="only-dark window" src="_images/screenshot-dark.png" />
 <p><a class="icon link reference external" href="https://www.analog.com" target="_blank">Analog Devices Inc.</a>
 Scopy is a multi-functional software toolset with strong capabilities for
 signal analysis.</p>
-<img alt="_images/screenshot-light.png" class="only-light window" src="_images/screenshot-light.png" />
-<img alt="_images/screenshot-dark.png" class="only-dark window" src="_images/screenshot-dark.png" />
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>We are in the process of moving the Scopy documentation from
-<a class="icon link reference external" href="https://wiki.analog.com/university/tools/m2k/scopy#user_guides" target="_blank">wiki</a>
-to <a class="icon git reference external" href="https://github.com/analogdevicesinc/scopy/tree/main/" target="_blank">ADI Scopy repository</a>.</p>
-<p>We apologize for any inconvenience that may occur due to this migration.</p>
-</div>
 <section id="contents">
 <h2>Contents<a class="headerlink" href="#contents" title="Link to this heading"></a></h2>
-<div class="toctree-wrapper compound">
+<div class="toctree-wrapper grid compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="user_guide/">Scopy Overview</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="user_guide/#about">About</a></li>
@@ -387,22 +381,9 @@ to <a class="icon git reference external" href="https://github.com/analogdevices
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="user_guide/#application-overview">Application Overview</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="user_guide/#homepage-layout">Homepage layout</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="user_guide/#device-browser">Device browser</a></li>
-<li class="toctree-l4"><a class="reference internal" href="user_guide/#add-device-page">Add(+) device page</a></li>
-<li class="toctree-l4"><a class="reference internal" href="user_guide/#instruments-menu">Instruments Menu</a></li>
-<li class="toctree-l4"><a class="reference internal" href="user_guide/#information-window">Information Window</a></li>
-<li class="toctree-l4"><a class="reference internal" href="user_guide/#save-load-session">Save &amp; Load session</a></li>
-<li class="toctree-l4"><a class="reference internal" href="user_guide/#preferences">Preferences</a></li>
-<li class="toctree-l4"><a class="reference internal" href="user_guide/#about-page">About page</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="user_guide/#homepage-layout">Homepage layout</a></li>
 <li class="toctree-l3"><a class="reference internal" href="user_guide/#connecting-to-a-device">Connecting to a device</a></li>
-<li class="toctree-l3"><a class="reference internal" href="user_guide/#managing-device-plugins">Managing Device Plugins</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="user_guide/#new-tabbed-interface">New Tabbed Interface</a></li>
-<li class="toctree-l4"><a class="reference internal" href="user_guide/#how-to-manage-plugins">How to Manage Plugins</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="user_guide/#managing-device-plugins">Managing Device Plugins</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="user_guide/#user-guides">User Guides</a><ul>
@@ -412,34 +393,9 @@ to <a class="icon git reference external" href="https://github.com/analogdevices
 <li class="toctree-l2"><a class="reference internal" href="user_guide/#instruments-overview">Instruments Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="user_guide/#scripting">Scripting</a></li>
 <li class="toctree-l2"><a class="reference internal" href="user_guide/#building-from-source">Building from source</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="user_guide/build_instructions/windowsBuild/">Windows Build Instructions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="user_guide/build_instructions/windowsBuild/#building-scopy">Building Scopy</a></li>
-<li class="toctree-l4"><a class="reference internal" href="user_guide/build_instructions/windowsBuild/#running-scopy">Running Scopy</a></li>
-<li class="toctree-l4"><a class="reference internal" href="user_guide/build_instructions/windowsBuild/#windows-qt-setup-instructions">Windows Qt Setup Instructions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="user_guide/build_instructions/windowsBuild/#creating-an-installer">Creating an Installer</a></li>
-<li class="toctree-l4"><a class="reference internal" href="user_guide/build_instructions/windowsBuild/#building-scopy-using-the-docker-image">Building Scopy using the Docker Image</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="user_guide/build_instructions/linuxBuild/">Linux Build Instructions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="user_guide/build_instructions/linuxBuild/#qt-setup-instructions">Qt Setup Instructions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="user_guide/build_instructions/linuxBuild/#building-scopy">Building Scopy</a></li>
-<li class="toctree-l4"><a class="reference internal" href="user_guide/build_instructions/linuxBuild/#qt-creator-project-configuration">Qt Creator project configuration</a></li>
-<li class="toctree-l4"><a class="reference internal" href="user_guide/build_instructions/linuxBuild/#creating-an-installer-for-x86-64-architecture">Creating an Installer for x86_64 architecture</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="user_guide/build_instructions/linuxBuild/#appimage">AppImage</a></li>
-<li class="toctree-l5"><a class="reference internal" href="user_guide/build_instructions/linuxBuild/#flatpak">Flatpak</a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="user_guide/build_instructions/linuxBuild/#creating-an-installer-for-other-architectures">Creating an Installer for other architectures</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="user_guide/build_instructions/linuxBuild/#installer-for-armhf">Installer for armhf</a></li>
-<li class="toctree-l5"><a class="reference internal" href="user_guide/build_instructions/linuxBuild/#installer-for-arm64">Installer for arm64</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="user_guide/build_instructions/macosBuild/">MacOS Build Instructions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="user_guide/build_instructions/macosBuild/#building-scopy">Building Scopy</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="user_guide/build_instructions/windowsBuild/">Windows Build Instructions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user_guide/build_instructions/linuxBuild/">Linux Build Instructions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user_guide/build_instructions/macosBuild/">MacOS Build Instructions</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="user_guide/#source-code">Source code</a></li>
@@ -448,505 +404,29 @@ to <a class="icon git reference external" href="https://github.com/analogdevices
 </li>
 <li class="toctree-l1"><a class="reference internal" href="plugins/">Plugins</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="plugins/#contents">Contents</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="plugins/adc/adc/">ADC plugin</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="plugins/adc/adc/#fft-averaging-frequency-instrument">FFT Averaging (Frequency Instrument)</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/adc/adc/#genalyzer-analysis-frequency-instrument">Genalyzer Analysis (Frequency Instrument)</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="plugins/adc/adc/#analysis-modes"><strong>Analysis Modes</strong></a></li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/adc/adc/#analysis-metrics"><strong>Analysis Metrics</strong></a></li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/adc/adc/#integration-with-fft-workflow"><strong>Integration with FFT Workflow:</strong></a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/adc/adc/#waterfall-plot-frequency-instrument">Waterfall Plot (Frequency Instrument)</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="plugins/dac/dac/">DAC plugin</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="plugins/dac/dac/#buffer-mode">Buffer mode</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/dac/dac/#dds-mode">DDS mode</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="plugins/datalogger/datalogger/">Datalogger</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="plugins/datalogger/datalogger/#general-description">General Description</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/datalogger/datalogger/#display-signals">Display Signals</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/datalogger/datalogger/#display-text">Display Text</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/datalogger/datalogger/#display-seven-segment">Display Seven Segment</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/datalogger/datalogger/#channel-attributes">Channel Attributes</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/datalogger/datalogger/#settings">Settings</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/datalogger/datalogger/#save-data">Save data</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/datalogger/datalogger/#import-data">Import data</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/datalogger/datalogger/#tutorial">Tutorial</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/datalogger/datalogger/#preferences">Preferences</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/datalogger/datalogger/#experimental-features">Experimental Features</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="plugins/debugger/">Debugger</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="plugins/debugger/#overview">Overview</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/debugger/#contents">Contents</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="plugins/debugger/debugger/">Debugger</a></li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/debugger/iioexplorer/">IIO Explorer</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="plugins/registermap/registermap/">Register Map</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="plugins/registermap/registermap/#user-guide">User Guide</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/registermap/registermap/#settings">Settings</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/registermap/registermap/#tutorial">Tutorial</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/registermap/registermap/#xml-file-format">XML file format</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/registermap/registermap/#preferences">Preferences</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="plugins/m2k/">ADALM2000</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="plugins/m2k/#overview">Overview</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/m2k/#introduction">Introduction</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/m2k/#adalm2000-plugins">ADALM2000 plugins:</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="plugins/m2k/oscilloscope/">Oscilloscope</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/oscilloscope/#general">General</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/oscilloscope/#setting-up-a-test-signal">Setting Up a Test Signal</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/oscilloscope/#setting-the-horizontal-and-vertical-scales">Setting the Horizontal and Vertical Scales</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/oscilloscope/#oscilloscope-triggering">Oscilloscope Triggering</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/oscilloscope/#making-signal-measurements-using-cursors">Making Signal Measurements Using Cursors</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/oscilloscope/#using-built-in-signal-measurement-features">Using Built-In Signal Measurement Features</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/oscilloscope/#working-with-math-channels">Working with Math Channels</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/oscilloscope/#working-with-reference-channels">Working with Reference Channels</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/oscilloscope/#working-with-mixed-signal-view">Working with Mixed Signal View</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/m2k/spectrum_analyzer/">Spectrum Analyzer</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/spectrum_analyzer/#general-description">General Description</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/spectrum_analyzer/#spectrum-analyzer-front-panel">Spectrum Analyzer Front Panel</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/spectrum_analyzer/#channel-settings">Channel Settings</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/spectrum_analyzer/#averaging">Averaging</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/spectrum_analyzer/#snapshot">Snapshot</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/spectrum_analyzer/#general-settings">General Settings</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/spectrum_analyzer/#sweep-setting">Sweep Setting</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/spectrum_analyzer/#markers">Markers</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/m2k/network_analyzer/">Network Analyzer</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/network_analyzer/#introduction">Introduction</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/network_analyzer/#front-panel">Front Panel</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/network_analyzer/#buffer-previewer">Buffer Previewer</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/network_analyzer/#general-settings-menu-button">General Settings Menu Button</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/network_analyzer/#snapshot">Snapshot</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/network_analyzer/#cursors-button">Cursors button</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/network_analyzer/#plots">Plots</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/network_analyzer/#network-analyzer-low-pass-filter-example">Network Analyzer - Low Pass Filter Example</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/m2k/signal_generator/">Signal Generator</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/signal_generator/#general-description">General Description</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/signal_generator/#use-cases"><strong>Use cases</strong></a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/signal_generator/#create-loopback-between-ch1-and-ch2-of-the-oscilloscope-and-the-signal-generator"><strong>Create loopback between CH1 and CH2 of the oscilloscope and the signal generator</strong></a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/signal_generator/#run-both-channels"><strong>Run both channels</strong></a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/signal_generator/#generate-square-waveform"><strong>Generate square waveform</strong></a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/signal_generator/#generate-trapezoidal-waveform"><strong>Generate trapezoidal waveform</strong></a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/signal_generator/#generate-waveform-from-wav-file"><strong>Generate waveform from wav file</strong></a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/signal_generator/#generate-stairstep-waveform"><strong>Generate stairstep waveform</strong></a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/signal_generator/#generate-waveform-from-math-function"><strong>Generate waveform from math function</strong></a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/m2k/logic_analyzer/">Logic Analyzer</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/logic_analyzer/#general">General</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/logic_analyzer/#channel-decoder-manager">Channel &amp; Decoder Manager</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/logic_analyzer/#general-settings">General settings</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/logic_analyzer/#export">Export</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/logic_analyzer/#channel-settings">Channel settings</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/logic_analyzer/#decoder-settings">Decoder settings</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/logic_analyzer/#grouping-channels-and-decoders">Grouping Channels and Decoders</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/logic_analyzer/#trigger-settings-menu">Trigger Settings Menu</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/logic_analyzer/#decoder-table">Decoder Table</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/logic_analyzer/#use-cases">Use Cases</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/logic_analyzer/#prerequisites"><strong>Prerequisites</strong></a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/logic_analyzer/#enable-run-multiple-channels"><strong>Enable &amp; run multiple channels</strong></a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/logic_analyzer/#interaction-with-scopy-pattern-generator"><strong>Interaction with Scopy Pattern Generator</strong></a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/m2k/pattern_generator/">Pattern Generator</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/pattern_generator/#introduction">Introduction</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/pattern_generator/#use-cases">Use cases</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/pattern_generator/#enable-run-one-channel"><strong>Enable &amp; run one channel</strong></a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/pattern_generator/#create-a-4-channel-binary-counter"><strong>Create a 4 channel binary counter</strong></a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/pattern_generator/#change-settings-while-running"><strong>Change settings while running</strong></a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/pattern_generator/#single-shot-generation"><strong>Single-shot generation</strong></a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/pattern_generator/#special-patterns"><strong>Special patterns</strong></a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/m2k/digitalio/">Digital IO</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/digitalio/#general-description">General description</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/digitalio/#use-cases">Use Cases</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/m2k/voltmeter/">Voltmeter</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/voltmeter/#main-window">Main Window</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/voltmeter/#history-plot"><strong>History Plot</strong></a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/voltmeter/#digital-display"><strong>Digital Display</strong></a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/voltmeter/#run-stop-button"><strong>Run/Stop Button</strong></a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/voltmeter/#ac-dc-modes"><strong>AC/DC Modes</strong></a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/voltmeter/#history"><strong>History</strong></a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/voltmeter/#data-logging"><strong>Data logging</strong></a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/voltmeter/#peak-hold"><strong>Peak hold</strong></a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/m2k/power_supply/">Power Supply</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/power_supply/#introduction">Introduction</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/m2k/power_supply/#controls">Controls</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="plugins/pqm/">PQM</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="plugins/pqm/rms/">RMS</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="plugins/pqm/rms/#user-guide">User Guide</a></li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/pqm/rms/#pq-events">PQ Events</a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/pqm/harmonics/">Harmonics</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="plugins/pqm/harmonics/#user-guide">User Guide</a></li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/pqm/harmonics/#overview-plot">Overview Plot</a></li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/pqm/harmonics/#pq-events">PQ Events</a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/pqm/waveform/">Waveform</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="plugins/pqm/waveform/#user-guide">User Guide</a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/pqm/settings/">System settings</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="plugins/pqm/settings/#user-guide">User Guide</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="plugins/swiot1l/">AD-SWIOT1L-SL plugin</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="plugins/swiot1l/#overview">Overview</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/swiot1l/#software-setup">Software setup</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/swiot1l/#launching-the-application">Launching the application</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/swiot1l/#power-supply-options">Power Supply Options</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/swiot1l/#system-operation-modes">System operation modes</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="plugins/swiot1l/swiot_config/">Configuration</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="plugins/swiot1l/swiot_config/#overview">Overview</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/swiot1l/swiot_config/#tutorial">Tutorial</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/swiot1l/ad74413r/">AD74413R</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="plugins/swiot1l/ad74413r/#overview">Overview</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/swiot1l/ad74413r/#instrument-layout">Instrument Layout</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/swiot1l/ad74413r/#channel-item-layout">Channel item layout</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/swiot1l/ad74413r/#plot-layout">Plot Layout</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/swiot1l/ad74413r/#general-settings-layout">General settings layout</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/swiot1l/ad74413r/#tutorial">Tutorial</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/swiot1l/max14906/">MAX14906</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="plugins/swiot1l/max14906/#overview">Overview</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/swiot1l/max14906/#instrument-layout">Instrument layout</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/swiot1l/max14906/#channel-layout">Channel Layout</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/swiot1l/max14906/#settings-tab">Settings tab</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/swiot1l/max14906/#tutorial">Tutorial</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/swiot1l/faults/">Faults</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="plugins/swiot1l/faults/#overview">Overview</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/swiot1l/faults/#instrument-layout">Instrument layout</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/swiot1l/faults/#id2">Faults</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/swiot1l/faults/#tutorial">Tutorial</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/registermap/registermap/">Register Map</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="plugins/registermap/registermap/#user-guide">User Guide</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/registermap/registermap/#settings">Settings</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/registermap/registermap/#tutorial">Tutorial</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/registermap/registermap/#xml-file-format">XML file format</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/registermap/registermap/#preferences">Preferences</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="plugins/ad936x/">AD936x</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="plugins/ad936x/#overview">Overview</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/ad936x/#features">Features</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/ad936x/#supported-devices">Supported Devices</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/ad936x/#getting-started">Getting Started</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/ad936x/#configuration-options">Configuration Options</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/ad936x/#troubleshooting">Troubleshooting</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/ad936x/#additional-resources">Additional Resources</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="plugins/ad936x/ad936x/">AD936X</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/ad936x/#description">Description</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/ad936x/#device-global-settings">Device Global Settings</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/ad936x/#receive-chain">Receive Chain</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/ad936x/#transmit-chain">Transmit Chain</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/ad936x/#block-diagram">Block Diagram</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/ad936x/ad936x_advanced/">AD936X Advanced</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/ad936x_advanced/#ensm-mode-clocks">ENSM/Mode/Clocks</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/ad936x_advanced/#gain-control">Gain Control</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/ad936x_advanced/#rssi">RSSI</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/ad936x_advanced/#external-lna">External LNA</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/ad936x_advanced/#tx-monitor">TX Monitor</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/ad936x_advanced/#axillary-io-adc-dac-control-io-temp-sensor">Axillary IO (ADC, DAC, Control IO, Temp Sensor)</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/ad936x_advanced/#misc">MISC</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/ad936x_advanced/#bist">BIST</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/ad936x/fmcomms5/">FMCOMMS5</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/fmcomms5/#description">Description</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/fmcomms5/#device-global-settings">Device Global Settings</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/fmcomms5/#synchronization-controls">Synchronization Controls</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/fmcomms5/#receive-chain">Receive Chain</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/fmcomms5/#transmit-chain">Transmit Chain</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/fmcomms5/#block-diagram">Block Diagram</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/fmcomms5/#references">References</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/ad936x/fmcomms5_advanced/">FMCOMMS5 Advanced</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/fmcomms5_advanced/#description">Description</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/fmcomms5_advanced/#ensm-mode-clocks">ENSM/Mode/Clocks</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/fmcomms5_advanced/#gain-control">Gain Control</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/fmcomms5_advanced/#rssi">RSSI</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/fmcomms5_advanced/#external-lna">External LNA</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/fmcomms5_advanced/#tx-monitor">TX Monitor</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/fmcomms5_advanced/#auxiliary-io-adc-dac-control-io-temp-sensor">Auxiliary  IO (ADC, DAC, Control IO, Temp Sensor)</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/fmcomms5_advanced/#misc">MISC</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/fmcomms5_advanced/#bist">BIST</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad936x/fmcomms5_advanced/#fmcomms5-tab">FMCOMMS5 Tab</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="plugins/ad9371/">AD9371 / AD9375</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="plugins/ad9371/#overview">Overview</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/ad9371/#features">Features</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/ad9371/#supported-devices">Supported Devices</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/ad9371/#getting-started">Getting Started</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="plugins/ad9371/ad9371/">AD9371</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9371/ad9371/#general-description">General Description</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9371/ad9371/#device-global-settings">Device Global Settings</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9371/ad9371/#receive-chain">Receive Chain</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9371/ad9371/#transmit-chain">Transmit Chain</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9371/ad9371/#observation-sniffer-chain">Observation / Sniffer Chain</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/ad9371/ad9371_advanced/">AD9371 Advanced</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9371/ad9371_advanced/#general-description">General Description</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9371/ad9371_advanced/#clock-settings">Clock Settings</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9371/ad9371_advanced/#calibrations">Calibrations</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9371/ad9371_advanced/#tx-settings">TX Settings</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9371/ad9371_advanced/#rx-settings">RX Settings</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9371/ad9371_advanced/#observation-rx-settings">Observation RX Settings</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9371/ad9371_advanced/#gain-setup">Gain Setup</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9371/ad9371_advanced/#agc-setup">AGC Setup</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9371/ad9371_advanced/#arm-gpio">ARM GPIO</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9371/ad9371_advanced/#gpio">GPIO</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9371/ad9371_advanced/#aux-dac">AUX DAC</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9371/ad9371_advanced/#jesd-framer">JESD Framer</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9371/ad9371_advanced/#jesd-deframer">JESD Deframer</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9371/ad9371_advanced/#bist">BIST</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/ad9371/ad9375/">AD9375</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9371/ad9375/#general-description">General Description</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9371/ad9375/#additional-tx-chain-features">Additional TX Chain Features</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/ad9371/ad9375_advanced/">AD9375 Advanced</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9371/ad9375_advanced/#general-description">General Description</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9371/ad9375_advanced/#dpd-setup">DPD Setup</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9371/ad9375_advanced/#clgc-setup">CLGC Setup</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9371/ad9375_advanced/#vswr-setup">VSWR Setup</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="plugins/ad9084/">APOLLO</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="plugins/ad9084/#overview">Overview</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/ad9084/#features">Features</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/ad9084/#supported-devices">Supported Devices</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/ad9084/#getting-started">Getting Started</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="plugins/ad9084/ad9084/">AD9084</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9084/ad9084/#overview">Overview</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/ad9084/ad9084/#instrument-layout">Instrument Layout</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/ad9084/#additional-resources">Additional Resources</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="plugins/adrv9002/adrv9002/">ADRV9002 (Jupiter) Plugin</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="plugins/adrv9002/adrv9002/#description">Description</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/adrv9002/adrv9002/#compatible-devices">Compatible Devices</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/adrv9002/adrv9002/#device-global-settings">Device Global Settings</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/adrv9002/adrv9002/#receive-chain-configuration">Receive Chain Configuration</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/adrv9002/adrv9002/#transmit-chain-configuration">Transmit Chain Configuration</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/adrv9002/adrv9002/#profile-generator">Profile Generator</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="plugins/adrv9009/">ADRV9009 Plugin</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="plugins/adrv9009/#overview">Overview</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/adrv9009/#features">Features</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/adrv9009/#getting-started">Getting Started</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/adrv9009/#multi-device-capabilities">Multi-Device Capabilities</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/adrv9009/#troubleshooting">Troubleshooting</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/adrv9009/#additional-resources">Additional Resources</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="plugins/adrv9009/adrv9009/">ADRV9009</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009/#description">Description</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009/#multi-device-support">Multi-Device Support</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009/#adrv9009-global-settings">ADRV9009 Global Settings</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009/#receive-chain">Receive Chain</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009/#transmit-chain">Transmit Chain</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009/#observation-rx">Observation RX</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009/#fpga-settings">FPGA Settings</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009/#multi-chip-synchronization-mcs">Multi-Chip Synchronization (MCS)</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009/#configuration-and-profiles">Configuration and Profiles</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009/#troubleshooting">Troubleshooting</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009/#additional-resources">Additional Resources</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/adrv9009/adrv9009_advanced/">ADRV9009 Advanced</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009_advanced/#description">Description</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009_advanced/#clk-settings">CLK Settings</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009_advanced/#calibrations">Calibrations</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009_advanced/#tx-settings">TX Settings</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009_advanced/#rx-settings">RX Settings</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009_advanced/#orx-settings">ORX Settings</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009_advanced/#fhm-setup">FHM Setup</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009_advanced/#pa-protection">PA Protection</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009_advanced/#gain-setup">GAIN Setup</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009_advanced/#agc-setup">AGC Setup</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009_advanced/#gpio-config">GPIO Config</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009_advanced/#aux-dac">AUX DAC</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009_advanced/#jesd204-settings">JESD204 Settings</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009_advanced/#jesd-framer">JESD Framer</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009_advanced/#jesd-deframer">JESD Deframer</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009_advanced/#bist-built-in-self-test">BIST (Built-In Self Test)</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009_advanced/#troubleshooting">Troubleshooting</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/adrv9009/adrv9009_advanced/#additional-resources">Additional Resources</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="plugins/fmcomms11/fmcomms11/">FMCOMMS11</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="plugins/fmcomms11/fmcomms11/#overview">Overview</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/fmcomms11/fmcomms11/#supported-devices">Supported Devices</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/fmcomms11/fmcomms11/#getting-started">Getting Started</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/fmcomms11/fmcomms11/#plugin-description">Plugin Description</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/fmcomms11/fmcomms11/#adc">ADC</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/fmcomms11/fmcomms11/#input-attenuator">Input Attenuator</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/fmcomms11/fmcomms11/#dac">DAC</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/fmcomms11/fmcomms11/#output-vga">Output VGA</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/fmcomms11/fmcomms11/#dds">DDS</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="plugins/cn0357/cn0357/">CN0357</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="plugins/cn0357/cn0357/#overview">Overview</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/cn0357/cn0357/#features">Features</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/cn0357/cn0357/#supported-devices">Supported Devices</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/cn0357/cn0357/#getting-started">Getting Started</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/cn0357/cn0357/#description">Description</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/cn0357/cn0357/#adc-settings">ADC Settings</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/cn0357/cn0357/#feedback-settings">Feedback Settings</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/cn0357/cn0357/#system">System</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="plugins/daq2/daq2/">DAQ2</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="plugins/daq2/daq2/#features">Features</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/daq2/daq2/#supported-devices">Supported Devices</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/daq2/daq2/#getting-started">Getting Started</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/daq2/daq2/#adc">ADC</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/daq2/daq2/#dac">DAC</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="plugins/ad6676/ad6676/">AD6676</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="plugins/ad6676/ad6676/#adc-settings">ADC Settings</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/ad6676/ad6676/#bandwidth-settings">Bandwidth Settings</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/ad6676/ad6676/#receive-settings">Receive Settings</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/ad6676/ad6676/#shuffler-settings">Shuffler Settings</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/ad6676/ad6676/#test-settings">Test Settings</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="plugins/jesdstatus/">JESD Status</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="plugins/jesdstatus/#overview">Overview</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/jesdstatus/#instrument-layout">Instrument Layout</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/jesdstatus/#comparison-with-jesd204b-status-utility">Comparison with JESD204B Status Utility</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/jesdstatus/#detailed-status-information">Detailed Status Information</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/jesdstatus/#additional-resources">Additional Resources</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="plugins/scripting/scripting/">Scripting Tool</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="plugins/scripting/scripting/#features">Features</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/scripting/scripting/#how-script-execution-works">How Script Execution Works</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/scripting/scripting/#scripting-examples">Scripting Examples</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/scripting/scripting/#command-line-scripting">Command Line Scripting</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/scripting/scripting/#supported-commands">Supported Commands</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="plugins/scripting/scripting/#general">General</a></li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/scripting/scripting/#adalm2000-digitalio">ADALM2000: DigitalIO</a></li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/scripting/scripting/#adalm2000-power-supply">ADALM2000: Power Supply</a></li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/scripting/scripting/#adalm2000-voltmeter">ADALM2000: Voltmeter</a></li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/scripting/scripting/#adalm2000-signal-generator">ADALM2000: Signal Generator</a></li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/scripting/scripting/#adalm2000-network-analyzer">ADALM2000: Network Analyzer</a></li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/scripting/scripting/#adalm2000-oscilloscope">ADALM2000: Oscilloscope</a></li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/scripting/scripting/#adalm2000-pattern-generator">ADALM2000: Pattern Generator</a></li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/scripting/scripting/#adalm2000-logic-analyzer">ADALM2000: Logic Analyzer</a></li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/scripting/scripting/#adalm2000-spectrum-analyzer">ADALM2000: Spectrum Analyzer</a></li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/scripting/scripting/#regmap-api">RegMap API</a></li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/scripting/scripting/#datalogger-api">DataLogger API</a></li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/scripting/scripting/#iio-explorer-debugger-api">IIO Explorer (Debugger) API</a></li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/scripting/scripting/#pqm-api">PQM API</a></li>
-<li class="toctree-l5"><a class="reference internal" href="plugins/scripting/scripting/#swiot-api">SWIOT API</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="plugins/imuanalyzer/imuanalyzer/">IMU Analyzer</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="plugins/imuanalyzer/imuanalyzer/#general-description">General Description</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/imuanalyzer/imuanalyzer/#key-features">Key Features</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/imuanalyzer/imuanalyzer/#hardware-requirements">Hardware Requirements</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/imuanalyzer/imuanalyzer/#using-the-imu-analyzer">Using the IMU Analyzer</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/imuanalyzer/imuanalyzer/#settings-and-configuration">Settings and Configuration</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="plugins/rfpowermeter/rfpowermeter/">RF Power Meter</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="plugins/rfpowermeter/rfpowermeter/#general-description">General Description</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/rfpowermeter/rfpowermeter/#key-features">Key Features</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/rfpowermeter/rfpowermeter/#hardware-requirements">Hardware Requirements</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/rfpowermeter/rfpowermeter/#plugin-operation">Plugin Operation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/rfpowermeter/rfpowermeter/#error-handling-and-troubleshooting">Error Handling and Troubleshooting</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/rfpowermeter/rfpowermeter/#for-more-information">For More Information</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="plugins/cn0540/cn0540/">CN0540</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="plugins/cn0540/cn0540/#description">Description</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/cn0540/cn0540/#power-control">Power Control</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/cn0540/cn0540/#adc-driver-settings">ADC Driver Settings</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/cn0540/cn0540/#sensor-calibration">Sensor Calibration</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/cn0540/cn0540/#voltage-monitor">Voltage Monitor</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="plugins/cn0511/">CN0511</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="plugins/cn0511/#overview">Overview</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/cn0511/#features">Features</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/cn0511/#supported-devices">Supported Devices</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plugins/cn0511/#getting-started">Getting Started</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="plugins/cn0511/cn0511/">CN0511</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="plugins/cn0511/cn0511/#description">Description</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/cn0511/cn0511/#single-tone-mode">Single Tone Mode</a></li>
-<li class="toctree-l6"><a class="reference internal" href="plugins/cn0511/cn0511/#dac-amplifier">DAC Amplifier</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/adc/adc/">ADC plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/dac/dac/">DAC plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/datalogger/datalogger/">Datalogger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/debugger/">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/registermap/registermap/">Register Map</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/m2k/">ADALM2000</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/pqm/">PQM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/swiot1l/">AD-SWIOT1L-SL plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/ad936x/">AD936x</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/ad9371/">AD9371 / AD9375</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/ad9084/">APOLLO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/adrv9002/adrv9002/">ADRV9002 (Jupiter) Plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/adrv9009/">ADRV9009 Plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/fmcomms11/fmcomms11/">FMCOMMS11</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/cn0357/cn0357/">CN0357</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/daq2/daq2/">DAQ2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/ad6676/ad6676/">AD6676</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/jesdstatus/">JESD Status</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/scripting/scripting/">Scripting Tool</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/imuanalyzer/imuanalyzer/">IMU Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/rfpowermeter/rfpowermeter/">RF Power Meter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/cn0540/cn0540/">CN0540</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/cn0511/">CN0511</a></li>
 </ul>
 </li>
 </ul>
@@ -954,40 +434,9 @@ to <a class="icon git reference external" href="https://github.com/analogdevices
 <li class="toctree-l1"><a class="reference internal" href="developer_guide/">Scopy developer guide</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="developer_guide/#about">About</a></li>
 <li class="toctree-l2"><a class="reference internal" href="developer_guide/#contents">Contents</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="developer_guide/style/">Style Tutorial</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="developer_guide/style/#create-new-style-property">Create New Style Property</a></li>
-<li class="toctree-l4"><a class="reference internal" href="developer_guide/style/#add-json-value">Add JSON Value</a></li>
-<li class="toctree-l4"><a class="reference internal" href="developer_guide/style/#add-theme">Add Theme</a></li>
-<li class="toctree-l4"><a class="reference internal" href="developer_guide/style/#add-plugin-style">Add Plugin Style</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="developer_guide/package_generator/">Package Generator</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="developer_guide/package_generator/#overview">Overview</a></li>
-<li class="toctree-l4"><a class="reference internal" href="developer_guide/package_generator/#platform">Platform</a></li>
-<li class="toctree-l4"><a class="reference internal" href="developer_guide/package_generator/#running-the-script">Running the Script</a></li>
-<li class="toctree-l4"><a class="reference internal" href="developer_guide/package_generator/#configuration-files">Configuration Files</a></li>
-<li class="toctree-l4"><a class="reference internal" href="developer_guide/package_generator/#manifest-file">Manifest File</a></li>
-<li class="toctree-l4"><a class="reference internal" href="developer_guide/package_generator/#packages-development-flow">Packages development flow</a></li>
-<li class="toctree-l4"><a class="reference internal" href="developer_guide/package_generator/#scopy-pdk">Scopy PDK</a></li>
-<li class="toctree-l4"><a class="reference internal" href="developer_guide/package_generator/#adding-new-config-specifications">Adding New Config Specifications</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="developer_guide/plugin_developer_guide/">Plugin Developer Guide</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="developer_guide/plugin_developer_guide/#using-connection-provider">Using Connection Provider</a></li>
-<li class="toctree-l4"><a class="reference internal" href="developer_guide/plugin_developer_guide/#how-do-we-determine-when-the-plugin-will-show-compatibility-condition">How Do We Determine When the Plugin Will Show (Compatibility Condition)</a></li>
-<li class="toctree-l4"><a class="reference internal" href="developer_guide/plugin_developer_guide/#how-to-filter-between-compatible-plugins">How to Filter Between Compatible Plugins</a></li>
-<li class="toctree-l4"><a class="reference internal" href="developer_guide/plugin_developer_guide/#setting-tool-icon-and-title">Setting Tool Icon and Title</a></li>
-<li class="toctree-l4"><a class="reference internal" href="developer_guide/plugin_developer_guide/#how-to-add-resources">How to Add Resources</a></li>
-<li class="toctree-l4"><a class="reference internal" href="developer_guide/plugin_developer_guide/#how-to-create-edit-preferences-for-the-plugin">How to Create / Edit Preferences for the Plugin</a></li>
-<li class="toctree-l4"><a class="reference internal" href="developer_guide/plugin_developer_guide/#how-to-add-compatible-plugins">How to Add Compatible Plugins</a></li>
-<li class="toctree-l4"><a class="reference internal" href="developer_guide/plugin_developer_guide/#useful-tools">Useful Tools</a></li>
-<li class="toctree-l4"><a class="reference internal" href="developer_guide/plugin_developer_guide/#iiowidgets">IIOWidgets</a></li>
-<li class="toctree-l4"><a class="reference internal" href="developer_guide/plugin_developer_guide/#menu-ui-items">Menu UI Items</a></li>
-<li class="toctree-l4"><a class="reference internal" href="developer_guide/plugin_developer_guide/#how-to-create-a-device-icon">How to Create a Device Icon</a></li>
-<li class="toctree-l4"><a class="reference internal" href="developer_guide/plugin_developer_guide/#how-to-create-a-tutorial-for-your-plugin">How to Create a Tutorial for Your Plugin</a></li>
-<li class="toctree-l4"><a class="reference internal" href="developer_guide/plugin_developer_guide/#conclusion">Conclusion</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="developer_guide/style/">Style Tutorial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer_guide/package_generator/">Package Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="developer_guide/plugin_developer_guide/">Plugin Developer Guide</a></li>
 </ul>
 </li>
 </ul>
@@ -995,248 +444,9 @@ to <a class="icon git reference external" href="https://github.com/analogdevices
 <li class="toctree-l1"><a class="reference internal" href="tests/">Test Cases</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="tests/#current-reports">Current reports</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tests/#contents">Contents</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="tests/testing_guide/">Testing Guide</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="tests/testing_guide/#overview">Overview</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tests/testing_guide/#testing-process-in-detail">Testing process in detail</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="tests/plugins/">Plugins Test Cases</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="tests/plugins/#contents">Contents</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="tests/plugins/pqm/">PQM</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/plugins/pqm/#contents">Contents</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/plugins/datalogger/">Datalogger</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/plugins/datalogger/#contents">Contents</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/plugins/dac/">DAC</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/plugins/dac/#contents">Contents</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/plugins/swiot1l/">SWIOT1L</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/plugins/swiot1l/#contents">Contents</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/plugins/adc/">ADC</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/plugins/adc/#contents">Contents</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/plugins/m2k/">ADALM2000</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/plugins/m2k/#contents">Contents</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/plugins/registermap/">Register Map</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/plugins/registermap/#contents">Contents</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/plugins/debugger/">Debugger</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/plugins/debugger/#contents">Contents</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/plugins/jesd/">JESD STATUS</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/plugins/jesd/#contents">Contents</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/plugins/ad936x/">AD936X</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/plugins/ad936x/#contents">Contents</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/plugins/daq2/">DAQ2</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/plugins/daq2/#contents">Contents</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/plugins/ad9084/">AD9084</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/plugins/ad9084/#contents">Contents</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/plugins/ad9371/">AD9371</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/plugins/ad9371/ad9371_tests/">AD9371 Test Suite</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/plugins/ad9371/ad9371_advanced_tests/">AD9371 Advanced Test Suite</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/plugins/ad9371/ad9371_api_tests/">AD9371 API Test Suite</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/plugins/ad9371/ad9371_advanced_api_tests/">AD9371 Advanced Tool API Test Suite</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/plugins/fmcomms5/">FMCOMMS5</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/plugins/fmcomms5/#contents">Contents</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/plugins/fmcomms11/">FMCOMMS11</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/plugins/fmcomms11/#contents">Contents</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/plugins/adrv9002/">ADRV9002 (Jupiter)</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/plugins/adrv9002/#contents">Contents</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/plugins/adrv9009/">ADRV9009</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/plugins/adrv9009/#contents">Contents</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/plugins/ad6676/">AD6676</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/plugins/ad6676/#contents">Contents</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/plugins/imuanalyzer/">IMU Analyzer</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/plugins/imuanalyzer/#contents">Contents</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/plugins/rfpowermeter/">RF Power Meter</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/plugins/rfpowermeter/#contents">Contents</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/plugins/cn0357/">CN0357</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/plugins/cn0357/#contents">Contents</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/plugins/cn0540/">CN0540</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/plugins/cn0540/#contents">Contents</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/plugins/cn0511/">CN0511</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/plugins/cn0511/#contents">Contents</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="tests/general/">General Test Cases</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="tests/general/#contents">Contents</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="tests/general/core/hp_tests/">Homepage</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/hp_tests/#test-1-the-homepage-displays-correctly-when-running-the-application">Test 1: The homepage displays correctly when running the application.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/hp_tests/#test-2-verifying-the-add-device-button">Test 2: Verifying the “Add device” (+) button.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/hp_tests/#test-3-verifying-the-auto-scan-feature-on">Test 3: Verifying the auto-scan feature (ON).</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/hp_tests/#test-4-verifying-the-auto-scan-feature-off">Test 4: Verifying the auto-scan feature (OFF).</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/hp_tests/#test-5-verifying-the-manual-scan-feature">Test 5: Verifying the manual scan feature.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/hp_tests/#test-6-navigation-using-the-buttons-in-the-info-page">Test 6: Navigation using the buttons in the info page.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/hp_tests/#test-7-auto-scan-behavior-when-the-device-is-unplugged">Test 7: Auto-scan behavior when the device is unplugged.</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/general/core/license_about_page_tests/">License and About Page</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/license_about_page_tests/#test-1-check-license-pop-up">Test 1: Check license pop-up</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/license_about_page_tests/#test-2-check-links-from-about-page">Test 2: Check links from About Page</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/general/core/install_tests/">Installers</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/install_tests/#test-1-check-scopy-appimage-x86-64">Test 1: Check Scopy AppImage x86_64</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/install_tests/#test-2-check-scopy-appimage-arm32">Test 2: Check Scopy AppImage arm32</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/install_tests/#test-3-check-if-scopy-appimage-arm64-opens-correctly">Test 3: Check if Scopy AppImage arm64 opens correctly</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/install_tests/#test-4-check-scopy-macos">Test 4: Check Scopy macOS</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/install_tests/#test-5-check-scopy-windows-installer">Test 5: Check Scopy Windows installer</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/general/core/add_dev_tests/">Add device</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/add_dev_tests/#setup-environment">Setup environment:</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/add_dev_tests/#test-1-verifying-the-device-scanning-functionality">Test 1: Verifying the device scanning functionality.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/add_dev_tests/#test-2-verifying-the-local-device-scanning-functionality">Test 2: Verifying the local device scanning functionality.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/add_dev_tests/#test-3-verifying-the-ip-device-scanning-functionality">Test 3: Verifying the ip device scanning functionality.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/add_dev_tests/#test-4-verifying-the-usb-device-scanning-functionality">Test 4: Verifying the usb device scanning functionality.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/add_dev_tests/#test-5-verifying-the-serial-device-scanning-functionality">Test 5: Verifying the serial device scanning functionality.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/add_dev_tests/#test-6-scanning-with-no-device">Test 6: Scanning with no device.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/add_dev_tests/#test-7-device-validation">Test 7: Device validation.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/add_dev_tests/#test-8-verify-the-back-button-from-compatible-plugin-page">Test 8: Verify the “BACK” button from compatible plugin page.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/add_dev_tests/#test-9-verify-the-add-device-button-from-compatible-plugin-page-single-plugin">Test 9: Verify the “ADD DEVICE” button from compatible plugin page (single plugin).</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/add_dev_tests/#test-10-verify-the-add-device-button-from-compatible-plugin-page-multiple-plugins">Test 10: Verify the “ADD DEVICE” button from compatible plugin page (multiple plugins).</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/add_dev_tests/#test-11-verify-the-add-device-button-from-compatible-plugin-page-with-no-plugin-selected">Test 11: Verify the “ADD DEVICE” button from compatible plugin page with no plugin selected.</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/general/core/connection_tests/">Connection flow</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/connection_tests/#setup-environment">Setup environment:</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/connection_tests/#test-1-verify-the-connection-flow">Test 1: Verify the connection flow.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/connection_tests/#test-2-unplug-the-device-while-connecting-auto-scan">Test 2: Unplug the device while connecting (AUTO-SCAN).</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/connection_tests/#test-3-unplug-the-device-while-connecting-manual-scan">Test 3: Unplug the device while connecting (MANUAL-SCAN).</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/connection_tests/#test-4-unplug-the-device-before-connecting">Test 4: Unplug the device before connecting.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/connection_tests/#test-5-disconnecting-a-device">Test 5: Disconnecting a device.</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/general/core/emu_tests/">EMU</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/emu_tests/#test-1-enable-the-emulator">Test 1: Enable the emulator.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/emu_tests/#test-2-emu-is-not-installed">Test 2: EMU is not installed.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/emu_tests/#test-3-disable-the-emulator">Test 3: Disable the emulator.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/emu_tests/#test-4-disable-the-emulator-while-the-emulated-device-is-connected">Test 4: Disable the emulator while the emulated device is connected.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/emu_tests/#test-5-verify-adalm2000-emu-device">Test 5: Verify adalm2000 emu device.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/emu_tests/#test-6-verify-pluto-emu-device">Test 6: Verify pluto emu device.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/emu_tests/#test-7-verify-pqm-emu-device">Test 7: Verify pqm emu device.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/emu_tests/#test-8-verify-swiot-config-emu-device">Test 8: Verify swiot_config emu device.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/emu_tests/#test-9-verify-swiot-runtime-emu-device">Test 9: Verify swiot_runtime emu device.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/emu_tests/#test-10-verify-generic-emu-device">Test 10: Verify generic emu device.</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/general/core/dev_tests/">Device interaction</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/dev_tests/#setup-environment">Setup environment:</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/dev_tests/#test-1-verifying-the-device-button">Test 1: Verifying the device button.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/dev_tests/#test-2-remove-a-device-from-device-browser">Test 2: Remove a device from device browser.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/dev_tests/#test-3-remove-a-device-from-device-browser-while-it-is-connected">Test 3: Remove a device from device browser while it is connected.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/dev_tests/#test-4-edit-the-name-of-the-device">Test 4: Edit the name of the device.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/dev_tests/#test-5-select-a-tool">Test 5: Select a tool.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/dev_tests/#test-6-detach-a-tool">Test 6: Detach a tool.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/dev_tests/#test-7-reopen-the-app-with-a-detached-tool">Test 7: Reopen the app with a detached tool.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/dev_tests/#test-8-collapse-device-tools-in-the-tool-menu">Test 8: Collapse device tools in the tool menu.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/dev_tests/#test-9-connecting-to-multiple-devices">Test 9: Connecting to multiple devices.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/dev_tests/#test-10-resource-manager-with-multiple-devices">Test 10: Resource manager with multiple devices.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/dev_tests/#test-11-devices-order-in-device-browser">Test 11: Devices order in device browser.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/dev_tests/#test-12-device-page-tabbed-interface">Test 12: Device page tabbed interface.</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/core/dev_tests/#test-13-device-reload-with-plugin-changes">Test 13: Device reload with plugin changes.</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/general/instrument_detaching_tests/">Instrument Detaching - Test Suite</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/instrument_detaching_tests/#setup-enviroment">Setup enviroment:</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/instrument_detaching_tests/#test-1-detach-and-reattach-an-instrument">Test 1: Detach and reattach an instrument</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/general/general_preferences_tests/">General Preferences - Test Suite</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/general_preferences_tests/#setup-environment">Setup environment:</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/general_preferences_tests/#test-1-save-load-scopy-session">Test 1 - Save/Load Scopy session</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/general_preferences_tests/#test-2-double-click-to-attach-detach-tool">Test 2 - Double click to attach/detach tool</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/general_preferences_tests/#test-3-save-load-tool-attached-state">Test 3 - Save/Load tool attached state</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/general_preferences_tests/#test-4-double-click-control-buttons-to-open-menu">Test 4 - Double click control buttons to open menu</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/general_preferences_tests/#test-5-enable-opengl-plotting">Test 5 - Enable OpenGL plotting</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/general_preferences_tests/#test-6-enable-menu-animations">Test 6 - Enable menu animations</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/general_preferences_tests/#test-7-enable-the-status-bar-for-displaying-important-messages">Test 7 - Enable the status bar for displaying important messages</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/general_preferences_tests/#test-8-show-grid">Test 8 - Show Grid</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/general_preferences_tests/#test-9-show-graticule">Test 9 - Show Graticule</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/general_preferences_tests/#test-10-use-lazy-loading">Test 10 - Use Lazy Loading</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/general_preferences_tests/#test-11-use-native-dialogs">Test 11 - Use native dialogs</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/general_preferences_tests/#test-12-auto-connect-to-previous-session">Test 12 - Auto-connect to previous session</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/general_preferences_tests/#test-13-font-scale">Test 13 - Font scale</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/general_preferences_tests/#test-14-theme">Test 14 - Theme</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/general_preferences_tests/#test-15-language">Test 15 - Language</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/general_preferences_tests/#test-16-connect-to-multiple-devices">Test 16 - Connect to multiple devices</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/general_preferences_tests/#test-17-regularly-scan-for-new-devices">Test 17 - Regularly scan for new devices</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/general_preferences_tests/#test-18-session-devices">Test 18 - Session devices</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/general_preferences_tests/#test-19-show-plot-fps">Test 19 - Show plot FPS</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/general_preferences_tests/#test-20-plot-target-fps">Test 20 - Plot target FPS</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/general_preferences_tests/#test-21-reset-settings-and-plugins-to-default">Test 21 - Reset settings and plugins to default</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/general/package_manager_tests/">Package Manager - Test Suite</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/package_manager_tests/#test-1-package-discovery-load">Test 1 - Package Discovery Load</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/package_manager_tests/#test-2-package-resource-access">Test 2 - Package Resource Access</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/package_manager_tests/#test-3-package-create">Test 3 - Package Create</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/package_manager_tests/#test-4-package-install">Test 4 - Package Install</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/package_manager_tests/#test-5-package-uninstall">Test 5 - Package Uninstall</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/package_manager_tests/#test-6-backward-compatibility">Test 6 - Backward compatibility</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/package_manager_tests/#test-7-error-handling">Test 7 - Error handling</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/package_manager_tests/#test-8-ui-ux">Test 8 - UI/UX</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/package_manager_tests/#test-9-manual-package-deletion">Test 9 - Manual package deletion</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/package_manager_tests/#test-10-plugin-info-about-page">Test 10 - Plugin info About page</a></li>
-</ul>
-</li>
-<li class="toctree-l5"><a class="reference internal" href="tests/general/scripting_tool/">Scripting Tool - Test Suite</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/scripting_tool/#test-1-enabling-the-scripting-tool-from-preferences">Test 1: Enabling the scripting tool from Preferences</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/scripting_tool/#test-2-scripting-tool-loads-successfully-in-scopy">Test 2: Scripting tool loads successfully in Scopy</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/scripting_tool/#test-3-user-can-run-a-script">Test 3: User can run a script</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/scripting_tool/#test-4-user-can-save-a-script">Test 4: User can save a script</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/scripting_tool/#test-5-user-can-load-a-script">Test 5: User can load a script</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/scripting_tool/#test-6-output-results-are-displayed-in-the-scripting-tool-s-output-panel">Test 6: Output/results are displayed in the scripting tool’s output panel</a></li>
-<li class="toctree-l6"><a class="reference internal" href="tests/general/scripting_tool/#test-7-integration-with-other-scopy-plugins">Test 7: Integration with other Scopy plugins</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="tests/testing_guide/">Testing Guide</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests/plugins/">Plugins Test Cases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests/general/">General Test Cases</a></li>
 </ul>
 </li>
 </ul>
