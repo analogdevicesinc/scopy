@@ -247,25 +247,70 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 		${SCOPY_DEPENDENCIES}
 		${SCOPY_WIN32_RESOURCES}
 	)
-	# Define target properties for Android with Qt 6 as: set_property(TARGET tool_launcher APPEND PROPERTY
-	# QT_ANDROID_PACKAGE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android) For more information, see
+	# Android packaging properties, consumed by androiddeployqt during target finalization.
 	# https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
-else()
+	#
+	# Note QT_ANDROID_ABIS is deliberately NOT set: a multi-ABI build compiles the secondary ABIs as ExternalProject
+	# sub-builds, and CMake cache variables passed on the command line are not forwarded to them unless named in
+	# QT_ANDROID_MULTI_ABI_FORWARD_VARS. Scopy is configured almost entirely through -D flags, so each ABI is built
+	# as its own single-ABI build instead, selecting the ABI via the Qt kit used to configure (android_x86_64 /
+	# android_arm64_v8a).
 	if(ANDROID)
-		add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${SCOPY_RESOURCES} ${SCOPY_DEPENDENCIES})
-		# Define properties for Android with Qt 5 after find_package() calls as: set(ANDROID_PACKAGE_SOURCE_DIR
-		# "${CMAKE_CURRENT_SOURCE_DIR}/android")
-	else()
-		add_executable(
-			${PROJECT_NAME} WIN32
-			${OSX_BUNDLE}
-			${PROJECT_SOURCES}
-			${SCOPY_RESOURCES}
-			${SCOPY_DEPENDENCIES}
-			${EXTRA_BUNDLE_FILES}
-			${SCOPY_WIN32_RESOURCES}
+		# androiddeployqt copies this directory over Qt's own templates, so it is assembled in the build tree
+		# rather than used from the source tree: the data assets below are generated, and android/ must stay
+		# clean.
+		set(SCOPY_ANDROID_PACKAGE_DIR ${CMAKE_BINARY_DIR}/android-package)
+		# versionCode must be a monotonically increasing integer.
+		math(EXPR SCOPY_ANDROID_VERSION_CODE
+		     "${PROJECT_VERSION_MAJOR} * 10000 + ${PROJECT_VERSION_MINOR} * 100 + ${PROJECT_VERSION_PATCH}"
 		)
+		# min 28 is a hard floor in Qt 6.8's androiddeployqt; target 34 is its default and stays within what the
+		# bundled Android Gradle Plugin supports.
+		set_target_properties(
+			${PROJECT_NAME}
+			PROPERTIES QT_ANDROID_PACKAGE_SOURCE_DIR ${SCOPY_ANDROID_PACKAGE_DIR}
+				   QT_ANDROID_MIN_SDK_VERSION 28
+				   QT_ANDROID_TARGET_SDK_VERSION 34
+				   QT_ANDROID_PACKAGE_NAME "org.adi.scopy"
+				   QT_ANDROID_VERSION_NAME "${SCOPY_VERSION}"
+				   QT_ANDROID_VERSION_CODE "${SCOPY_ANDROID_VERSION_CODE}"
+		)
+		# Android only loads lib*.so from the APK's lib/<abi>/ dir, flat and unversioned, and cannot dlopen from
+		# assets:/ or a subdirectory. So every native library a plugin links has to end up in that dir. The
+		# third-party part of the set depends on the dependency staging layout, so it is supplied by the build
+		# (ci/android/android_deps_build.sh collect_extra_libs) rather than hardcoded.
+		if(SCOPY_ANDROID_EXTRA_LIBS)
+			# Beyond this list, androiddeployqt fills lib/<abi>/ from the application binary's recursive
+			# dependency closure. Scopy libraries that only plugins link are in neither place, so they never
+			# reach the APK and every plugin needing them fails to dlopen. Append them explicitly.
+			list(APPEND SCOPY_ANDROID_EXTRA_LIBS "${SCOPY_DLL_BUILD_PATH}/libscopy-iio-widgets.so")
+			# rfpowermeter links the datalogger plugin, which ships as an asset rather than in lib/<abi>/,
+			# and the INSTALL_RPATH it sets does not apply to the build-tree copy that gets staged. Bundling
+			# it here resolves that dependency without relying on datalogger happening to be dlopen'd first.
+			list(APPEND SCOPY_ANDROID_EXTRA_LIBS
+			     "${SCOPY_PACKAGE_BUILD_PATH}/generic-plugins/plugins/libscopy-datalogger.so"
+			)
+			set_target_properties(
+				${PROJECT_NAME} PROPERTIES QT_ANDROID_EXTRA_LIBS "${SCOPY_ANDROID_EXTRA_LIBS}"
+			)
+		else()
+			message(
+				WARNING
+					"SCOPY_ANDROID_EXTRA_LIBS is empty: the APK will ship without plugin/dependency "
+					"native libraries, so the app will start with no plugins and no style."
+			)
+		endif()
 	endif()
+else()
+	add_executable(
+		${PROJECT_NAME} WIN32
+		${OSX_BUNDLE}
+		${PROJECT_SOURCES}
+		${SCOPY_RESOURCES}
+		${SCOPY_DEPENDENCIES}
+		${EXTRA_BUNDLE_FILES}
+		${SCOPY_WIN32_RESOURCES}
+	)
 endif()
 
 if(APPLE)
@@ -292,6 +337,17 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets ${S
 
 if(KF6Archive_FOUND)
 	target_link_libraries(${PROJECT_NAME} PUBLIC KF6::Archive)
+endif()
+
+if(ANDROID)
+	# JNI headers for the QJniObject call in core/src/application_restarter.cpp, and the native libraries the Qt
+	# Widgets stack expects to be linked explicitly on Android. libunwind is required because the NDK does not link
+	# it implicitly: https://android.googlesource.com/platform/ndk/+/master/docs/BuildSystemMaintainers.md#Unwinding
+	find_package(JNI)
+	if(JNI_FOUND)
+		target_include_directories(${PROJECT_NAME} PRIVATE ${JNI_INCLUDE_DIRS})
+	endif()
+	target_link_libraries(${PROJECT_NAME} PRIVATE EGL GLESv2 unwind)
 endif()
 
 # Compiler options
@@ -357,6 +413,36 @@ install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/style DESTINATION ${SCOPY_STYLE_IN
 
 if(QT_VERSION_MAJOR EQUAL 6)
 	qt_finalize_executable(${PROJECT_NAME})
+	if(ANDROID)
+		# Scopy resolves style/translations/packages from $APPDATA on Android, which ScopyApplication.java
+		# points at the app cache dir and Helpers.java fills from the APK assets on first run. So those three
+		# trees have to ship as assets.
+		#
+		# The packages/ tree is copied complete, plugin .so files included: PkgManager discovers plugins by
+		# listing <pkg>/plugins/ and the manifest does not name them, and those extracted copies are what
+		# PluginManager dlopen's. lib/<abi>/ carries no plugin at all, only the libraries the plugins link
+		# against - which is why QT_ANDROID_EXTRA_LIBS above has to name the ones nothing else pulls in.
+		add_custom_target(
+			scopy_android_package ALL
+			COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/android
+				${SCOPY_ANDROID_PACKAGE_DIR}
+			COMMAND ${CMAKE_COMMAND} -E copy_directory ${SCOPY_STYLE_BUILD_PATH}
+				${SCOPY_ANDROID_PACKAGE_DIR}/assets/style
+			COMMAND ${CMAKE_COMMAND} -E copy_directory ${SCOPY_TRANSLATION_BUILD_PATH}
+				${SCOPY_ANDROID_PACKAGE_DIR}/assets/translations
+			COMMAND ${CMAKE_COMMAND} -E copy_directory ${SCOPY_PACKAGE_BUILD_PATH}
+				${SCOPY_ANDROID_PACKAGE_DIR}/assets/packages
+			COMMENT "Staging Android package source dir and data assets"
+		)
+		# Plugins are loaded at runtime, so nothing links them and the build system has no reason to finish them
+		# before the copy above. Order it explicitly against every package/plugin target (recorded by
+		# PackageUtils.cmake), otherwise a clean build can stage an incomplete packages/ tree.
+		get_property(SCOPY_PACKAGE_TARGETS GLOBAL PROPERTY SCOPY_PACKAGE_TARGETS)
+		if(SCOPY_PACKAGE_TARGETS)
+			add_dependencies(scopy_android_package ${SCOPY_PACKAGE_TARGETS})
+		endif()
+		add_dependencies(${PROJECT_NAME}_make_apk scopy_android_package)
+	endif()
 endif()
 
 # make uninstall
