@@ -129,6 +129,17 @@ QString variantToString(const QVariant &v);
 MenuSectionCollapseWidget *makeSection(const QString &title, QWidget *parent, bool collapsed = false);
 QTableWidget *makeTable(const QStringList &headers, QWidget *parent);
 
+// Instrument views a node panel may show; each one can be turned off in the preferences.
+namespace viewprefs {
+constexpr const char *ACQUISITION = "dcdebugger_view_acquisition";
+constexpr const char *GENERATOR = "dcdebugger_view_generator";
+constexpr const char *MONITOR = "dcdebugger_view_monitor";
+constexpr const char *REGISTERS = "dcdebugger_view_registers";
+
+void initPreferences();
+bool enabled(const char *id);
+} // namespace viewprefs
+
 } // namespace scopy::dcdebugger
 
 #endif // NODEPANEL_H

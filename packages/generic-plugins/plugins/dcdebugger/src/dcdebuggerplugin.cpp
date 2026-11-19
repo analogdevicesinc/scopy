@@ -22,6 +22,7 @@
 #include "dcdebuggerplugin.h"
 
 #include "dcdebuggertool.h"
+#include "nodepanel.h"
 #include "log/commandlogview.h"
 #include "readpolicy.h"
 
@@ -55,6 +56,7 @@ void DCDebuggerPlugin::init()
 {
 	CommandLogView::initPreferences();
 	ReadPolicy::initPreferences();
+	viewprefs::initPreferences();
 }
 
 bool DCDebuggerPlugin::loadPreferencesPage()
@@ -80,6 +82,25 @@ bool DCDebuggerPlugin::loadPreferencesPage()
 		"selection only\" reads an attribute once, if it has no cached value yet; \"On every selection\" "
 		"reads them each time. The Refresh button and the per-attribute read buttons always read.",
 		ReadPolicy::options(), generalSection));
+
+	MenuSectionWidget *viewsWidget = new MenuSectionWidget(m_preferencesPage);
+	MenuCollapseSection *viewsSection = new MenuCollapseSection("Views", MenuCollapseSection::MHCW_NONE,
+								    MenuCollapseSection::MHW_BASEWIDGET, viewsWidget);
+	viewsWidget->contentLayout()->setSpacing(10);
+	viewsWidget->contentLayout()->addWidget(viewsSection);
+	viewsSection->contentLayout()->setSpacing(10);
+	lay->insertWidget(1, viewsWidget);
+
+	const QList<QPair<const char *, QString>> views = {{viewprefs::ACQUISITION, "Acquisition"},
+							   {viewprefs::GENERATOR, "Generator"},
+							   {viewprefs::MONITOR, "Monitor"},
+							   {viewprefs::REGISTERS, "Registers"}};
+	for(const auto &[id, name] : views) {
+		viewsSection->contentLayout()->addWidget(PREFERENCE_CHECK_BOX(
+			p, id, "Enable " + name + " view",
+			"Show the " + name + " view in the node panel. Applies to panels opened afterwards.",
+			viewsSection));
+	}
 	return true;
 }
 

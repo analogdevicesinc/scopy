@@ -48,6 +48,7 @@
 #include <gui/docking/dockablearea.h>
 #include <gui/docking/dockwrapper.h>
 #include <menusectionwidget.h>
+#include <pluginbase/preferences.h>
 #include <style.h>
 #include <widgets/animatedrefreshbtn.h>
 
@@ -432,23 +433,37 @@ NodePanel *scopy::dcdebugger::createNodePanel(QObject *node, NodeKind kind, cons
 	QObject::connect(panel, &NodePanel::selected, props, &PropertiesSection::refresh);
 	panel->addSection(props);
 
-	if(auto *in = qobject_cast<component::InputStream *>(node)) {
-		panel->setMainView("Acquisition", new AcquisitionView(in, panel));
-	} else if(auto *out = qobject_cast<component::OutputStream *>(node)) {
-		panel->setMainView("Generator", new GeneratorView(out, panel));
+	auto *in = qobject_cast<component::InputStream *>(node);
+	auto *out = qobject_cast<component::OutputStream *>(node);
+	if(in || out) {
+		if(in && viewprefs::enabled(viewprefs::ACQUISITION)) {
+			panel->setMainView("Acquisition", new AcquisitionView(in, panel));
+		} else if(out && viewprefs::enabled(viewprefs::GENERATOR)) {
+			panel->setMainView("Generator", new GeneratorView(out, panel));
+		}
 	} else if(auto *ping = qobject_cast<component::Ping *>(node)) {
 		auto *view = new PingView(ping, panel);
 		QObject::connect(panel, &NodePanel::refreshRequested, view, &PingView::refresh);
 		QObject::connect(panel, &NodePanel::selected, view, &PingView::refresh);
 		panel->setMainView("Ping", view);
-	} else if((kind == NodeKind::Context || kind == NodeKind::Device) &&
+	} else if((kind == NodeKind::Context || kind == NodeKind::Device) && viewprefs::enabled(viewprefs::MONITOR) &&
 		  !MonitorView::monitorableChannels(node).isEmpty()) {
 		panel->setMainView("Monitor", new MonitorView(node, panel));
 	}
-	if((kind == NodeKind::Context || kind == NodeKind::Device) && !RegisterView::targetsOf(node).isEmpty()) {
+	if((kind == NodeKind::Context || kind == NodeKind::Device) && viewprefs::enabled(viewprefs::REGISTERS) &&
+	   !RegisterView::targetsOf(node).isEmpty()) {
 		panel->setMainView("Registers", new RegisterView(node, panel));
 	}
 	return panel;
 }
+
+void viewprefs::initPreferences()
+{
+	for(const char *id : {ACQUISITION, GENERATOR, MONITOR, REGISTERS}) {
+		Preferences::init(id, true);
+	}
+}
+
+bool viewprefs::enabled(const char *id) { return Preferences::get(id).toBool(); }
 
 #include "moc_nodepanel.cpp"
