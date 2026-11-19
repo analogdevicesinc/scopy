@@ -68,7 +68,7 @@ Max14906::Max14906(QString uri, ToolMenuEntry *tme, QWidget *parent)
 
 		connect(infoBtn->getDocumentationButton(), &QAbstractButton::clicked, this, [=, this]() {
 			QDesktopServices::openUrl(
-				QUrl("https://analogdevicesinc.github.io/scopy/plugins/swiot1l/max14906.html"));
+				QUrl("https://analogdevicesinc.github.io/scopy/plugins/swiot1l/max14906/index.html"));
 		});
 	});
 	m_configBtn = createConfigBtn(this);

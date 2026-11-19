@@ -71,7 +71,8 @@ WaveformInstrument::WaveformInstrument(ToolMenuEntry *tme, QString uri, QWidget 
 	InfoBtn *infoBtn = new InfoBtn(this);
 	tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
 	connect(infoBtn, &QAbstractButton::clicked, this, [=, this]() {
-		QDesktopServices::openUrl(QUrl("https://analogdevicesinc.github.io/scopy/plugins/pqm/waveform.html"));
+		QDesktopServices::openUrl(
+			QUrl("https://analogdevicesinc.github.io/scopy/plugins/pqm/waveform/index.html"));
 	});
 
 	QWidget *dockableAreaWidget = m_dockableArea->asWidget();

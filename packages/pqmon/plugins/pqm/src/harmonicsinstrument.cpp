@@ -64,7 +64,8 @@ HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidge
 	InfoBtn *infoBtn = new InfoBtn(this);
 	tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
 	connect(infoBtn, &QAbstractButton::clicked, this, [=, this]() {
-		QDesktopServices::openUrl(QUrl("https://analogdevicesinc.github.io/scopy/plugins/pqm/harmonics.html"));
+		QDesktopServices::openUrl(
+			QUrl("https://analogdevicesinc.github.io/scopy/plugins/pqm/harmonics/index.html"));
 	});
 
 	// create dockable area

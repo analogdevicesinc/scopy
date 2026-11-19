@@ -170,7 +170,7 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 	// Build the flowgraph only once
 	m_initFlowgraph = false;
 
-	ui->btnHelp->setUrl("https://analogdevicesinc.github.io/scopy/plugins/m2k/network_analyzer.html");
+	ui->btnHelp->setUrl("https://analogdevicesinc.github.io/scopy/plugins/m2k/network_analyzer/index.html");
 }
 
 NetworkAnalyzer::NetworkAnalyzer(libm2k::context::M2k *m2k, QString uri, Filter *filt, ToolMenuEntry *tme,

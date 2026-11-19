@@ -510,7 +510,7 @@ SignalGenerator::SignalGenerator(libm2k::context::M2k *m2k, QString uri, Filter 
 
 	readPreferences();
 
-	ui->btnHelp->setUrl("https://analogdevicesinc.github.io/scopy/plugins/m2k/signal_generator.html");
+	ui->btnHelp->setUrl("https://analogdevicesinc.github.io/scopy/plugins/m2k/signal_generator/index.html");
 
 	m_plot->setOffsetHandleVisible(0, false);
 	m_plot->setOffsetHandleVisible(1, false);

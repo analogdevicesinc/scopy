@@ -881,7 +881,7 @@ Oscilloscope::Oscilloscope(libm2k::context::M2k *m2k, QString uri, Filter *filt,
 	connect(&plot, SIGNAL(leftGateChanged(double)), SLOT(onLeftGateChanged(double)));
 	connect(&plot, SIGNAL(rightGateChanged(double)), SLOT(onRightGateChanged(double)));
 
-	ui->btnHelp->setUrl("https://analogdevicesinc.github.io/scopy/plugins/m2k/oscilloscope.html");
+	ui->btnHelp->setUrl("https://analogdevicesinc.github.io/scopy/plugins/m2k/oscilloscope/index.html");
 
 #ifdef __ANDROID__
 	ui->btnAddMath->setIconSize(QSize(24, 24));
