@@ -269,11 +269,15 @@ QString Style::getAttribute(const char *key)
 
 QColor Style::getChannelColor(int index)
 {
-	QList<QColor> list = getChannelColorList();
-	if(list.count() <= index)
+	const QList<QColor> list = getChannelColorList();
+	if(list.isEmpty() || index < 0)
 		return QColor();
+	if(index < list.count())
+		return list[index];
 
-	return getChannelColorList()[index];
+	// Each lap past the palette turns the hue a quarter and goes paler, so laps stay apart.
+	const QColor color = getChannelColor(index - list.count());
+	return QColor::fromHsv((color.hsvHue() + 90) % 360, color.hsvSaturation(), color.value()).lighter(130);
 }
 
 QList<QColor> Style::getChannelColorList()
