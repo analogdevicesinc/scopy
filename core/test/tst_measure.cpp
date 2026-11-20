@@ -18,7 +18,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <core/acq_engine/datastore.h>
 #include <core/acq_engine/measure.h>
+#include <core/acq_engine/measureprocessor.h>
+
+#include <QSignalSpy>
 
 #include <QTest>
 #include <QVector>
@@ -37,6 +41,7 @@ private Q_SLOTS:
 	void gate();
 	void flatSignalHasNoPeriod();
 	void namesAndUnits();
+	void processorKeepsStatistics();
 
 private:
 	static QVector<float> sine(int n, double periodSamples, double amplitude, double offset);
@@ -148,6 +153,34 @@ void TST_Measure::namesAndUnits()
 	QCOMPARE(measureUnit(Measure::Frequency), QStringLiteral("Hz"));
 	QCOMPARE(measureUnit(Measure::PosDuty), QStringLiteral("%"));
 	QCOMPARE(measureName(Measure::NegDuty), QStringLiteral("-Duty"));
+}
+
+void TST_Measure::processorKeepsStatistics()
+{
+	const DataKey key = DataKey::raw(QStringLiteral("osc"), QStringLiteral("ch1"));
+	DataStore store;
+	MeasureProcessor proc;
+	proc.setWatchedKeys({key});
+	proc.setSampleRate(1e3);
+	proc.setEmitInterval(0);
+	QSignalSpy spy(&proc, &MeasureProcessor::measured);
+	store.write(key, QVector<float>(100, 1.0f));
+	proc.process(&store);
+	store.write(key, QVector<float>(100, 3.0f));
+	proc.process(&store);
+	QCOMPARE(spy.count(), 2);
+	MeasureSnapshot snap = spy.last().first().value<MeasureSnapshot>();
+	QCOMPARE(snap.key, key);
+	const MeasureStat &mean = snap.stats[static_cast<int>(Measure::Mean)];
+	QCOMPARE(mean.count, 2);
+	QCOMPARE(mean.average, 2.0);
+	QCOMPARE(mean.min, 1.0);
+	QCOMPARE(mean.max, 3.0);
+
+	proc.clearStats();
+	proc.process(&store);
+	snap = spy.last().first().value<MeasureSnapshot>();
+	QCOMPARE(snap.stats[static_cast<int>(Measure::Mean)].count, 1);
 }
 
 QTEST_MAIN(TST_Measure)
