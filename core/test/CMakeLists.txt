@@ -29,6 +29,7 @@ setup_scopy_tests(
 	spectrumprocessor
 	acqmarkercontroller
 	acquisitionerrors
+	measure
 )
 
 # test_translationsrepository
