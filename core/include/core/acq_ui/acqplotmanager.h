@@ -166,11 +166,6 @@ public:
 	// in its constructor and cannot be retargeted, so a single controller could only ever
 	// serve one plot, which is what the old instrument-wide "Cursors" button did.
 
-	// There are deliberately no measurement or stats panels. Measurements are not part of
-	// this instrument: nothing here computes one, no channel kind offers a selector for one,
-	// and no slot is reserved for a readout. See acqchannel.h for the same note on the
-	// channel side.
-
 	// The timeline for channels whose producer declared none — a raw ADC channel,
 	// where the source block does not know the device rate. Set by the controller,
 	// which is the only thing that knows the pipeline. A channel whose StreamInfo

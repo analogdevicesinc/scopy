@@ -218,10 +218,6 @@ public:
 	void setKeyPresent(bool present);
 
 	// ---- settings ------------------------------------------------------------
-	//
-	// There is deliberately no measurement API here — no manager, no selector, no
-	// per-cycle measure() call. Measurements are not part of this instrument yet, and a
-	// hook with nothing behind it is a hook that gets maintained for nothing.
 
 	// A generic CHANNEL section (name, colour, key readout) stacked over the kind's
 	// own section, the way Block::withBaseSettings() composes
