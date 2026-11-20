@@ -33,6 +33,7 @@ namespace scopy {
 namespace acq {
 
 // Processor that applies per-channel linear transform: output[i] = scale * input[i] + offset.
+// Channels whose input is not watched are skipped.
 // Reads <inputKey> from the DataStore, writes the result to <outputKey>.
 // scale and offset are set from the GUI thread and read from the worker thread via atomics.
 class SCOPY_CORE_EXPORT ScaleOffsetProcessor : public ProcessorBlock
@@ -46,6 +47,8 @@ public:
 		QString label;
 		std::atomic<float> scale{1.0f};
 		std::atomic<float> offset{0.0f};
+		// Subtracts each chunk's mean before the scale.
+		std::atomic<bool> acCoupled{false};
 
 		// Non-copyable, non-movable (atomic members)
 		ChannelConfig(const ChannelConfig &) = delete;

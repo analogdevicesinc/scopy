@@ -26,6 +26,8 @@
 
 #include <QWidget>
 
+#include <numeric>
+
 namespace scopy {
 namespace acq {
 
@@ -55,13 +57,19 @@ QList<DataKey> ScaleOffsetProcessor::outputKeys() const
 
 void ScaleOffsetProcessor::process(DataStore *store)
 {
+	const QList<DataKey> watched = watchedKeys();
 	for(ChannelConfig *cfg : m_channels) {
+		if(!watched.contains(cfg->inputKey))
+			continue;
 		const auto src = store->latestFloat(cfg->inputKey);
-		if(!src)
+		if(!src || src->isEmpty())
 			continue;
 
 		const float scale = cfg->scale.load(std::memory_order_relaxed);
-		const float offset = cfg->offset.load(std::memory_order_relaxed);
+		const float mean = cfg->acCoupled.load(std::memory_order_relaxed)
+			? std::accumulate(src->cbegin(), src->cend(), 0.0) / src->size()
+			: 0.0f;
+		const float offset = cfg->offset.load(std::memory_order_relaxed) - scale * mean;
 
 		QVector<float> out(src->size());
 		for(int i = 0; i < src->size(); ++i)
