@@ -146,7 +146,6 @@ private:
 	void selectMarker(int ch, int idx);
 	void refreshSelectedMarker();
 	void updateProgress();
-	void restartIfRunning(const std::function<void()> &change);
 	void updateRunEnabled() override;
 
 	void addReference(const QString &name, const scopy::acq::DataKey &key, const scopy::acq::DataKey &xKey,

@@ -84,6 +84,7 @@ file(
 	../src/m2kBackend/*.cpp
 	../src/spectrum/*.cpp
 	../src/m2kinstrumentcontroller.cpp
+	../src/uihelpers.cpp
 	../src/m2ksource.cpp
 )
 file(GLOB SPECTRUM_HW_HDR ../include/${SCOPY_MODULE}/m2kBackend/*.h ../include/${SCOPY_MODULE}/spectrum/*.h)
@@ -106,6 +107,7 @@ file(
 	../src/m2kBackend/*.cpp
 	../src/logic/*.cpp
 	../src/m2kinstrumentcontroller.cpp
+	../src/uihelpers.cpp
 	../src/m2ksource.cpp
 )
 file(GLOB LOGIC_HW_HDR ../include/${SCOPY_MODULE}/m2kBackend/*.h ../include/${SCOPY_MODULE}/logic/*.h)

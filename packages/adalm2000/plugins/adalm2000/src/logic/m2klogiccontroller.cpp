@@ -25,6 +25,7 @@
 #include "m2kcontext.h"
 #include "m2ksource.h"
 #include "m2ktriggermath.h"
+#include "uihelpers.h"
 
 #include <core/acq_engine/acquisitionengine.h>
 #include <core/acq_engine/datastore.h>
@@ -85,6 +86,7 @@
 
 using namespace scopy;
 using namespace scopy::adalm2000;
+using namespace scopy::adalm2000::ui;
 using scopy::acq::DataKey;
 
 namespace {
@@ -134,16 +136,6 @@ MenuCombo *conditionCombo(const QString &label, QWidget *parent)
 		combo->combo()->addItem(c.first, c.second);
 	}
 	return combo;
-}
-
-QWidget *withStretch(QWidget *content)
-{
-	auto *w = new QWidget();
-	auto *lay = new QVBoxLayout(w);
-	lay->setContentsMargins(0, 0, 0, 0);
-	lay->addWidget(content);
-	lay->addStretch();
-	return w;
 }
 
 gui::MenuSpinbox *samplesSpin(const QString &name, int value, int max, QWidget *parent)
@@ -218,21 +210,7 @@ void M2kLogicController::setupPlots()
 	MenuControlButton *trig = it->addChannelRow(group, tr("Trigger"), QColor(), QStringLiteral("trigger"));
 	m_trigEnable = trig->checkBox();
 	m_trigEnable->setChecked(true);
-	// The status goes under the name rather than beside it, so the row stays narrow.
-	m_trigStatus = new QLabel(trig);
-	m_trigStatus->setAttribute(Qt::WA_TransparentForMouseEvents);
-	Style::setStyle(m_trigStatus, style::properties::label::subtle);
-	auto *nameCol = new QVBoxLayout();
-	nameCol->setSpacing(0);
-	const int at = trig->layout()->indexOf(trig->label());
-	trig->layout()->removeWidget(trig->label());
-	trig->layout()->insertLayout(at, nameCol);
-	nameCol->addWidget(trig->label());
-	nameCol->addWidget(m_trigStatus);
-	QMargins m = trig->layout()->contentsMargins();
-	m.setTop(m.top() / 2);
-	m.setBottom(m.bottom() / 2);
-	trig->layout()->setContentsMargins(m);
+	m_trigStatus = addRowStatus(trig);
 	m_trigWaitTimer = new QTimer(this);
 	m_trigWaitTimer->setSingleShot(true);
 	connect(m_trigWaitTimer, &QTimer::timeout, this, [this]() { setTriggerStatus(tr("Waiting")); });
@@ -268,7 +246,7 @@ void M2kLogicController::setupDecoders()
 	row->checkBox()->setVisible(false);
 	MenuSectionCollapseWidget *section = it->createMenuSection(tr("DECODERS"), SO_CH);
 	section->add(decoders());
-	it->addMenuPage(QStringLiteral("decoders"), withStretch(section));
+	it->addMenuPage(QStringLiteral("decoders"), withStretch({section}));
 
 	scopy::decoder::DecoderManager *mgr = decoders()->manager();
 	mgr->setDecoderWindowSize(m_plotWindow);
@@ -465,7 +443,7 @@ QWidget *M2kLogicController::buildGeneralPage()
 	connect(m_delaySpin, &gui::MenuSpinbox::valueChanged, this, [this](double v) { setDelay(qRound(v)); });
 	connect(m_buffersSwitch->onOffswitch(), &QAbstractButton::toggled, m_plot,
 		&scopy::adc::AcqPlot::setShowBufferStarts);
-	return withStretch(section);
+	return withStretch({section});
 }
 
 QWidget *M2kLogicController::buildTriggerPage()
@@ -555,7 +533,7 @@ QWidget *M2kLogicController::buildCursorsPage()
 	settings->getXEn()->setChecked(false);
 	m_plot->setShowCursors(true);
 	section->add(settings);
-	return withStretch(section);
+	return withStretch({section});
 }
 
 void M2kLogicController::onStarted()
@@ -616,18 +594,6 @@ void M2kLogicController::single()
 		return;
 	}
 	m_ui->single(static_cast<unsigned int>((m_plotWindow + m_bufferSize - 1) / m_bufferSize));
-}
-
-void M2kLogicController::restartIfRunning(const std::function<void()> &change)
-{
-	const bool running = m_ui->engine()->isRunning();
-	if(running) {
-		m_ui->stop();
-	}
-	change();
-	if(running) {
-		m_ui->run();
-	}
 }
 
 void M2kLogicController::setSampleRate(double hz)
@@ -774,7 +740,7 @@ void M2kLogicController::addDecoderRow(const QString &uid)
 	const QString menuId = QStringLiteral("decoder:") + uid;
 	MenuSectionCollapseWidget *section = it->createMenuSection(uid.toUpper(), SO_CH);
 	section->add(editor);
-	it->addMenuPage(menuId, withStretch(section));
+	it->addMenuPage(menuId, withStretch({section}));
 	MenuControlButton *row = it->addChannelRow(it->addChannelGroup(kDecodersGroup), uid, QColor(), menuId, 0,
 						   InstrumentTemplate::CRS_SMALL);
 	row->checkBox()->setChecked(true);

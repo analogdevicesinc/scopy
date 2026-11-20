@@ -28,8 +28,6 @@
 #include <QPointer>
 #include <QString>
 
-#include <functional>
-
 class QAbstractButton;
 class QLabel;
 class QScrollBar;
@@ -108,7 +106,6 @@ private:
 	void setDelay(int samples);
 	void applySweep();
 	void applyXTransform();
-	void restartIfRunning(const std::function<void()> &change);
 
 	void addDecode(const scopy::acq::DataKey &key);
 	void removeDecodes(const QList<scopy::acq::DataKey> &keys);

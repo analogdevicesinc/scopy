@@ -30,10 +30,13 @@
 #include <gui/semiexclusivebuttongroup.h>
 #include <gui/style.h>
 #include <gui/widgets/hoverwidget.h>
+#include <gui/widgets/menucontrolbutton.h>
 #include <gui/widgets/toolbuttons.h>
 #include <pluginbase/statusbarmanager.h>
 
+#include <QLabel>
 #include <QPushButton>
+#include <QVBoxLayout>
 
 using namespace scopy;
 using namespace scopy::adalm2000;
@@ -124,6 +127,37 @@ void M2kInstrumentController::addHoverButton(const QString &label, QWidget *cont
 		hover->setVisible(on);
 		hover->raise();
 	});
+}
+
+QLabel *M2kInstrumentController::addRowStatus(MenuControlButton *row)
+{
+	auto *status = new QLabel(row);
+	status->setAttribute(Qt::WA_TransparentForMouseEvents);
+	Style::setStyle(status, style::properties::label::subtle);
+	auto *nameCol = new QVBoxLayout();
+	nameCol->setSpacing(0);
+	const int at = row->layout()->indexOf(row->label());
+	row->layout()->removeWidget(row->label());
+	row->layout()->insertLayout(at, nameCol);
+	nameCol->addWidget(row->label());
+	nameCol->addWidget(status);
+	QMargins m = row->layout()->contentsMargins();
+	m.setTop(m.top() / 2);
+	m.setBottom(m.bottom() / 2);
+	row->layout()->setContentsMargins(m);
+	return status;
+}
+
+void M2kInstrumentController::restartIfRunning(const std::function<void()> &change)
+{
+	const bool running = m_ui->engine()->isRunning();
+	if(running) {
+		m_ui->stop();
+	}
+	change();
+	if(running) {
+		m_ui->run();
+	}
 }
 
 bool M2kInstrumentController::claim()

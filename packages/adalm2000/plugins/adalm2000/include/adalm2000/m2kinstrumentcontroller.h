@@ -26,9 +26,13 @@
 
 #include <QString>
 
+#include <functional>
+
+class QLabel;
 class QWidget;
 
 namespace scopy {
+class MenuControlButton;
 class SemiExclusiveButtonGroup;
 namespace component {
 class Ping;
@@ -57,6 +61,9 @@ protected:
 
 	// A bottom-rail toggle showing `content` as a hover over the plot.
 	void addHoverButton(const QString &label, QWidget *content);
+	// A status line under the row's name, keeping the row narrow.
+	static QLabel *addRowStatus(MenuControlButton *row);
+	void restartIfRunning(const std::function<void()> &change);
 
 	M2kContext *m_ctx{nullptr};
 	bool m_calibrating{false};

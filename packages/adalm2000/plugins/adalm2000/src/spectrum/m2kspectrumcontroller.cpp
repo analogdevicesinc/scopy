@@ -24,6 +24,7 @@
 #include "m2kcomponentbuilder.h"
 #include "m2kcontext.h"
 #include "m2ksource.h"
+#include "uihelpers.h"
 
 #include <core/acq_engine/acquisitionengine.h>
 #include <core/acq_engine/datastore.h>
@@ -88,6 +89,7 @@ Q_LOGGING_CATEGORY(CAT_M2K_SPECTRUM, "M2kSpectrumController")
 
 using namespace scopy;
 using namespace scopy::adalm2000;
+using namespace scopy::adalm2000::ui;
 using scopy::acq::DataKey;
 using scopy::acq::SpectrumProcessor;
 
@@ -116,15 +118,7 @@ const QList<QPair<QString, int>> kWindows = {
 	{QStringLiteral("Rectangular"), GnWindowNoWindow},
 };
 
-QString channelName(int ch) { return QStringLiteral("CH%1").arg(ch + 1); }
 QString menuIdFor(int ch) { return QStringLiteral("ch%1").arg(ch); }
-
-QPushButton *button(const QString &text, QWidget *parent)
-{
-	auto *b = new QPushButton(text, parent);
-	Style::setStyle(b, style::properties::button::basicButton);
-	return b;
-}
 
 gui::MenuSpinbox *hzSpin(const QString &name, double v, double min, QWidget *parent)
 {
@@ -763,18 +757,6 @@ void M2kSpectrumController::onStopped()
 	}
 	m_specPlot->replot();
 	m_wfPlot->replot();
-}
-
-void M2kSpectrumController::restartIfRunning(const std::function<void()> &change)
-{
-	const bool running = m_ui->engine()->isRunning();
-	if(running) {
-		m_ui->stop();
-	}
-	change();
-	if(running) {
-		m_ui->run();
-	}
 }
 
 void M2kSpectrumController::setChannelEnabled(int ch, bool on) { m_chRow[ch]->checkBox()->setChecked(on); }
