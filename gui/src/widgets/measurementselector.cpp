@@ -28,7 +28,7 @@
 #include <QSignalBlocker>
 #include <QVBoxLayout>
 
-#include <stylehelper.h>
+#include <style.h>
 
 using namespace scopy;
 MeasurementSelector::MeasurementSelector(QWidget *parent)
@@ -114,7 +114,13 @@ MeasurementSelectorItem::MeasurementSelectorItem(QString name, QString iconPath,
 	lay->setStretch(1, 5);
 	lay->setStretch(2, 1);
 	lay->setStretch(3, 1);
-	StyleHelper::MeasurementSelectorItemWidget(iconPath, this, "MeasurementSelectorItem" + name);
+	setObjectName("MeasurementSelectorItem" + name);
+	lay->setContentsMargins(0, 0, 0, 0);
+	lay->setSpacing(0);
+	m_icon->setPixmap(iconPath);
+	m_icon->setFixedSize(24, 24);
+	m_name->setContentsMargins(5, 0, 0, 0);
+	Style::setStyle(m_name, style::properties::label::menuMedium);
 }
 
 MeasurementSelectorItem::~MeasurementSelectorItem() {}

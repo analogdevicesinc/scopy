@@ -20,6 +20,7 @@
 #include "widgets/measurementlabel.h"
 
 #include <QLabel>
+#include <cmath>
 #include <style.h>
 
 using namespace scopy;
@@ -48,8 +49,7 @@ MeasurementLabel::MeasurementLabel(QWidget *parent)
 	lay->addWidget(m_valueLabel);
 	m_valueLabel->setAlignment(Qt::AlignRight);
 
-	m_color = Style::getAttribute(json::theme::content_default);
-	StyleHelper::MeasurementPanelLabel(this, m_name + "MeasurementLabel");
+	setColor(Style::getAttribute(json::theme::content_default));
 }
 
 MeasurementLabel::~MeasurementLabel() {}
@@ -67,11 +67,18 @@ void MeasurementLabel::setPrecision(int val) { m_precision = val; }
 void MeasurementLabel::setColor(QColor color)
 {
 	m_color = color;
-	StyleHelper::MeasurementPanelLabel(this, m_name + "MeasurementLabel");
+	setObjectName(m_name + "MeasurementLabel");
+	const QString css = QStringLiteral("color: %1;").arg(m_color.name());
+	m_nameLabel->setStyleSheet(css);
+	m_valueLabel->setStyleSheet(css);
 }
 
 void MeasurementLabel::setValue(double val)
 {
+	if(std::isnan(val)) {
+		m_valueLabel->setText("---");
+		return;
+	}
 	if(!m_formatter) {
 		m_valueLabel->setText(QString::number(val, 'g', m_precision) + " " + m_unit);
 	} else {
@@ -131,11 +138,22 @@ void StatsLabel::setPrecision(int val) { m_precision = val; }
 void StatsLabel::setColor(QColor color)
 {
 	m_color = color;
-	StyleHelper::StatsPanelLabel(this, m_name + "MeasurementLabel");
+	setObjectName(m_name + "MeasurementLabel");
+	const QString size = QStringLiteral("font-size: %1;").arg(Style::getAttribute(json::global::font_size_0_5));
+	m_nameLabel->setStyleSheet(size + QStringLiteral("color: %1;").arg(m_color.name()));
+	m_avgLabel->setStyleSheet(size);
+	m_minLabel->setStyleSheet(size);
+	m_maxLabel->setStyleSheet(size);
 }
 
 void StatsLabel::setValue(double avg, double min, double max)
 {
+	if(std::isnan(avg)) {
+		m_avgLabel->setText("Avg: ---");
+		m_minLabel->setText("Min: ---");
+		m_maxLabel->setText("Max: ---");
+		return;
+	}
 	if(!m_formatter) {
 		m_avgLabel->setText("Avg: " + QString::number(avg, 'g', m_precision) + " " + m_unit);
 		m_minLabel->setText("Min: " + QString::number(min, 'g', m_precision) + " " + m_unit);
