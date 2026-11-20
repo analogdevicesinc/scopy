@@ -152,9 +152,14 @@ MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, dou
 	m_max = max;
 	m_scaleMin = min;
 	m_scaleMax = max;
-	setScaleRange(m_scaleMin, m_scaleMax);
-	setValue(val);
 	m_scalingEnabled = true;
+	setScaleRange(m_scaleMin, m_scaleMax);
+	{
+		// Zero keeps whatever prefix is selected, so start on the plain unit.
+		QSignalBlocker block(m_scaleCb);
+		m_scaleCb->setCurrentIndex(std::max(0, m_scaleCb->findData(1.0)));
+	}
+	setValueForce(val, true);
 	m_incrementStrategy->setScale(stepScale());
 	m_mouseWheelGuard->installEventRecursively(this);
 }
