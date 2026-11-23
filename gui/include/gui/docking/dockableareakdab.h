@@ -40,6 +40,8 @@ public:
 	~DockableArea() override = default;
 
 	void addDockWrapper(DockWrapperInterface *wrapper, Direction direction = Direction_RIGHT) override;
+	void addDockWrapperBeside(DockWrapperInterface *wrapper, DockWrapperInterface *relativeTo,
+				  Direction direction) override;
 	QWidget *asWidget() override { return this; }
 
 private:

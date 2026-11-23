@@ -41,6 +41,11 @@ public:
 
 	virtual ~DockableAreaInterface() = default;
 	virtual void addDockWrapper(DockWrapperInterface *, Direction = Direction_RIGHT) = 0;
+	// Docks next to `relativeTo` where the area supports nesting.
+	virtual void addDockWrapperBeside(DockWrapperInterface *w, DockWrapperInterface *, Direction d)
+	{
+		addDockWrapper(w, d);
+	}
 	virtual QWidget *asWidget() = 0;
 };
 } // namespace scopy

@@ -51,6 +51,19 @@ void DockableArea::addDockWrapper(DockWrapperInterface *dockWrapper, Direction d
 	}
 }
 
+void DockableArea::addDockWrapperBeside(DockWrapperInterface *dockWrapper, DockWrapperInterface *relativeTo,
+					Direction direction)
+{
+	auto *w = dynamic_cast<KDDockWidgets::QtWidgets::DockWidget *>(dockWrapper);
+	auto *rel = dynamic_cast<KDDockWidgets::QtWidgets::DockWidget *>(relativeTo);
+	if(!w || !rel) {
+		addDockWrapper(dockWrapper, direction);
+		return;
+	}
+	w->setAffinities({uniqueName()});
+	addDockWidget(w, translateLocation(direction), rel);
+}
+
 KDDockWidgets::Location DockableArea::translateLocation(Direction direction)
 {
 	switch(direction) {
