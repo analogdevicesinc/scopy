@@ -22,9 +22,12 @@
 
 #include "m2kcallcommand.h"
 #include "m2kcontext.h"
+#include "m2ktrace.h"
 #include "voltmeterdsp.h"
 
 #include "component/capabilityexecutor.h"
+
+#include <component/commandmonitor.h>
 
 #include <libm2k/analog/m2kanalogin.hpp>
 #include <libm2k/m2k.hpp>
@@ -64,18 +67,26 @@ QCoro::Task<bool> M2kVoltmeterController::claimAndConfigure()
 	libm2k::context::M2k *m2k = m_ctx->m2k();
 
 	auto *cmd = new M2kCallCommand<void>(m2k, [m2k]() {
-		M2kAnalogIn *ain = m2k->getAnalogIn();
-		ain->setKernelBuffersCount(4);
-		ain->setSampleRate(dsp::SAMPLE_RATE_HZ);
-		ain->setOversamplingRatio(1);
-		libm2k::M2kHardwareTrigger *trigger = ain->getTrigger();
+		M2kAnalogIn *ain = M2K_CALL(m2k, "M2k::getAnalogIn", m2k->getAnalogIn());
+		M2K_CALL(ain, "M2kAnalogIn::setKernelBuffersCount", ain->setKernelBuffersCount(4),
+			 M2K_ARGN("count", 4));
+		M2K_CALL(ain, "M2kAnalogIn::setSampleRate", ain->setSampleRate(dsp::SAMPLE_RATE_HZ),
+			 M2K_ARGN("samplerate", dsp::SAMPLE_RATE_HZ));
+		M2K_CALL(ain, "M2kAnalogIn::setOversamplingRatio", ain->setOversamplingRatio(1),
+			 M2K_ARGN("oversampling", 1));
+		libm2k::M2kHardwareTrigger *trigger = M2K_CALL(ain, "M2kAnalogIn::getTrigger", ain->getTrigger());
 		for(unsigned int c = 0; c < 2; ++c) {
-			ain->setVerticalOffset(static_cast<ANALOG_IN_CHANNEL>(c), 0.0);
+			const ANALOG_IN_CHANNEL channel = static_cast<ANALOG_IN_CHANNEL>(c);
+			M2K_CALL(ain, "M2kAnalogIn::setVerticalOffset", ain->setVerticalOffset(channel, 0.0),
+				 M2K_ARG(channel), M2K_ARGN("vertOffset", 0.0));
 			if(trigger) {
-				trigger->setAnalogMode(c, libm2k::ALWAYS);
+				M2K_CALL(trigger, "M2kHardwareTrigger::setAnalogMode",
+					 trigger->setAnalogMode(c, libm2k::ALWAYS), M2K_ARGN("chnIdx", c),
+					 M2K_ARGN("mode", libm2k::ALWAYS));
 			}
 		}
 	});
+	component::CommandMonitor::tag(cmd, m_ctx);
 
 	auto r = co_await component::runCommand(
 		m_ctx->executor(), cmd, [](const scopy::Result<void> &) {},
@@ -100,7 +111,12 @@ void M2kVoltmeterController::release()
 
 	if(m_ctx && m_ctx->m2k() && m_ctx->executor() && !m_ctx->connectionLost()) {
 		libm2k::context::M2k *m2k = m_ctx->m2k();
-		auto *cmd = new M2kCallCommand<void>(m2k, [m2k]() { m2k->getAnalogIn()->setKernelBuffersCount(1); });
+		auto *cmd = new M2kCallCommand<void>(m2k, [m2k]() {
+			M2kAnalogIn *ain = M2K_CALL(m2k, "M2k::getAnalogIn", m2k->getAnalogIn());
+			M2K_CALL(ain, "M2kAnalogIn::setKernelBuffersCount", ain->setKernelBuffersCount(1),
+				 M2K_ARGN("count", 1));
+		});
+		component::CommandMonitor::tag(cmd, m_ctx);
 		// Unawaited: disconnect must not wait on device I/O; the view drains it before closing.
 		component::runCommand(
 			m_ctx->executor(), cmd, [](const scopy::Result<void> &) {},

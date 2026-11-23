@@ -24,6 +24,7 @@
 
 #include "component/attributereader.h"
 #include "component/capabilityexecutor.h"
+#include "component/commandmonitor.h"
 
 #include <QByteArray>
 
@@ -53,6 +54,7 @@ public:
 	{
 		Q_UNUSED(bytes)
 		auto *cmd = new M2kCallCommand<QByteArray>(m_resource, m_getter);
+		component::CommandMonitor::tag(cmd, this);
 		return component::runCommand(
 			m_executor, cmd, [this](scopy::Result<QByteArray> &r) { Q_EMIT readSucceeded(r); },
 			[this](const scopy::Error &error) { Q_EMIT readFailed(error); });

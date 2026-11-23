@@ -22,10 +22,13 @@
 
 #include "m2kcallcommand.h"
 #include "m2kcontext.h"
+#include "m2ktrace.h"
 
 #include "component/capabilityexecutor.h"
 #include "component/connection.h"
 #include "component/ping.h"
+
+#include <component/commandmonitor.h>
 
 #include <pluginbase/statusbarmanager.h>
 
@@ -113,12 +116,14 @@ QCoro::Task<void> M2kVoltmeterReader::acquisitionLoop()
 	const unsigned int n = SAMPLES_PER_CHANNEL;
 
 	auto *openCmd = new M2kCallCommand<void>(m2k, [m2k, n]() {
-		M2kAnalogIn *ain = m2k->getAnalogIn();
+		M2kAnalogIn *ain = M2K_CALL(m2k, "M2k::getAnalogIn", m2k->getAnalogIn());
 		for(unsigned int c = 0; c < 2; ++c) {
-			ain->enableChannel(c, true);
+			M2K_CALL(ain, "M2kAnalogIn::enableChannel", ain->enableChannel(c, true), M2K_ARGN("chnIdx", c),
+				 M2K_ARGN("enable", true));
 		}
-		ain->startAcquisition(n);
+		M2K_CALL(ain, "M2kAnalogIn::startAcquisition", ain->startAcquisition(n), M2K_ARGN("nb_samples", n));
 	});
+	component::CommandMonitor::tag(openCmd, m_ctx);
 	auto opened = co_await component::runCommand(
 		exec, openCmd, [](const scopy::Result<void> &) {},
 		[](const scopy::Error &e) {
@@ -140,9 +145,13 @@ QCoro::Task<void> M2kVoltmeterReader::acquisitionLoop()
 
 	while(m_running) {
 		auto *refill = new M2kCallCommand<std::vector<short>>(m2k, [m2k, n]() {
-			const short *raw = m2k->getAnalogIn()->getSamplesRawInterleaved(n);
+			M2kAnalogIn *ain = M2K_CALL(m2k, "M2k::getAnalogIn", m2k->getAnalogIn());
+			const short *raw =
+				M2K_CALL(ain, "M2kAnalogIn::getSamplesRawInterleaved", ain->getSamplesRawInterleaved(n),
+					 M2K_ARGN("nb_samples_per_channel", n));
 			return std::vector<short>(raw, raw + (n * 2));
 		});
+		component::CommandMonitor::tag(refill, m_ctx);
 		auto r = co_await component::runCommand(
 			exec, refill, [](const scopy::Result<std::vector<short>> &) {},
 			[](const scopy::Error &e) { qDebug(CAT_M2KVM_READER) << "refill error:" << e.message; });
@@ -179,7 +188,11 @@ QCoro::Task<void> M2kVoltmeterReader::acquisitionLoop()
 		}
 	}
 
-	auto *closeCmd = new M2kCallCommand<void>(m2k, [m2k]() { m2k->getAnalogIn()->stopAcquisition(); });
+	auto *closeCmd = new M2kCallCommand<void>(m2k, [m2k]() {
+		M2kAnalogIn *ain = M2K_CALL(m2k, "M2k::getAnalogIn", m2k->getAnalogIn());
+		M2K_CALL(ain, "M2kAnalogIn::stopAcquisition", ain->stopAcquisition());
+	});
+	component::CommandMonitor::tag(closeCmd, m_ctx);
 	co_await component::runCommand(
 		exec, closeCmd, [](const scopy::Result<void> &) {},
 		[](const scopy::Error &e) { qWarning(CAT_M2KVM_READER) << "stopAcquisition failed:" << e.message; });

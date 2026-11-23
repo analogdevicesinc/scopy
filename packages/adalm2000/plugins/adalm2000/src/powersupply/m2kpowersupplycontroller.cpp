@@ -22,6 +22,7 @@
 
 #include "m2kcallcommand.h"
 #include "m2kcontext.h"
+#include "m2ktrace.h"
 #include "powersupplymath.h"
 
 #include "component/attribute.h"
@@ -29,6 +30,8 @@
 #include "component/channel.h"
 #include "component/device.h"
 #include "component/navigation.h"
+
+#include <component/commandmonitor.h>
 
 #include <libm2k/analog/m2kpowersupply.hpp>
 #include <libm2k/m2k.hpp>
@@ -214,11 +217,15 @@ void M2kPowerSupplyController::shutdown()
 
 	libm2k::context::M2k *m2k = m2kCtx->m2k();
 	auto *cmd = new M2kCallCommand<void>(m2k, [m2k]() {
-		libm2k::analog::M2kPowerSupply *supply = m2k->getPowerSupply();
-		supply->enableChannel(0, false);
-		supply->enableChannel(1, false);
-		supply->powerDownDacs(true);
+		libm2k::analog::M2kPowerSupply *supply = M2K_CALL(m2k, "M2k::getPowerSupply", m2k->getPowerSupply());
+		M2K_CALL(supply, "M2kPowerSupply::enableChannel", supply->enableChannel(0, false), M2K_ARGN("chn", 0),
+			 M2K_ARGN("en", false));
+		M2K_CALL(supply, "M2kPowerSupply::enableChannel", supply->enableChannel(1, false), M2K_ARGN("chn", 1),
+			 M2K_ARGN("en", false));
+		M2K_CALL(supply, "M2kPowerSupply::powerDownDacs", supply->powerDownDacs(true),
+			 M2K_ARGN("powerdown", true));
 	});
+	component::CommandMonitor::tag(cmd, m2kCtx);
 	// Unawaited: disconnect must not wait on device I/O; the view drains it before closing.
 	component::runCommand(
 		m2kCtx->executor(), cmd, [](const scopy::Result<void> &) {},

@@ -22,6 +22,7 @@
 
 #include "m2kcallcommand.h"
 #include "m2kcontext.h"
+#include "m2ktrace.h"
 
 #include "component/attribute.h"
 #include "component/attributereader.h"
@@ -30,6 +31,8 @@
 #include "component/channel.h"
 #include "component/device.h"
 #include "component/navigation.h"
+
+#include <component/commandmonitor.h>
 
 #include <libm2k/digital/m2kdigital.hpp>
 #include <libm2k/m2k.hpp>
@@ -234,12 +237,16 @@ QCoro::Task<void> M2kDigitalIoController::initialize()
 	// what makes the hardware agree with it.
 	libm2k::context::M2k *m2k = m2kCtx->m2k();
 	auto *cmd = new M2kCallCommand<void>(m2k, [m2k]() {
-		libm2k::digital::M2kDigital *dig = m2k->getDigital();
+		libm2k::digital::M2kDigital *dig = M2K_CALL(m2k, "M2k::getDigital", m2k->getDigital());
 		for(int i = 0; i < dio::PIN_COUNT; ++i) {
-			dig->setDirection(static_cast<DIO_CHANNEL>(i), DIO_DIRECTION::DIO_INPUT);
-			dig->setValueRaw(static_cast<DIO_CHANNEL>(i), DIO_LEVEL::LOW);
+			const DIO_CHANNEL index = static_cast<DIO_CHANNEL>(i);
+			M2K_CALL(dig, "M2kDigital::setDirection", dig->setDirection(index, DIO_DIRECTION::DIO_INPUT),
+				 M2K_ARG(index), M2K_ARGN("dir", DIO_DIRECTION::DIO_INPUT));
+			M2K_CALL(dig, "M2kDigital::setValueRaw", dig->setValueRaw(index, DIO_LEVEL::LOW),
+				 M2K_ARG(index), M2K_ARGN("level", DIO_LEVEL::LOW));
 		}
 	});
+	component::CommandMonitor::tag(cmd, m2kCtx);
 
 	auto r = co_await component::runCommand(
 		m2kCtx->executor(), cmd, [](const scopy::Result<void> &) {},
@@ -389,11 +396,14 @@ void M2kDigitalIoController::shutdown()
 	// whatever is wired to them.
 	libm2k::context::M2k *m2k = m2kCtx->m2k();
 	auto *cmd = new M2kCallCommand<void>(m2k, [m2k]() {
-		libm2k::digital::M2kDigital *dig = m2k->getDigital();
+		libm2k::digital::M2kDigital *dig = M2K_CALL(m2k, "M2k::getDigital", m2k->getDigital());
 		for(int i = 0; i < dio::PIN_COUNT; ++i) {
-			dig->setDirection(static_cast<DIO_CHANNEL>(i), DIO_DIRECTION::DIO_INPUT);
+			const DIO_CHANNEL index = static_cast<DIO_CHANNEL>(i);
+			M2K_CALL(dig, "M2kDigital::setDirection", dig->setDirection(index, DIO_DIRECTION::DIO_INPUT),
+				 M2K_ARG(index), M2K_ARGN("dir", DIO_DIRECTION::DIO_INPUT));
 		}
 	});
+	component::CommandMonitor::tag(cmd, m2kCtx);
 	// Unawaited: disconnect must not wait on device I/O; the view drains it before closing.
 	component::runCommand(
 		m2kCtx->executor(), cmd, [](const scopy::Result<void> &) {},

@@ -21,8 +21,11 @@
 #include "m2kinputstream.h"
 
 #include "m2kcallcommand.h"
+#include "m2ktrace.h"
 
 #include "component/capabilityexecutor.h"
+
+#include <component/commandmonitor.h>
 
 #include <libm2k/analog/m2kanalogin.hpp>
 
@@ -109,9 +112,12 @@ QCoro::Task<CommandResponse<void>> M2kInputStream::openAsync(const component::St
 	// rather than raced (D13).
 	auto *cmd = new M2kCallCommand<void>(m_resource, [ain, channels, kernelBuffers, samples, scales]() {
 		for(int i = 0; i < M2kInputStream::HW_CHANNELS; ++i) {
-			ain->enableChannel(static_cast<unsigned>(i), channels.contains(i));
+			M2K_CALL(ain, "M2kAnalogIn::enableChannel",
+				 ain->enableChannel(static_cast<unsigned>(i), channels.contains(i)),
+				 M2K_ARGN("chnIdx", i), M2K_ARGN("enable", channels.contains(i)));
 		}
-		ain->setKernelBuffersCount(kernelBuffers);
+		M2K_CALL(ain, "M2kAnalogIn::setKernelBuffersCount", ain->setKernelBuffersCount(kernelBuffers),
+			 M2K_ARGN("count", kernelBuffers));
 
 		// Solve raw -> volts as an affine map, then prove it on a third point.
 		// StreamFormat can only express scale + offset; if the real conversion is
@@ -137,8 +143,10 @@ QCoro::Task<CommandResponse<void>> M2kInputStream::openAsync(const component::St
 			scales->append(cs);
 		}
 
-		ain->startAcquisition(samples);
+		M2K_CALL(ain, "M2kAnalogIn::startAcquisition", ain->startAcquisition(samples),
+			 M2K_ARGN("nb_samples", samples));
 	});
+	component::CommandMonitor::tag(cmd, this);
 
 	auto result = co_await component::runCommand(
 		m_executor, cmd, [](const Result<void> &) {}, [this](const Error &e) { Q_EMIT streamError(e); });
@@ -173,7 +181,9 @@ QCoro::Task<CommandResponse<void>> M2kInputStream::closeAsync()
 	}
 
 	M2kAnalogIn *ain = m_ain;
-	auto *cmd = new M2kCallCommand<void>(m_resource, [ain]() { ain->stopAcquisition(); });
+	auto *cmd = new M2kCallCommand<void>(
+		m_resource, [ain]() { M2K_CALL(ain, "M2kAnalogIn::stopAcquisition", ain->stopAcquisition()); });
+	component::CommandMonitor::tag(cmd, this);
 
 	auto result = co_await component::runCommand(
 		m_executor, cmd, [](const Result<void> &) {}, [this](const Error &e) { Q_EMIT streamError(e); });
@@ -202,12 +212,17 @@ QCoro::Task<CommandResponse<void>> M2kInputStream::refillAsync()
 
 	auto *cmd = new M2kCallCommand<void>(m_resource, [ain, samples, kernelBuffers, restart, samplePtr]() {
 		if(restart) {
-			ain->stopAcquisition();
-			ain->setKernelBuffersCount(kernelBuffers);
-			ain->startAcquisition(samples);
+			M2K_CALL(ain, "M2kAnalogIn::stopAcquisition", ain->stopAcquisition());
+			M2K_CALL(ain, "M2kAnalogIn::setKernelBuffersCount", ain->setKernelBuffersCount(kernelBuffers),
+				 M2K_ARGN("count", kernelBuffers));
+			M2K_CALL(ain, "M2kAnalogIn::startAcquisition", ain->startAcquisition(samples),
+				 M2K_ARGN("nb_samples", samples));
 		}
-		*samplePtr = ain->getSamplesRawInterleaved(samples);
+		*samplePtr =
+			M2K_CALL(ain, "M2kAnalogIn::getSamplesRawInterleaved", ain->getSamplesRawInterleaved(samples),
+				 M2K_ARGN("nb_samples_per_channel", samples));
 	});
+	component::CommandMonitor::tag(cmd, this);
 
 	auto result = co_await component::runCommand(
 		m_executor, cmd, [](const Result<void> &) {}, [](const Error &) {});
@@ -305,6 +320,7 @@ QCoro::Task<CommandResponse<short>> M2kInputStream::convertVoltsToRawAsync(unsig
 	M2kAnalogIn *ain = m_ain;
 	auto *cmd = new M2kCallCommand<short>(
 		m_resource, [ain, channel, volts]() { return ain->convertVoltsToRaw(channel, volts); });
+	component::CommandMonitor::tag(cmd, this);
 	co_return co_await component::runCommand(
 		m_executor, cmd, [](const Result<short> &) {}, [](const Error &) {});
 }

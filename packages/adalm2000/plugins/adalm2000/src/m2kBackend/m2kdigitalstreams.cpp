@@ -21,8 +21,11 @@
 #include "m2kdigitalstreams.h"
 
 #include "m2kcallcommand.h"
+#include "m2ktrace.h"
 
 #include "component/capabilityexecutor.h"
+
+#include <component/commandmonitor.h>
 
 #include <libm2k/digital/m2kdigital.hpp>
 
@@ -127,9 +130,12 @@ QCoro::Task<CommandResponse<void>> M2kDigitalInputStream::openAsync(const compon
 	// No per-channel input enable exists, and none is needed: the capture word
 	// always carries all 16 pins. Channel selection is a descriptor concern.
 	auto *cmd = new M2kCallCommand<void>(m_resource, [digital, kernelBuffers, samples]() {
-		digital->setKernelBuffersCountIn(kernelBuffers);
-		digital->startAcquisition(samples);
+		M2K_CALL(digital, "M2kDigital::setKernelBuffersCountIn",
+			 digital->setKernelBuffersCountIn(kernelBuffers), M2K_ARGN("count", kernelBuffers));
+		M2K_CALL(digital, "M2kDigital::startAcquisition", digital->startAcquisition(samples),
+			 M2K_ARGN("nb_samples", samples));
 	});
+	component::CommandMonitor::tag(cmd, this);
 
 	auto result = co_await component::runCommand(
 		m_executor, cmd, [](const Result<void> &) {}, [this](const Error &e) { Q_EMIT streamError(e); });
@@ -160,7 +166,10 @@ QCoro::Task<CommandResponse<void>> M2kDigitalInputStream::closeAsync()
 	}
 
 	M2kDigital *digital = m_digital;
-	auto *cmd = new M2kCallCommand<void>(m_resource, [digital]() { digital->stopAcquisition(); });
+	auto *cmd = new M2kCallCommand<void>(m_resource, [digital]() {
+		M2K_CALL(digital, "M2kDigital::stopAcquisition", digital->stopAcquisition());
+	});
+	component::CommandMonitor::tag(cmd, this);
 
 	auto result = co_await component::runCommand(
 		m_executor, cmd, [](const Result<void> &) {}, [this](const Error &e) { Q_EMIT streamError(e); });
@@ -189,12 +198,16 @@ QCoro::Task<CommandResponse<void>> M2kDigitalInputStream::refillAsync()
 
 	auto *cmd = new M2kCallCommand<void>(m_resource, [digital, samples, kernelBuffers, restart, samplePtr]() {
 		if(restart) {
-			digital->stopAcquisition();
-			digital->setKernelBuffersCountIn(kernelBuffers);
-			digital->startAcquisition(samples);
+			M2K_CALL(digital, "M2kDigital::stopAcquisition", digital->stopAcquisition());
+			M2K_CALL(digital, "M2kDigital::setKernelBuffersCountIn",
+				 digital->setKernelBuffersCountIn(kernelBuffers), M2K_ARGN("count", kernelBuffers));
+			M2K_CALL(digital, "M2kDigital::startAcquisition", digital->startAcquisition(samples),
+				 M2K_ARGN("nb_samples", samples));
 		}
-		*samplePtr = digital->getSamplesP(samples);
+		*samplePtr = M2K_CALL(digital, "M2kDigital::getSamplesP", digital->getSamplesP(samples),
+				      M2K_ARGN("nb_samples", samples));
 	});
+	component::CommandMonitor::tag(cmd, this);
 
 	auto result = co_await component::runCommand(
 		m_executor, cmd, [](const Result<void> &) {}, [](const Error &) {});
@@ -279,11 +292,16 @@ QCoro::Task<CommandResponse<void>> M2kDigitalOutputStream::openAsync(const compo
 		// Takes over direction for these pins; see the header's caution about the
 		// Digital I/O tool's shadow going stale.
 		for(int pin : pins) {
-			digital->setDirection(static_cast<DIO_CHANNEL>(pin), DIO_DIRECTION::DIO_OUTPUT);
-			digital->enableChannel(static_cast<DIO_CHANNEL>(pin), true);
+			const DIO_CHANNEL index = static_cast<DIO_CHANNEL>(pin);
+			M2K_CALL(digital, "M2kDigital::setDirection",
+				 digital->setDirection(index, DIO_DIRECTION::DIO_OUTPUT), M2K_ARG(index),
+				 M2K_ARGN("dir", DIO_DIRECTION::DIO_OUTPUT));
+			M2K_CALL(digital, "M2kDigital::enableChannel", digital->enableChannel(index, true),
+				 M2K_ARG(index), M2K_ARGN("enable", true));
 		}
-		digital->setCyclic(cyclic);
+		M2K_CALL(digital, "M2kDigital::setCyclic", digital->setCyclic(cyclic), M2K_ARG(cyclic));
 	});
+	component::CommandMonitor::tag(cmd, this);
 
 	auto result = co_await component::runCommand(
 		m_executor, cmd, [](const Result<void> &) {}, [this](const Error &e) { Q_EMIT streamError(e); });
@@ -314,7 +332,9 @@ QCoro::Task<CommandResponse<void>> M2kDigitalOutputStream::closeAsync()
 	}
 
 	M2kDigital *digital = m_digital;
-	auto *cmd = new M2kCallCommand<void>(m_resource, [digital]() { digital->stopBufferOut(); });
+	auto *cmd = new M2kCallCommand<void>(
+		m_resource, [digital]() { M2K_CALL(digital, "M2kDigital::stopBufferOut", digital->stopBufferOut()); });
+	component::CommandMonitor::tag(cmd, this);
 
 	auto result = co_await component::runCommand(
 		m_executor, cmd, [](const Result<void> &) {}, [this](const Error &e) { Q_EMIT streamError(e); });
@@ -333,7 +353,10 @@ QCoro::Task<CommandResponse<void>> M2kDigitalOutputStream::pushAsync()
 	// Snapshot: the push runs on a worker thread while writeFormat() stays writable.
 	auto payload = std::make_shared<std::vector<unsigned short>>(m_buffer.begin(), m_buffer.end());
 
-	auto *cmd = new M2kCallCommand<void>(m_resource, [digital, payload]() { digital->push(*payload); });
+	auto *cmd = new M2kCallCommand<void>(m_resource, [digital, payload]() {
+		M2K_CALL(digital, "M2kDigital::push", digital->push(*payload), M2K_ARGN("data", *payload));
+	});
+	component::CommandMonitor::tag(cmd, this);
 
 	auto result = co_await component::runCommand(
 		m_executor, cmd, [](const Result<void> &) {}, [](const Error &) {});

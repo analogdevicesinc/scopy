@@ -27,6 +27,7 @@
 #include "m2kinputstream.h"
 #include "m2koutputstream.h"
 #include "m2kscanelement.h"
+#include "m2ktrace.h"
 
 #include "component/attribute.h"
 #include "component/channel.h"
@@ -221,29 +222,59 @@ void addAnalogTriggerChannelAttrs(component::Channel *chn, M2kHardwareTrigger *t
 
 	component::Attribute *mode = addReadWriteAttr(
 		chn, QStringLiteral("trigger_mode"), QString(), resource,
-		[trig, chIdx]() { return nameBytes(MODE_OPTIONS, trig->getAnalogMode(chIdx)); },
+		[trig, chIdx]() {
+			return nameBytes(MODE_OPTIONS,
+					 M2K_CALL(trig, "M2kHardwareTrigger::getAnalogMode", trig->getAnalogMode(chIdx),
+						  M2K_ARG(chIdx)));
+		},
 		[trig, chIdx](const QString &v) {
-			trig->setAnalogMode(chIdx, enumFromName<libm2k::M2K_TRIGGER_MODE>(MODE_OPTIONS, v));
+			const auto mode = enumFromName<libm2k::M2K_TRIGGER_MODE>(MODE_OPTIONS, v);
+			M2K_CALL(trig, "M2kHardwareTrigger::setAnalogMode", trig->setAnalogMode(chIdx, mode),
+				 M2K_ARG(chIdx), M2K_ARG(mode));
 		},
 		exec);
 	mode->setOptions(toOptions(MODE_OPTIONS));
 
 	addReadWriteAttr(
 		chn, QStringLiteral("trigger_level"), QStringLiteral("V"), resource,
-		[trig, chIdx]() { return QByteArray::number(trig->getAnalogLevel(chIdx), 'g', 12); },
-		[trig, chIdx](const QString &v) { trig->setAnalogLevel(chIdx, v.toDouble()); }, exec);
+		[trig, chIdx]() {
+			return QByteArray::number(M2K_CALL(trig, "M2kHardwareTrigger::getAnalogLevel",
+							   trig->getAnalogLevel(chIdx), M2K_ARG(chIdx)),
+						  'g', 12);
+		},
+		[trig, chIdx](const QString &v) {
+			const double v_level = v.toDouble();
+			M2K_CALL(trig, "M2kHardwareTrigger::setAnalogLevel", trig->setAnalogLevel(chIdx, v_level),
+				 M2K_ARG(chIdx), M2K_ARG(v_level));
+		},
+		exec);
 
 	addReadWriteAttr(
 		chn, QStringLiteral("trigger_hysteresis"), QStringLiteral("V"), resource,
-		[trig, chIdx]() { return QByteArray::number(trig->getAnalogHysteresis(chIdx), 'g', 12); },
-		[trig, chIdx](const QString &v) { trig->setAnalogHysteresis(chIdx, v.toDouble()); }, exec);
+		[trig, chIdx]() {
+			return QByteArray::number(M2K_CALL(trig, "M2kHardwareTrigger::getAnalogHysteresis",
+							   trig->getAnalogHysteresis(chIdx), M2K_ARG(chIdx)),
+						  'g', 12);
+		},
+		[trig, chIdx](const QString &v) {
+			const double hysteresis = v.toDouble();
+			M2K_CALL(trig, "M2kHardwareTrigger::setAnalogHysteresis",
+				 trig->setAnalogHysteresis(chIdx, hysteresis), M2K_ARG(chIdx), M2K_ARG(hysteresis));
+		},
+		exec);
 
 	component::Attribute *condition = addReadWriteAttr(
 		chn, QStringLiteral("trigger_condition"), QString(), resource,
-		[trig, chIdx]() { return nameBytes(ANALOG_CONDITION_OPTIONS, trig->getAnalogCondition(chIdx)); },
+		[trig, chIdx]() {
+			return nameBytes(ANALOG_CONDITION_OPTIONS,
+					 M2K_CALL(trig, "M2kHardwareTrigger::getAnalogCondition",
+						  trig->getAnalogCondition(chIdx), M2K_ARG(chIdx)));
+		},
 		[trig, chIdx](const QString &v) {
-			trig->setAnalogCondition(
-				chIdx, enumFromName<libm2k::M2K_TRIGGER_CONDITION_ANALOG>(ANALOG_CONDITION_OPTIONS, v));
+			const auto cond =
+				enumFromName<libm2k::M2K_TRIGGER_CONDITION_ANALOG>(ANALOG_CONDITION_OPTIONS, v);
+			M2K_CALL(trig, "M2kHardwareTrigger::setAnalogCondition", trig->setAnalogCondition(chIdx, cond),
+				 M2K_ARG(chIdx), M2K_ARG(cond));
 		},
 		exec);
 	condition->setOptions(toOptions(ANALOG_CONDITION_OPTIONS));
@@ -251,12 +282,15 @@ void addAnalogTriggerChannelAttrs(component::Channel *chn, M2kHardwareTrigger *t
 	component::Attribute *externalCondition = addReadWriteAttr(
 		chn, QStringLiteral("trigger_external_condition"), QString(), resource,
 		[trig, chIdx]() {
-			return nameBytes(DIGITAL_CONDITION_OPTIONS, trig->getAnalogExternalCondition(chIdx));
+			return nameBytes(DIGITAL_CONDITION_OPTIONS,
+					 M2K_CALL(trig, "M2kHardwareTrigger::getAnalogExternalCondition",
+						  trig->getAnalogExternalCondition(chIdx), M2K_ARG(chIdx)));
 		},
 		[trig, chIdx](const QString &v) {
-			trig->setAnalogExternalCondition(
-				chIdx,
-				enumFromName<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>(DIGITAL_CONDITION_OPTIONS, v));
+			const auto cond =
+				enumFromName<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>(DIGITAL_CONDITION_OPTIONS, v);
+			M2K_CALL(trig, "M2kHardwareTrigger::setAnalogExternalCondition",
+				 trig->setAnalogExternalCondition(chIdx, cond), M2K_ARG(chIdx), M2K_ARG(cond));
 		},
 		exec);
 	externalCondition->setOptions(toOptions(DIGITAL_CONDITION_OPTIONS, DIGITAL_CONDITION_NONE));
@@ -269,10 +303,14 @@ void addAnalogTriggerDeviceAttrs(component::Device *dev, M2kHardwareTrigger *tri
 
 	component::Attribute *source = addReadWriteAttr(
 		dev, QStringLiteral("trigger_source"), QString(), resource,
-		[trig]() { return nameBytes(ANALOG_SOURCE_OPTIONS, trig->getAnalogSource()); },
+		[trig]() {
+			return nameBytes(
+				ANALOG_SOURCE_OPTIONS,
+				M2K_CALL(trig, "M2kHardwareTrigger::getAnalogSource", trig->getAnalogSource()));
+		},
 		[trig](const QString &v) {
-			trig->setAnalogSource(
-				enumFromName<libm2k::M2K_TRIGGER_SOURCE_ANALOG>(ANALOG_SOURCE_OPTIONS, v));
+			const auto src = enumFromName<libm2k::M2K_TRIGGER_SOURCE_ANALOG>(ANALOG_SOURCE_OPTIONS, v);
+			M2K_CALL(trig, "M2kHardwareTrigger::setAnalogSource", trig->setAnalogSource(src), M2K_ARG(src));
 		},
 		exec);
 	source->setOptions(caps.crossInstrument ? toOptions(ANALOG_SOURCE_OPTIONS)
@@ -280,23 +318,47 @@ void addAnalogTriggerDeviceAttrs(component::Device *dev, M2kHardwareTrigger *tri
 
 	component::Attribute *delay = addReadWriteAttr(
 		dev, QStringLiteral("trigger_delay"), QStringLiteral("samples"), resource,
-		[trig]() { return QByteArray::number(trig->getAnalogDelay()); },
-		[trig](const QString &v) { trig->setAnalogDelay(v.toInt()); }, exec);
+		[trig]() {
+			return QByteArray::number(
+				M2K_CALL(trig, "M2kHardwareTrigger::getAnalogDelay", trig->getAnalogDelay()));
+		},
+		[trig](const QString &v) {
+			const int delay = v.toInt();
+			M2K_CALL(trig, "M2kHardwareTrigger::setAnalogDelay", trig->setAnalogDelay(delay),
+				 M2K_ARG(delay));
+		},
+		exec);
 	delay->setRange({static_cast<double>(DELAY_MIN), 1.0, static_cast<double>(-DELAY_MIN)});
 
 	component::Attribute *streaming = addReadWriteAttr(
 		dev, QStringLiteral("trigger_streaming_flag"), QString(), resource,
-		[trig]() { return QByteArray::number(trig->getAnalogStreamingFlag() ? 1 : 0); },
-		[trig](const QString &v) { trig->setAnalogStreamingFlag(v.toInt() != 0); }, exec);
+		[trig]() {
+			return QByteArray::number(M2K_CALL(trig, "M2kHardwareTrigger::getAnalogStreamingFlag",
+							   trig->getAnalogStreamingFlag())
+							  ? 1
+							  : 0);
+		},
+		[trig](const QString &v) {
+			const bool enable = v.toInt() != 0;
+			M2K_CALL(trig, "M2kHardwareTrigger::setAnalogStreamingFlag",
+				 trig->setAnalogStreamingFlag(enable), M2K_ARG(enable));
+		},
+		exec);
 	streaming->setOptions({QStringLiteral("0"), QStringLiteral("1")});
 
 	if(caps.externalOut) {
 		component::Attribute *outSelect = addReadWriteAttr(
 			dev, QStringLiteral("trigger_external_out_select"), QString(), resource,
-			[trig]() { return nameBytes(OUT_SELECT_OPTIONS, trig->getAnalogExternalOutSelect()); },
+			[trig]() {
+				return nameBytes(OUT_SELECT_OPTIONS,
+						 M2K_CALL(trig, "M2kHardwareTrigger::getAnalogExternalOutSelect",
+							  trig->getAnalogExternalOutSelect()));
+			},
 			[trig](const QString &v) {
-				trig->setAnalogExternalOutSelect(
-					enumFromName<libm2k::M2K_TRIGGER_OUT_SELECT>(OUT_SELECT_OPTIONS, v));
+				const auto output_select =
+					enumFromName<libm2k::M2K_TRIGGER_OUT_SELECT>(OUT_SELECT_OPTIONS, v);
+				M2K_CALL(trig, "M2kHardwareTrigger::setAnalogExternalOutSelect",
+					 trig->setAnalogExternalOutSelect(output_select), M2K_ARG(output_select));
 			},
 			exec);
 		outSelect->setOptions(toOptions(OUT_SELECT_OPTIONS));
@@ -304,13 +366,31 @@ void addAnalogTriggerDeviceAttrs(component::Device *dev, M2kHardwareTrigger *tri
 
 	addReadOnlyAttr(
 		dev, QStringLiteral("has_external_trigger_in"), QString(), resource,
-		[trig]() { return QByteArray::number(trig->hasExternalTriggerIn() ? 1 : 0); }, exec);
+		[trig]() {
+			return QByteArray::number(
+				M2K_CALL(trig, "M2kHardwareTrigger::hasExternalTriggerIn", trig->hasExternalTriggerIn())
+					? 1
+					: 0);
+		},
+		exec);
 	addReadOnlyAttr(
 		dev, QStringLiteral("has_external_trigger_out"), QString(), resource,
-		[trig]() { return QByteArray::number(trig->hasExternalTriggerOut() ? 1 : 0); }, exec);
+		[trig]() {
+			return QByteArray::number(M2K_CALL(trig, "M2kHardwareTrigger::hasExternalTriggerOut",
+							   trig->hasExternalTriggerOut())
+							  ? 1
+							  : 0);
+		},
+		exec);
 	addReadOnlyAttr(
 		dev, QStringLiteral("has_cross_instrument_trigger"), QString(), resource,
-		[trig]() { return QByteArray::number(trig->hasCrossInstrumentTrigger() ? 1 : 0); }, exec);
+		[trig]() {
+			return QByteArray::number(M2K_CALL(trig, "M2kHardwareTrigger::hasCrossInstrumentTrigger",
+							   trig->hasCrossInstrumentTrigger())
+							  ? 1
+							  : 0);
+		},
+		exec);
 }
 
 component::Channel *buildAnalogInChannel(component::Device *analogIn, M2kAnalogIn *ain, void *resource, int index,
@@ -327,35 +407,74 @@ component::Channel *buildAnalogInChannel(component::Device *analogIn, M2kAnalogI
 
 	component::Attribute *range = addReadWriteAttr(
 		chn, QStringLiteral("range"), QString(), resource,
-		[ain, ch]() { return rangeToLabel(ain->getRange(ch)); },
-		[ain, ch](const QString &v) { ain->setRange(ch, labelToRange(v)); }, executor);
+		[ain, ch]() {
+			return rangeToLabel(M2K_CALL(ain, "M2kAnalogIn::getRange", ain->getRange(ch), M2K_ARG(ch)));
+		},
+		[ain, ch](const QString &v) {
+			const M2K_RANGE range = labelToRange(v);
+			M2K_CALL(ain, "M2kAnalogIn::setRange", ain->setRange(ch, range), M2K_ARG(ch), M2K_ARG(range));
+		},
+		executor);
 	range->setOptions({QLatin1String(PLUS_25V), QLatin1String(PLUS_2_5V)});
 
 	addReadWriteAttr(
 		chn, QStringLiteral("vertical_offset"), QStringLiteral("V"), resource,
-		[ain, ch]() { return QByteArray::number(ain->getVerticalOffset(ch)); },
-		[ain, ch](const QString &v) { ain->setVerticalOffset(ch, v.toDouble()); }, executor);
+		[ain, ch]() {
+			return QByteArray::number(M2K_CALL(ain, "M2kAnalogIn::getVerticalOffset",
+							   ain->getVerticalOffset(ch), M2K_ARG(ch)));
+		},
+		[ain, ch](const QString &v) {
+			const double vertOffset = v.toDouble();
+			M2K_CALL(ain, "M2kAnalogIn::setVerticalOffset", ain->setVerticalOffset(ch, vertOffset),
+				 M2K_ARG(ch), M2K_ARG(vertOffset));
+		},
+		executor);
 
 	addReadOnlyAttr(
 		chn, QStringLiteral("range_limits"), QStringLiteral("V"), resource,
-		[ain, ch]() { return boundsToBytes(ain->getRangeLimits(ain->getRange(ch))); }, executor);
+		[ain, ch]() {
+			const M2K_RANGE range = M2K_CALL(ain, "M2kAnalogIn::getRange", ain->getRange(ch), M2K_ARG(ch));
+			return boundsToBytes(M2K_CALL(ain, "M2kAnalogIn::getRangeLimits", ain->getRangeLimits(range),
+						      M2K_ARG(range)));
+		},
+		executor);
 
 	addReadOnlyAttr(
 		chn, QStringLiteral("hysteresis_range"), QStringLiteral("V"), resource,
-		[ain, ch]() { return boundsToBytes(ain->getHysteresisRange(ch)); }, executor);
+		[ain, ch]() {
+			return boundsToBytes(M2K_CALL(ain, "M2kAnalogIn::getHysteresisRange",
+						      ain->getHysteresisRange(ch), M2K_ARG(ch)));
+		},
+		executor);
 
 	addReadOnlyAttr(
 		chn, QStringLiteral("scaling_factor"), QString(), resource,
-		[ain, ch]() { return QByteArray::number(ain->getScalingFactor(ch), 'g', 12); }, executor);
+		[ain, ch]() {
+			return QByteArray::number(
+				M2K_CALL(ain, "M2kAnalogIn::getScalingFactor", ain->getScalingFactor(ch), M2K_ARG(ch)),
+				'g', 12);
+		},
+		executor);
 
 	addReadOnlyAttr(
 		chn, QStringLiteral("range_value"), QString(), resource,
-		[ain, ch]() { return QByteArray::number(ain->getValueForRange(ain->getRange(ch)), 'g', 12); },
+		[ain, ch]() {
+			const M2K_RANGE range = M2K_CALL(ain, "M2kAnalogIn::getRange", ain->getRange(ch), M2K_ARG(ch));
+			return QByteArray::number(M2K_CALL(ain, "M2kAnalogIn::getValueForRange",
+							   ain->getValueForRange(range), M2K_ARG(range)),
+						  'g', 12);
+		},
 		executor);
 
 	addReadOnlyAttr(
 		chn, QStringLiteral("enabled"), QString(), resource,
-		[ain, chIdx]() { return QByteArray::number(ain->isChannelEnabled(chIdx) ? 1 : 0); }, executor);
+		[ain, chIdx]() {
+			return QByteArray::number(M2K_CALL(ain, "M2kAnalogIn::isChannelEnabled",
+							   ain->isChannelEnabled(chIdx), M2K_ARG(chIdx))
+							  ? 1
+							  : 0);
+		},
+		executor);
 	return chn;
 }
 
@@ -363,37 +482,74 @@ void buildAnalogInDeviceAttrs(component::Device *analogIn, M2kAnalogIn *ain, voi
 {
 	addReadOnlyAttr(
 		analogIn, QStringLiteral("name"), QString(), resource,
-		[ain]() { return QByteArray::fromStdString(ain->getName()); }, executor);
+		[ain]() { return QByteArray::fromStdString(M2K_CALL(ain, "M2kAnalogIn::getName", ain->getName())); },
+		executor);
 
 	addReadOnlyAttr(
 		analogIn, QStringLiteral("nb_channels"), QString(), resource,
-		[ain]() { return QByteArray::number(ain->getNbChannels()); }, executor);
+		[ain]() {
+			return QByteArray::number(M2K_CALL(ain, "M2kAnalogIn::getNbChannels", ain->getNbChannels()));
+		},
+		executor);
 
 	addReadOnlyAttr(
 		analogIn, QStringLiteral("maximum_samplerate"), QStringLiteral("Hz"), resource,
-		[ain]() { return QByteArray::number(ain->getMaximumSamplerate(), 'g', 12); }, executor);
+		[ain]() {
+			return QByteArray::number(
+				M2K_CALL(ain, "M2kAnalogIn::getMaximumSamplerate", ain->getMaximumSamplerate()), 'g',
+				12);
+		},
+		executor);
 
 	addReadOnlyAttr(
 		analogIn, QStringLiteral("available_sample_rates"), QStringLiteral("Hz"), resource,
-		[ain]() { return ratesToBytes(ain->getAvailableSampleRates()); }, executor);
+		[ain]() {
+			return ratesToBytes(
+				M2K_CALL(ain, "M2kAnalogIn::getAvailableSampleRates", ain->getAvailableSampleRates()));
+		},
+		executor);
 
 	addReadOnlyAttr(
 		analogIn, QStringLiteral("available_ranges"), QStringLiteral("V"), resource,
-		[ain]() { return rangesToBytes(ain->getAvailableRanges()); }, executor);
+		[ain]() {
+			return rangesToBytes(
+				M2K_CALL(ain, "M2kAnalogIn::getAvailableRanges", ain->getAvailableRanges()));
+		},
+		executor);
 
 	addReadOnlyAttr(
 		analogIn, QStringLiteral("filter_compensation"), QString(), resource,
-		[ain]() { return QByteArray::number(ain->getFilterCompensation(ain->getSampleRate()), 'g', 12); },
+		[ain]() {
+			const double samplerate = M2K_CALL(ain, "M2kAnalogIn::getSampleRate", ain->getSampleRate());
+			return QByteArray::number(M2K_CALL(ain, "M2kAnalogIn::getFilterCompensation",
+							   ain->getFilterCompensation(samplerate), M2K_ARG(samplerate)),
+						  'g', 12);
+		},
 		executor);
 
 	addReadOnlyAttr(
 		analogIn, QStringLiteral("low_range_max"), QStringLiteral("V"), resource,
-		[ain]() { return QByteArray::number(ain->getRangeLimits(PLUS_MINUS_2_5V).second, 'f', 6); }, executor);
+		[ain]() {
+			return QByteArray::number(M2K_CALL(ain, "M2kAnalogIn::getRangeLimits",
+							   ain->getRangeLimits(PLUS_MINUS_2_5V),
+							   M2K_ARGN("range", PLUS_MINUS_2_5V))
+							  .second,
+						  'f', 6);
+		},
+		executor);
 
 	component::Attribute *sampleRate = addReadWriteAttr(
 		analogIn, QStringLiteral("sample_rate"), QStringLiteral("Hz"), resource,
-		[ain]() { return QByteArray::number(ain->getSampleRate(), 'g', 12); },
-		[ain](const QString &v) { ain->setSampleRate(v.toDouble()); }, executor);
+		[ain]() {
+			return QByteArray::number(M2K_CALL(ain, "M2kAnalogIn::getSampleRate", ain->getSampleRate()),
+						  'g', 12);
+		},
+		[ain](const QString &v) {
+			const double samplerate = v.toDouble();
+			M2K_CALL(ain, "M2kAnalogIn::setSampleRate", ain->setSampleRate(samplerate),
+				 M2K_ARG(samplerate));
+		},
+		executor);
 	try {
 		sampleRate->setOptions(ratesToOptions(ain->getAvailableSampleRates()));
 	} catch(const std::exception &e) {
@@ -402,8 +558,16 @@ void buildAnalogInDeviceAttrs(component::Device *analogIn, M2kAnalogIn *ain, voi
 
 	addReadWriteAttr(
 		analogIn, QStringLiteral("oversampling_ratio"), QString(), resource,
-		[ain]() { return QByteArray::number(ain->getOversamplingRatio()); },
-		[ain](const QString &v) { ain->setOversamplingRatio(v.toInt()); }, executor);
+		[ain]() {
+			return QByteArray::number(
+				M2K_CALL(ain, "M2kAnalogIn::getOversamplingRatio", ain->getOversamplingRatio()));
+		},
+		[ain](const QString &v) {
+			const int oversampling = v.toInt();
+			M2K_CALL(ain, "M2kAnalogIn::setOversamplingRatio", ain->setOversamplingRatio(oversampling),
+				 M2K_ARG(oversampling));
+		},
+		executor);
 }
 
 bool buildAnalogIn(component::Context *ctx, libm2k::context::M2k *m2k, ICmdExecutor *executor)
@@ -459,14 +623,33 @@ void buildAnalogOutChannel(component::Device *analogOut, M2kAnalogOut *aout, voi
 
 	component::Attribute *enabled = addReadWriteAttr(
 		chn, QStringLiteral("enabled"), QString(), resource,
-		[aout, chIdx]() { return QByteArray::number(aout->isChannelEnabled(chIdx) ? 1 : 0); },
-		[aout, chIdx](const QString &v) { aout->enableChannel(chIdx, v.toInt() != 0); }, executor);
+		[aout, chIdx]() {
+			return QByteArray::number(M2K_CALL(aout, "M2kAnalogOut::isChannelEnabled",
+							   aout->isChannelEnabled(chIdx), M2K_ARG(chIdx))
+							  ? 1
+							  : 0);
+		},
+		[aout, chIdx](const QString &v) {
+			const bool enable = v.toInt() != 0;
+			M2K_CALL(aout, "M2kAnalogOut::enableChannel", aout->enableChannel(chIdx, enable),
+				 M2K_ARG(chIdx), M2K_ARG(enable));
+		},
+		executor);
 	enabled->setOptions({QStringLiteral("0"), QStringLiteral("1")});
 
 	component::Attribute *sampleRate = addReadWriteAttr(
 		chn, QStringLiteral("sample_rate"), QStringLiteral("Hz"), resource,
-		[aout, chIdx]() { return QByteArray::number(aout->getSampleRate(chIdx), 'g', 12); },
-		[aout, chIdx](const QString &v) { aout->setSampleRate(chIdx, v.toDouble()); }, executor);
+		[aout, chIdx]() {
+			return QByteArray::number(M2K_CALL(aout, "M2kAnalogOut::getSampleRate",
+							   aout->getSampleRate(chIdx), M2K_ARG(chIdx)),
+						  'g', 12);
+		},
+		[aout, chIdx](const QString &v) {
+			const double samplerate = v.toDouble();
+			M2K_CALL(aout, "M2kAnalogOut::setSampleRate", aout->setSampleRate(chIdx, samplerate),
+				 M2K_ARG(chIdx), M2K_ARG(samplerate));
+		},
+		executor);
 	try {
 		sampleRate->setOptions(ratesToOptions(aout->getAvailableSampleRates(chIdx)));
 	} catch(const std::exception &e) {
@@ -475,51 +658,104 @@ void buildAnalogOutChannel(component::Device *analogOut, M2kAnalogOut *aout, voi
 
 	addReadWriteAttr(
 		chn, QStringLiteral("oversampling_ratio"), QString(), resource,
-		[aout, chIdx]() { return QByteArray::number(aout->getOversamplingRatio(chIdx)); },
-		[aout, chIdx](const QString &v) { aout->setOversamplingRatio(chIdx, v.toInt()); }, executor);
+		[aout, chIdx]() {
+			return QByteArray::number(M2K_CALL(aout, "M2kAnalogOut::getOversamplingRatio",
+							   aout->getOversamplingRatio(chIdx), M2K_ARG(chIdx)));
+		},
+		[aout, chIdx](const QString &v) {
+			const int oversampling = v.toInt();
+			M2K_CALL(aout, "M2kAnalogOut::setOversamplingRatio",
+				 aout->setOversamplingRatio(chIdx, oversampling), M2K_ARG(chIdx),
+				 M2K_ARG(oversampling));
+		},
+		executor);
 
 	component::Attribute *cyclic = addReadWriteAttr(
 		chn, QStringLiteral("cyclic"), QString(), resource,
-		[aout, chIdx]() { return QByteArray::number(aout->getCyclic(chIdx) ? 1 : 0); },
-		[aout, chIdx](const QString &v) { aout->setCyclic(chIdx, v.toInt() != 0); }, executor);
+		[aout, chIdx]() {
+			return QByteArray::number(
+				M2K_CALL(aout, "M2kAnalogOut::getCyclic", aout->getCyclic(chIdx), M2K_ARG(chIdx)) ? 1
+														  : 0);
+		},
+		[aout, chIdx](const QString &v) {
+			const bool en = v.toInt() != 0;
+			M2K_CALL(aout, "M2kAnalogOut::setCyclic", aout->setCyclic(chIdx, en), M2K_ARG(chIdx),
+				 M2K_ARG(en));
+		},
+		executor);
 	cyclic->setOptions({QStringLiteral("0"), QStringLiteral("1")});
 
 	addReadWriteAttr(
 		chn, QStringLiteral("kernel_buffers_count"), QString(), resource,
-		[aout, chIdx]() { return QByteArray::number(aout->getKernelBuffersCount(chIdx)); },
+		[aout, chIdx]() {
+			return QByteArray::number(M2K_CALL(aout, "M2kAnalogOut::getKernelBuffersCount",
+							   aout->getKernelBuffersCount(chIdx), M2K_ARG(chIdx)));
+		},
 		[aout, chIdx](const QString &v) {
-			aout->setKernelBuffersCount(chIdx, static_cast<unsigned int>(v.toUInt()));
+			const unsigned int count = static_cast<unsigned int>(v.toUInt());
+			M2K_CALL(aout, "M2kAnalogOut::setKernelBuffersCount", aout->setKernelBuffersCount(chIdx, count),
+				 M2K_ARG(chIdx), M2K_ARG(count));
 		},
 		executor);
 
 	addReadOnlyAttr(
 		chn, QStringLiteral("maximum_samplerate"), QStringLiteral("Hz"), resource,
-		[aout, chIdx]() { return QByteArray::number(aout->getMaximumSamplerate(chIdx), 'g', 12); }, executor);
+		[aout, chIdx]() {
+			return QByteArray::number(M2K_CALL(aout, "M2kAnalogOut::getMaximumSamplerate",
+							   aout->getMaximumSamplerate(chIdx), M2K_ARG(chIdx)),
+						  'g', 12);
+		},
+		executor);
 
 	addReadOnlyAttr(
 		chn, QStringLiteral("available_sample_rates"), QStringLiteral("Hz"), resource,
-		[aout, chIdx]() { return ratesToBytes(aout->getAvailableSampleRates(chIdx)); }, executor);
+		[aout, chIdx]() {
+			return ratesToBytes(M2K_CALL(aout, "M2kAnalogOut::getAvailableSampleRates",
+						     aout->getAvailableSampleRates(chIdx), M2K_ARG(chIdx)));
+		},
+		executor);
 
 	addReadOnlyAttr(
 		chn, QStringLiteral("scaling_factor"), QString(), resource,
-		[aout, chIdx]() { return QByteArray::number(aout->getScalingFactor(chIdx), 'g', 12); }, executor);
+		[aout, chIdx]() {
+			return QByteArray::number(M2K_CALL(aout, "M2kAnalogOut::getScalingFactor",
+							   aout->getScalingFactor(chIdx), M2K_ARG(chIdx)),
+						  'g', 12);
+		},
+		executor);
 
 	addReadOnlyAttr(
 		chn, QStringLiteral("filter_compensation"), QString(), resource,
 		[aout, chIdx]() {
-			return QByteArray::number(aout->getFilterCompensation(aout->getSampleRate(chIdx)), 'g', 12);
+			const double samplerate = M2K_CALL(aout, "M2kAnalogOut::getSampleRate",
+							   aout->getSampleRate(chIdx), M2K_ARG(chIdx));
+			return QByteArray::number(M2K_CALL(aout, "M2kAnalogOut::getFilterCompensation",
+							   aout->getFilterCompensation(samplerate),
+							   M2K_ARG(samplerate)),
+						  'g', 12);
 		},
 		executor);
 
 #ifndef LIBIIO_V1
 	addReadOnlyAttr(
 		chn, QStringLiteral("push_done"), QString(), resource,
-		[aout, chIdx]() { return QByteArray::number(aout->isPushDone(chIdx) ? 1 : 0); }, executor);
+		[aout, chIdx]() {
+			return QByteArray::number(
+				M2K_CALL(aout, "M2kAnalogOut::isPushDone", aout->isPushDone(chIdx), M2K_ARG(chIdx))
+					? 1
+					: 0);
+		},
+		executor);
 #endif
 
 	addWriteOnlyAttr(
 		chn, QStringLiteral("voltage"), QStringLiteral("V"), resource,
-		[aout, chIdx](const QString &v) { aout->setVoltage(chIdx, v.toDouble()); }, executor);
+		[aout, chIdx](const QString &v) {
+			const double volts = v.toDouble();
+			M2K_CALL(aout, "M2kAnalogOut::setVoltage", aout->setVoltage(chIdx, volts), M2K_ARG(chIdx),
+				 M2K_ARG(volts));
+		},
+		executor);
 }
 
 void buildAnalogOut(component::Context *ctx, libm2k::context::M2k *m2k, ICmdExecutor *executor)
@@ -546,7 +782,10 @@ void buildAnalogOut(component::Context *ctx, libm2k::context::M2k *m2k, ICmdExec
 
 	addReadOnlyAttr(
 		analogOut, QStringLiteral("nb_channels"), QString(), m2k,
-		[aout]() { return QByteArray::number(aout->getNbChannels()); }, executor);
+		[aout]() {
+			return QByteArray::number(M2K_CALL(aout, "M2kAnalogOut::getNbChannels", aout->getNbChannels()));
+		},
+		executor);
 
 	for(unsigned int i = 0; i < channels; ++i) {
 		buildAnalogOutChannel(analogOut, aout, m2k, static_cast<int>(i), executor);
@@ -580,7 +819,8 @@ void addRail(component::Device *dev, libm2k::analog::M2kPowerSupply *supply, voi
 		resource,
 		[supply, idx, setpoint](const QString &v) {
 			const double volts = v.toDouble();
-			supply->pushChannel(idx, volts);
+			M2K_CALL(supply, "M2kPowerSupply::pushChannel", supply->pushChannel(idx, volts), M2K_ARG(idx),
+				 M2K_ARG(volts));
 			*setpoint = volts;
 		},
 		exec));
@@ -595,7 +835,8 @@ void addRail(component::Device *dev, libm2k::analog::M2kPowerSupply *supply, voi
 		resource,
 		[supply, idx, enabled](const QString &v) {
 			const bool on = (v.toInt() != 0);
-			supply->enableChannel(idx, on);
+			M2K_CALL(supply, "M2kPowerSupply::enableChannel", supply->enableChannel(idx, on), M2K_ARG(idx),
+				 M2K_ARG(on));
 			*enabled = on;
 		},
 		exec));
@@ -604,7 +845,13 @@ void addRail(component::Device *dev, libm2k::analog::M2kPowerSupply *supply, voi
 	measured->setName(QStringLiteral("measured"));
 	measured->setUnit(QStringLiteral("V"));
 	measured->addReadCapability(new M2kAttributeReader(
-		resource, [supply, idx]() { return QByteArray::number(supply->readChannel(idx), 'f', 7); }, exec));
+		resource,
+		[supply, idx]() {
+			return QByteArray::number(
+				M2K_CALL(supply, "M2kPowerSupply::readChannel", supply->readChannel(idx), M2K_ARG(idx)),
+				'f', 7);
+		},
+		exec));
 }
 
 void buildPowerSupply(component::Context *ctx, libm2k::context::M2k *m2k, ICmdExecutor *executor)
@@ -636,7 +883,9 @@ using DioStatePtr = std::shared_ptr<dio::PinState>;
 void writePinDirection(M2kDigital *dig, const dio::PinState &state, int pin)
 {
 	const bool output = state.outputEnabled && dio::bit(state.direction, pin);
-	dig->setDirection(static_cast<DIO_CHANNEL>(pin), output ? DIO_DIRECTION::DIO_OUTPUT : DIO_DIRECTION::DIO_INPUT);
+	const DIO_CHANNEL index = static_cast<DIO_CHANNEL>(pin);
+	const DIO_DIRECTION dir = output ? DIO_DIRECTION::DIO_OUTPUT : DIO_DIRECTION::DIO_INPUT;
+	M2K_CALL(dig, "M2kDigital::setDirection", dig->setDirection(index, dir), M2K_ARG(index), M2K_ARG(dir));
 }
 
 void writePinValue(M2kDigital *dig, const dio::PinState &state, int pin)
@@ -644,7 +893,9 @@ void writePinValue(M2kDigital *dig, const dio::PinState &state, int pin)
 	if(!state.outputEnabled) {
 		return;
 	}
-	dig->setValueRaw(static_cast<DIO_CHANNEL>(pin), dio::bit(state.gpo, pin) ? DIO_LEVEL::HIGH : DIO_LEVEL::LOW);
+	const DIO_CHANNEL index = static_cast<DIO_CHANNEL>(pin);
+	const DIO_LEVEL level = dio::bit(state.gpo, pin) ? DIO_LEVEL::HIGH : DIO_LEVEL::LOW;
+	M2K_CALL(dig, "M2kDigital::setValueRaw", dig->setValueRaw(index, level), M2K_ARG(index), M2K_ARG(level));
 }
 
 void addDigitalTriggerPinAttr(component::Channel *chn, M2kHardwareTrigger *trig, void *resource, int pin,
@@ -655,11 +906,16 @@ void addDigitalTriggerPinAttr(component::Channel *chn, M2kHardwareTrigger *trig,
 
 	component::Attribute *condition = addReadWriteAttr(
 		chn, QStringLiteral("trigger_condition"), QString(), resource,
-		[trig, dioPin]() { return nameBytes(DIGITAL_CONDITION_OPTIONS, trig->getDigitalCondition(dioPin)); },
+		[trig, dioPin]() {
+			return nameBytes(DIGITAL_CONDITION_OPTIONS,
+					 M2K_CALL(trig, "M2kHardwareTrigger::getDigitalCondition",
+						  trig->getDigitalCondition(dioPin), M2K_ARG(dioPin)));
+		},
 		[trig, dioPin](const QString &v) {
-			trig->setDigitalCondition(
-				dioPin,
-				enumFromName<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>(DIGITAL_CONDITION_OPTIONS, v));
+			const auto cond =
+				enumFromName<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>(DIGITAL_CONDITION_OPTIONS, v);
+			M2K_CALL(trig, "M2kHardwareTrigger::setDigitalCondition",
+				 trig->setDigitalCondition(dioPin, cond), M2K_ARG(dioPin), M2K_ARG(cond));
 		},
 		exec);
 	condition->setOptions(toOptions(DIGITAL_CONDITION_OPTIONS));
@@ -672,17 +928,29 @@ void addDigitalTriggerDeviceAttrs(component::Device *dev, M2kHardwareTrigger *tr
 
 	component::Attribute *mode = addReadWriteAttr(
 		dev, QStringLiteral("trigger_mode"), QString(), resource,
-		[trig]() { return nameBytes(DIGITAL_MODE_OPTIONS, trig->getDigitalMode()); },
+		[trig]() {
+			return nameBytes(DIGITAL_MODE_OPTIONS,
+					 M2K_CALL(trig, "M2kHardwareTrigger::getDigitalMode", trig->getDigitalMode()));
+		},
 		[trig](const QString &v) {
-			trig->setDigitalMode(enumFromName<libm2k::digital::DIO_TRIGGER_MODE>(DIGITAL_MODE_OPTIONS, v));
+			const auto mode = enumFromName<libm2k::digital::DIO_TRIGGER_MODE>(DIGITAL_MODE_OPTIONS, v);
+			M2K_CALL(trig, "M2kHardwareTrigger::setDigitalMode", trig->setDigitalMode(mode), M2K_ARG(mode));
 		},
 		exec);
 	mode->setOptions(toOptions(DIGITAL_MODE_OPTIONS));
 
 	component::Attribute *delay = addReadWriteAttr(
 		dev, QStringLiteral("trigger_delay"), QStringLiteral("samples"), resource,
-		[trig]() { return QByteArray::number(trig->getDigitalDelay()); },
-		[trig](const QString &v) { trig->setDigitalDelay(v.toInt()); }, exec);
+		[trig]() {
+			return QByteArray::number(
+				M2K_CALL(trig, "M2kHardwareTrigger::getDigitalDelay", trig->getDigitalDelay()));
+		},
+		[trig](const QString &v) {
+			const int delay = v.toInt();
+			M2K_CALL(trig, "M2kHardwareTrigger::setDigitalDelay", trig->setDigitalDelay(delay),
+				 M2K_ARG(delay));
+		},
+		exec);
 	delay->setRange({static_cast<double>(DELAY_MIN), 1.0, static_cast<double>(-DELAY_MIN)});
 
 	try {
@@ -692,17 +960,33 @@ void addDigitalTriggerDeviceAttrs(component::Device *dev, M2kHardwareTrigger *tr
 	}
 	component::Attribute *streaming = addReadWriteAttr(
 		dev, QStringLiteral("trigger_streaming_flag"), QString(), resource,
-		[trig]() { return QByteArray::number(trig->getDigitalStreamingFlag() ? 1 : 0); },
-		[trig](const QString &v) { trig->setDigitalStreamingFlag(v.toInt() != 0); }, exec);
+		[trig]() {
+			return QByteArray::number(M2K_CALL(trig, "M2kHardwareTrigger::getDigitalStreamingFlag",
+							   trig->getDigitalStreamingFlag())
+							  ? 1
+							  : 0);
+		},
+		[trig](const QString &v) {
+			const bool enable = v.toInt() != 0;
+			M2K_CALL(trig, "M2kHardwareTrigger::setDigitalStreamingFlag",
+				 trig->setDigitalStreamingFlag(enable), M2K_ARG(enable));
+		},
+		exec);
 	streaming->setOptions({QStringLiteral("0"), QStringLiteral("1")});
 
 	if(caps.crossInstrument) {
 		component::Attribute *source = addReadWriteAttr(
 			dev, QStringLiteral("trigger_source"), QString(), resource,
-			[trig]() { return nameBytes(DIGITAL_SOURCE_OPTIONS, trig->getDigitalSource()); },
+			[trig]() {
+				return nameBytes(DIGITAL_SOURCE_OPTIONS,
+						 M2K_CALL(trig, "M2kHardwareTrigger::getDigitalSource",
+							  trig->getDigitalSource()));
+			},
 			[trig](const QString &v) {
-				trig->setDigitalSource(
-					enumFromName<libm2k::M2K_TRIGGER_SOURCE_DIGITAL>(DIGITAL_SOURCE_OPTIONS, v));
+				const auto external_src =
+					enumFromName<libm2k::M2K_TRIGGER_SOURCE_DIGITAL>(DIGITAL_SOURCE_OPTIONS, v);
+				M2K_CALL(trig, "M2kHardwareTrigger::setDigitalSource",
+					 trig->setDigitalSource(external_src), M2K_ARG(external_src));
 			},
 			exec);
 		source->setOptions(toOptions(DIGITAL_SOURCE_OPTIONS));
@@ -710,10 +994,16 @@ void addDigitalTriggerDeviceAttrs(component::Device *dev, M2kHardwareTrigger *tr
 
 	component::Attribute *externalCondition = addReadWriteAttr(
 		dev, QStringLiteral("trigger_external_condition"), QString(), resource,
-		[trig]() { return nameBytes(DIGITAL_CONDITION_OPTIONS, trig->getDigitalExternalCondition()); },
+		[trig]() {
+			return nameBytes(DIGITAL_CONDITION_OPTIONS,
+					 M2K_CALL(trig, "M2kHardwareTrigger::getDigitalExternalCondition",
+						  trig->getDigitalExternalCondition()));
+		},
 		[trig](const QString &v) {
-			trig->setDigitalExternalCondition(
-				enumFromName<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>(DIGITAL_CONDITION_OPTIONS, v));
+			const auto cond =
+				enumFromName<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>(DIGITAL_CONDITION_OPTIONS, v);
+			M2K_CALL(trig, "M2kHardwareTrigger::setDigitalExternalCondition",
+				 trig->setDigitalExternalCondition(cond), M2K_ARG(cond));
 		},
 		exec);
 	externalCondition->setOptions(toOptions(DIGITAL_CONDITION_OPTIONS));
@@ -757,14 +1047,18 @@ component::Channel *addPin(component::Device *dev, M2kDigital *dig, void *resour
 	component::Attribute *outputMode = addReadWriteAttr(
 		chn, QStringLiteral("output_mode"), QString(), resource,
 		[dig, pin]() {
-			return QByteArray(dig->getOutputMode(static_cast<DIO_CHANNEL>(pin)) == DIO_MODE::DIO_OPENDRAIN
+			const DIO_CHANNEL chn = static_cast<DIO_CHANNEL>(pin);
+			return QByteArray(M2K_CALL(dig, "M2kDigital::getOutputMode", dig->getOutputMode(chn),
+						   M2K_ARG(chn)) == DIO_MODE::DIO_OPENDRAIN
 						  ? dio::OUTPUT_MODE_OPTIONS[1]
 						  : dio::OUTPUT_MODE_OPTIONS[0]);
 		},
 		[dig, pin](const QString &v) {
-			dig->setOutputMode(static_cast<DIO_CHANNEL>(pin),
-					   v == QLatin1String(dio::OUTPUT_MODE_OPTIONS[1]) ? DIO_MODE::DIO_OPENDRAIN
-											   : DIO_MODE::DIO_PUSHPULL);
+			const DIO_CHANNEL chn = static_cast<DIO_CHANNEL>(pin);
+			const DIO_MODE mode = v == QLatin1String(dio::OUTPUT_MODE_OPTIONS[1]) ? DIO_MODE::DIO_OPENDRAIN
+											      : DIO_MODE::DIO_PUSHPULL;
+			M2K_CALL(dig, "M2kDigital::setOutputMode", dig->setOutputMode(chn, mode), M2K_ARG(chn),
+				 M2K_ARG(mode));
 		},
 		exec);
 	outputMode->setOptions(
@@ -773,7 +1067,9 @@ component::Channel *addPin(component::Device *dev, M2kDigital *dig, void *resour
 	addReadOnlyAttr(
 		chn, QStringLiteral("direction_hw"), QString(), resource,
 		[dig, pin]() {
-			return QByteArray(dig->getDirection(static_cast<DIO_CHANNEL>(pin)) == DIO_DIRECTION::DIO_OUTPUT
+			const DIO_CHANNEL index = static_cast<DIO_CHANNEL>(pin);
+			return QByteArray(M2K_CALL(dig, "M2kDigital::getDirection", dig->getDirection(index),
+						   M2K_ARG(index)) == DIO_DIRECTION::DIO_OUTPUT
 						  ? "out"
 						  : "in");
 		},
@@ -781,7 +1077,12 @@ component::Channel *addPin(component::Device *dev, M2kDigital *dig, void *resour
 
 	addWriteOnlyAttr(
 		chn, QStringLiteral("channel_enabled"), QString(), resource,
-		[dig, pin](const QString &v) { dig->enableChannel(static_cast<DIO_CHANNEL>(pin), v.toInt() != 0); },
+		[dig, pin](const QString &v) {
+			const DIO_CHANNEL index = static_cast<DIO_CHANNEL>(pin);
+			const bool enable = v.toInt() != 0;
+			M2K_CALL(dig, "M2kDigital::enableChannel", dig->enableChannel(index, enable), M2K_ARG(index),
+				 M2K_ARG(enable));
+		},
 		exec);
 	return chn;
 }
@@ -840,7 +1141,9 @@ void addDigitalDeviceAttrs(component::Device *dev, M2kDigital *dig, void *resour
 		[dig]() {
 			uint16_t word = 0;
 			for(int i = 0; i < dio::PIN_COUNT; ++i) {
-				const bool high = dig->getValueRaw(static_cast<DIO_CHANNEL>(i)) != DIO_LEVEL::LOW;
+				const DIO_CHANNEL index = static_cast<DIO_CHANNEL>(i);
+				const bool high = M2K_CALL(dig, "M2kDigital::getValueRaw", dig->getValueRaw(index),
+							   M2K_ARG(index)) != DIO_LEVEL::LOW;
 				word = dio::withBit(word, i, high);
 			}
 			return QByteArray::number(word);
@@ -871,31 +1174,65 @@ void addDigitalBufferAttrs(component::Device *dev, M2kDigital *dig, void *resour
 {
 	addReadWriteAttr(
 		dev, QStringLiteral("sample_rate_in"), QStringLiteral("Hz"), resource,
-		[dig]() { return QByteArray::number(dig->getSampleRateIn(), 'g', 12); },
-		[dig](const QString &v) { dig->setSampleRateIn(v.toDouble()); }, exec);
+		[dig]() {
+			return QByteArray::number(M2K_CALL(dig, "M2kDigital::getSampleRateIn", dig->getSampleRateIn()),
+						  'g', 12);
+		},
+		[dig](const QString &v) {
+			const double samplerate = v.toDouble();
+			M2K_CALL(dig, "M2kDigital::setSampleRateIn", dig->setSampleRateIn(samplerate),
+				 M2K_ARG(samplerate));
+		},
+		exec);
 
 	addReadWriteAttr(
 		dev, QStringLiteral("sample_rate_out"), QStringLiteral("Hz"), resource,
-		[dig]() { return QByteArray::number(dig->getSampleRateOut(), 'g', 12); },
-		[dig](const QString &v) { dig->setSampleRateOut(v.toDouble()); }, exec);
+		[dig]() {
+			return QByteArray::number(
+				M2K_CALL(dig, "M2kDigital::getSampleRateOut", dig->getSampleRateOut()), 'g', 12);
+		},
+		[dig](const QString &v) {
+			const double samplerate = v.toDouble();
+			M2K_CALL(dig, "M2kDigital::setSampleRateOut", dig->setSampleRateOut(samplerate),
+				 M2K_ARG(samplerate));
+		},
+		exec);
 
 	component::Attribute *cyclic = addReadWriteAttr(
 		dev, QStringLiteral("cyclic"), QString(), resource,
-		[dig]() { return QByteArray::number(dig->getCyclic() ? 1 : 0); },
-		[dig](const QString &v) { dig->setCyclic(v.toInt() != 0); }, exec);
+		[dig]() {
+			return QByteArray::number(M2K_CALL(dig, "M2kDigital::getCyclic", dig->getCyclic()) ? 1 : 0);
+		},
+		[dig](const QString &v) {
+			const bool cyclic = v.toInt() != 0;
+			M2K_CALL(dig, "M2kDigital::setCyclic", dig->setCyclic(cyclic), M2K_ARG(cyclic));
+		},
+		exec);
 	cyclic->setOptions({QStringLiteral("0"), QStringLiteral("1")});
 
 	addReadOnlyAttr(
 		dev, QStringLiteral("nb_channels_in"), QString(), resource,
-		[dig]() { return QByteArray::number(dig->getNbChannelsIn()); }, exec);
+		[dig]() {
+			return QByteArray::number(M2K_CALL(dig, "M2kDigital::getNbChannelsIn", dig->getNbChannelsIn()));
+		},
+		exec);
 
 	addReadOnlyAttr(
 		dev, QStringLiteral("nb_channels_out"), QString(), resource,
-		[dig]() { return QByteArray::number(dig->getNbChannelsOut()); }, exec);
+		[dig]() {
+			return QByteArray::number(
+				M2K_CALL(dig, "M2kDigital::getNbChannelsOut", dig->getNbChannelsOut()));
+		},
+		exec);
 
 	addWriteOnlyAttr(
 		dev, QStringLiteral("kernel_buffers_count_in"), QString(), resource,
-		[dig](const QString &v) { dig->setKernelBuffersCountIn(static_cast<unsigned int>(v.toUInt())); }, exec);
+		[dig](const QString &v) {
+			const unsigned int count = static_cast<unsigned int>(v.toUInt());
+			M2K_CALL(dig, "M2kDigital::setKernelBuffersCountIn", dig->setKernelBuffersCountIn(count),
+				 M2K_ARG(count));
+		},
+		exec);
 }
 
 void buildDigital(component::Context *ctx, libm2k::context::M2k *m2k, ICmdExecutor *executor)
@@ -951,13 +1288,21 @@ void buildContextDevice(component::Context *ctx, libm2k::context::M2k *m2k, ICmd
 	for(const std::string &name : names) {
 		addReadOnlyAttr(
 			contextDev, QString::fromStdString(name), QString(), m2k,
-			[m2k, name]() { return QByteArray::fromStdString(m2k->getContextAttributeValue(name)); },
+			[m2k, name]() {
+				return QByteArray::fromStdString(M2K_CALL(m2k, "M2k::getContextAttributeValue",
+									  m2k->getContextAttributeValue(name),
+									  M2K_ARG(name)));
+			},
 			executor);
 	}
 
 	addWriteOnlyAttr(
 		contextDev, QStringLiteral("timeout_ms"), QStringLiteral("ms"), m2k,
-		[m2k](const QString &v) { m2k->setTimeout(v.toUInt()); }, executor);
+		[m2k](const QString &v) {
+			const unsigned int timeout = v.toUInt();
+			M2K_CALL(m2k, "M2k::setTimeout", m2k->setTimeout(timeout), M2K_ARG(timeout));
+		},
+		executor);
 }
 
 void buildDmm(component::Context *ctx, DMM *dmm, const QString &id, void *resource, ICmdExecutor *executor)

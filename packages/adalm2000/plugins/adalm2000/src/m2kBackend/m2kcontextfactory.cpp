@@ -23,6 +23,7 @@
 #include "m2kcalibration.h"
 #include "m2kcomponentbuilder.h"
 #include "m2kcontext.h"
+#include "m2ktrace.h"
 
 #include <component/backends/iio/iioconnection.h>
 #include <component/backends/iio/iioprovider.h>
@@ -101,8 +102,9 @@ component::Context *M2kContextFactory::create(component::Connection &c, ICmdExec
 	QObject::connect(&c, &component::Connection::lost, ctx, [ctx]() { ctx->setConnectionLost(); });
 
 	new M2kCalibration(
-		m2k, [m2k]() { return m2k->isCalibrated(); }, [m2k]() { return m2k->calibrate(); },
-		[m2k]() { return m2k->resetCalibration(); }, executor, ctx);
+		m2k, [m2k]() { return M2K_CALL(m2k, "M2k::isCalibrated", m2k->isCalibrated()); },
+		[m2k]() { return M2K_CALL(m2k, "M2k::calibrate", m2k->calibrate()); },
+		[m2k]() { return M2K_CALL(m2k, "M2k::resetCalibration", m2k->resetCalibration()); }, executor, ctx);
 
 	M2kComponentBuilder builder;
 	if(!builder.build(ctx, executor)) {

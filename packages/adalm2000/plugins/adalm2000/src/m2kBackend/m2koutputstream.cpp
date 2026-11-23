@@ -21,8 +21,11 @@
 #include "m2koutputstream.h"
 
 #include "m2kcallcommand.h"
+#include "m2ktrace.h"
 
 #include "component/capabilityexecutor.h"
+
+#include <component/commandmonitor.h>
 
 #include <libm2k/analog/m2kanalogout.hpp>
 
@@ -121,15 +124,20 @@ QCoro::Task<CommandResponse<void>> M2kOutputStream::openAsync(const component::S
 	// One grouped command: libm2k documents no thread safety (D13).
 	auto *cmd = new M2kCallCommand<void>(m_resource, [aout, channels, cyclic, kernelBuffers, scales]() {
 		// Drop any buffer left attached by a previous run, as the old signal generator does.
-		aout->cancelBuffer();
+		M2K_CALL(aout, "M2kAnalogOut::cancelBuffer", aout->cancelBuffer());
 		for(int i = 0; i < M2kOutputStream::HW_CHANNELS; ++i) {
-			aout->enableChannel(static_cast<unsigned>(i), channels.contains(i));
+			M2K_CALL(aout, "M2kAnalogOut::enableChannel",
+				 aout->enableChannel(static_cast<unsigned>(i), channels.contains(i)),
+				 M2K_ARGN("chnIdx", i), M2K_ARGN("enable", channels.contains(i)));
 		}
 
 		for(int channel : channels) {
 			const unsigned ch = static_cast<unsigned>(channel);
-			aout->setCyclic(ch, cyclic);
-			aout->setKernelBuffersCount(ch, kernelBuffers);
+			M2K_CALL(aout, "M2kAnalogOut::setCyclic", aout->setCyclic(ch, cyclic), M2K_ARGN("chn", ch),
+				 M2K_ARGN("en", cyclic));
+			M2K_CALL(aout, "M2kAnalogOut::setKernelBuffersCount",
+				 aout->setKernelBuffersCount(ch, kernelBuffers), M2K_ARGN("chnIdx", ch),
+				 M2K_ARGN("count", kernelBuffers));
 
 			// Solve raw -> volts from the DAC's own converter, NOT from
 			// getScalingFactor(): that reports raw-codes-per-volt and is
@@ -155,6 +163,7 @@ QCoro::Task<CommandResponse<void>> M2kOutputStream::openAsync(const component::S
 			scales->append(cs);
 		}
 	});
+	component::CommandMonitor::tag(cmd, this);
 
 	auto result = co_await component::runCommand(
 		m_executor, cmd, [](const Result<void> &) {}, [this](const Error &e) { Q_EMIT streamError(e); });
@@ -189,7 +198,9 @@ QCoro::Task<CommandResponse<void>> M2kOutputStream::closeAsync()
 	}
 
 	M2kAnalogOut *aout = m_aout;
-	auto *cmd = new M2kCallCommand<void>(m_resource, [aout]() { aout->stop(); });
+	auto *cmd =
+		new M2kCallCommand<void>(m_resource, [aout]() { M2K_CALL(aout, "M2kAnalogOut::stop", aout->stop()); });
+	component::CommandMonitor::tag(cmd, this);
 
 	auto result = co_await component::runCommand(
 		m_executor, cmd, [](const Result<void> &) {}, [this](const Error &e) { Q_EMIT streamError(e); });
@@ -221,7 +232,10 @@ QCoro::Task<CommandResponse<void>> M2kOutputStream::pushAsync()
 	}
 
 	M2kAnalogOut *aout = m_aout;
-	auto *cmd = new M2kCallCommand<void>(m_resource, [aout, payload]() { aout->push(*payload); });
+	auto *cmd = new M2kCallCommand<void>(m_resource, [aout, payload]() {
+		M2K_CALL(aout, "M2kAnalogOut::push", aout->push(*payload), M2K_ARGN("data", *payload));
+	});
+	component::CommandMonitor::tag(cmd, this);
 
 	co_return co_await finishPush(cmd);
 }
@@ -261,11 +275,13 @@ QCoro::Task<CommandResponse<void>> M2kOutputStream::pushAsync(std::vector<std::v
 	auto *cmd = new M2kCallCommand<void>(m_resource, [aout, payload, pushed]() {
 		if(pushed.size() == 1) {
 			const unsigned ch = static_cast<unsigned>(pushed.first());
-			aout->push(ch, payload->at(ch));
+			M2K_CALL(aout, "M2kAnalogOut::push", aout->push(ch, payload->at(ch)), M2K_ARGN("chnIdx", ch),
+				 M2K_ARGN("data", payload->at(ch)));
 			return;
 		}
-		aout->push(*payload);
+		M2K_CALL(aout, "M2kAnalogOut::push", aout->push(*payload), M2K_ARGN("data", *payload));
 	});
+	component::CommandMonitor::tag(cmd, this);
 
 	co_return co_await finishPush(cmd);
 }

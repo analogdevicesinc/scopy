@@ -24,6 +24,8 @@
 
 #include "component/capabilityexecutor.h"
 
+#include <component/commandmonitor.h>
+
 #include <QLoggingCategory>
 #include <QPointer>
 
@@ -90,6 +92,8 @@ QCoro::Task<void> M2kCalibration::run(bool force)
 QCoro::Task<bool> M2kCalibration::call(Procedure procedure)
 {
 	auto *cmd = new M2kCallCommand<bool>(m_resource, std::move(procedure));
+	// Not a tree node: attributed to the M2kContext that owns it.
+	component::CommandMonitor::tag(cmd, parent());
 	const auto r = co_await component::runCommand(
 		m_executor, cmd, [](const scopy::Result<bool> &) {},
 		[](const scopy::Error &e) { qWarning(CAT_M2KCALIBRATION) << e.message; });

@@ -24,6 +24,7 @@
 
 #include "component/attributewriter.h"
 #include "component/capabilityexecutor.h"
+#include "component/commandmonitor.h"
 
 #include <QString>
 
@@ -53,6 +54,7 @@ public:
 	{
 		auto setter = m_setter;
 		auto *cmd = new M2kCallCommand<void>(m_resource, [setter, value]() { setter(value); });
+		component::CommandMonitor::tag(cmd, this);
 		return component::runCommand(
 			m_executor, cmd, [this](const scopy::Result<void> &) { Q_EMIT writeSucceeded(); },
 			[this](const scopy::Error &error) { Q_EMIT writeFailed(error); });
