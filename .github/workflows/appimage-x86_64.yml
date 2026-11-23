@@ -91,11 +91,12 @@ jobs:
 
         - name: Generate .deb package
           id: deb
-          uses: analogdevicesinc/shared-actions/deb-generator-action@9efc4d656aced2e6cba05ff76c24eea54c9e3688
+          uses: analogdevicesinc/shared-actions/deb-generator-action@main
           env:
             DEB_APPIMAGE_PATH: ${{ github.workspace }}/${{ env.app_image_name }}
           with:
             version: ${{ steps.version.outputs.version }}
+            version-suffix: +Ubuntu${{ matrix.ubuntu_version }}
             control-path: ci/packaging/debian
             ignore-path: |
               ${{ env.app_image_name }}

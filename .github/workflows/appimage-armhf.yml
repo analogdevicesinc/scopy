@@ -76,7 +76,7 @@ jobs:
           uses: actions/checkout@v6
           with:
             repository: analogdevicesinc/shared-actions
-            ref: 9efc4d656aced2e6cba05ff76c24eea54c9e3688
+            ref: main
             path: shared-actions
 
         - name: Set up QEMU for armhf containers
@@ -89,6 +89,7 @@ jobs:
             docker run --rm --platform linux/arm/v7 \
               -w /scopy \
               -e VERSION="${{ steps.version.outputs.version }}" \
+              -e VERSION_SUFFIX="+debian13" \
               -e CONTROL_PATH=ci/packaging/debian \
               -e IGNORE_PATH="$IGNORE_PATH" \
               -e DEB_APPIMAGE_PATH=/scopy/${{ env.APPIMAGE_NAME }}.AppImage \
