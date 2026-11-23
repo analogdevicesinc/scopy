@@ -37,13 +37,14 @@ namespace scopy {
 // file frame. Pure text; language ids are the ones CodeEmitter::language() returns.
 namespace codegen {
 inline constexpr auto C = "c";
+inline constexpr auto Cpp = "cpp"; // C syntax for literals / comments / loops, C++ program frame
 inline constexpr auto Python = "python";
 
-// "C" / "Python" (the id itself for an unknown language).
+// "C" / "C++" / "Python" (the id itself for an unknown language).
 CONTROLLER_CORE_EXPORT QString languageName(const QString &language);
-// "c" / "py" ("txt" for an unknown language).
+// "c" / "cpp" / "py" ("txt" for an unknown language).
 CONTROLLER_CORE_EXPORT QString fileExtension(const QString &language);
-// One indentation level: a tab for C, four spaces otherwise.
+// One indentation level: a tab for C / C++, four spaces otherwise.
 CONTROLLER_CORE_EXPORT QString indentUnit(const QString &language);
 // Prefixes every non-empty line of `text` with `prefix`.
 CONTROLLER_CORE_EXPORT QString indent(const QString &text, const QString &prefix);
@@ -64,7 +65,7 @@ CONTROLLER_CORE_EXPORT QString loopBegin(const QString &language, int count);
 CONTROLLER_CORE_EXPORT QString loopEnd(const QString &language);
 
 // The whole file: header comment, header lines (#include / import), then the body inside the
-// language's entry point (C main, Python top level).
+// language's entry point (C / C++ main, Python top level).
 CONTROLLER_CORE_EXPORT QString script(const QString &language, const QString &headerComment, const QStringList &headers,
 				      const QString &body);
 } // namespace codegen
@@ -123,7 +124,7 @@ public:
 	virtual ~CodeEmitter();
 
 	virtual QString library() const = 0;  // CallRecord::library it handles: "libiio", "remote-bus"
-	virtual QString language() const = 0; // codegen::C / Python
+	virtual QString language() const = 0; // codegen::C / Cpp / Python
 	// Shown in the script header, e.g. "libiio v1 API (pylibiio 1.x)".
 	virtual QString description() const { return library(); }
 

@@ -37,7 +37,8 @@ using namespace scopy::component;
 namespace {
 const QStringList &knownLanguages()
 {
-	static const QStringList l = {QString::fromLatin1(codegen::C), QString::fromLatin1(codegen::Python)};
+	static const QStringList l = {QString::fromLatin1(codegen::C), QString::fromLatin1(codegen::Cpp),
+				      QString::fromLatin1(codegen::Python)};
 	return l;
 }
 

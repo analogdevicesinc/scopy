@@ -56,7 +56,7 @@ public:
 	std::shared_ptr<CodeEmitter> emitter(const QString &library, const QString &language) const;
 	QStringList libraries() const;
 
-	// Languages with an emitter for every one of `libraries` (C, Python first, in that order);
+	// Languages with an emitter for every one of `libraries` (C, C++, Python first, in that order);
 	// empty for no libraries.
 	QStringList languagesFor(const QStringList &libraries) const;
 	// Libraries of the calls in `entries`, in order of first use.

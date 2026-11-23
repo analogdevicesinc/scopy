@@ -25,6 +25,9 @@ using namespace scopy;
 
 namespace {
 bool isC(const QString &l) { return l == QLatin1String(codegen::C); }
+bool isCpp(const QString &l) { return l == QLatin1String(codegen::Cpp); }
+// C and C++ share literals, comments, loops and indentation.
+bool isCLike(const QString &l) { return isC(l) || isCpp(l); }
 bool isPython(const QString &l) { return l == QLatin1String(codegen::Python); }
 
 bool isPrintableAscii(uint c) { return c >= 0x20 && c < 0x7f; }
@@ -114,6 +117,9 @@ QString codegen::languageName(const QString &language)
 	if(isC(language)) {
 		return QStringLiteral("C");
 	}
+	if(isCpp(language)) {
+		return QStringLiteral("C++");
+	}
 	if(isPython(language)) {
 		return QStringLiteral("Python");
 	}
@@ -125,6 +131,9 @@ QString codegen::fileExtension(const QString &language)
 	if(isC(language)) {
 		return QStringLiteral("c");
 	}
+	if(isCpp(language)) {
+		return QStringLiteral("cpp");
+	}
 	if(isPython(language)) {
 		return QStringLiteral("py");
 	}
@@ -133,7 +142,7 @@ QString codegen::fileExtension(const QString &language)
 
 QString codegen::indentUnit(const QString &language)
 {
-	return isC(language) ? QStringLiteral("\t") : QStringLiteral("    ");
+	return isCLike(language) ? QStringLiteral("\t") : QStringLiteral("    ");
 }
 
 QString codegen::indent(const QString &text, const QString &prefix)
@@ -258,8 +267,9 @@ QString codegen::script(const QString &language, const QString &headerComment, c
 	}
 	out << QString();
 
-	if(isC(language)) {
-		out << QStringLiteral("int main(void)") << QStringLiteral("{");
+	if(isCLike(language)) {
+		out << (isCpp(language) ? QStringLiteral("int main()") : QStringLiteral("int main(void)"))
+		    << QStringLiteral("{");
 		if(!body.isEmpty()) {
 			out << indent(body, QStringLiteral("\t")) << QString();
 		}

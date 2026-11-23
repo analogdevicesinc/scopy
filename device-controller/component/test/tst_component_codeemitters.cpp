@@ -289,6 +289,7 @@ private Q_SLOTS:
 
 	void languagesForMixedLibraries();
 	void languagesForEmptySelection();
+	void cppFrame();
 	void addReplacesSameLanguage();
 	void instanceMatchesLinkedBackend();
 	void emptySelectionGivesNoScript();
@@ -635,6 +636,25 @@ void TstComponentCodeEmitters::comments()
 	QCOMPARE(comment(lang(C), QStringLiteral("path\\")), QStringLiteral("// path\\."));
 	QCOMPARE(loopBegin(lang(Python), 4), QStringLiteral("for _ in range(4):"));
 	QCOMPARE(loopEnd(lang(Python)), QString());
+}
+
+void TstComponentCodeEmitters::cppFrame()
+{
+	using namespace codegen;
+	const QString cpp = lang(Cpp);
+	QCOMPARE(languageName(cpp), QStringLiteral("C++"));
+	QCOMPARE(fileExtension(cpp), QStringLiteral("cpp"));
+	QCOMPARE(indentUnit(cpp), QStringLiteral("\t"));
+	// C syntax for literals, comments and loops.
+	QCOMPARE(stringLiteral(cpp, QStringLiteral("a\"b")), stringLiteral(lang(C), QStringLiteral("a\"b")));
+	QCOMPARE(boolLiteral(cpp, true), QStringLiteral("true"));
+	QCOMPARE(comment(cpp, QStringLiteral("x")), QStringLiteral("// x"));
+	QCOMPARE(loopBegin(cpp, 3), QStringLiteral("for (int i = 0; i < 3; i++) {"));
+	QCOMPARE(loopEnd(cpp), QStringLiteral("}"));
+	// A C++ program: headers, then the body inside main().
+	const QString code = script(cpp, QStringLiteral("// header"), {QStringLiteral("#include <x.hpp>")},
+				    QStringLiteral("call();"));
+	QCOMPARE(code, QStringLiteral("// header\n\n#include <x.hpp>\n\nint main()\n{\n\tcall();\n\n\treturn 0;\n}\n"));
 }
 
 QTEST_MAIN(TstComponentCodeEmitters)
