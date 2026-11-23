@@ -30,6 +30,7 @@
 
 class QModelIndex;
 class QSortFilterProxyModel;
+class QSplitter;
 class QStackedWidget;
 class QTimer;
 class QTreeView;
@@ -68,6 +69,10 @@ public:
 	CommandLogView *commandLog() const { return m_log; }
 	BottomPaneHost *bottomPanes() const { return m_bottomPanes; }
 
+	// The tree | panel split and the bottom pane (open one, height), to / from layoutstate.
+	void storeLayout();
+	void restoreLayout();
+
 public Q_SLOTS:
 	void rebuild();
 	// Drops every reference into the component tree (before the views are released).
@@ -97,6 +102,7 @@ private:
 	QStackedWidget *m_panels;
 	CommandLogView *m_log;
 	BottomPaneHost *m_bottomPanes;
+	QSplitter *m_mainSplitter;
 	QTimer *m_logTabTimer;
 	QWidget *m_emptyPanel;
 	QHash<QString, NodePanel *> m_panelCache;

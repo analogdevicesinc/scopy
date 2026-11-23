@@ -54,27 +54,34 @@ public:
 };
 
 // A plot above its measurements table: two docks (KDDockWidgets when available and preferred), else a
-// vertical splitter. The table starts DefaultRows rows tall; extra height goes to the plot.
+// vertical splitter. The table starts DefaultRows rows tall; extra height goes to the plot. The
+// arrangement is kept per stateKey (see layoutstate): the table height of the splitter, or where
+// the docks are (which side, tabbed, floating) and the table dock size.
 class PlotMeasurementsArea : public QWidget
 {
 	Q_OBJECT
 public:
 	static constexpr int DefaultRows = 2;
 
-	PlotMeasurementsArea(QWidget *plot, QTableWidget *table, QWidget *parent = nullptr);
+	PlotMeasurementsArea(QWidget *plot, QTableWidget *table, const QString &stateKey, QWidget *parent = nullptr);
 	~PlotMeasurementsArea() override;
 
 protected:
 	void showEvent(QShowEvent *event) override;
+	void hideEvent(QHideEvent *event) override;
 
 private:
 	int tableHeight() const;
 	void applyInitialSizes();
+	void storeDocks();
+	void restoreDocks(QWidget *mainWindow);
 
 	QTableWidget *m_table;
+	QString m_stateKey;
 	QSplitter *m_splitter = nullptr;
 	QList<DockWrapperInterface *> m_docks;
 	bool m_sized = false;
+	bool m_shown = false;
 };
 
 // v with an SI prefix and `unit`, e.g. 1.0008 kHz.

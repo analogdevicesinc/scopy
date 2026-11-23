@@ -140,7 +140,15 @@ Q_SIGNALS:
 	// isRecording() changed: the monitor was turned, bound, unbound or destroyed.
 	void recordingChanged(bool recording);
 
+protected:
+	void showEvent(QShowEvent *event) override;
+	void hideEvent(QHideEvent *event) override;
+
 private:
+	// Column widths, the log | generator arrangement and whether the generator is shown, to
+	// layoutstate (read back by the constructor).
+	void storeLayout();
+	void fitCodeGenerator();
 	QWidget *buildFilters(QWidget *parent);
 	void applyFilter();
 	void onRowClicked(const QModelIndex &index);
@@ -184,6 +192,7 @@ private:
 	QTimer *m_codegenTimer;
 	bool m_docking = false;
 	bool m_codegenShown = false;
+	bool m_fitted = false;
 	bool m_recording = false;
 };
 

@@ -56,6 +56,8 @@ public:
 	QString description() override;
 	QString pkgName() override;
 	QString version() override;
+	void saveSettings(QSettings &s) override;
+	void loadSettings(QSettings &s) override;
 
 public Q_SLOTS:
 	bool onConnect() override;

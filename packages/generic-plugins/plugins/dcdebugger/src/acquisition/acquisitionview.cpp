@@ -96,7 +96,7 @@ AcquisitionView::AcquisitionView(InputStream *stream, QWidget *parent)
 	m_tool->topContainerMenuControl()->setVisible(false);
 	lay->addWidget(m_tool);
 	// Channels | plot | menus, resizable; a side dragged to the edge hides.
-	m_sides = new SideSplitter(200, 300, this);
+	m_sides = new SideSplitter(200, 300, QStringLiteral("acquisition/sides"), this);
 	m_tool->addWidgetToCentralContainerHelper(m_sides);
 
 	m_status = new QLabel("Stopped", this);
@@ -104,7 +104,7 @@ AcquisitionView::AcquisitionView(InputStream *stream, QWidget *parent)
 	m_runBtn = new RunBtn(this);
 	m_singleBtn = new SingleShotBtn(this);
 	auto *gearBtn = new GearBtn(this);
-	gearBtn->setChecked(true);
+	gearBtn->setChecked(m_sides->isRightOpen());
 	m_tool->addWidgetToTopContainerHelper(m_status, TTA_LEFT);
 	m_tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	m_tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
@@ -353,7 +353,7 @@ void AcquisitionView::buildPlot()
 	lay->addWidget(m_plot);
 
 	m_table = new MeasurementsTable(this);
-	m_sides->setCentralWidget(new PlotMeasurementsArea(wrapper, m_table, this));
+	m_sides->setCentralWidget(new PlotMeasurementsArea(wrapper, m_table, QStringLiteral("acquisition"), this));
 }
 
 void AcquisitionView::applyChannelSelection()

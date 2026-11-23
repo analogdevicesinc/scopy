@@ -112,7 +112,7 @@ GeneratorView::GeneratorView(OutputStream *stream, QWidget *parent)
 	m_tool->topContainerMenuControl()->setVisible(false);
 	lay->addWidget(m_tool);
 	// Channels | plot | menus, resizable; a side dragged to the edge hides.
-	m_sides = new SideSplitter(200, 300, this);
+	m_sides = new SideSplitter(200, 300, QStringLiteral("generator/sides"), this);
 	m_tool->addWidgetToCentralContainerHelper(m_sides);
 
 	m_status = new QLabel("Stopped", this);
@@ -123,7 +123,7 @@ GeneratorView::GeneratorView(OutputStream *stream, QWidget *parent)
 	connect(m_runBtn, &QPushButton::toggled, m_runBtn,
 		[this](bool on) { m_runBtn->setText(on ? "Stop" : "Start"); });
 	auto *gearBtn = new GearBtn(this);
-	gearBtn->setChecked(true);
+	gearBtn->setChecked(m_sides->isRightOpen());
 	m_tool->addWidgetToTopContainerHelper(m_status, TTA_LEFT);
 	m_tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	m_tool->addWidgetToTopContainerHelper(gearBtn, TTA_RIGHT);

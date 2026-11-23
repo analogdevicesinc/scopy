@@ -150,7 +150,7 @@ MonitorView::MonitorView(QObject *root, QWidget *parent)
 	m_tool->topContainerMenuControl()->setVisible(false);
 	lay->addWidget(m_tool);
 	// Channels | plot | menus, resizable; a side dragged to the edge hides.
-	m_sides = new SideSplitter(220, 300, this);
+	m_sides = new SideSplitter(220, 300, QStringLiteral("monitor/sides"), this);
 	m_tool->addWidgetToCentralContainerHelper(m_sides);
 
 	m_status = new QLabel("Stopped", this);
@@ -161,7 +161,7 @@ MonitorView::MonitorView(QObject *root, QWidget *parent)
 	m_clearBtn = new QPushButton("Clear", this);
 	Style::setStyle(m_clearBtn, style::properties::dcdebugger::topButton);
 	auto *gearBtn = new GearBtn(this);
-	gearBtn->setChecked(true);
+	gearBtn->setChecked(m_sides->isRightOpen());
 	m_tool->addWidgetToTopContainerHelper(m_status, TTA_LEFT);
 	m_tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	m_tool->addWidgetToTopContainerHelper(m_clearBtn, TTA_RIGHT);
@@ -440,7 +440,7 @@ void MonitorView::buildPlots()
 	m_table->setFocusPolicy(Qt::NoFocus);
 	Style::setStyle(m_table, style::properties::widget::tableViewWidget);
 
-	m_sides->setCentralWidget(new PlotMeasurementsArea(m_plotsArea, m_table, this));
+	m_sides->setCentralWidget(new PlotMeasurementsArea(m_plotsArea, m_table, QStringLiteral("monitor"), this));
 
 	addPlot(); // there is always at least one plot
 }

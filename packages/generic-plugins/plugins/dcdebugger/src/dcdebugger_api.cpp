@@ -39,6 +39,7 @@
 #include "ping/pingview.h"
 #include "registers/registersession.h"
 #include "registers/registerview.h"
+#include "sidesplitter.h"
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -238,6 +239,26 @@ CommandLogView *DCDebugger_API::log() const
 		qWarning(CAT_DCDEBUGGER_API) << "The selected node has no" << #Type;                                   \
 		return fail;                                                                                           \
 	}
+
+// Layout
+
+QVariantMap DCDebugger_API::layout() const
+{
+	if(m_current && m_current->m_tool) {
+		m_current->m_tool->storeLayout();
+	}
+	return layoutstate::values();
+}
+
+void DCDebugger_API::setLayout(const QVariantMap &layout)
+{
+	layoutstate::setValues(layout);
+	if(m_current && m_current->m_tool) {
+		m_current->m_tool->restoreLayout();
+	}
+}
+
+void DCDebugger_API::resetLayout() { setLayout({}); }
 
 // Devices
 

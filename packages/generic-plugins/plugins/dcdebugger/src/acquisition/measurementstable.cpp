@@ -33,6 +33,8 @@
 #include <gui/docking/dockwrapper.h>
 #include <style.h>
 
+#include "sidesplitter.h"
+
 using namespace scopy;
 using namespace scopy::dcdebugger;
 
@@ -99,9 +101,10 @@ void MeasurementsTable::setRows(const QList<MeasurementRow> &rows, const QString
 	}
 }
 
-PlotMeasurementsArea::PlotMeasurementsArea(QWidget *plot, QTableWidget *table, QWidget *parent)
+PlotMeasurementsArea::PlotMeasurementsArea(QWidget *plot, QTableWidget *table, const QString &stateKey, QWidget *parent)
 	: QWidget(parent)
 	, m_table(table)
+	, m_stateKey(stateKey)
 {
 	auto *lay = new QVBoxLayout(this);
 	lay->setContentsMargins(0, 0, 0, 0);
@@ -116,11 +119,12 @@ PlotMeasurementsArea::PlotMeasurementsArea(QWidget *plot, QTableWidget *table, Q
 		DockWrapperInterface *tableDock = createDockWrapper("Measurements");
 		tableDock->setInnerWidget(table);
 		m_docks = {plotDock, tableDock};
-		// Added directly, not through the area: only this way it gets its initial height.
-		auto *dw = dynamic_cast<KDDockWidgets::QtWidgets::DockWidget *>(tableDock);
-		dw->setAffinities({mw->uniqueName()});
-		mw->addDockWidget(dw, KDDockWidgets::Location_OnBottom, nullptr,
-				  KDDockWidgets::InitialOption(QSize(0, tableHeight())));
+		restoreDocks(mw);
+		layoutstate::addCollector(this, [this]() {
+			if(isVisible()) {
+				storeDocks();
+			}
+		});
 		return;
 	}
 #endif
@@ -132,6 +136,12 @@ PlotMeasurementsArea::PlotMeasurementsArea(QWidget *plot, QTableWidget *table, Q
 	m_splitter->setStretchFactor(0, 1);
 	m_splitter->setStretchFactor(1, 0);
 	lay->addWidget(m_splitter);
+	connect(m_splitter, &QSplitter::splitterMoved, this, [this]() {
+		const int table = m_splitter->sizes().value(1);
+		if(table > 0) {
+			layoutstate::setValue(m_stateKey + QStringLiteral("/tableHeight"), table);
+		}
+	});
 }
 
 PlotMeasurementsArea::~PlotMeasurementsArea()
@@ -145,10 +155,36 @@ PlotMeasurementsArea::~PlotMeasurementsArea()
 void PlotMeasurementsArea::showEvent(QShowEvent *event)
 {
 	QWidget::showEvent(event);
+	m_shown = true;
 	if(m_splitter && !m_sized) {
 		// After the first layout pass, once the splitter has its real height.
 		QTimer::singleShot(0, this, &PlotMeasurementsArea::applyInitialSizes);
 	}
+}
+
+void PlotMeasurementsArea::hideEvent(QHideEvent *event)
+{
+	// Leaving the panel (or the tool): keep how its docks were arranged.
+	storeDocks();
+	QWidget::hideEvent(event);
+}
+
+void PlotMeasurementsArea::storeDocks()
+{
+	if(!m_shown || m_docks.size() != 2) {
+		return;
+	}
+	const QVariantMap state = layoutstate::dockPairState(m_docks[0], m_docks[1]);
+	if(!state.isEmpty()) {
+		layoutstate::setValue(m_stateKey + QStringLiteral("/docks"), state);
+	}
+}
+
+void PlotMeasurementsArea::restoreDocks(QWidget *mainWindow)
+{
+	layoutstate::placeDockPair(mainWindow, m_docks[0], m_docks[1],
+				   layoutstate::value(m_stateKey + QStringLiteral("/docks")).toMap(),
+				   QStringLiteral("bottom"), tableHeight());
 }
 
 int PlotMeasurementsArea::tableHeight() const
@@ -164,7 +200,8 @@ void PlotMeasurementsArea::applyInitialSizes()
 		return;
 	}
 	m_sized = true;
-	const int table = std::min(tableHeight(), total / 2);
+	const int kept = layoutstate::value(m_stateKey + QStringLiteral("/tableHeight"), 0).toInt();
+	const int table = kept > 0 ? std::min(kept, total - 1) : std::min(tableHeight(), total / 2);
 	m_splitter->setSizes({total - table, table});
 }
 

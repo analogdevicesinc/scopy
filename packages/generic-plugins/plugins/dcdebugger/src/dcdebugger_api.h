@@ -52,9 +52,13 @@ class RegisterView;
 // The instrument calls (acquisition, generator, monitor, registers, ping) act on the view of the
 // selected node (selectNode()) and drive its UI, so the screen follows the script. Calls that talk
 // to the device wait for the result, up to timeoutMs.
+//
+// Stored property: "layout", the arrangement of the tool (splitters, panes, docks), saved and
+// loaded with the plugin's session settings.
 class SCOPY_DCDEBUGGER_EXPORT DCDebugger_API : public ApiObject
 {
 	Q_OBJECT
+	Q_PROPERTY(QVariantMap layout READ layout WRITE setLayout)
 
 public:
 	static constexpr int DEFAULT_TIMEOUT_MS = 5000;
@@ -62,6 +66,9 @@ public:
 	// One API for every plugin instance: created with the first, deleted with the last.
 	static DCDebugger_API *attach(DCDebuggerPlugin *plugin);
 	static void detach(DCDebuggerPlugin *plugin);
+
+	QVariantMap layout() const;
+	void setLayout(const QVariantMap &layout);
 
 	// Devices
 	Q_INVOKABLE QStringList getDevices() const;
@@ -157,6 +164,9 @@ public:
 	Q_INVOKABLE QStringList getCodeLanguages();
 	Q_INVOKABLE QString generateCode(const QString &language = {});
 	Q_INVOKABLE bool saveCode(const QString &path, const QString &language = {});
+
+	// Layout
+	Q_INVOKABLE void resetLayout();
 
 private:
 	DCDebugger_API();

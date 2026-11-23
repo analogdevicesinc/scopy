@@ -71,6 +71,8 @@ public:
 	QSplitter *splitter() const { return m_splitter; }
 	// Height the pane opens with (the last non-zero one it had).
 	int paneHeight() const { return m_paneHeight; }
+	// Height the next open uses (e.g. kept from the last session).
+	void setPaneHeight(int height) { m_paneHeight = height; }
 
 public Q_SLOTS:
 	void showPane(const QString &id);
@@ -116,6 +118,8 @@ private:
 	QList<Pane> m_panes;
 	QString m_current;
 	int m_paneHeight = DEFAULT_PANE_HEIGHT;
+	// The pane was opened before the splitter had a height: its height applies on the first resize.
+	bool m_restorePending = false;
 };
 
 } // namespace scopy::dcdebugger

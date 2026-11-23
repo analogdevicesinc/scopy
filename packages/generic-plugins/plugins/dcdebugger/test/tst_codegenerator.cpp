@@ -24,6 +24,7 @@
 #include "log/codegeneratorpanel.h"
 #include "log/commandlogmodel.h"
 #include "log/commandlogview.h"
+#include "sidesplitter.h"
 
 #include <QAbstractButton>
 #include <QAction>
@@ -260,7 +261,12 @@ void TST_CodeGenerator::initTestCase()
 	QDir::setCurrent(QStringLiteral(DCDEBUGGER_TEST_BUILD_DIR));
 }
 
-void TST_CodeGenerator::cleanup() { Preferences::set(DOCKING_PREF, false); }
+void TST_CodeGenerator::cleanup()
+{
+	Preferences::set(DOCKING_PREF, false);
+	// The kept layout is process-wide: no test case starts from another's arrangement.
+	layoutstate::setValues({});
+}
 
 void TST_CodeGenerator::languagesFollowEntries()
 {

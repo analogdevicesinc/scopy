@@ -76,6 +76,7 @@ BottomPaneHost::BottomPaneHost(QWidget *mainWidget, QWidget *parent)
 	m_paneArea->hide();
 	// A pane dragged fully down closes when the handle is released.
 	m_splitter->handle(1)->installEventFilter(this);
+	m_splitter->installEventFilter(this);
 
 	// The bar: one checkable tab per pane, always visible.
 	m_bar = new QFrame(this);
@@ -226,6 +227,21 @@ void BottomPaneHost::syncFromSplitter()
 
 bool BottomPaneHost::eventFilter(QObject *watched, QEvent *event)
 {
+	if(watched == m_splitter) {
+		if(event->type() == QEvent::Resize && m_restorePending && isPaneOpen() &&
+		   m_splitter->height() > m_splitter->handleWidth()) {
+			// After the splitter's own resize handling.
+			QMetaObject::invokeMethod(
+				this,
+				[this]() {
+					if(isPaneOpen()) {
+						restorePaneHeight();
+					}
+				},
+				Qt::QueuedConnection);
+		}
+		return QWidget::eventFilter(watched, event);
+	}
 	if(event->type() == QEvent::MouseButtonRelease) {
 		// After the splitter's own release handling.
 		QMetaObject::invokeMethod(this, &BottomPaneHost::syncFromSplitter, Qt::QueuedConnection);
@@ -243,9 +259,12 @@ void BottomPaneHost::restorePaneHeight()
 {
 	const int total = m_splitter->height() - m_splitter->handleWidth();
 	if(total > 0) {
+		// Sized while hidden (e.g. not the current tool): again once it has its shown size.
+		m_restorePending = !m_splitter->isVisible();
 		const int h = qBound(1, m_paneHeight, qMax(1, total - 100));
 		m_splitter->setSizes({total - h, h});
 	} else {
+		m_restorePending = true;
 		// Not laid out yet: the sizes act as preferred sizes, the main widget takes the rest.
 		m_splitter->setSizes({m_paneHeight * 2, m_paneHeight});
 	}

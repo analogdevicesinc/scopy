@@ -20,7 +20,8 @@
 
 // DC Debugger Plugin Automated Tests (DCDebugger_API, registered as "dcdebugger")
 // Tests: TST.DCDBG.API, TST.DCDBG.TREE, TST.DCDBG.FILTER, TST.DCDBG.ATTR, TST.DCDBG.ACQ,
-//        TST.DCDBG.GEN, TST.DCDBG.MONITOR, TST.DCDBG.REGS, TST.DCDBG.PING, TST.DCDBG.LOG
+//        TST.DCDBG.GEN, TST.DCDBG.MONITOR, TST.DCDBG.REGS, TST.DCDBG.PING, TST.DCDBG.LOG,
+//        TST.DCDBG.LAYOUT
 // Written against iio-emu with packages/generic-plugins/emu-xml/pluto.xml:
 //   python3 js/run_tests.py generic-plugins --emu-xml packages/generic-plugins/emu-xml/pluto.xml \
 //       --js-file js/testAutomations/generic-plugins/dcdebugger/dcdebuggerTests.js
@@ -371,6 +372,25 @@ TestFramework.runTest("TST.DCDBG.LOG", function() {
     ok = TestFramework.assertEqual(dcdebugger.getLogEntryCount(), 0, "Cleared") && ok;
     dcdebugger.setLogEnabled(false);
     return TestFramework.assertEqual(dcdebugger.isLogEnabled(), false, "Log off") && ok;
+});
+
+// ============================================
+// Layout (saved / loaded with the session)
+// ============================================
+TestFramework.runTest("TST.DCDBG.LAYOUT", function() {
+    var layout = dcdebugger.layout;
+    var keys = Object.keys(layout);
+    printToConsole("  Layout keys: " + keys);
+    if (keys.indexOf("tool/mainSplit") === -1) {
+        printToConsole("  FAIL: the tool split is missing");
+        return false;
+    }
+    dcdebugger.layout = layout;
+    var again = Object.keys(dcdebugger.layout);
+    var ok = TestFramework.assertEqual(again.indexOf("tool/mainSplit") !== -1, true, "Layout round trip");
+    dcdebugger.resetLayout();
+    dcdebugger.layout = layout;
+    return ok;
 });
 
 TestFramework.disconnectFromDevice();

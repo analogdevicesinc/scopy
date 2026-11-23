@@ -28,6 +28,7 @@
 #include "nodepanel.h"
 #include "splitterpane.h"
 #include "readpolicy.h"
+#include "sidesplitter.h"
 
 #include <QCursor>
 #include <climits>
@@ -73,6 +74,7 @@ DCDebuggerTool::DCDebuggerTool(component::Connection *conn, QWidget *parent)
 	// Both sides are SplitterPanes: the handle moves smoothly over the whole width.
 	auto *splitter = new QSplitter(Qt::Horizontal, this);
 	splitter->setChildrenCollapsible(true);
+	m_mainSplitter = splitter;
 
 	auto *treeContainer = new QWidget();
 	Style::setBackgroundColor(treeContainer, json::theme::background_subtle);
@@ -128,6 +130,37 @@ DCDebuggerTool::DCDebuggerTool(component::Connection *conn, QWidget *parent)
 	updateLogTab();
 
 	m_model->setConnection(m_conn);
+}
+
+namespace {
+constexpr const char *MAIN_SPLIT_KEY = "tool/mainSplit";
+constexpr const char *PANE_KEY = "tool/pane";
+constexpr const char *PANE_HEIGHT_KEY = "tool/paneHeight";
+} // namespace
+
+void DCDebuggerTool::storeLayout()
+{
+	layoutstate::setValue(MAIN_SPLIT_KEY, m_mainSplitter->saveState());
+	layoutstate::setValue(PANE_KEY, m_bottomPanes->currentPane());
+	layoutstate::setValue(PANE_HEIGHT_KEY, m_bottomPanes->paneHeight());
+}
+
+void DCDebuggerTool::restoreLayout()
+{
+	const QByteArray split = layoutstate::value(MAIN_SPLIT_KEY).toByteArray();
+	if(!split.isEmpty()) {
+		m_mainSplitter->restoreState(split);
+	}
+	const int height = layoutstate::value(PANE_HEIGHT_KEY, 0).toInt();
+	if(height > 0) {
+		m_bottomPanes->setPaneHeight(height);
+	}
+	const QString pane = layoutstate::value(PANE_KEY).toString();
+	if(pane.isEmpty()) {
+		m_bottomPanes->hidePane();
+	} else {
+		m_bottomPanes->showPane(pane);
+	}
 }
 
 DCDebuggerTool::~DCDebuggerTool()

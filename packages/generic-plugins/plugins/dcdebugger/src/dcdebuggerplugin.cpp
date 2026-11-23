@@ -25,6 +25,7 @@
 
 #include "dcdebuggertool.h"
 #include "nodepanel.h"
+#include "sidesplitter.h"
 #include "log/commandlogview.h"
 #include "readpolicy.h"
 
@@ -35,6 +36,7 @@
 
 #include <component/commandmonitor.h>
 #include <component/connection.h>
+#include <common/scopyconfig.h>
 #include <component/context.h>
 #include <core/deviceimpl.h>
 #include <deviceiconbuilder.h>
@@ -145,6 +147,27 @@ QString DCDebuggerPlugin::pkgName() { return DCDEBUGGER_PKG_NAME; }
 
 QString DCDebuggerPlugin::version() { return "0.1"; }
 
+void DCDebuggerPlugin::saveSettings(QSettings &s)
+{
+	if(m_tool) {
+		m_tool->storeLayout();
+	}
+	if(m_api) {
+		m_api->save(s);
+	}
+}
+
+void DCDebuggerPlugin::loadSettings(QSettings &s)
+{
+	// After onConnect (which already read the same file): the tool's own splitters and pane.
+	if(m_api) {
+		m_api->load(s);
+	}
+	if(m_tool) {
+		m_tool->restoreLayout();
+	}
+}
+
 component::Connection *DCDebuggerPlugin::resolveConnection() const
 {
 	if(m_device && m_device->connection()) {
@@ -185,7 +208,13 @@ bool DCDebuggerPlugin::onConnect()
 	acquireViews(m_conn);
 	// The command log state lives in the connection's monitor (off on every new connection).
 
+	// Before the tool: the views restore their layout ("layout" of the API) when built, and the
+	// core loads the settings only after onConnect.
 	m_api = DCDebugger_API::attach(this);
+	if(Preferences::get("general_save_session").toBool()) {
+		QSettings s(scopy::config::settingsFolderPath() + "/" + name() + ".ini", QSettings::IniFormat);
+		m_api->load(s);
+	}
 	m_tool = new DCDebuggerTool(m_conn);
 	ToolMenuEntry *tme = ToolMenuEntry::findToolMenuEntryById(m_toolList, TOOL_ID);
 	tme->setTool(m_tool);
