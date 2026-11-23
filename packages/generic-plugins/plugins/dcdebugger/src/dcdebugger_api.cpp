@@ -36,6 +36,7 @@
 #include "monitor/attributemonitor.h"
 #include "monitor/monitorview.h"
 #include "nodepanel.h"
+#include "nodeviewregistry.h"
 #include "ping/pingview.h"
 #include "registers/registersession.h"
 #include "registers/registerview.h"
@@ -68,6 +69,7 @@
 #include <menucontrolbutton.h>
 #include <menuonoffswitch.h>
 #include <menuspinbox.h>
+#include <pluginbase/preferences.h>
 #include <pluginbase/scopyjs.h>
 #include <qcoro/qcorotask.h>
 #include <widgets/searchbar.h>
@@ -347,23 +349,32 @@ QString DCDebugger_API::getSelectedNode() const
 
 QStringList DCDebugger_API::getViews() const
 {
-	QStringList views;
-	if(view<AcquisitionView>()) {
-		views.append("Acquisition");
+	NodePanel *p = panel();
+	return p ? p->viewTitles() : QStringList();
+}
+
+QStringList DCDebugger_API::getRegisteredViews() const
+{
+	QStringList ids;
+	for(NodeViewFactory *factory : NodeViewRegistry::instance()->factories()) {
+		ids.append(factory->id());
 	}
-	if(view<GeneratorView>()) {
-		views.append("Generator");
+	return ids;
+}
+
+bool DCDebugger_API::setViewEnabled(const QString &id, bool enabled)
+{
+	if(!NodeViewRegistry::instance()->factory(id)) {
+		qWarning(CAT_DCDEBUGGER_API) << "No view" << id << "- views:" << getRegisteredViews();
+		return false;
 	}
-	if(view<MonitorView>()) {
-		views.append("Monitor");
-	}
-	if(view<RegisterView>()) {
-		views.append("Registers");
-	}
-	if(view<PingView>()) {
-		views.append("Ping");
-	}
-	return views;
+	Preferences::set(NodeViewRegistry::preferenceKey(id), enabled);
+	return true;
+}
+
+bool DCDebugger_API::isViewEnabled(const QString &id) const
+{
+	return NodeViewRegistry::instance()->factory(id) && NodeViewRegistry::isEnabled(id);
 }
 
 void DCDebugger_API::setFilter(const QString &text)

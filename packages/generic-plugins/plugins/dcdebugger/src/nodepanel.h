@@ -65,6 +65,8 @@ public:
 	// view and the attributes are docks instead, tabbed at first: they can be split side by side
 	// or floated.
 	void setMainView(const QString &title, QWidget *view);
+	// Titles of the main views, in the order they were added.
+	QStringList viewTitles() const { return m_viewTitles; }
 	// Stops the acquisitions / generations of the panel, docked or floating.
 	void shutdown();
 
@@ -91,6 +93,7 @@ private:
 	QTabWidget *m_tabs = nullptr;
 	DockableAreaInterface *m_area = nullptr;
 	QList<DockWrapperInterface *> m_docks; // the attributes first, then the views
+	QStringList m_viewTitles;
 	QVBoxLayout *m_sections;
 
 	void addDock(const QString &title, QWidget *widget);

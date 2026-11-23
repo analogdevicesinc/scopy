@@ -81,8 +81,13 @@ public:
 	Q_INVOKABLE QStringList getNodes(const QString &backend = {}) const;
 	Q_INVOKABLE bool selectNode(const QString &path, const QString &backend = {});
 	Q_INVOKABLE QString getSelectedNode() const;
-	// Titles of the selected node's views: "Acquisition", "Generator", "Monitor", "Registers", "Ping".
+	// Titles of the selected node's views ("Acquisition", "Monitor", ...), as its panel shows them.
 	Q_INVOKABLE QStringList getViews() const;
+	// Ids of every registered view (the debugger's and other plugins'), e.g. "acquisition".
+	Q_INVOKABLE QStringList getRegisteredViews() const;
+	// The view's preference; applies to panels built afterwards (rebuild() for the open ones).
+	Q_INVOKABLE bool setViewEnabled(const QString &id, bool enabled);
+	Q_INVOKABLE bool isViewEnabled(const QString &id) const;
 	Q_INVOKABLE void setFilter(const QString &text);
 	Q_INVOKABLE QString getFilter() const;
 	Q_INVOKABLE void refresh();

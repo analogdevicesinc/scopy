@@ -19,7 +19,7 @@
  */
 
 // DC Debugger Plugin Automated Tests (DCDebugger_API, registered as "dcdebugger")
-// Tests: TST.DCDBG.API, TST.DCDBG.TREE, TST.DCDBG.FILTER, TST.DCDBG.ATTR, TST.DCDBG.ACQ,
+// Tests: TST.DCDBG.API, TST.DCDBG.TREE, TST.DCDBG.VIEWS, TST.DCDBG.FILTER, TST.DCDBG.ATTR, TST.DCDBG.ACQ,
 //        TST.DCDBG.GEN, TST.DCDBG.MONITOR, TST.DCDBG.REGS, TST.DCDBG.PING, TST.DCDBG.LOG,
 //        TST.DCDBG.LAYOUT
 // Written against iio-emu with packages/generic-plugins/emu-xml/pluto.xml:
@@ -117,6 +117,34 @@ TestFramework.runTest("TST.DCDBG.TREE", function() {
     }
     dcdebugger.refresh();
     return true;
+});
+
+TestFramework.runTest("TST.DCDBG.VIEWS", function() {
+    var views = dcdebugger.getRegisteredViews();
+    printToConsole("  Registered views: " + views);
+    var builtin = ["acquisition", "generator", "ping", "monitor", "registers"];
+    for (var i = 0; i < builtin.length; i++) {
+        if (views.indexOf(builtin[i]) === -1 || !dcdebugger.isViewEnabled(builtin[i])) {
+            printToConsole("  FAIL: " + builtin[i] + " missing or disabled");
+            return false;
+        }
+    }
+    var phy = findNode("ad9361-phy");
+    // A panel is cached once built: rebuild() for the preference to apply.
+    if (!dcdebugger.setViewEnabled("registers", false)) {
+        return false;
+    }
+    dcdebugger.rebuild();
+    dcdebugger.selectNode(phy, BACKEND);
+    var withoutRegisters = dcdebugger.getViews();
+    dcdebugger.setViewEnabled("registers", true);
+    dcdebugger.rebuild();
+    dcdebugger.selectNode(phy, BACKEND);
+    var withRegisters = dcdebugger.getViews();
+    printToConsole("  ad9361-phy views: " + withoutRegisters + " -> " + withRegisters);
+    var ok = TestFramework.assertEqual(withoutRegisters.indexOf("Registers"), -1, "Registers off");
+    ok = TestFramework.assertEqual(withRegisters.indexOf("Registers") !== -1, true, "Registers on") && ok;
+    return !dcdebugger.setViewEnabled("no-such-view", false) && ok;
 });
 
 TestFramework.runTest("TST.DCDBG.FILTER", function() {

@@ -214,6 +214,7 @@ NodePanel::~NodePanel()
 
 void NodePanel::setMainView(const QString &title, QWidget *view)
 {
+	m_viewTitles.append(title);
 	if(!m_tabs && !m_area) {
 		m_layout->removeWidget(m_sectionsArea);
 		// The docks: KDDockWidgets when available and preferred (their own area: they only dock
