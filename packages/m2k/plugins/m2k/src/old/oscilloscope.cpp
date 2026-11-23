@@ -678,7 +678,7 @@ Oscilloscope::Oscilloscope(libm2k::context::M2k *m2k, QString uri, Filter *filt,
 	connect(&trigger_settings, SIGNAL(triggerModeChanged(int)), this, SLOT(onTriggerModeChanged(int)));
 
 	connect(&*iio, SIGNAL(timeout()), &trigger_settings, SLOT(autoTriggerDisable()));
-	connect(&plot, SIGNAL(newData()), &trigger_settings, SLOT(autoTriggerEnable()));
+	connect(&plot, SIGNAL(newData()), &trigger_settings, SLOT(autoTriggerRearm()));
 	connect(&plot, SIGNAL(newData()), this, SLOT(singleCaptureDone()));
 
 	connect(&plot, SIGNAL(filledScreen(bool, unsigned int)), this, SLOT(onFilledScreen(bool, unsigned int)));

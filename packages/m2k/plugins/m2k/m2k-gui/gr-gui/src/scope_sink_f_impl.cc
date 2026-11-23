@@ -54,6 +54,7 @@
 
 #include <qwt_symbol.h>
 
+#include <algorithm>
 #include <string.h>
 #include <volk/volk.h>
 
@@ -319,31 +320,32 @@ int scope_sink_f_impl::work(int noutput_items, gr_vector_const_void_star &input_
 	// If we've have a full d_size of items in the buffers, plot.
 	if((d_end != 0 && !d_displayOneBuffer) ||
 	   ((d_triggered) && (d_index == d_end) && d_end != 0 && d_displayOneBuffer)) {
-		// Copy data to be plotted to start of buffers.
-		for(n = 0; n < d_nconnections; n++) {
-			if(!d_displayOneBuffer) {
-				nItemsToSend = d_index;
-				if(nItemsToSend >= d_size) {
-					nItemsToSend = d_size;
-					d_cleanBuffers = false;
-				}
-				volk_32f_convert_64f(d_buffers[n], &d_fbuffers[n][d_start], nItemsToSend);
-			} else {
-				// memmove(d_buffers[n], &d_buffers[n][d_start], d_size*sizeof(double));
-				volk_32f_convert_64f(d_buffers[n], &d_fbuffers[n][d_start], d_size);
-				nItemsToSend = d_size;
-			}
+		if(!d_displayOneBuffer && d_index >= d_size) {
+			d_cleanBuffers = false;
 		}
 
-		// Plot if we are able to update
-		if((gr::high_res_timer_now() - d_last_time > d_update_time) || !d_cleanBuffers) {
+		const bool guiBusy = !d_displayOneBuffer && d_event_in_flight->load();
+		const bool timeToPlot = (gr::high_res_timer_now() - d_last_time > d_update_time) || !d_cleanBuffers;
+
+		if(timeToPlot && !guiBusy) {
+			for(n = 0; n < d_nconnections; n++) {
+				if(!d_displayOneBuffer) {
+					nItemsToSend = std::min(d_index, d_size);
+					volk_32f_convert_64f(d_buffers[n], &d_fbuffers[n][d_start], nItemsToSend);
+				} else {
+					volk_32f_convert_64f(d_buffers[n], &d_fbuffers[n][d_start], d_size);
+					nItemsToSend = d_size;
+				}
+			}
+
 			d_last_time = gr::high_res_timer_now();
 			if(d_qApplication) {
-				qDebug() << QString::fromStdString(d_name);
-
-				d_qApplication->postEvent(
-					this->plot,
-					new IdentifiableTimeUpdateEvent(d_buffers, nItemsToSend, d_tags, d_name));
+				auto *ev = new IdentifiableTimeUpdateEvent(d_buffers, nItemsToSend, d_tags, d_name);
+				if(!d_displayOneBuffer) {
+					d_event_in_flight->store(true);
+					ev->setInFlightFlag(d_event_in_flight);
+				}
+				d_qApplication->postEvent(this->plot, ev);
 			}
 		}
 

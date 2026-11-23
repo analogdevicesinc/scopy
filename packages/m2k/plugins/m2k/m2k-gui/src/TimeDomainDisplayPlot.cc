@@ -53,6 +53,7 @@
 #include <qwt_scale_draw.h>
 #include <style.h>
 
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <volk/volk.h>
@@ -429,14 +430,20 @@ void TimeDomainDisplayPlot::plotNewData(
 				sinkNumPoints = numDataPoints;
 				sink->setChannelsDataLength(numDataPoints);
 
-				delete[] d_xdata[sinkIndex];
-				d_xdata[sinkIndex] = new double[numDataPoints];
+				if(numDataPoints > d_data_capacity[sinkIndex]) {
+					const unsigned long long capacity = std::max<unsigned long long>(
+						numDataPoints, d_data_capacity[sinkIndex] * 3 / 2);
+					delete[] d_xdata[sinkIndex];
+					d_xdata[sinkIndex] = new double[capacity];
+					for(int i = start; i < start + sinkNumChannels; i++) {
+						delete[] d_ydata[i];
+						d_ydata[i] = new double[capacity];
+					}
+					d_data_capacity[sinkIndex] = capacity;
+				}
 
 				int ref_offset = countReferenceWaveform(start);
 				for(int i = start; i < start + sinkNumChannels; i++) {
-					delete[] d_ydata[i];
-					d_ydata[i] = new double[numDataPoints];
-
 					d_plot_curve[i + ref_offset]->setRawSamples(d_xdata[sinkIndex], d_ydata[i],
 										    numDataPoints);
 				}
@@ -460,29 +467,29 @@ void TimeDomainDisplayPlot::plotNewData(
 				d_plot_curve.at(i)->show();
 			d_curves_hidden = false;
 
-			if(d_plotGrTags)
-				//	plotTags(tags);
+			// if(d_plotGrTags)
+			//	plotTags(tags);
 
-				if(d_autoscale_state) {
-					double bottom = 1e20, top = -1e20;
-					for(int n = 0; n < d_nplots; n++) {
-						if(d_plot_curve[n]->plot()) {
-							for(int64_t point = 0; point < numDataPoints; point++) {
-								if(d_ydata[n][point] < bottom) {
-									bottom = d_ydata[n][point];
-								}
-								if(d_ydata[n][point] > top) {
-									top = d_ydata[n][point];
-								}
+			if(d_autoscale_state) {
+				double bottom = 1e20, top = -1e20;
+				for(int n = 0; n < d_nplots; n++) {
+					if(d_plot_curve[n]->plot()) {
+						for(int64_t point = 0; point < numDataPoints; point++) {
+							if(d_ydata[n][point] < bottom) {
+								bottom = d_ydata[n][point];
+							}
+							if(d_ydata[n][point] > top) {
+								top = d_ydata[n][point];
 							}
 						}
 					}
-					_autoScale(bottom, top);
-					if(d_autoscale_shot) {
-						d_autoscale_state = false;
-						d_autoscale_shot = false;
-					}
 				}
+				_autoScale(bottom, top);
+				if(d_autoscale_shot) {
+					d_autoscale_state = false;
+					d_autoscale_shot = false;
+				}
+			}
 			replot();
 
 			Q_EMIT newData();
@@ -1252,6 +1259,7 @@ bool TimeDomainDisplayPlot::registerSink(std::string sinkUniqueNme, unsigned int
 		int numCurves = d_ydata.size();
 		int sinkIndex = d_sinkManager.indexOfSink(sinkUniqueNme);
 		d_xdata.push_back(new double[channelsDataLength]);
+		d_data_capacity.push_back(channelsDataLength);
 
 		for(size_t i = 0; i < numChannels; i++) {
 			int n = i + numCurves;
@@ -1312,6 +1320,7 @@ bool TimeDomainDisplayPlot::unregisterSink(std::string sinkName)
 		// Remove X axis associated with the channels of the sink
 		delete[] d_xdata[sinkIndex];
 		d_xdata.erase(d_xdata.begin() + sinkIndex);
+		d_data_capacity.erase(d_data_capacity.begin() + sinkIndex);
 
 		// Remove Y axes corresponding to each channel of the sink
 		int offset = d_sinkManager.sinkFirstChannelPos(sinkName);

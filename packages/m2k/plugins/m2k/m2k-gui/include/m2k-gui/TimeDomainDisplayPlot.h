@@ -227,6 +227,7 @@ private Q_SLOTS:
 protected:
 	std::vector<double *> d_ydata;
 	std::vector<double *> d_xdata;
+	std::vector<unsigned long long> d_data_capacity;
 	std::vector<double *> d_ref_ydata;
 	QVector<QVector<double>> d_preview_xdata;
 	QVector<QVector<double>> d_preview_ydata;

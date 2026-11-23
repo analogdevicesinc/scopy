@@ -154,6 +154,9 @@ TimeUpdateEvent::~TimeUpdateEvent()
 	for(size_t i = 0; i < _nplots; i++) {
 		delete[] _dataTimeDomainPoints[i];
 	}
+	if(_inFlight) {
+		_inFlight->store(false);
+	}
 }
 
 const std::vector<double *> TimeUpdateEvent::getTimeDomainPoints() const { return _dataTimeDomainPoints; }

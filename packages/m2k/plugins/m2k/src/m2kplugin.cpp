@@ -148,6 +148,10 @@ bool M2kPlugin::loadPage()
 	m_m2kInfoPage->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	ConnectionProvider *c = ConnectionProvider::GetInstance();
 	Connection *conn = c->open(m_param);
+	if(!conn || !conn->context()) {
+		qWarning(CAT_M2KPLUGIN) << "Cannot open" << m_param << "to read the device info";
+		return true;
+	}
 	for(int i = 0; i < iio_context_get_attrs_count(conn->context()); i++) {
 		const char *name;
 		const char *value;
@@ -396,26 +400,29 @@ void M2kPlugin::saveSettings(QSettings &s)
 
 void M2kPlugin::loadSettings(QSettings &s)
 {
-	for(auto &&tool : tools) {
+	for(auto it = tools.begin(); it != tools.end(); ++it) {
+		M2kTool *tool = it.value();
+		if(!tool) {
+			continue;
+		}
 		ApiObject *api = tool->getApi();
-		if(api) {
+		if(!api) {
+			continue;
+		}
+		try {
 			api->load(s);
+		} catch(const std::exception &e) {
+			qWarning(CAT_M2KPLUGIN) << "Restoring" << it.key() << "session failed:" << e.what();
+		} catch(...) {
+			qWarning(CAT_M2KPLUGIN) << "Restoring" << it.key() << "session failed";
 		}
 	}
 }
 
 void M2kPlugin::cleanup()
 {
-	if(m2k_man) {
-		delete m2k_man;
-		m2k_man = nullptr;
-	}
-	if(m_calib) {
-		delete m_calib;
-		m_calib = nullptr;
-	}
-
 	restoreToolState(calibrationToolNames);
+	tools.clear();
 
 	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
 		QWidget *tool = tme->tool();
@@ -426,6 +433,15 @@ void M2kPlugin::cleanup()
 		if(tool) {
 			delete tool;
 		}
+	}
+
+	if(m2k_man) {
+		delete m2k_man;
+		m2k_man = nullptr;
+	}
+	if(m_calib) {
+		delete m_calib;
+		m_calib = nullptr;
 	}
 
 	disconnect(m_m2kController, SIGNAL(calibrationStarted()), this, SLOT(calibrationStarted()));

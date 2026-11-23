@@ -28,6 +28,9 @@
 #include <QEvent>
 #include <QString>
 
+#include <atomic>
+#include <memory>
+
 #include <complex>
 #include <stdint.h>
 #include <vector>
@@ -128,10 +131,13 @@ public:
 
 	const std::vector<std::vector<gr::tag_t>> getTags() const;
 
+	void setInFlightFlag(std::shared_ptr<std::atomic<bool>> flag) { _inFlight = std::move(flag); }
+
 	static QEvent::Type Type() { return QEvent::Type(SpectrumUpdateEventType); }
 
 protected:
 private:
+	std::shared_ptr<std::atomic<bool>> _inFlight;
 	size_t _nplots;
 	std::vector<double *> _dataTimeDomainPoints;
 	uint64_t _numTimeDomainDataPoints;
