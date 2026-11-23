@@ -32,6 +32,7 @@
 #include "component/attribute.h"
 #include "component/channel.h"
 #include "component/device.h"
+#include "component/tags.h"
 
 #include "digitaliomath.h"
 #include "m2ktriggermath.h"
@@ -550,6 +551,8 @@ void buildAnalogInDeviceAttrs(component::Device *analogIn, M2kAnalogIn *ain, voi
 				 M2K_ARG(samplerate));
 		},
 		executor);
+	// The acquisition view times its samples with it (found by tag, like the IIO sampling_frequency).
+	component::addTag(sampleRate, component::tags::SampleRate);
 	try {
 		sampleRate->setOptions(ratesToOptions(ain->getAvailableSampleRates()));
 	} catch(const std::exception &e) {
@@ -650,6 +653,8 @@ void buildAnalogOutChannel(component::Device *analogOut, M2kAnalogOut *aout, voi
 				 M2K_ARG(chIdx), M2K_ARG(samplerate));
 		},
 		executor);
+	// The generator computes its waveforms for this rate (found by tag on the output channels).
+	component::addTag(sampleRate, component::tags::SampleRate);
 	try {
 		sampleRate->setOptions(ratesToOptions(aout->getAvailableSampleRates(chIdx)));
 	} catch(const std::exception &e) {

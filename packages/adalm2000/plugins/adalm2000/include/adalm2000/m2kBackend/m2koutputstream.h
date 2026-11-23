@@ -57,8 +57,10 @@ public:
 			QObject *parent = nullptr);
 	~M2kOutputStream() override;
 
-	bool cyclic() const { return m_cyclic; }
-	Result<void> setCyclic(bool enable);
+	// The DACs replay a cyclic buffer by themselves (what the signal generator uses).
+	bool supportsCyclic() const override { return true; }
+	bool cyclic() const override { return m_cyclic; }
+	Result<void> setCyclic(bool enable) override;
 
 	unsigned kernelBuffers() const { return m_kernelBuffers; }
 	Result<void> setKernelBuffers(unsigned n);
