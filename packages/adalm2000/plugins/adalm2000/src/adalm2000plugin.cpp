@@ -28,9 +28,11 @@
 #endif
 #include "m2kcalibration.h"
 #include "m2kcontext.h"
+#include "libm2kemitter.h"
 #include "m2kcontextfactory.h"
 
 #include <component/backends/iio/iioctxbackend.h>
+#include <component/codeemitterregistry.h>
 #include <component/device.h>
 #include <iio-widgets/iiowidgetgroup.h>
 #include <pluginbase/statusbarmanager.h>
@@ -52,6 +54,10 @@ using namespace scopy::adalm2000;
 void Adalm2000Plugin::init()
 {
 	component::Controller::GetInstance()->registerBackend(std::make_shared<M2kContextFactory>());
+	// The command log turns the traced libm2k calls (m2ktrace.h) into C++ / Python.
+	for(const auto &emitter : Libm2kEmitter::create()) {
+		component::CodeEmitterRegistry::GetInstance()->add(emitter);
+	}
 }
 
 bool Adalm2000Plugin::compatible(QString param, QString category)
