@@ -53,6 +53,7 @@
 #include <menucontrolbutton.h>
 #include <menuonoffswitch.h>
 #include <menusectionwidget.h>
+#include <menuplotaxisrangecontrol.h>
 #include <menuspinbox.h>
 #include <plot_utils.hpp>
 #include <plotaxis.h>
@@ -118,11 +119,11 @@ AcquisitionView::AcquisitionView(InputStream *stream, QWidget *parent)
 	m_tool->addWidgetToTopContainerHelper(gearBtn, TTA_RIGHT);
 
 	buildChannels();
+	buildPlot(); // before the settings: the axis sections bind to its axes
 	m_sides->rightStack()->add(SETTINGS_KEY, buildSettings(this));
 	connect(gearBtn, &QPushButton::toggled, m_sides, &SideSplitter::setRightOpen);
 	connect(m_sides, &SideSplitter::rightOpenChanged, gearBtn, &QAbstractButton::setChecked);
 
-	buildPlot();
 	applyChannelSelection();
 
 	connect(m_runBtn, &QPushButton::toggled, this, [this](bool on) {
@@ -161,6 +162,8 @@ QWidget *AcquisitionView::buildSettings(QWidget *parent)
 	lay->setSpacing(10);
 	lay->addWidget(buildAcquisitionSection(content));
 	lay->addWidget(buildViewSection(content));
+	lay->addWidget(buildAxisSection("Y-Axis", false, content));
+	lay->addWidget(buildAxisSection("X-Axis", true, content));
 	lay->addWidget(buildSoftwareTriggerSection(content));
 	lay->addStretch();
 	scroll->setWidget(content);
@@ -481,15 +484,6 @@ QWidget *AcquisitionView::buildViewSection(QWidget *parent)
 	}
 	m_xySourceY->combo()->setCurrentIndex(m_xySourceY->combo()->count() > 1 ? 1 : 0);
 
-	m_autoscale = new MenuOnOffSwitch("Y autoscale", section);
-	m_autoscale->onOffswitch()->setChecked(true);
-	m_yMin = new gui::MenuSpinbox("Y min", -1, "", -1e12, 1e12, true, false, false, section);
-	m_yMax = new gui::MenuSpinbox("Y max", 1, "", -1e12, 1e12, true, false, false, section);
-	for(gui::MenuSpinbox *sb : {m_yMin, m_yMax}) {
-		sb->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
-		sb->setEnabled(false);
-	}
-
 	lay->addWidget(m_mode);
 	lay->addWidget(m_xySource);
 	lay->addWidget(m_xySourceY);
@@ -497,9 +491,6 @@ QWidget *AcquisitionView::buildViewSection(QWidget *parent)
 	lay->addWidget(m_window);
 	lay->addWidget(m_averages);
 	lay->addWidget(m_complexIQ);
-	lay->addWidget(m_autoscale);
-	lay->addWidget(m_yMin);
-	lay->addWidget(m_yMax);
 
 	for(MenuCombo *c : {m_mode, m_units, m_window, m_xySource, m_xySourceY}) {
 		connect(c->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this,
@@ -507,24 +498,60 @@ QWidget *AcquisitionView::buildViewSection(QWidget *parent)
 	}
 	connect(m_averages, &gui::MenuSpinbox::valueChanged, this, &AcquisitionView::onViewChanged);
 	connect(m_complexIQ->onOffswitch(), &QAbstractButton::toggled, this, &AcquisitionView::onViewChanged);
-	connect(m_autoscale->onOffswitch(), &QAbstractButton::toggled, this, [this](bool on) {
-		m_yMin->setEnabled(!on);
-		m_yMax->setEnabled(!on);
+	return section;
+}
+
+QWidget *AcquisitionView::buildAxisSection(const QString &title, bool horizontal, QWidget *parent)
+{
+	MenuSectionCollapseWidget *section = makeSection(title, parent);
+	QVBoxLayout *lay = section->contentLayout();
+	lay->setSpacing(8);
+
+	PlotAxis *axis = horizontal ? m_plot->xAxis() : m_plot->yAxis();
+	auto *autoscale = new MenuOnOffSwitch("AUTOSCALE", section, false);
+	autoscale->onOffswitch()->setChecked(true);
+	// Min / Max follow the axis both ways: autoscale and zoom show in them, an edit moves the axis.
+	auto *range = new gui::MenuPlotAxisRangeControl(axis, section);
+	range->setEnabled(false);
+	lay->addWidget(autoscale);
+	lay->addWidget(range);
+	(horizontal ? m_xAutoscale : m_yAutoscale) = autoscale;
+	(horizontal ? m_xRangeCtrl : m_yRangeCtrl) = range;
+
+	connect(autoscale->onOffswitch(), &QAbstractButton::toggled, this, [this, range](bool on) {
+		range->setEnabled(!on);
 		if(on) {
 			render();
-		} else {
-			applyFixedYRange();
 		}
 	});
-	for(gui::MenuSpinbox *sb : {m_yMin, m_yMax}) {
-		connect(sb, &gui::MenuSpinbox::valueChanged, this, [this]() {
-			if(!m_autoscale->onOffswitch()->isChecked()) {
-				applyFixedYRange();
-			}
-		});
+	connect(range, &gui::MenuPlotAxisRangeControl::intervalChanged, this, [this]() { m_plot->replot(); });
+	if(horizontal) {
+		// The last section built: the view state applies to both.
+		onViewChanged();
 	}
-	onViewChanged();
 	return section;
+}
+
+void AcquisitionView::updateAxisUnits()
+{
+	const int mode = m_mode->combo()->currentIndex();
+	const bool raw = m_units->combo()->currentIndex() == 1;
+	const bool rate = sampleRate() > 0;
+	QString xUnit;
+	if(mode == TimeMode && rate) {
+		xUnit = "s";
+	} else if(mode == SpectrumMode && rate) {
+		xUnit = "Hz";
+	}
+	const QString yUnit = mode == SpectrumMode ? (raw ? "dBFS" : "dB") : QString();
+	for(gui::MenuSpinbox *sb : {m_xRangeCtrl->minSpinbox(), m_xRangeCtrl->maxSpinbox()}) {
+		sb->setUnit(xUnit);
+	}
+	for(gui::MenuSpinbox *sb : {m_yRangeCtrl->minSpinbox(), m_yRangeCtrl->maxSpinbox()}) {
+		sb->setUnit(yUnit);
+		// No milli-dB: SI prefixes only for linear values.
+		sb->setScalingEnabled(mode != SpectrumMode);
+	}
 }
 
 void AcquisitionView::onViewChanged()
@@ -536,13 +563,19 @@ void AcquisitionView::onViewChanged()
 	m_xySource->setVisible(mode == XYMode);
 	m_xySourceY->setVisible(mode == XYMode);
 
-	// Each mode keeps its own fixed Y range (a dB range makes no sense in time mode).
-	m_yRange[m_lastMode] = {m_yMin->value(), m_yMax->value()};
+	// Each mode keeps its own fixed ranges (a dB range makes no sense in time mode).
+	m_yRange[m_lastMode] = {m_plot->yAxis()->min(), m_plot->yAxis()->max()};
+	m_xRange[m_lastMode] = {m_plot->xAxis()->min(), m_plot->xAxis()->max()};
 	if(mode != m_lastMode) {
-		const auto range =
+		const auto y =
 			m_yRange.value(mode, mode == SpectrumMode ? qMakePair(-140.0, 0.0) : qMakePair(-1.0, 1.0));
-		m_yMin->setValueSilent(range.first);
-		m_yMax->setValueSilent(range.second);
+		const auto x = m_xRange.value(mode, qMakePair(0.0, 1.0));
+		if(!m_yAutoscale->onOffswitch()->isChecked()) {
+			m_plot->yAxis()->setInterval(y.first, y.second);
+		}
+		if(!m_xAutoscale->onOffswitch()->isChecked()) {
+			m_plot->xAxis()->setInterval(x.first, x.second);
+		}
 		for(PlotChannel *ch : std::as_const(m_plotChannels)) {
 			ch->setStyle(mode == XYMode ? PlotChannel::PCS_DOTS : PlotChannel::PCS_LINES);
 		}
@@ -551,8 +584,11 @@ void AcquisitionView::onViewChanged()
 
 	m_averager.setCount(int(m_averages->value()));
 	m_averager.reset();
+	updateAxisUnits();
 	if(m_hasFrame) {
 		render();
+	} else {
+		m_plot->replot();
 	}
 }
 
@@ -790,50 +826,29 @@ void AcquisitionView::applyAxes(double xlo, double xhi, double ylo, double yhi)
 	if(m_plot->navigator()->isZoomed()) {
 		return;
 	}
-	const bool autoscale = m_autoscale->onOffswitch()->isChecked();
-	if(autoscale && ylo <= yhi) {
+	// Autoscaled axes follow the data (with a margin, but time and frequency span exactly their
+	// data); a fixed axis keeps what its Min / Max say.
+	if(m_yAutoscale->onOffswitch()->isChecked() && ylo <= yhi) {
 		const double span = yhi > ylo ? yhi - ylo : std::max(1.0, std::abs(yhi));
 		ylo -= span * 0.1;
 		yhi += span * 0.1;
-		m_yMin->setValueSilent(ylo);
-		m_yMax->setValueSilent(yhi);
-	} else {
-		ylo = m_yMin->value();
-		yhi = m_yMax->value();
+		if(m_plot->yAxis()->min() != ylo || m_plot->yAxis()->max() != yhi) {
+			m_plot->yAxis()->setInterval(ylo, yhi);
+		}
 	}
-	if(m_mode->combo()->currentIndex() == XYMode) {
-		if(autoscale && xhi > xlo) {
+	if(m_xAutoscale->onOffswitch()->isChecked()) {
+		if(m_mode->combo()->currentIndex() == XYMode && xhi > xlo) {
 			const double span = xhi - xlo;
 			xlo -= span * 0.1;
 			xhi += span * 0.1;
-		} else {
-			xlo = ylo; // fixed range: square view
-			xhi = yhi;
+		}
+		if(xhi <= xlo) {
+			xhi = xlo + 1;
+		}
+		if(m_plot->xAxis()->min() != xlo || m_plot->xAxis()->max() != xhi) {
+			m_plot->xAxis()->setInterval(xlo, xhi);
 		}
 	}
-	if(xhi <= xlo) {
-		xhi = xlo + 1;
-	}
-	if(yhi <= ylo) {
-		yhi = ylo + 1;
-	}
-	if(m_plot->xAxis()->min() != xlo || m_plot->xAxis()->max() != xhi) {
-		m_plot->xAxis()->setInterval(xlo, xhi);
-	}
-	if(m_plot->yAxis()->min() != ylo || m_plot->yAxis()->max() != yhi) {
-		m_plot->yAxis()->setInterval(ylo, yhi);
-	}
-}
-
-void AcquisitionView::applyFixedYRange()
-{
-	const double lo = m_yMin->value();
-	const double hi = std::max(m_yMax->value(), lo + 1e-12);
-	m_plot->yAxis()->setInterval(lo, hi);
-	if(m_mode->combo()->currentIndex() == XYMode) {
-		m_plot->xAxis()->setInterval(lo, hi);
-	}
-	m_plot->replot();
 }
 
 void AcquisitionView::exportData()

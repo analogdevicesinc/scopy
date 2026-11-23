@@ -41,8 +41,9 @@ class PlotChannel;
 class PlotWidget;
 class ToolTemplate;
 namespace gui {
+class MenuPlotAxisRangeControl;
 class MenuSpinbox;
-}
+} // namespace gui
 } // namespace scopy
 
 namespace scopy::component {
@@ -81,13 +82,15 @@ public:
 private:
 	QWidget *buildSettings(QWidget *parent);
 	QWidget *buildViewSection(QWidget *parent);
+	// "Y-Axis" / "X-Axis": AUTOSCALE and the Min / Max of the plot axis, like the ADC instrument.
+	QWidget *buildAxisSection(const QString &title, bool horizontal, QWidget *parent);
+	void updateAxisUnits();
 	void onViewChanged();
 	void render();
 	// Spectrum of consecutive enabled channels paired as I + jQ; returns the x range.
 	QPair<double, double> renderIQSpectrum(bool raw, double fs, QList<MeasurementRow> &rows, double &ylo,
 					       double &yhi);
 	void applyAxes(double xlo, double xhi, double ylo, double yhi);
-	void applyFixedYRange();
 	void exportData();
 	// What the plot shows, as CSV (X column, then one per curve); empty before the first buffer.
 	QString csvData() const;
@@ -135,10 +138,13 @@ private:
 	MenuOnOffSwitch *m_complexIQ;
 	MenuCombo *m_xySource;
 	MenuCombo *m_xySourceY;
-	MenuOnOffSwitch *m_autoscale;
-	gui::MenuSpinbox *m_yMin;
-	gui::MenuSpinbox *m_yMax;
-	QMap<int, QPair<double, double>> m_yRange; // per PlotMode
+	MenuOnOffSwitch *m_yAutoscale = nullptr;
+	MenuOnOffSwitch *m_xAutoscale = nullptr;
+	gui::MenuPlotAxisRangeControl *m_yRangeCtrl = nullptr;
+	gui::MenuPlotAxisRangeControl *m_xRangeCtrl = nullptr;
+	// Fixed ranges per PlotMode (a dB range makes no sense in time mode).
+	QMap<int, QPair<double, double>> m_yRange;
+	QMap<int, QPair<double, double>> m_xRange;
 	int m_lastMode = TimeMode;
 
 	MeasurementsTable *m_table;
