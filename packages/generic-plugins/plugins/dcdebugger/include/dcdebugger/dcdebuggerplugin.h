@@ -35,6 +35,7 @@
 #include <vector>
 
 namespace scopy::dcdebugger {
+class DCDebugger_API;
 class DCDebuggerTool;
 
 // Generic explorer over the device-controller tree of a connection: every compatible view
@@ -43,6 +44,7 @@ class SCOPY_DCDEBUGGER_EXPORT DCDebuggerPlugin : public QObject, public PluginBa
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;
+	friend class DCDebugger_API;
 
 public:
 	void initMetadata() override;
@@ -67,6 +69,7 @@ private:
 	QPointer<component::Connection> m_conn;
 	std::vector<component::ContextHandle> m_views;
 	QPointer<DCDebuggerTool> m_tool;
+	DCDebugger_API *m_api = nullptr;
 };
 } // namespace scopy::dcdebugger
 

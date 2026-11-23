@@ -464,6 +464,11 @@ void viewprefs::initPreferences()
 	}
 }
 
-bool viewprefs::enabled(const char *id) { return Preferences::get(id).toBool(); }
+bool viewprefs::enabled(const char *id)
+{
+	// Not initialised (e.g. no plugin init()): shown, like the default.
+	const QVariant v = Preferences::get(id);
+	return !v.isValid() || v.toBool();
+}
 
 #include "moc_nodepanel.cpp"

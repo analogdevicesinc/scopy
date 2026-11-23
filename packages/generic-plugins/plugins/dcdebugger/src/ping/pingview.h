@@ -41,6 +41,7 @@ class Ping;
 } // namespace scopy
 
 namespace scopy::dcdebugger {
+class DCDebugger_API;
 
 // Ping tab of a Ping node: start / stop the periodic reachability check, its period, a one-off
 // check and the outcome of the last one. Backend-agnostic (component::Ping only). It never
@@ -49,6 +50,8 @@ namespace scopy::dcdebugger {
 class SCOPY_DCDEBUGGER_EXPORT PingView : public QWidget
 {
 	Q_OBJECT
+	friend class DCDebugger_API;
+
 public:
 	static constexpr int MIN_PERIOD_MS = 100;
 	static constexpr int MAX_PERIOD_MS = 60000;

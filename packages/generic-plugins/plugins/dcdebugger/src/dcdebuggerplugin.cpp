@@ -21,6 +21,8 @@
 
 #include "dcdebuggerplugin.h"
 
+#include "dcdebugger_api.h"
+
 #include "dcdebuggertool.h"
 #include "nodepanel.h"
 #include "log/commandlogview.h"
@@ -183,6 +185,7 @@ bool DCDebuggerPlugin::onConnect()
 	acquireViews(m_conn);
 	// The command log state lives in the connection's monitor (off on every new connection).
 
+	m_api = DCDebugger_API::attach(this);
 	m_tool = new DCDebuggerTool(m_conn);
 	ToolMenuEntry *tme = ToolMenuEntry::findToolMenuEntryById(m_toolList, TOOL_ID);
 	tme->setTool(m_tool);
@@ -198,6 +201,8 @@ bool DCDebuggerPlugin::onConnect()
 
 bool DCDebuggerPlugin::onDisconnect()
 {
+	DCDebugger_API::detach(this);
+	m_api = nullptr;
 	// Drop every reference into the tree before the views go away.
 	if(m_tool) {
 		m_tool->clear();

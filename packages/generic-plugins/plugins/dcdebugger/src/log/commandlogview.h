@@ -54,6 +54,7 @@ class CommandMonitor;
 }
 
 namespace scopy::dcdebugger {
+class DCDebugger_API;
 class CodeGeneratorPanel;
 class CommandLogModel;
 
@@ -70,6 +71,8 @@ class CommandLogModel;
 class SCOPY_DCDEBUGGER_EXPORT CommandLogView : public QWidget
 {
 	Q_OBJECT
+	friend class DCDebugger_API;
+
 public:
 	static constexpr const char *SIZE_PREF = "dcdebugger_command_log_size";
 	static constexpr const char *COLLAPSE_PREF = "dcdebugger_command_log_collapse_after";

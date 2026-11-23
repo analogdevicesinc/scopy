@@ -52,6 +52,7 @@ class OutputStream;
 } // namespace scopy::component
 
 namespace scopy::dcdebugger {
+class DCDebugger_API;
 class SideSplitter;
 
 // Generator tab of an OutputStream, laid out like the Scopy instruments: a channel list on the
@@ -60,6 +61,8 @@ class SideSplitter;
 class GeneratorView : public QWidget
 {
 	Q_OBJECT
+	friend class DCDebugger_API;
+
 public:
 	explicit GeneratorView(component::OutputStream *stream, QWidget *parent = nullptr);
 	~GeneratorView() override;

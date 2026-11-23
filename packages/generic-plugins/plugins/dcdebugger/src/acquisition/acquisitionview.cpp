@@ -838,9 +838,20 @@ void AcquisitionView::applyFixedYRange()
 
 void AcquisitionView::exportData()
 {
-	if(m_shownY.isEmpty()) {
+	const QString csv = csvData();
+	if(csv.isEmpty()) {
 		setStatus("Nothing to export: acquire a buffer first", true);
 		return;
+	}
+	if(FileManagerHelper::saveDataToFile(this, csv, "Export plot data")) {
+		setStatus("Exported " + QString::number(m_shownX.size()) + " rows");
+	}
+}
+
+QString AcquisitionView::csvData() const
+{
+	if(m_shownY.isEmpty()) {
+		return {};
 	}
 	QString csv = m_shownXLabel;
 	for(const QString &name : std::as_const(m_shownNames)) {
@@ -854,9 +865,7 @@ void AcquisitionView::exportData()
 		}
 		csv += "\n";
 	}
-	if(FileManagerHelper::saveDataToFile(this, csv, "Export plot data")) {
-		setStatus("Exported " + QString::number(m_shownX.size()) + " rows");
-	}
+	return csv;
 }
 
 void AcquisitionView::onRunningChanged(bool running)

@@ -48,6 +48,7 @@ class RegisterWriter;
 } // namespace scopy::component
 
 namespace scopy::dcdebugger {
+class DCDebugger_API;
 class BitToggleGrid;
 
 // Registers tab of a Context or Device: target (every node under `root` that owns a
@@ -56,6 +57,8 @@ class BitToggleGrid;
 class SCOPY_DCDEBUGGER_EXPORT RegisterView : public QWidget
 {
 	Q_OBJECT
+	friend class DCDebugger_API;
+
 public:
 	explicit RegisterView(QObject *root, QWidget *parent = nullptr);
 

@@ -43,12 +43,15 @@ class MenuSectionCollapseWidget;
 } // namespace scopy
 
 namespace scopy::dcdebugger {
+class DCDebugger_API;
 
 // Control widget shown right of the tree for the selected node. Built from sections; the
 // per-kind sections are added by createNodePanel().
 class NodePanel : public QWidget
 {
 	Q_OBJECT
+	friend class DCDebugger_API;
+
 public:
 	NodePanel(QObject *node, NodeKind kind, const QString &title, const QList<PathTitle::Segment> &path,
 		  QWidget *parent = nullptr);

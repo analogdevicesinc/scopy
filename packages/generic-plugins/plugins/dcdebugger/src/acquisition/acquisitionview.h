@@ -52,6 +52,7 @@ class Triggerable;
 } // namespace scopy::component
 
 namespace scopy::dcdebugger {
+class DCDebugger_API;
 class SideSplitter;
 class MeasurementsTable;
 struct MeasurementRow;
@@ -62,6 +63,8 @@ struct MeasurementRow;
 class AcquisitionView : public QWidget
 {
 	Q_OBJECT
+	friend class DCDebugger_API;
+
 public:
 	explicit AcquisitionView(component::InputStream *stream, QWidget *parent = nullptr);
 	~AcquisitionView() override;
@@ -86,6 +89,8 @@ private:
 	void applyAxes(double xlo, double xhi, double ylo, double yhi);
 	void applyFixedYRange();
 	void exportData();
+	// What the plot shows, as CSV (X column, then one per curve); empty before the first buffer.
+	QString csvData() const;
 	void buildChannels();
 	QWidget *buildAcquisitionSection(QWidget *parent);
 	QWidget *buildSoftwareTriggerSection(QWidget *parent);

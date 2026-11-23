@@ -44,6 +44,7 @@ class Connection;
 }
 
 namespace scopy::dcdebugger {
+class DCDebugger_API;
 class BottomPaneHost;
 class CommandLogView;
 class ComponentTreeModel;
@@ -54,6 +55,8 @@ class NodePanel;
 class SCOPY_DCDEBUGGER_EXPORT DCDebuggerTool : public QWidget
 {
 	Q_OBJECT
+	friend class DCDebugger_API;
+
 public:
 	explicit DCDebuggerTool(component::Connection *conn, QWidget *parent = nullptr);
 	~DCDebuggerTool() override;

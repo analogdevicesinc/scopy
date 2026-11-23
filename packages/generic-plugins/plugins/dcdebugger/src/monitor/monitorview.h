@@ -55,6 +55,7 @@ class Channel;
 } // namespace scopy::component
 
 namespace scopy::dcdebugger {
+class DCDebugger_API;
 class SideSplitter;
 
 // Monitor tab of a Context or Device: polls one attribute per channel (like Data Monitor) and
@@ -65,6 +66,8 @@ class SideSplitter;
 class SCOPY_DCDEBUGGER_EXPORT MonitorView : public QWidget
 {
 	Q_OBJECT
+	friend class DCDebugger_API;
+
 public:
 	explicit MonitorView(QObject *root, QWidget *parent = nullptr);
 	~MonitorView() override;
