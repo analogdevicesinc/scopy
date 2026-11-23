@@ -44,6 +44,7 @@ void MenuPlotChannelCurveStyleControl::createCurveMenu(QWidget *parent)
 	mainLay->setSpacing(10);
 
 	m_cbChannel = new MenuCombo("Curve", this);
+	m_cbChannel->setVisible(false);
 	mainLay->addWidget(m_cbChannel);
 
 	QHBoxLayout *styleLay = new QHBoxLayout();
@@ -103,6 +104,7 @@ void MenuPlotChannelCurveStyleControl::addChannels(PlotChannel *c)
 
 	m_channels.append(c);
 	m_cbChannel->combo()->addItem(c->name(), QVariant::fromValue(c));
+	m_cbChannel->setVisible(m_channels.size() > 1);
 
 	connect(c, &PlotChannel::nameChanged, this, [this, c](const QString &name) {
 		int idx = m_channels.indexOf(c);
@@ -123,6 +125,7 @@ void MenuPlotChannelCurveStyleControl::removeChannels(PlotChannel *c)
 		disconnect(c, &PlotChannel::nameChanged, this, nullptr);
 		m_channels.removeAt(idx);
 		m_cbChannel->combo()->removeItem(idx);
+		m_cbChannel->setVisible(m_channels.size() > 1);
 	}
 }
 
