@@ -135,7 +135,8 @@ void TST_Adalm2000Plugin::metadataExcludesGenericPlugins()
 {
 	// No generic plugin on an M2K device: plugins judged compatible against the
 	// generic context would otherwise find the libm2k-shaped tree after the
-	// backend swap.
+	// backend swap. The DC Debugger is the exception: it browses any backend
+	// through the component bases only (and shows the libm2k command log).
 	QPluginLoader qp(FILENAME, this);
 	auto *original = qobject_cast<Plugin *>(qp.instance());
 	original->initMetadata();
@@ -144,8 +145,9 @@ void TST_Adalm2000Plugin::metadataExcludesGenericPlugins()
 
 	QVERIFY(md.contains("exclude"));
 	const QJsonArray exclude = md.value("exclude").toArray();
-	QCOMPARE(exclude.size(), 1);
+	QCOMPARE(exclude.size(), 2);
 	QCOMPARE(exclude.at(0).toString(), QStringLiteral("*"));
+	QCOMPARE(exclude.at(1).toString(), QStringLiteral("!dcdebuggerplugin"));
 
 	// A false from onConnect() must abort the connect.
 	QCOMPARE(md.value("disconnectDevOnConnectFailure").toBool(), true);

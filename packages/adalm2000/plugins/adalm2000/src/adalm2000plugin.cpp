@@ -231,7 +231,7 @@ void Adalm2000Plugin::initMetadata()
 	      "iio",
 	      "m2k"
 	   ],
-	   "exclude":["*"]
+	   "exclude":["*", "!dcdebuggerplugin"]
 	}
 )plugin");
 }
