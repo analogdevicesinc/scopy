@@ -24,7 +24,7 @@
 #include "dcdebugger_api.h"
 
 #include "dcdebuggertool.h"
-#include "nodepanel.h"
+#include "nodeviewregistry.h"
 #include "sidesplitter.h"
 #include "log/commandlogview.h"
 #include "readpolicy.h"
@@ -60,7 +60,7 @@ void DCDebuggerPlugin::init()
 {
 	CommandLogView::initPreferences();
 	ReadPolicy::initPreferences();
-	viewprefs::initPreferences();
+	NodeViewRegistry::instance(); // the built-in views and their preferences
 }
 
 bool DCDebuggerPlugin::loadPreferencesPage()
@@ -95,13 +95,11 @@ bool DCDebuggerPlugin::loadPreferencesPage()
 	viewsSection->contentLayout()->setSpacing(10);
 	lay->insertWidget(1, viewsWidget);
 
-	const QList<QPair<const char *, QString>> views = {{viewprefs::ACQUISITION, "Acquisition"},
-							   {viewprefs::GENERATOR, "Generator"},
-							   {viewprefs::MONITOR, "Monitor"},
-							   {viewprefs::REGISTERS, "Registers"}};
-	for(const auto &[id, name] : views) {
+	// Every registered view, also those of other plugins (registered in their init()).
+	for(NodeViewFactory *factory : NodeViewRegistry::instance()->factories()) {
+		const QString name = factory->title();
 		viewsSection->contentLayout()->addWidget(PREFERENCE_CHECK_BOX(
-			p, id, "Enable " + name + " view",
+			p, NodeViewRegistry::preferenceKey(factory->id()), "Enable " + name + " view",
 			"Show the " + name + " view in the node panel. Applies to panels opened afterwards.",
 			viewsSection));
 	}

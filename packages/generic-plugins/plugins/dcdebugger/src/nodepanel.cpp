@@ -21,14 +21,10 @@
 
 #include "nodepanel.h"
 
-#include "acquisition/acquisitionview.h"
 #include "acquisition/streamacquisition.h"
 #include "attributessection.h"
-#include "generation/generatorview.h"
+#include "nodeviewregistry.h"
 #include "generation/streamgeneration.h"
-#include "monitor/monitorview.h"
-#include "ping/pingview.h"
-#include "registers/registerview.h"
 #include "splitterpane.h"
 
 #include <QHBoxLayout>
@@ -42,9 +38,6 @@
 #include <QVBoxLayout>
 
 #include <component/attribute.h>
-#include <component/inputstream.h>
-#include <component/outputstream.h>
-#include <component/ping.h>
 #include <gui/docking/dockablearea.h>
 #include <gui/docking/dockwrapper.h>
 #include <menusectionwidget.h>
@@ -433,42 +426,10 @@ NodePanel *scopy::dcdebugger::createNodePanel(QObject *node, NodeKind kind, cons
 	QObject::connect(panel, &NodePanel::selected, props, &PropertiesSection::refresh);
 	panel->addSection(props);
 
-	auto *in = qobject_cast<component::InputStream *>(node);
-	auto *out = qobject_cast<component::OutputStream *>(node);
-	if(in || out) {
-		if(in && viewprefs::enabled(viewprefs::ACQUISITION)) {
-			panel->setMainView("Acquisition", new AcquisitionView(in, panel));
-		} else if(out && viewprefs::enabled(viewprefs::GENERATOR)) {
-			panel->setMainView("Generator", new GeneratorView(out, panel));
-		}
-	} else if(auto *ping = qobject_cast<component::Ping *>(node)) {
-		auto *view = new PingView(ping, panel);
-		QObject::connect(panel, &NodePanel::refreshRequested, view, &PingView::refresh);
-		QObject::connect(panel, &NodePanel::selected, view, &PingView::refresh);
-		panel->setMainView("Ping", view);
-	} else if((kind == NodeKind::Context || kind == NodeKind::Device) && viewprefs::enabled(viewprefs::MONITOR) &&
-		  !MonitorView::monitorableChannels(node).isEmpty()) {
-		panel->setMainView("Monitor", new MonitorView(node, panel));
-	}
-	if((kind == NodeKind::Context || kind == NodeKind::Device) && viewprefs::enabled(viewprefs::REGISTERS) &&
-	   !RegisterView::targetsOf(node).isEmpty()) {
-		panel->setMainView("Registers", new RegisterView(node, panel));
+	for(NodeViewFactory *factory : NodeViewRegistry::instance()->factoriesFor(node, kind)) {
+		panel->setMainView(factory->title(), factory->create(node, kind, panel));
 	}
 	return panel;
-}
-
-void viewprefs::initPreferences()
-{
-	for(const char *id : {ACQUISITION, GENERATOR, MONITOR, REGISTERS}) {
-		Preferences::init(id, true);
-	}
-}
-
-bool viewprefs::enabled(const char *id)
-{
-	// Not initialised (e.g. no plugin init()): shown, like the default.
-	const QVariant v = Preferences::get(id);
-	return !v.isValid() || v.toBool();
 }
 
 #include "moc_nodepanel.cpp"
