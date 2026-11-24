@@ -108,6 +108,7 @@ inline component::StreamFormat interleavedInt16Format(void *data, size_t samples
 		}
 
 		component::ChannelFormat cf;
+		cf.streamIndex = channel;
 		cf.offset = static_cast<ptrdiff_t>(channel) * unit;
 		cf.stride = static_cast<ptrdiff_t>(hwChannels) * unit;
 		cf.type = component::DataType::S16;
@@ -126,9 +127,10 @@ inline component::StreamFormat interleavedInt16Format(void *data, size_t samples
 // channel. The output direction differs from the input one: for capture the
 // hardware hands back a fixed 2-wide stream and the format views a subset of it,
 // whereas for playback we allocate the buffer, so its width is exactly the number
-// of channels being pushed and nothing is skipped.
+// of channels being pushed and nothing is skipped. `streamIndices` names the
+// channel in each slot; when shorter than channelCount, the slot index is used.
 inline component::StreamFormat packedInt16Format(void *data, size_t samplesPerChannel, int channelCount,
-						 const QVector<ChannelScale> &scales)
+						 const QVector<ChannelScale> &scales, const QList<int> &streamIndices)
 {
 	component::StreamFormat format;
 	format.data = data;
@@ -139,6 +141,7 @@ inline component::StreamFormat packedInt16Format(void *data, size_t samplesPerCh
 	const ptrdiff_t unit = static_cast<ptrdiff_t>(sizeof(int16_t));
 	for(int i = 0; i < channelCount; ++i) {
 		component::ChannelFormat cf;
+		cf.streamIndex = (i < streamIndices.size()) ? streamIndices.at(i) : -1;
 		cf.offset = static_cast<ptrdiff_t>(i) * unit;
 		cf.stride = static_cast<ptrdiff_t>(channelCount) * unit;
 		cf.type = component::DataType::S16;
@@ -202,6 +205,7 @@ inline component::StreamFormat bitPackedUint16Format(void *data, size_t samplesP
 			continue;
 		}
 		component::ChannelFormat cf;
+		cf.streamIndex = pin;
 		cf.offset = 0;
 		cf.stride = unit;
 		cf.type = component::DataType::U16;

@@ -30,7 +30,6 @@
 #include <component/device.h>
 #include <component/streamview.h>
 #include <component/backends/iio/iioinputstream.h>
-#include <component/backends/iio/iioscanelement.h>
 
 using namespace scopy;
 using namespace scopy::swiot;

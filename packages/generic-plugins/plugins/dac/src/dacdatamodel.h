@@ -25,6 +25,7 @@
 #include <QObject>
 #include <QString>
 #include <QMap>
+#include <QSet>
 #include <QTimer>
 
 #include <cstdint>
@@ -34,9 +35,9 @@
 namespace scopy {
 namespace component {
 class Device;
+class Channel;
 namespace iio {
 class IIOOutputStream;
-class IIOScanElement;
 class IIOSampleCodec;
 } // namespace iio
 } // namespace component
@@ -114,7 +115,8 @@ private:
 
 	QMap<QString, TxNode *> m_ddsTxs;
 	QMap<QString, TxNode *> m_bufferTxs;
-	QMap<QString, component::iio::IIOScanElement *> m_scanElements;
+	// User channel selection (TxNode uuids); applied at the next stream open.
+	QSet<QString> m_enabledTxs;
 
 	QVector<QVector<double>> m_data;
 	std::optional<QCoro::Task<void>> m_pushTask;
@@ -129,14 +131,13 @@ private:
 	QString generateToneName(QString chnId);
 	QStringList generateTxNodesForChannel(QString name);
 	QCoro::Task<void> pushTask();
-	QList<component::iio::IIOScanElement *> collectEnabledScanElements(QList<int> &indices) const;
-	QVector<component::iio::IIOSampleCodec *>
-	resolveCodecs(const QList<component::iio::IIOScanElement *> &enabledEls) const;
+	QList<component::Channel *> collectEnabledChannels(QList<int> &indices) const;
+	QVector<component::iio::IIOSampleCodec *> resolveCodecs(const QList<component::Channel *> &enabledChns) const;
 	QVector<QVector<int32_t>> buildSampleColumns(unsigned int channelCount) const;
-	void fillBuffer(int bufferIdx, const QList<component::iio::IIOScanElement *> &enabledEls,
+	void fillBuffer(int bufferIdx, const QList<component::Channel *> &enabledChns,
 			const QVector<component::iio::IIOSampleCodec *> &codecs,
 			const QVector<QVector<int32_t>> &columns);
-	component::iio::IIOScanElement *scanElement(TxNode *node) const;
+	bool isTxEnabled(TxNode *node) const;
 	unsigned int getEnabledChannelsCount();
 	bool validateBufferParams();
 	void requestInterruption();

@@ -32,7 +32,6 @@
 #include "component/backends/iio/iioregisterreader.h"
 #include "component/backends/iio/iioregisterwriter.h"
 #include "component/backends/iio/iiosamplecodec.h"
-#include "component/backends/iio/iioscanelement.h"
 #include "component/backends/iio/iiotrigger.h"
 #include "component/backends/iio/iiotriggerable.h"
 #include "component/tags.h"
@@ -200,6 +199,7 @@ void IIOComponentBuilder::buildChannels(IIODevice *dev, const AttrMap &devAttrs,
 		applyAvailable(attrs, &devAttrs);
 
 		if(chOps->isScanElement(ch)) {
+			chan->setStreamIndex(chOps->index(ch));
 			new IIOSampleCodec(chOps, ch, chan);
 		}
 	}
@@ -212,40 +212,32 @@ void IIOComponentBuilder::buildStreams(IIODevice *dev, ICmdExecutor *executor)
 	auto *bufOps = m_backend->bufferOps();
 	const auto dh = dev->handle();
 
-	const unsigned int count = devOps->channelsCount(dh);
-	QList<scopy::iio::ChannelHandle> inputs, outputs;
-	for(unsigned int c = 0; c < count; ++c) {
-		const scopy::iio::ChannelHandle ch = devOps->getChannel(dh, c);
-		if(!ch.ptr || !chOps->isScanElement(ch)) {
-			continue;
+	// Streamable channels were tagged with a streamIndex by buildChannels.
+	QList<component::Channel *> inputs, outputs;
+	for(IIOChannel *chan : dev->findChildren<IIOChannel *>(QString(), Qt::FindDirectChildrenOnly)) {
+		if(chan->isStreamable()) {
+			(chan->isOutput() ? outputs : inputs).append(chan);
 		}
-		(chOps->isOutput(ch) ? outputs : inputs).append(ch);
 	}
 
-	const int nbChannels = static_cast<int>(count);
+	const int nbChannels = static_cast<int>(devOps->channelsCount(dh));
 
 	// libiio v1 exposes multiple buffers per device; attach one stream per buffer
-	// index per present direction, each with its own mask and scan elements. A
+	// index per present direction, each with its own mask and member channels. A
 	// single-buffer device (buffersCount 0 or 1) collapses to one stream per direction.
 	const unsigned buffers = std::max(1u, devOps->buffersCount(dh));
 	for(unsigned b = 0; b < buffers; ++b) {
 		if(!inputs.isEmpty()) {
 			auto *stream = new IIOInputStream(bufOps, chOps, dh, nbChannels, b, executor, dev);
-			for(const scopy::iio::ChannelHandle ch : inputs) {
-				auto *el = new IIOScanElement(chOps, ch, stream->mask(), executor, stream);
-				el->setIndex(chOps->index(ch));
-				el->setId(chOps->id(ch));
-				el->setIsOutput(false);
+			for(component::Channel *chan : std::as_const(inputs)) {
+				stream->addChannel(chan);
 			}
 			buildBufferAttributes(stream, dh, b, executor);
 		}
 		if(!outputs.isEmpty()) {
 			auto *stream = new IIOOutputStream(bufOps, chOps, dh, nbChannels, b, executor, dev);
-			for(const scopy::iio::ChannelHandle ch : outputs) {
-				auto *el = new IIOScanElement(chOps, ch, stream->mask(), executor, stream);
-				el->setIndex(chOps->index(ch));
-				el->setId(chOps->id(ch));
-				el->setIsOutput(true);
+			for(component::Channel *chan : std::as_const(outputs)) {
+				stream->addChannel(chan);
 			}
 			buildBufferAttributes(stream, dh, b, executor);
 		}

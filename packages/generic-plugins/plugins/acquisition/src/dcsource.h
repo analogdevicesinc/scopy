@@ -31,12 +31,12 @@
 
 namespace scopy {
 namespace component {
+class Channel;
 class Context;
 class Device;
 class InputStream;
 namespace iio {
 class IIOSampleCodec;
-class IIOScanElement;
 } // namespace iio
 } // namespace component
 
@@ -75,13 +75,13 @@ public:
 	QWidget *createSettingsWidget(QWidget *parent = nullptr) override;
 
 private:
-	// One streamable channel: the scan element gives the mask index, the codec decodes raw
+	// One streamable channel: its streamIndex gives the mask index, the codec decodes raw
 	// bytes in the channel's own declared format, and channelId is what DataKeys carry.
 	struct Chan
 	{
 		QString channelId; // "<dev>:<iioId>"
 		QString iioId;	   // "accel_x"
-		scopy::component::iio::IIOScanElement *element{nullptr};
+		scopy::component::Channel *channel{nullptr};
 		scopy::component::iio::IIOSampleCodec *codec{nullptr};
 	};
 
@@ -90,7 +90,7 @@ private:
 		scopy::component::Device *device{nullptr};
 		scopy::component::InputStream *stream{nullptr};
 		QString name;
-		// Every input scan element, ascending by index — the order buildStreamFormat()
+		// Every input stream member, ascending by streamIndex — the order buildStreamFormat()
 		// appends enabled channels in, so a position here is a position there.
 		QList<Chan> channels;
 		// The subset the stream was actually opened with, same order. Empty means closed,
@@ -100,7 +100,7 @@ private:
 	};
 
 	// Ctor-time tree walk: every direct-child Device with an input stream that has at least
-	// one input scan element. No I/O, so it is safe to call before onStart().
+	// one input stream member. No I/O, so it is safe to call before onStart().
 	void discover();
 
 	// Read "sampling_frequency" off each open device, for streamInfo(). Nothing prefetches
