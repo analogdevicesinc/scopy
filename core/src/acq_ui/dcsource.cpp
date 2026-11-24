@@ -179,7 +179,11 @@ void DcSource::onStart()
 			// Reported, not thrown: a throw here would make the engine fault-stop and tear
 			// down every source, so one unavailable device would take the whole run with
 			// it. The other devices keep streaming.
-			qWarning() << "DcSource: open failed for" << dev.name << ":" << resp.error().errorString();
+			report(scopy::acq::AcquisitionError::Severity::Warning,
+			       QStringLiteral("opening the %1 stream (%2 samples) failed: %3")
+				       .arg(dev.name)
+				       .arg(static_cast<qulonglong>(m_bufferSize.load()))
+				       .arg(resp.error().errorString()));
 			continue;
 		}
 		dev.open = want;
@@ -203,7 +207,10 @@ void DcSource::readSampleRates()
 		// Read deliberately: building the tree does not populate the attribute cache, so
 		// without this the rate would read back empty and every stream would publish an
 		// unknown timeline.
-		if(!QCoro::waitFor(attr->readCapability()->readAsync())) {
+		if(const auto resp = QCoro::waitFor(attr->readCapability()->readAsync()); !resp) {
+			reportOnce(scopy::acq::AcquisitionError::Severity::Warning,
+				   QStringLiteral("reading %1/%2 failed, its streams have no time base: %3")
+					   .arg(dev.name, QString::fromLatin1(kRateAttr), resp.error().errorString()));
 			continue;
 		}
 		bool ok = false;
@@ -242,7 +249,9 @@ void DcSource::acquire(scopy::acq::DataStore *store)
 			return;
 		}
 		if(!resp) {
-			qWarning() << "DcSource: refill failed for" << dev.name << ":" << resp.error().errorString();
+			reportOnce(scopy::acq::AcquisitionError::Severity::Warning,
+				   QStringLiteral("reading samples from %1 failed: %2")
+					   .arg(dev.name, resp.error().errorString()));
 			continue;
 		}
 

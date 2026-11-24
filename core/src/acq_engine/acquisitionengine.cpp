@@ -274,7 +274,9 @@ bool AcquisitionEngine::guarded(const QString &id, const QString &what, Fn &&fn)
 		fn();
 		return true;
 	} catch(const std::exception &e) {
-		Q_EMIT error(static_cast<int>(Severity::Critical), id, QString::fromStdString(e.what()));
+		// The phase too, so the log says whether it broke starting, reading or stopping
+		Q_EMIT error(static_cast<int>(Severity::Critical), id,
+			     QStringLiteral("%1: %2").arg(what, QString::fromStdString(e.what())));
 	} catch(...) {
 		Q_EMIT error(static_cast<int>(Severity::Critical), id, QStringLiteral("unknown exception in ") + what);
 	}
