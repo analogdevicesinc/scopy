@@ -57,8 +57,9 @@ enum class ByteOrder : uint8_t
 // decode raw bytes to an integer, and how to scale that to physical units.
 struct ChannelFormat
 {
-	ptrdiff_t offset = 0; // bytes from StreamFormat::data to this channel's first sample
-	ptrdiff_t stride = 0; // bytes between consecutive samples of this channel
+	long streamIndex = -1; // Channel::streamIndex of the stream member this entry describes
+	ptrdiff_t offset = 0;  // bytes from StreamFormat::data to this channel's first sample
+	ptrdiff_t stride = 0;  // bytes between consecutive samples of this channel
 	DataType type = DataType::S16;
 	uint8_t validBits = 16;	 // meaningful bits inside the container
 	uint8_t shift = 0;	 // right-shift before masking to validBits

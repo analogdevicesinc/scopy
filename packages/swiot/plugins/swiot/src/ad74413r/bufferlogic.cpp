@@ -28,7 +28,6 @@
 #include <component/channel.h>
 #include <component/device.h>
 #include <component/backends/iio/iioinputstream.h>
-#include <component/backends/iio/iioscanelement.h>
 
 using namespace scopy;
 using namespace scopy::swiot;
@@ -54,17 +53,9 @@ BufferLogic::~BufferLogic()
 
 void BufferLogic::createChannels()
 {
-	// Resolve which channels are scan elements (and at which index) from the
-	// device's input stream.
-	QMap<QString, long> scanElemIndex;
+	// Only members of the device's input stream are treated as scan elements.
 	component::iio::IIOInputStream *stream = m_adDevice->findChild<component::iio::IIOInputStream *>();
-	if(stream) {
-		const QList<component::iio::IIOScanElement *> elems =
-			stream->findChildren<component::iio::IIOScanElement *>(Qt::FindDirectChildrenOnly);
-		for(component::iio::IIOScanElement *el : elems) {
-			scanElemIndex[el->id()] = el->index();
-		}
-	}
+	const QList<component::Channel *> streamChnls = stream ? stream->channels() : QList<component::Channel *>{};
 
 	int plotChnlsNo = 0;
 	int chnlIdx = -1;
@@ -78,8 +69,8 @@ void BufferLogic::createChannels()
 			chnlInfoId = "d";
 		}
 		ChnlInfo *channelInfo = ChnlInfoBuilder::build(chnl, chnlInfoId);
-		if(scanElemIndex.contains(chnlId)) {
-			channelInfo->setScanIndex(scanElemIndex[chnlId]);
+		if(streamChnls.contains(chnl)) {
+			channelInfo->setScanIndex(chnl->streamIndex());
 		}
 		const auto &&parts = chnlId.split(rx);
 		chnlIdx = -1;

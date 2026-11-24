@@ -47,27 +47,6 @@ using libm2k::digital::DIO_CHANNEL;
 using libm2k::digital::DIO_DIRECTION;
 using libm2k::digital::M2kDigital;
 
-namespace {
-
-// Every pin when nothing specific was asked for.
-QList<int> normalisePins(const QList<int> &requested)
-{
-	QList<int> pins;
-	for(int pin : requested) {
-		if(pin >= 0 && pin < stream::DIGITAL_WORD_BITS && !pins.contains(pin)) {
-			pins.append(pin);
-		}
-	}
-	if(pins.isEmpty()) {
-		for(int pin = 0; pin < stream::DIGITAL_WORD_BITS; ++pin) {
-			pins.append(pin);
-		}
-	}
-	return pins;
-}
-
-} // namespace
-
 // ---------------------------------------------------------------- input
 
 M2kDigitalInputStream::M2kDigitalInputStream(void *resource, M2kDigital *digital, ICmdExecutor *executor,
@@ -121,7 +100,12 @@ QCoro::Task<CommandResponse<void>> M2kDigitalInputStream::openAsync(const compon
 			<< "samplesCount" << cfg.samplesCount << "must be a multiple of 4 above 16; using"
 			<< effective.samplesCount;
 	}
-	effective.enabledChannels = normalisePins(cfg.enabledChannels);
+	// Every pin is captured; the selection only picks which ones the format exposes.
+	const Result<QList<int>> resolved = resolveForOpen(cfg.enabledChannels);
+	if(!resolved) {
+		co_return CommandResponse<void>(QUuid(), Unexpected{resolved.error()});
+	}
+	effective.enabledChannels = resolved.value();
 
 	M2kDigital *digital = m_digital;
 	const unsigned kernelBuffers = m_kernelBuffers;
@@ -141,7 +125,7 @@ QCoro::Task<CommandResponse<void>> M2kDigitalInputStream::openAsync(const compon
 		m_executor, cmd, [](const Result<void> &) {}, [this](const Error &e) { Q_EMIT streamError(e); });
 
 	if(result) {
-		m_config = effective;
+		commitConfig(effective);
 		m_stale = false;
 		m_open = true;
 		Q_EMIT openedChanged(true);
@@ -282,13 +266,26 @@ QCoro::Task<CommandResponse<void>> M2kDigitalOutputStream::openAsync(const compo
 			<< "samplesCount" << cfg.samplesCount << "must be a multiple of 4 above 16; using"
 			<< effective.samplesCount;
 	}
-	effective.enabledChannels = normalisePins(cfg.enabledChannels);
+	// TX pins are enabled individually (M2kDigital::enableChannel): base resolve.
+	const Result<QList<int>> resolved = resolveForOpen(cfg.enabledChannels);
+	if(!resolved) {
+		co_return CommandResponse<void>(QUuid(), Unexpected{resolved.error()});
+	}
+	effective.enabledChannels = resolved.value();
 
 	M2kDigital *digital = m_digital;
 	const QList<int> pins = effective.enabledChannels;
+	const QList<int> dropped = m_drivenPins;
 	const bool cyclic = m_cyclic;
 
-	auto *cmd = new M2kCallCommand<void>(m_resource, [digital, pins, cyclic]() {
+	auto *cmd = new M2kCallCommand<void>(m_resource, [digital, pins, dropped, cyclic]() {
+		// Release the pins of the previous run that are no longer selected, so they
+		// stop driving; their direction is left to the Digital I/O tool.
+		for(int pin : dropped) {
+			if(!pins.contains(pin)) {
+				digital->enableChannel(static_cast<DIO_CHANNEL>(pin), false);
+			}
+		}
 		// Takes over direction for these pins; see the header's caution about the
 		// Digital I/O tool's shadow going stale.
 		for(int pin : pins) {
@@ -307,7 +304,8 @@ QCoro::Task<CommandResponse<void>> M2kDigitalOutputStream::openAsync(const compo
 		m_executor, cmd, [](const Result<void> &) {}, [this](const Error &e) { Q_EMIT streamError(e); });
 
 	if(result) {
-		m_config = effective;
+		commitConfig(effective);
+		m_drivenPins = pins;
 		m_buffer.fill(0, static_cast<qsizetype>(effective.samplesCount));
 		m_format = stream::bitPackedUint16Format(m_buffer.data(), effective.samplesCount, pins);
 		m_open = true;

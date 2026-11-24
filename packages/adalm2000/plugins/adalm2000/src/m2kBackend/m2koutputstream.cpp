@@ -104,16 +104,12 @@ QCoro::Task<CommandResponse<void>> M2kOutputStream::openAsync(const component::S
 						<< effective.samplesCount;
 	}
 
-	QList<int> channels;
-	for(int channel : effective.enabledChannels) {
-		if(channel >= 0 && channel < HW_CHANNELS && !channels.contains(channel)) {
-			channels.append(channel);
-		}
+	// The two DACs are separate devices: channels are independent (base resolve).
+	const Result<QList<int>> resolved = resolveForOpen(cfg.enabledChannels);
+	if(!resolved) {
+		co_return CommandResponse<void>(QUuid(), Unexpected{resolved.error()});
 	}
-	if(channels.isEmpty()) {
-		channels = {0};
-	}
-	std::sort(channels.begin(), channels.end());
+	const QList<int> channels = resolved.value();
 	effective.enabledChannels = channels;
 
 	M2kAnalogOut *aout = m_aout;
@@ -170,10 +166,10 @@ QCoro::Task<CommandResponse<void>> M2kOutputStream::openAsync(const component::S
 
 	if(result) {
 		m_scales = *scales;
-		m_config = effective;
+		commitConfig(effective);
 		m_buffer.fill(0, static_cast<qsizetype>(effective.samplesCount) * channels.size());
 		m_format = stream::packedInt16Format(m_buffer.data(), effective.samplesCount,
-						     static_cast<int>(channels.size()), m_scales);
+						     static_cast<int>(channels.size()), m_scales, channels);
 		m_open = true;
 		Q_EMIT openedChanged(true);
 	}

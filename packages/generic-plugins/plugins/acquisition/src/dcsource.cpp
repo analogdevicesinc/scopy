@@ -29,7 +29,6 @@
 #include <component/attribute.h>
 #include <component/attributereader.h>
 #include <component/backends/iio/iiosamplecodec.h>
-#include <component/backends/iio/iioscanelement.h>
 #include <component/context.h>
 #include <component/device.h>
 #include <component/inputstream.h>
@@ -109,23 +108,17 @@ void DcSource::discover()
 		// devices would collide.
 		entry.name = dev->name().isEmpty() ? dev->id() : dev->name();
 
-		// Parented to the stream, not the device, and their objectName is "Scan element N" —
-		// so they are iterated and matched by id() rather than looked up.
-		for(component::iio::IIOScanElement *el :
-		    stream->findChildren<component::iio::IIOScanElement *>(QString(), Qt::FindDirectChildrenOnly)) {
-			if(el->isOutput()) {
+		// The stream's members are sibling Channels under the device, sorted by streamIndex.
+		for(component::Channel *c : stream->channels()) {
+			if(c->isOutput()) {
 				continue;
 			}
 			Chan ch;
-			ch.iioId = el->id();
+			ch.iioId = c->id();
 			ch.channelId = entry.name + ":" + ch.iioId;
-			ch.element = el;
-			// An input and an output channel may share an id, so the direction is part
-			// of the lookup. The codec hangs off the Channel, not the scan element.
-			if(component::Channel *c = component::channelById(dev, ch.iioId, false)) {
-				ch.codec = c->findChild<component::iio::IIOSampleCodec *>(QString(),
-											  Qt::FindDirectChildrenOnly);
-			}
+			ch.channel = c;
+			ch.codec =
+				c->findChild<component::iio::IIOSampleCodec *>(QString(), Qt::FindDirectChildrenOnly);
 			if(!ch.codec) {
 				// Decoding needs the channel's declared format. Without it the
 				// samples would be guesswork, so the channel is not offered.
@@ -142,8 +135,9 @@ void DcSource::discover()
 		// Ascending scan index, because that is the order buildStreamFormat() appends
 		// enabled channels to StreamFormat::channels in. Everything downstream relies on a
 		// position in `open` being a position in that list.
-		std::sort(entry.channels.begin(), entry.channels.end(),
-			  [](const Chan &a, const Chan &b) { return a.element->index() < b.element->index(); });
+		std::sort(entry.channels.begin(), entry.channels.end(), [](const Chan &a, const Chan &b) {
+			return a.channel->streamIndex() < b.channel->streamIndex();
+		});
 
 		for(const Chan &ch : entry.channels) {
 			// All off: a context can hold dozens of channels across several devices, and
@@ -166,15 +160,15 @@ void DcSource::onStart()
 		for(const Chan &ch : dev.channels) {
 			if(enabled.contains(ch.channelId)) {
 				want.append(ch);
-				mask.append(static_cast<int>(ch.element->index()));
+				mask.append(static_cast<int>(ch.channel->streamIndex()));
 			}
 		}
 		if(want.isEmpty()) {
 			continue;
 		}
 
-		// The mask is the whole truth, not an addition: openAsync() disables every scan
-		// element not in it. Which is also why a channel toggled mid-run does nothing until
+		// The mask is the whole truth, not an addition: openAsync() disables every stream
+		// member not in it. Which is also why a channel toggled mid-run does nothing until
 		// the next run.
 		const auto resp = QCoro::waitFor(dev.stream->openAsync({mask, m_bufferSize}));
 		if(!resp) {
@@ -256,13 +250,17 @@ void DcSource::decodeAndWrite(const Dev &dev, scopy::acq::DataStore *store)
 {
 	const component::StreamFormat &f = dev.stream->readFormat();
 
-	// Positional, not by scan index: buildStreamFormat() appends one ChannelFormat per
-	// *enabled* element in ascending-index order, which is exactly the order of dev.open.
-	const int n = std::min(dev.open.size(), f.channels.size());
-
-	for(int c = 0; c < n; ++c) {
-		const Chan &ch = dev.open.at(c);
-		const component::ChannelFormat &cf = f.channels.at(c);
+	// By scan index, not position: the stream may enable more channels than were asked
+	// for (Stream::resolveEnabledChannels), and those extra entries are skipped.
+	for(const Chan &ch : dev.open) {
+		const long streamIndex = ch.channel->streamIndex();
+		const auto it = std::find_if(
+			f.channels.cbegin(), f.channels.cend(),
+			[streamIndex](const component::ChannelFormat &c) { return c.streamIndex == streamIndex; });
+		if(it == f.channels.cend()) {
+			continue;
+		}
+		const component::ChannelFormat &cf = *it;
 		const char *p = static_cast<const char *>(f.data) + cf.offset;
 
 		if(isBitStream(ch.codec->dataFormat())) {

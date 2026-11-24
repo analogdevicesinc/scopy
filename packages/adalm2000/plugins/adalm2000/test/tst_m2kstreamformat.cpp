@@ -178,7 +178,7 @@ void TST_M2kStreamFormat::packedFormatIsOneSlotPerChannel()
 	// Playback buffers are ours, so the width is exactly the channel count and
 	// nothing is skipped -- unlike capture, which views a subset of a 2-wide stream.
 	int16_t buffer[8] = {};
-	const StreamFormat f = packedInt16Format(buffer, 4, 2, {});
+	const StreamFormat f = packedInt16Format(buffer, 4, 2, {}, {0, 1});
 
 	QCOMPARE(f.channels.size(), 2);
 	QCOMPARE(f.channels.at(0).offset, ptrdiff_t(0));
@@ -190,7 +190,8 @@ void TST_M2kStreamFormat::packedFormatIsOneSlotPerChannel()
 void TST_M2kStreamFormat::packedFormatOfASingleChannelIsDense()
 {
 	int16_t buffer[4] = {};
-	const StreamFormat f = packedInt16Format(buffer, 4, 1, {});
+	const StreamFormat f = packedInt16Format(buffer, 4, 1, {}, {1});
+	QCOMPARE(f.channels.at(0).streamIndex, 1L);
 
 	QCOMPARE(f.channels.size(), 1);
 	QCOMPARE(f.channels.at(0).offset, ptrdiff_t(0));
@@ -238,7 +239,7 @@ void TST_M2kStreamFormat::encodeThenDecodeRoundTrips()
 	// the two conventions must agree, since both sides share one ChannelScale.
 	QVector<ChannelScale> scales{{-0.01, 0.25}};
 	int16_t buffer[4] = {};
-	const StreamFormat f = packedInt16Format(buffer, 4, 1, scales);
+	const StreamFormat f = packedInt16Format(buffer, 4, 1, scales, {0});
 
 	const double wanted[4] = {0.0, 1.0, -1.0, 2.5};
 	for(int i = 0; i < 4; ++i) {
@@ -316,7 +317,7 @@ void TST_M2kStreamFormat::isBitPackedTellsTheTwoLayoutsApart()
 
 	QVERIFY(isBitPacked(bitPackedUint16Format(words, 2, {0, 1})));
 	QVERIFY(!isBitPacked(interleavedInt16Format(analog, 2, 2, {0, 1}, {})));
-	QVERIFY(!isBitPacked(packedInt16Format(analog, 2, 2, {})));
+	QVERIFY(!isBitPacked(packedInt16Format(analog, 2, 2, {}, {0, 1})));
 	QVERIFY(!isBitPacked(StreamFormat{}));
 }
 

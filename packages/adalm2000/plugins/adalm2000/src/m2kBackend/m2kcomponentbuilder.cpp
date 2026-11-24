@@ -26,7 +26,6 @@
 #include "m2kdigitalstreams.h"
 #include "m2kinputstream.h"
 #include "m2koutputstream.h"
-#include "m2kscanelement.h"
 #include "m2ktrace.h"
 
 #include "component/attribute.h"
@@ -405,6 +404,7 @@ component::Channel *buildAnalogInChannel(component::Device *analogIn, M2kAnalogI
 	chn->setName(QStringLiteral("Channel %1").arg(index + 1));
 	chn->setLabel(chn->name());
 	chn->setIsOutput(false);
+	chn->setStreamIndex(index);
 
 	component::Attribute *range = addReadWriteAttr(
 		chn, QStringLiteral("range"), QString(), resource,
@@ -590,8 +590,10 @@ bool buildAnalogIn(component::Context *ctx, libm2k::context::M2k *m2k, ICmdExecu
 	}
 
 	M2kHardwareTrigger *trig = triggerOf(ain);
+	QList<component::Channel *> members;
 	for(int i = 0; i < 2; ++i) {
 		component::Channel *chn = buildAnalogInChannel(analogIn, ain, m2k, i, executor);
+		members.append(chn);
 		if(trig) {
 			addAnalogTriggerChannelAttrs(chn, trig, m2k, static_cast<unsigned int>(i), executor);
 		}
@@ -602,14 +604,14 @@ bool buildAnalogIn(component::Context *ctx, libm2k::context::M2k *m2k, ICmdExecu
 	}
 
 	auto *in = new M2kInputStream(m2k, ain, executor, analogIn);
-	for(int i = 0; i < 2; ++i) {
-		new M2kScanElement(i, false, in);
+	for(component::Channel *chn : members) {
+		in->addChannel(chn);
 	}
 	return true;
 }
 
-void buildAnalogOutChannel(component::Device *analogOut, M2kAnalogOut *aout, void *resource, int index,
-			   ICmdExecutor *executor)
+component::Channel *buildAnalogOutChannel(component::Device *analogOut, M2kAnalogOut *aout, void *resource, int index,
+					  ICmdExecutor *executor)
 {
 	const unsigned int chIdx = static_cast<unsigned int>(index);
 
@@ -623,6 +625,7 @@ void buildAnalogOutChannel(component::Device *analogOut, M2kAnalogOut *aout, voi
 	}
 	chn->setLabel(chn->name());
 	chn->setIsOutput(true);
+	chn->setStreamIndex(index);
 
 	component::Attribute *enabled = addReadWriteAttr(
 		chn, QStringLiteral("enabled"), QString(), resource,
@@ -761,6 +764,7 @@ void buildAnalogOutChannel(component::Device *analogOut, M2kAnalogOut *aout, voi
 				 M2K_ARG(volts));
 		},
 		executor);
+	return chn;
 }
 
 void buildAnalogOut(component::Context *ctx, libm2k::context::M2k *m2k, ICmdExecutor *executor)
@@ -792,13 +796,14 @@ void buildAnalogOut(component::Context *ctx, libm2k::context::M2k *m2k, ICmdExec
 		},
 		executor);
 
+	QList<component::Channel *> members;
 	for(unsigned int i = 0; i < channels; ++i) {
-		buildAnalogOutChannel(analogOut, aout, m2k, static_cast<int>(i), executor);
+		members.append(buildAnalogOutChannel(analogOut, aout, m2k, static_cast<int>(i), executor));
 	}
 
 	auto *out = new M2kOutputStream(m2k, aout, executor, analogOut);
-	for(unsigned int i = 0; i < channels; ++i) {
-		new M2kScanElement(static_cast<long>(i), true, out);
+	for(component::Channel *chn : members) {
+		out->addChannel(chn);
 	}
 }
 
@@ -1022,6 +1027,7 @@ component::Channel *addPin(component::Device *dev, M2kDigital *dig, void *resour
 	chn->setName(QStringLiteral("DIO %1").arg(pin));
 	chn->setLabel(chn->name());
 	chn->setIsOutput(false);
+	chn->setStreamIndex(pin);
 
 	auto *direction = new component::Attribute(chn);
 	direction->setName(QStringLiteral("direction"));
@@ -1257,8 +1263,10 @@ void buildDigital(component::Context *ctx, libm2k::context::M2k *m2k, ICmdExecut
 
 	M2kHardwareTrigger *trig = triggerOf(digital);
 	auto state = std::make_shared<dio::PinState>();
+	QList<component::Channel *> pins;
 	for(int pin = 0; pin < dio::PIN_COUNT; ++pin) {
 		component::Channel *chn = addPin(digitalDev, digital, m2k, pin, state, executor);
+		pins.append(chn);
 		if(trig) {
 			addDigitalTriggerPinAttr(chn, trig, m2k, pin, executor);
 		}
@@ -1274,9 +1282,10 @@ void buildDigital(component::Context *ctx, libm2k::context::M2k *m2k, ICmdExecut
 
 	auto *din = new M2kDigitalInputStream(m2k, digital, executor, digitalDev);
 	auto *dout = new M2kDigitalOutputStream(m2k, digital, executor, digitalDev);
-	for(int pin = 0; pin < dio::PIN_COUNT; ++pin) {
-		new M2kScanElement(pin, false, din);
-		new M2kScanElement(pin, true, dout);
+	// The same pin channel is a member of both streams.
+	for(component::Channel *chn : pins) {
+		din->addChannel(chn);
+		dout->addChannel(chn);
 	}
 }
 

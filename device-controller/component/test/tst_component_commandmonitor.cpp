@@ -29,7 +29,6 @@
 #include "component/context.h"
 #include "component/controller.h"
 #include "component/device.h"
-#include "component/scanelement.h"
 #include "component/tags.h"
 
 #include "core/calltrace.h"
@@ -434,16 +433,6 @@ void TstComponentCommandMonitor::originOfUnnamedLeaf()
 	QCOMPARE(CommandMonitor::originOf(dev).object, quintptr(dev));
 }
 
-namespace {
-class FakeScanElement : public ScanElement
-{
-public:
-	using ScanElement::ScanElement;
-	bool isEnabled() const override { return false; }
-	QCoro::Task<CommandResponse<void>> enableAsync(bool) override { co_return CommandResponse<void>(QUuid()); }
-};
-} // namespace
-
 void TstComponentCommandMonitor::originScopeNamesTheNodes()
 {
 	namespace os = originscope;
@@ -482,14 +471,16 @@ void TstComponentCommandMonitor::originScopeNamesTheNodes()
 	QCOMPARE(c.value(os::AttributeOf).toString(), QStringLiteral("context"));
 	QVERIFY(!c.contains(os::Device));
 
-	// An unnamed device is addressed by its id; a scan element carries its channel and direction.
+	// An unnamed device is addressed by its id; a streamable channel (the origin of its
+	// stream's enable/disable commands) carries its id and direction.
 	auto *anon = new Device(&ctx);
 	anon->setId("iio:device3");
-	auto *el = new FakeScanElement(anon);
+	auto *el = new Channel(anon);
 	el->setId("voltage1");
 	el->setIsOutput(false);
+	el->setStreamIndex(1);
 	const QVariantMap e = CommandMonitor::originOf(el).scope;
-	QCOMPARE(e.value(os::Kind).toString(), QStringLiteral("ScanElement"));
+	QCOMPARE(e.value(os::Kind).toString(), QStringLiteral("Channel"));
 	QCOMPARE(e.value(os::Device).toString(), QStringLiteral("iio:device3"));
 	QCOMPARE(e.value(os::Channel).toString(), QStringLiteral("voltage1"));
 	QCOMPARE(e.value(os::Output).toBool(), false);

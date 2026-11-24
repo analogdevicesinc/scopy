@@ -21,12 +21,14 @@
 
 #include "component/backends/iio/iiooutputstream.h"
 
-#include "component/backends/iio/iioscanelement.h"
+#include "component/backends/iio/iiochannel.h"
 #include "component/capabilityexecutor.h"
 #include "component/commandmonitor.h"
 #include "iioutil/commands/bufferclosecommand.h"
 #include "iioutil/commands/bufferopencommand.h"
 #include "iioutil/commands/bufferpushcommand.h"
+#include "iioutil/commands/chndisablecommand.h"
+#include "iioutil/commands/chnenablecommand.h"
 #include "iioutil/ibufferops.h"
 #include "iioutil/ichannelops.h"
 
@@ -79,16 +81,31 @@ Result<void> IIOOutputStream::setCyclic(bool cyclic)
 
 QCoro::Task<void> IIOOutputStream::applyEnabledChannels(const QList<int> &channels)
 {
-	const QList<IIOScanElement *> elems = findChildren<IIOScanElement *>(QString(), Qt::FindDirectChildrenOnly);
-	for(IIOScanElement *el : elems) {
-		co_await el->enableAsync(channels.contains(static_cast<int>(el->index())));
+	// Copy: members are fixed after build, but the frame outlives each suspension.
+	const QList<Channel *> members = m_channels;
+	for(Channel *member : members) {
+		auto *iioCh = qobject_cast<IIOChannel *>(member);
+		if(!iioCh) {
+			continue;
+		}
+		const scopy::iio::ChannelHandle ch = iioCh->handle();
+		Command *cmd = channels.contains(static_cast<int>(member->streamIndex()))
+			? static_cast<Command *>(new scopy::iio::ChnEnableCommand(m_chOps, ch, m_mask))
+			: static_cast<Command *>(new scopy::iio::ChnDisableCommand(m_chOps, ch, m_mask));
+		co_await m_executor->execute(cmd);
+		cmd->deleteLater();
 	}
 }
 
 QCoro::Task<CommandResponse<void>> IIOOutputStream::openAsync(const StreamConfig &config)
 {
 	// Coroutine frame copy: the caller's config may not outlive the first suspension.
-	const StreamConfig cfg = config;
+	StreamConfig cfg = config;
+	const Result<QList<int>> resolved = resolveForOpen(cfg.enabledChannels);
+	if(!resolved) {
+		co_return CommandResponse<void>(QUuid(), Unexpected{resolved.error()});
+	}
+	cfg.enabledChannels = resolved.value();
 	co_await applyEnabledChannels(cfg.enabledChannels);
 
 	auto *cmd = new scopy::iio::BufferOpenCommand(m_bufOps, m_dev, m_bufferIndex, m_mask, cfg.samplesCount,
@@ -99,7 +116,7 @@ QCoro::Task<CommandResponse<void>> IIOOutputStream::openAsync(const StreamConfig
 		[this](const Error &e) { Q_EMIT streamError(e); });
 
 	if(result) {
-		m_config = cfg;
+		commitConfig(cfg);
 		m_open = true;
 		buildStreamFormat();
 		Q_EMIT openedChanged(true);
@@ -157,16 +174,17 @@ void IIOOutputStream::buildStreamFormat()
 	f.data = start;
 	f.sampleCount = stride > 0 ? static_cast<size_t>((end - start) / stride) : 0;
 
-	const QList<IIOScanElement *> elems = findChildren<IIOScanElement *>(QString(), Qt::FindDirectChildrenOnly);
-	for(IIOScanElement *el : elems) {
-		if(!el->isEnabled()) {
+	for(Channel *member : std::as_const(m_channels)) {
+		auto *iioCh = qobject_cast<IIOChannel *>(member);
+		if(!iioCh || !m_chOps->isEnabled(iioCh->handle(), m_mask)) {
 			continue;
 		}
-		const scopy::iio::ChannelHandle ch = el->channelHandle();
+		const scopy::iio::ChannelHandle ch = iioCh->handle();
 		const scopy::iio::DataFormat fmt = m_chOps->dataFormat(ch);
 		auto *first = static_cast<char *>(m_bufOps->bufferFirst(m_buffer, ch));
 
 		ChannelFormat cf;
+		cf.streamIndex = member->streamIndex();
 		cf.offset = first - start;
 		cf.stride = stride;
 		cf.type = dataTypeOf(fmt.bits, fmt.is_signed);

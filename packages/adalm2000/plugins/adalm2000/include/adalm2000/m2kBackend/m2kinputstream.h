@@ -52,6 +52,11 @@ public:
 	unsigned kernelBuffers() const { return m_kernelBuffers; }
 	Result<void> setKernelBuffers(unsigned n);
 
+	// libm2k enables both ADC channels around every buffer refill
+	// (M2kAnalogIn::handleChannelsEnableState), so the stream is both-or-none:
+	// any requested channel resolves to {0, 1}. Hide a channel consumer-side.
+	QList<int> resolveEnabledChannels(const QList<int> &requested) const override;
+
 	QCoro::Task<CommandResponse<void>> openAsync(const component::StreamConfig &cfg) override;
 	QCoro::Task<CommandResponse<void>> closeAsync() override;
 	QCoro::Task<CommandResponse<void>> refillAsync() override;

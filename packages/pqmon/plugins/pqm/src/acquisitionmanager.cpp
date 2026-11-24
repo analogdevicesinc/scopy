@@ -23,11 +23,11 @@
 #include <QLoggingCategory>
 #include <QTimer>
 #include <component/attribute.h>
-#include <component/backends/iio/iioscanelement.h>
 #include <component/channel.h>
 #include <component/connection.h>
 #include <component/device.h>
 #include <component/ping.h>
+#include <component/stream.h>
 #include <component/streamview.h>
 #include <pluginbase/preferences.h>
 
@@ -103,10 +103,8 @@ QList<int> AcquisitionManager::enableBufferChnls(component::Device *dev)
 		}
 		m_buffChnls.push_back(chnl->name());
 	}
-	const QList<component::iio::IIOScanElement *> elements =
-		m_inputStream->findChildren<component::iio::IIOScanElement *>(Qt::FindDirectChildrenOnly);
-	for(component::iio::IIOScanElement *el : elements) {
-		enabledChnls.push_back(el->index());
+	for(component::Channel *ch : m_inputStream->channels()) {
+		enabledChnls.push_back(ch->streamIndex());
 	}
 	m_pqmLog->setChnlsName(m_buffChnls);
 	return enabledChnls;

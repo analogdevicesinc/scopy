@@ -114,6 +114,9 @@ private:
 	scopy::ICmdExecutor *m_executor;
 	bool m_cyclic = true;
 	bool m_cancelRequested = false;
+	// TX pins this stream enabled on its last successful open; released on the
+	// next open if no longer selected.
+	QList<int> m_drivenPins;
 	QVector<uint16_t> m_buffer;
 	component::StreamFormat m_format;
 };

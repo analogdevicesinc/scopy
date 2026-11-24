@@ -79,6 +79,13 @@ Result<void> M2kInputStream::setKernelBuffers(unsigned n)
 	return Result<void>();
 }
 
+QList<int> M2kInputStream::resolveEnabledChannels(const QList<int> &requested) const
+{
+	// Both-or-none: any member requested enables every member.
+	const QList<int> members = InputStream::resolveEnabledChannels(requested);
+	return members.isEmpty() ? QList<int>{} : InputStream::resolveEnabledChannels({0, 1});
+}
+
 QCoro::Task<CommandResponse<void>> M2kInputStream::openAsync(const component::StreamConfig &cfg)
 {
 	if(m_open) {
@@ -98,9 +105,11 @@ QCoro::Task<CommandResponse<void>> M2kInputStream::openAsync(const component::St
 		qWarning(CAT_M2K_INPUT_STREAM) << "samplesCount" << cfg.samplesCount
 					       << "must be a multiple of 4 above 16; using" << effective.samplesCount;
 	}
-	if(effective.enabledChannels.isEmpty()) {
-		effective.enabledChannels = {0, 1};
+	const Result<QList<int>> resolved = resolveForOpen(cfg.enabledChannels);
+	if(!resolved) {
+		co_return CommandResponse<void>(QUuid(), Unexpected{resolved.error()});
 	}
+	effective.enabledChannels = resolved.value();
 
 	M2kAnalogIn *ain = m_ain;
 	const QList<int> channels = effective.enabledChannels;
@@ -153,7 +162,7 @@ QCoro::Task<CommandResponse<void>> M2kInputStream::openAsync(const component::St
 
 	if(result) {
 		m_scales = *scales;
-		m_config = effective;
+		commitConfig(effective);
 		m_stale = false;
 		m_open = true;
 		Q_EMIT openedChanged(true);

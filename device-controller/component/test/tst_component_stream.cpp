@@ -21,7 +21,7 @@
 
 #include "component/backends/iio/iioinputstream.h"
 #include "component/backends/iio/iiooutputstream.h"
-#include "component/backends/iio/iioscanelement.h"
+#include "component/backends/iio/iiochannel.h"
 #include "component/stream.h"
 #include "component/streamview.h"
 #include "component/streamwriter.h"
@@ -29,6 +29,7 @@
 #include "fakebufferops.h"
 
 #include <QSignalSpy>
+#include <cerrno>
 #include <QTest>
 #include <qcoro/qcorofuture.h>
 
@@ -51,6 +52,18 @@ scopy::iio::DataFormat s16Format()
 	return f;
 }
 
+// Register a fake libiio channel as a stream member, the way the builder does.
+IIOChannel *addMember(Stream *stream, dctest::FakeChannel *fc)
+{
+	auto *chan = new IIOChannel(stream);
+	chan->setHandle({fc});
+	chan->setId(fc->name);
+	chan->setIsOutput(fc->output);
+	chan->setStreamIndex(fc->index);
+	stream->addChannel(chan);
+	return chan;
+}
+
 } // namespace
 
 class TstComponentStream : public QObject
@@ -59,6 +72,10 @@ class TstComponentStream : public QObject
 private Q_SLOTS:
 	void openEnablesRefillDecodes();
 	void openCopiesConfigBeforeSuspending();
+	void membersSortedAndFiltered();
+	void disabledMemberLeftOutOfFormat();
+	void openRefusesEmptySelection();
+	void setEnabledChannelsReopens();
 	void setKernelBuffersRefusedWhenOpen();
 	void maskFreedOnDelete();
 	void outputPushEmits();
@@ -80,18 +97,18 @@ void TstComponentStream::openEnablesRefillDecodes()
 	dctest::FakeChannel c1{1, "voltage1", false, true, s16Format()};
 
 	auto *stream = new IIOInputStream(&bufOps, &chOps, {reinterpret_cast<void *>(0x1)}, 2, 0, &exec);
-	auto *e0 = new IIOScanElement(&chOps, {&c0}, stream->mask(), &exec, stream);
-	e0->setIndex(0);
-	auto *e1 = new IIOScanElement(&chOps, {&c1}, stream->mask(), &exec, stream);
-	e1->setIndex(1);
+	addMember(stream, &c0);
+	addMember(stream, &c1);
 
 	bufOps.chOffset.insert(&c0, 0);
 	bufOps.chOffset.insert(&c1, 2);
 
 	QVERIFY(QCoro::waitFor(stream->openAsync({{0, 1}, 3})));
 	QVERIFY(stream->isOpen());
-	QVERIFY(e0->isEnabled());
-	QVERIFY(e1->isEnabled());
+	QVERIFY(chOps.isEnabled({&c0}, stream->mask()));
+	QVERIFY(chOps.isEnabled({&c1}, stream->mask()));
+	QVERIFY(stream->isChannelEnabled(0));
+	QVERIFY(stream->isChannelEnabled(1));
 
 	// Fill known bytes: ch0 = 1,2,3 ; ch1 = 10,20,30 (int16 LE, interleaved).
 	auto *p = reinterpret_cast<int16_t *>(bufOps.storage.data());
@@ -120,6 +137,118 @@ void TstComponentStream::openEnablesRefillDecodes()
 	QVERIFY(bufOps.cancels >= 1);
 }
 
+void TstComponentStream::membersSortedAndFiltered()
+{
+	PooledCmdExecutor exec(1);
+	dctest::FakeChannelOps chOps;
+	dctest::FakeBufferOps bufOps;
+	dctest::FakeChannel c0{0, "voltage0", false, true, s16Format()};
+	dctest::FakeChannel c3{3, "voltage3", false, true, s16Format()};
+
+	IIOInputStream stream(&bufOps, &chOps, {reinterpret_cast<void *>(0x1)}, 4, 0, &exec);
+	IIOChannel *m3 = addMember(&stream, &c3);
+	IIOChannel *m0 = addMember(&stream, &c0);
+	stream.addChannel(m0); // duplicate ignored
+
+	auto *notScan = new IIOChannel(&stream); // streamIndex -1: rejected
+	stream.addChannel(notScan);
+	stream.addChannel(nullptr);
+
+	QCOMPARE(stream.channels(), (QList<Channel *>{m0, m3}));
+	QCOMPARE(stream.channelAt(3), m3);
+	QCOMPARE(stream.channelAt(1), nullptr);
+}
+
+void TstComponentStream::disabledMemberLeftOutOfFormat()
+{
+	PooledCmdExecutor exec(1);
+	dctest::FakeChannelOps chOps;
+	dctest::FakeBufferOps bufOps;
+	bufOps.step = 4;
+	dctest::FakeChannel c0{0, "voltage0", false, true, s16Format()};
+	dctest::FakeChannel c1{1, "voltage1", false, true, s16Format()};
+
+	auto *stream = new IIOInputStream(&bufOps, &chOps, {reinterpret_cast<void *>(0x1)}, 2, 0, &exec);
+	addMember(stream, &c0);
+	addMember(stream, &c1);
+	bufOps.chOffset.insert(&c0, 0);
+	bufOps.chOffset.insert(&c1, 2);
+
+	// Enable both, then reopen with only ch1: the mask must drop ch0.
+	QVERIFY(QCoro::waitFor(stream->openAsync({{0, 1}, 2})));
+	QVERIFY(QCoro::waitFor(stream->closeAsync()));
+	QVERIFY(QCoro::waitFor(stream->openAsync({{1}, 2})));
+	QVERIFY(!chOps.isEnabled({&c0}, stream->mask()));
+	QVERIFY(chOps.isEnabled({&c1}, stream->mask()));
+	QVERIFY(!stream->isChannelEnabled(0));
+
+	QVERIFY(QCoro::waitFor(stream->refillAsync()));
+	QCOMPARE(stream->readFormat().channels.size(), 1);
+	QCOMPARE(stream->readFormat().channels.at(0).streamIndex, 1L);
+	QCOMPARE(stream->readFormat().channels.at(0).offset, ptrdiff_t(2));
+	delete stream;
+}
+
+void TstComponentStream::openRefusesEmptySelection()
+{
+	PooledCmdExecutor exec(1);
+	dctest::FakeChannelOps chOps;
+	dctest::FakeBufferOps bufOps;
+	bufOps.step = 2;
+	dctest::FakeChannel c0{0, "voltage0", false, true, s16Format()};
+
+	IIOInputStream stream(&bufOps, &chOps, {reinterpret_cast<void *>(0x1)}, 2, 0, &exec);
+	addMember(&stream, &c0);
+
+	// Nothing requested, and a non-member index resolves to nothing too.
+	for(const QList<int> &req : {QList<int>{}, QList<int>{5}}) {
+		const auto resp = QCoro::waitFor(stream.openAsync({req, 4}));
+		QVERIFY(!resp);
+		QCOMPARE(resp.error().code, -EINVAL);
+		QVERIFY(!stream.isOpen());
+	}
+	QCOMPARE(stream.resolveEnabledChannels({5, 0, 0}), QList<int>({0}));
+}
+
+void TstComponentStream::setEnabledChannelsReopens()
+{
+	PooledCmdExecutor exec(1);
+	dctest::FakeChannelOps chOps;
+	dctest::FakeBufferOps bufOps;
+	bufOps.step = 4;
+	dctest::FakeChannel c0{0, "voltage0", false, true, s16Format()};
+	dctest::FakeChannel c1{1, "voltage1", false, true, s16Format()};
+
+	IIOInputStream stream(&bufOps, &chOps, {reinterpret_cast<void *>(0x1)}, 2, 0, &exec);
+	addMember(&stream, &c0);
+	addMember(&stream, &c1);
+	QSignalSpy changed(&stream, &Stream::enabledChannelsChanged);
+
+	// Closed: only recorded.
+	QVERIFY(QCoro::waitFor(stream.setEnabledChannelsAsync({1})));
+	QVERIFY(!stream.isOpen());
+	QCOMPARE(stream.enabledChannels(), QList<int>({1}));
+	QCOMPARE(changed.count(), 1);
+
+	QVERIFY(QCoro::waitFor(stream.openAsync({{0}, 8})));
+	QCOMPARE(changed.count(), 2);
+
+	// Open: reopened with the new mask and the same samplesCount.
+	QVERIFY(QCoro::waitFor(stream.setEnabledChannelsAsync({1, 0})));
+	QVERIFY(stream.isOpen());
+	QCOMPARE(stream.enabledChannels(), QList<int>({0, 1}));
+	QCOMPARE(stream.samplesCount(), size_t(8));
+	QVERIFY(chOps.isEnabled({&c0}, stream.mask()));
+	QVERIFY(chOps.isEnabled({&c1}, stream.mask()));
+	QCOMPARE(changed.count(), 3);
+
+	// Empty: closed and left closed.
+	QVERIFY(QCoro::waitFor(stream.setEnabledChannelsAsync({})));
+	QVERIFY(!stream.isOpen());
+	QVERIFY(stream.enabledChannels().isEmpty());
+	QCOMPARE(changed.count(), 4);
+}
+
 // The caller's config is not required to outlive the first suspension of openAsync.
 void TstComponentStream::openCopiesConfigBeforeSuspending()
 {
@@ -130,8 +259,7 @@ void TstComponentStream::openCopiesConfigBeforeSuspending()
 	dctest::FakeChannel c0{0, "voltage0", false, true, s16Format()};
 
 	auto *stream = new IIOInputStream(&bufOps, &chOps, {reinterpret_cast<void *>(0x1)}, 1, 0, &exec);
-	auto *e0 = new IIOScanElement(&chOps, {&c0}, stream->mask(), &exec, stream);
-	e0->setIndex(0);
+	addMember(stream, &c0);
 
 	StreamConfig cfg{{0}, 3};
 	auto task = stream->openAsync(cfg);
@@ -151,9 +279,12 @@ void TstComponentStream::setKernelBuffersRefusedWhenOpen()
 	dctest::FakeBufferOps bufOps;
 	bufOps.step = 2;
 
+	dctest::FakeChannel c0{0, "voltage0", false, true, s16Format()};
+
 	IIOInputStream stream(&bufOps, &chOps, {reinterpret_cast<void *>(0x1)}, 1, 0, &exec);
+	addMember(&stream, &c0);
 	QVERIFY(stream.setKernelBuffers(8));
-	QVERIFY(QCoro::waitFor(stream.openAsync({{}, 4})));
+	QVERIFY(QCoro::waitFor(stream.openAsync({{0}, 4})));
 	QVERIFY(!stream.setKernelBuffers(2));
 }
 
@@ -179,8 +310,7 @@ void TstComponentStream::outputPushEmits()
 
 	dctest::FakeChannel c0{0, "voltage0", true, true, s16Format()};
 	auto *stream = new IIOOutputStream(&bufOps, &chOps, {reinterpret_cast<void *>(0x1)}, 1, 0, &exec);
-	auto *e0 = new IIOScanElement(&chOps, {&c0}, stream->mask(), &exec, stream);
-	e0->setIndex(0);
+	addMember(stream, &c0);
 	bufOps.chOffset.insert(&c0, 0);
 
 	QVERIFY(QCoro::waitFor(stream->openAsync({{0}, 2})));

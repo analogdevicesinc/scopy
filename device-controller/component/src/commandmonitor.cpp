@@ -28,7 +28,6 @@
 #include "component/device.h"
 #include "component/inputstream.h"
 #include "component/outputstream.h"
-#include "component/scanelement.h"
 #include "component/tags.h"
 #include "core/calltrace.h"
 
@@ -87,9 +86,6 @@ QVariantMap scopeOf(const QObject *node)
 		} else if(auto *ch = qobject_cast<const Channel *>(cur)) {
 			setOnce(scope, os::Channel, ch->id());
 			setOnce(scope, os::Output, ch->isOutput());
-		} else if(auto *el = qobject_cast<const ScanElement *>(cur)) {
-			setOnce(scope, os::Channel, el->id());
-			setOnce(scope, os::Output, el->isOutput());
 		} else if(auto *st = qobject_cast<const Stream *>(cur)) {
 			const bool out = qobject_cast<const OutputStream *>(st) != nullptr;
 			setOnce(scope, os::Stream, QString::fromLatin1(out ? "output" : "input"));
