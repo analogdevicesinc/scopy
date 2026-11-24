@@ -135,6 +135,28 @@ public:
 	// enum type - metric, hour, logarithmic, etc
 };
 
+// Ring showing where the value sits in its range. Checking it turns on fine mode,
+// shown by the center dot; the wheel over it steps the value.
+class SCOPY_GUI_EXPORT MenuSpinboxCircle : public QAbstractButton
+{
+	Q_OBJECT
+public:
+	explicit MenuSpinboxCircle(QWidget *parent = nullptr);
+
+	void setRatio(double ratio);
+
+Q_SIGNALS:
+	void stepped(bool up);
+
+protected:
+	void paintEvent(QPaintEvent *e) override;
+	void wheelEvent(QWheelEvent *e) override;
+
+private:
+	double m_ratio = 0.0;
+	int m_wheelDelta = 0;
+};
+
 class SCOPY_GUI_EXPORT MenuSpinbox : public QWidget
 {
 	Q_OBJECT
@@ -177,6 +199,8 @@ public Q_SLOTS:
 	void setIncrementMode(IncrementMode is);
 	void setScalingEnabled(bool en);
 	void setScaleList(QList<UnitPrefix> scales);
+	void setCircleEnabled(bool en);
+	void setCircleLogFloor(double floor);
 
 Q_SIGNALS:
 	void nameChanged(QString);
@@ -194,6 +218,9 @@ private:
 	double clamp(double val, double min, double max);
 	void incrementValue();
 	void decrementValue();
+	double nextValue(bool up) const;
+	double stepScale() const;
+	void updateCircle();
 
 	QLabel *m_label;
 	InfoIconWidget *m_infoIcon;
@@ -201,6 +228,7 @@ private:
 	QComboBox *m_scaleCb;
 	QPushButton *m_plus;
 	QPushButton *m_minus;
+	MenuSpinboxCircle *m_circle;
 	MouseWheelWidgetGuard *m_mouseWheelGuard;
 
 	// The top of the next prefix down, e.g. 1 V -> 999 mV. False when there is no
@@ -228,6 +256,8 @@ private:
 	double getScaleForPrefix(QString prefix, Qt::CaseSensitivity s = Qt::CaseSensitive);
 	bool m_scalingEnabled = false;
 	bool m_rangeLimits = false;
+	// Where the log scale circle starts when the range itself starts at or below 0
+	double m_circleLogFloor = 1.0;
 };
 } // namespace gui
 } // namespace scopy
