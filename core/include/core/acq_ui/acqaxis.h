@@ -201,6 +201,11 @@ public:
 	// for a change that needs correcting.
 	void requestInterval(double min, double max);
 
+	// For a caller that owns the range (a span setting): data requests are then ignored
+	// and only setInterval() moves the axis.
+	void setRangeLocked(bool locked) { m_rangeLocked = locked; }
+	bool isRangeLocked() const { return m_rangeLocked; }
+
 	QString unit() const { return m_source.unit; }
 	void setUnit(const QString &u);
 
@@ -257,6 +262,7 @@ private:
 	double m_reqMin{qQNaN()}, m_reqMax{qQNaN()};
 
 	bool m_autoscale{false};
+	bool m_rangeLocked{false};
 };
 
 } // namespace adc

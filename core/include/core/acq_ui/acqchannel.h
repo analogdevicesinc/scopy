@@ -154,7 +154,8 @@ public:
 	AcqPlot *plotOwner() const { return m_owner; }
 
 	// This channel's two axes, or null before attach(). X and Y are the same class at
-	// two QwtAxis positions — see acqaxis.h; there is deliberately no asymmetry here.
+	// two QwtAxis positions — see acqaxis.h. yAxis() is also null for a kind with no
+	// value axis (see hasValueAxis()).
 	AcqAxis *xAxis() const { return m_xAxis; }
 	AcqAxis *yAxis() const { return m_yAxis; }
 
@@ -310,6 +311,11 @@ protected:
 	// constraint stated.
 	virtual bool wantsPooledXAxis() const { return true; }
 	virtual bool wantsPooledYAxis() const { return true; }
+
+	// Whether the values are drawn against a Y axis at all. A waterfall's are colours, and
+	// its Y is the plot's own history axis, so it gets no Y AcqAxis: wrapping that axis
+	// would label it with the stream's unit and offer range controls that break it.
+	virtual bool hasValueAxis() const { return true; }
 
 	// The axis a kind that declined wants wrapped instead. Called only when the
 	// corresponding wantsPooled*Axis() is false; null falls back to the plot widget's own

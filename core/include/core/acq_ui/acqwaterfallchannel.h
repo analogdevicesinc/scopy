@@ -93,13 +93,13 @@ protected:
 
 	void onEnabledChanged(bool en) override;
 
-	// Neither side comes from the pool: WaterfallPlotWidget owns an inverted time axis
-	// and an Hz axis, and a spectrogram drawn against anything else is not a
-	// spectrogram. Both AcqAxis still exist, wrapping the widget's own pair, so the two
-	// sections are on the page with the constraint stated rather than absent for this
-	// one kind.
+	// Neither side comes from the pool: WaterfallPlotWidget owns its time axis and its
+	// frequency axis, and a spectrogram drawn against anything else is not a spectrogram.
+	// X is still wrapped, source-fixed, so the frequency view has its section; Y is not
+	// wrapped at all — it is history, owned by the widget, and the values are colours.
 	bool wantsPooledXAxis() const override { return false; }
 	bool wantsPooledYAxis() const override { return false; }
+	bool hasValueAxis() const override { return false; }
 
 private:
 	// The plot's own widget, found by attachTo(), never built here — owned by the dock the

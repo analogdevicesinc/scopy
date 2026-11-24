@@ -166,9 +166,14 @@ void AcqChannel::acquireAxes()
 	const bool yPooled = pooled && wantsPooledYAxis();
 
 	// Before the axes: which axis a side draws against is decided by its source.
+	// The producer's unit for a stream X (Hz for FFT bins); empty would hide the label
+	QString xUnit;
+	if(!m_engine.isNull()) {
+		xUnit = m_engine->streamInfo(m_xKey).value_or(scopy::acq::StreamInfo{}).unit;
+	}
 	const AcqAxis::Source xSrc = m_xKey == scopy::acq::AcquisitionEngine::indexRampKey()
 		? AcqAxis::Source::sampleIndex()
-		: AcqAxis::Source::stream(m_xKey, QString());
+		: AcqAxis::Source::stream(m_xKey, xUnit);
 	const AcqAxis::Source ySrc = AcqAxis::Source::stream(m_key, m_info.unit);
 
 	if(xPooled) {
@@ -176,7 +181,9 @@ void AcqChannel::acquireAxes()
 	} else {
 		xPlotAxis = ownXAxis(m_owner);
 	}
-	if(yPooled) {
+	if(!hasValueAxis()) {
+		// No Y wrapper, see hasValueAxis()
+	} else if(yPooled) {
 		yPlotAxis = m_owner->axisForSource(QwtAxis::YLeft, ySrc.id());
 	} else {
 		yPlotAxis = ownYAxis(m_owner);
@@ -188,17 +195,19 @@ void AcqChannel::acquireAxes()
 	if(!xPlotAxis && w) {
 		xPlotAxis = w->xAxis();
 	}
-	if(!yPlotAxis && w) {
+	if(!yPlotAxis && w && hasValueAxis()) {
 		yPlotAxis = w->yAxis();
 	}
 
 	m_xAxis = new AcqAxis(xPlotAxis, xSrc, m_store.data(), m_engine.data(), this);
-	m_yAxis = new AcqAxis(yPlotAxis, ySrc, m_store.data(), m_engine.data(), this);
+	if(hasValueAxis()) {
+		m_yAxis = new AcqAxis(yPlotAxis, ySrc, m_store.data(), m_engine.data(), this);
+	}
 
 	if(!xPooled) {
 		m_xAxis->setSourceFixed(true, tr("This plot kind owns its horizontal axis"));
 	}
-	if(!yPooled) {
+	if(m_yAxis && !yPooled) {
 		m_yAxis->setSourceFixed(true, tr("This plot kind owns its vertical axis"));
 	}
 
@@ -212,11 +221,14 @@ void AcqChannel::acquireAxes()
 	});
 	// The Y axis's source is a scaling choice, not this channel's key — key() is fixed
 	// for life. A retarget there still changes what is read, so it reclaims too.
-	connect(m_yAxis, &AcqAxis::sourceChanged, this, [this](scopy::acq::DataKey oldKey, scopy::acq::DataKey newKey) {
-		Q_UNUSED(newKey)
-		moveToSourceAxis(m_yAxis, QwtAxis::YLeft, wantsPooledYAxis());
-		Q_EMIT depthNeedsReclaim(oldKey);
-	});
+	if(m_yAxis) {
+		connect(m_yAxis, &AcqAxis::sourceChanged, this,
+			[this](scopy::acq::DataKey oldKey, scopy::acq::DataKey newKey) {
+				Q_UNUSED(newKey)
+				moveToSourceAxis(m_yAxis, QwtAxis::YLeft, wantsPooledYAxis());
+				Q_EMIT depthNeedsReclaim(oldKey);
+			});
+	}
 }
 
 void AcqChannel::moveToSourceAxis(AcqAxis *side, int position, bool wantsPooled)

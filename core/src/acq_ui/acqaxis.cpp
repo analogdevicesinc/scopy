@@ -310,7 +310,7 @@ void AcqAxis::requestInterval(double min, double max)
 {
 	// The autoscaler owns the range while it is on; a read-driven write would fight it
 	// every frame.
-	if(m_autoscale || m_axis.isNull()) {
+	if(m_autoscale || m_rangeLocked || m_axis.isNull()) {
 		return;
 	}
 	// A degenerate range comes out of an empty or single-sample stream. Qwt divides by

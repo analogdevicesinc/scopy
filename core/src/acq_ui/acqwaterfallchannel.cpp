@@ -211,7 +211,12 @@ void AcqWaterfallChannel::updateFrequencyRange(scopy::acq::DataStore *store)
 	}
 	m_freqStart = start;
 	m_freqStop = stop;
-	m_wf->setFrequencyRange(start, stop);
+	// The axis on the same terms as a curve's: following the data unless the reader
+	// zoomed or the caller owns the range. Forcing it here overrode a span or log view.
+	m_wf->setDataFrequencyRange(start, stop);
+	if(xAxis()) {
+		xAxis()->requestInterval(start, stop);
+	}
 }
 
 void AcqWaterfallChannel::reset()
