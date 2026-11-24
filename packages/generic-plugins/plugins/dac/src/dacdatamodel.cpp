@@ -32,7 +32,6 @@
 #include <component/backends/iio/iiochannel.h>
 #include <component/backends/iio/iiosamplecodec.h>
 #include <component/backends/iio/iiooutputstream.h>
-#include <component/backends/iio/iioscanelement.h>
 
 #include <algorithm>
 
@@ -206,20 +205,20 @@ bool DacDataModel::setFilesize(unsigned int filesize)
 	return needToUpdate;
 }
 
-component::iio::IIOScanElement *DacDataModel::scanElement(TxNode *node) const
-{
-	return node ? m_scanElements.value(node->getUuid(), nullptr) : nullptr;
-}
+bool DacDataModel::isTxEnabled(TxNode *node) const { return node && m_enabledTxs.contains(node->getUuid()); }
 
 void DacDataModel::enableBufferChannel(QString uuid, bool enable)
 {
 	requestInterruption();
-	auto *el = m_scanElements.value(uuid, nullptr);
-	if(!el) {
-		qDebug(CAT_DAC_DATA) << QString("No scan element for uuid %1").arg(uuid);
+	if(!m_bufferTxs.contains(uuid)) {
+		qDebug(CAT_DAC_DATA) << QString("No buffer channel for uuid %1").arg(uuid);
 		return;
 	}
-	QCoro::waitFor(el->enableAsync(enable));
+	if(enable) {
+		m_enabledTxs.insert(uuid);
+	} else {
+		m_enabledTxs.remove(uuid);
+	}
 
 	tryInitBuffer();
 }
@@ -228,8 +227,7 @@ unsigned int DacDataModel::getEnabledChannelsCount()
 {
 	unsigned int enChannelsCount = 0;
 	for(auto node : std::as_const(m_bufferTxs)) {
-		auto *el = scanElement(node);
-		enChannelsCount += (el && el->isEnabled()) ? 1 : 0;
+		enChannelsCount += isTxEnabled(node) ? 1 : 0;
 	}
 	return enChannelsCount;
 }
@@ -374,37 +372,33 @@ bool DacDataModel::isRunning()
 	return (m_out && m_out->isOpen()) || m_cycleInFlight || (m_debounceTimer && m_debounceTimer->isActive());
 }
 
-QList<component::iio::IIOScanElement *> DacDataModel::collectEnabledScanElements(QList<int> &indices) const
+QList<component::Channel *> DacDataModel::collectEnabledChannels(QList<int> &indices) const
 {
-	// Enabled scan elements, in stream (findChildren) order -> aligns 1:1 with
-	// writeFormat().channels after openAsync.
-	const QList<component::iio::IIOScanElement *> allEls =
-		m_out->findChildren<component::iio::IIOScanElement *>(QString(), Qt::FindDirectChildrenOnly);
-	QList<component::iio::IIOScanElement *> enabledEls;
+	// Selected stream member channels, sorted by streamIndex (the order of
+	// writeFormat().channels after openAsync).
+	QList<component::Channel *> enabledChns;
 	indices.clear();
-	for(auto *el : allEls) {
-		if(el->isEnabled()) {
-			enabledEls.append(el);
-			indices.append(static_cast<int>(el->index()));
-		}
-	}
-	return enabledEls;
-}
-
-QVector<component::iio::IIOSampleCodec *>
-DacDataModel::resolveCodecs(const QList<component::iio::IIOScanElement *> &enabledEls) const
-{
-	// Per enabled channel, resolve the sample codec (device counts -> raw bytes),
-	// matched to the scan element by id.
-	QVector<component::iio::IIOSampleCodec *> codecs(enabledEls.size(), nullptr);
-	for(int chIdx = 0; chIdx < enabledEls.size(); ++chIdx) {
+	for(auto *chn : m_out->channels()) {
 		for(auto node : std::as_const(m_bufferTxs)) {
-			auto *chn = node->getChannel();
-			if(chn && chn->id() == enabledEls[chIdx]->id()) {
-				codecs[chIdx] = chn->findChild<component::iio::IIOSampleCodec *>();
+			if(node->getChannel() == chn) {
+				if(isTxEnabled(node)) {
+					enabledChns.append(chn);
+					indices.append(static_cast<int>(chn->streamIndex()));
+				}
 				break;
 			}
 		}
+	}
+	return enabledChns;
+}
+
+QVector<component::iio::IIOSampleCodec *>
+DacDataModel::resolveCodecs(const QList<component::Channel *> &enabledChns) const
+{
+	// Per enabled channel, resolve the sample codec (device counts -> raw bytes).
+	QVector<component::iio::IIOSampleCodec *> codecs(enabledChns.size(), nullptr);
+	for(int chIdx = 0; chIdx < enabledChns.size(); ++chIdx) {
+		codecs[chIdx] = enabledChns[chIdx]->findChild<component::iio::IIOSampleCodec *>();
 	}
 	return codecs;
 }
@@ -424,7 +418,7 @@ QVector<QVector<int32_t>> DacDataModel::buildSampleColumns(unsigned int channelC
 	return columns;
 }
 
-void DacDataModel::fillBuffer(int bufferIdx, const QList<component::iio::IIOScanElement *> &enabledEls,
+void DacDataModel::fillBuffer(int bufferIdx, const QList<component::Channel *> &enabledChns,
 			      const QVector<component::iio::IIOSampleCodec *> &codecs,
 			      const QVector<QVector<int32_t>> &columns)
 {
@@ -432,12 +426,19 @@ void DacDataModel::fillBuffer(int bufferIdx, const QList<component::iio::IIOScan
 	char *base = static_cast<char *>(fmt.data);
 	unsigned int samplesPerBuffer = fmt.sampleCount;
 	unsigned int srcBase = (bufferIdx - 1) * samplesPerBuffer;
-	for(int chIdx = 0; chIdx < enabledEls.size(); ++chIdx) {
+	for(int chIdx = 0; chIdx < enabledChns.size(); ++chIdx) {
 		auto *codec = codecs[chIdx];
 		if(!codec) {
 			continue;
 		}
-		const component::ChannelFormat &cf = fmt.channels.at(chIdx);
+		const long streamIndex = enabledChns[chIdx]->streamIndex();
+		auto cfIt = std::find_if(
+			fmt.channels.cbegin(), fmt.channels.cend(),
+			[streamIndex](const component::ChannelFormat &f) { return f.streamIndex == streamIndex; });
+		if(cfIt == fmt.channels.cend()) {
+			continue;
+		}
+		const component::ChannelFormat &cf = *cfIt;
 		const QVector<int32_t> &col = columns[chIdx];
 		for(unsigned int s = 0; s < samplesPerBuffer; s++) {
 			unsigned int srcIdx = srcBase + s;
@@ -470,8 +471,8 @@ QCoro::Task<void> DacDataModel::pushTask()
 	m_out->setKernelBuffers(m_kernelBufferCount);
 
 	QList<int> indices;
-	const QList<component::iio::IIOScanElement *> enabledEls = collectEnabledScanElements(indices);
-	if(enabledEls.isEmpty()) {
+	const QList<component::Channel *> enabledChns = collectEnabledChannels(indices);
+	if(enabledChns.isEmpty()) {
 		m_cycleInFlight = false;
 		co_return;
 	}
@@ -485,8 +486,8 @@ QCoro::Task<void> DacDataModel::pushTask()
 		co_return;
 	}
 
-	const QVector<component::iio::IIOSampleCodec *> codecs = resolveCodecs(enabledEls);
-	const QVector<QVector<int32_t>> columns = buildSampleColumns(enabledEls.size());
+	const QVector<component::iio::IIOSampleCodec *> codecs = resolveCodecs(enabledChns);
+	const QVector<QVector<int32_t>> columns = buildSampleColumns(enabledChns.size());
 
 	unsigned int samplesPerBuffer = m_out->writeFormat().sampleCount;
 	unsigned int totalSamples = columns[0].size();
@@ -494,7 +495,7 @@ QCoro::Task<void> DacDataModel::pushTask()
 
 	int bufferIdx = 1;
 	while(!m_interrupted && bufferIdx <= totalNbBuffers) {
-		fillBuffer(bufferIdx, enabledEls, codecs, columns);
+		fillBuffer(bufferIdx, enabledChns, codecs, columns);
 
 		auto pushRes = co_await m_out->pushAsync();
 		if(!pushRes) {
@@ -552,16 +553,12 @@ bool DacDataModel::initBufferDac()
 	m_out = m_dev->findChild<component::iio::IIOOutputStream *>();
 	const QList<component::Channel *> channels =
 		m_dev->findChildren<component::Channel *>(QString(), Qt::FindDirectChildrenOnly);
-	QList<component::iio::IIOScanElement *> els;
-	if(m_out) {
-		els = m_out->findChildren<component::iio::IIOScanElement *>(QString(), Qt::FindDirectChildrenOnly);
-	}
 	for(auto *chn : channels) {
 		if(!chn->isOutput()) {
 			continue;
 		}
-		// Scan-element (buffer TX) channels carry an IIOSampleCodec child.
-		if(!chn->findChild<component::iio::IIOSampleCodec *>()) {
+		// Buffer TX channels are members of the output stream and carry an IIOSampleCodec child.
+		if(!m_out || !m_out->channels().contains(chn) || !chn->findChild<component::iio::IIOSampleCodec *>()) {
 			continue;
 		}
 		txCount++;
@@ -572,12 +569,6 @@ bool DacDataModel::initBufferDac()
 		}
 		QString uuid = m_dev->name() + ":" + id;
 		m_bufferTxs.insert(uuid, new TxNode(uuid, chn, this));
-		for(auto *el : els) {
-			if(el->id() == chn->id()) {
-				m_scanElements.insert(uuid, el);
-				break;
-			}
-		}
 	}
 	return (txCount != 0);
 }
@@ -640,9 +631,7 @@ int DacDataModel::getTxChannelEnabledCount(unsigned *enabled_mask)
 		*enabled_mask = 0;
 
 	for(auto ch : std::as_const(m_bufferTxs)) {
-		auto *el = scanElement(ch);
-		bool enabled = el && el->isEnabled();
-		if(enabled) {
+		if(isTxEnabled(ch)) {
 			num_enabled++;
 			if(enabled_mask)
 				*enabled_mask |= 1 << ch_pos;

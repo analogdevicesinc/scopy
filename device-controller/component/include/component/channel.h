@@ -32,6 +32,10 @@ namespace scopy::component {
 // identity (id/name/label + direction). Concrete backends subclass this
 // (IIOChannel, ...) to carry backend handles; the base holds no backend types.
 // Shared identity is exposed through Q_PROPERTY for uniform client binding.
+// streamIndex is the channel's position in a stream sample mask (the value
+// StreamConfig::enabledChannels refers to); -1 if the channel is not streamable.
+// Stream membership lives on the stream (Stream::channels()), so one channel may
+// belong to several streams (both directions, or several device buffers).
 class COMPONENT_EXPORT Channel : public QObject
 {
 	Q_OBJECT
@@ -39,6 +43,7 @@ class COMPONENT_EXPORT Channel : public QObject
 	Q_PROPERTY(QString name READ name CONSTANT)
 	Q_PROPERTY(QString label READ label CONSTANT)
 	Q_PROPERTY(bool isOutput READ isOutput CONSTANT)
+	Q_PROPERTY(long streamIndex READ streamIndex CONSTANT)
 public:
 	explicit Channel(QObject *parent = nullptr)
 		: QObject(parent)
@@ -49,6 +54,8 @@ public:
 	QString name() const { return m_name; }
 	QString label() const { return m_label; }
 	bool isOutput() const { return m_isOutput; }
+	long streamIndex() const { return m_streamIndex; }
+	bool isStreamable() const { return m_streamIndex >= 0; }
 
 	void setId(const QString &id)
 	{
@@ -58,12 +65,14 @@ public:
 	void setName(const QString &name) { m_name = name; }
 	void setLabel(const QString &label) { m_label = label; }
 	void setIsOutput(bool isOutput) { m_isOutput = isOutput; }
+	void setStreamIndex(long streamIndex) { m_streamIndex = streamIndex; }
 
 protected:
 	QString m_id;
 	QString m_name;
 	QString m_label;
 	bool m_isOutput = false;
+	long m_streamIndex = -1;
 };
 
 } // namespace scopy::component
