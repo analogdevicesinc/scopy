@@ -28,57 +28,37 @@
 #include <component/attributereader.h>
 #include <component/inputstream.h>
 #include <component/outputstream.h>
-#include <component/scanelement.h>
+#include <component/channel.h>
 #include <qcoro/qcorotask.h>
 
 using namespace scopy;
 using namespace scopy::component;
 
 namespace scopy::dcdebugger::test {
-class FakeScanElement : public ScanElement
+// Member channels "voltage<e>" with streamIndex e, owned by the stream.
+inline void addFakeChannels(Stream *stream, int count, bool output)
 {
-public:
-	using ScanElement::ScanElement;
-	bool isEnabled() const override { return m_on; }
-	QCoro::Task<CommandResponse<void>> enableAsync(bool en) override
-	{
-		m_on = en;
-		co_return CommandResponse<void>(QUuid());
+	for(int e = 0; e < count; ++e) {
+		auto *ch = new Channel(stream);
+		ch->setStreamIndex(e);
+		ch->setId(QStringLiteral("voltage%1").arg(e));
+		ch->setIsOutput(output);
+		stream->addChannel(ch);
 	}
-	bool m_on = false;
-};
+}
 
-// Interleaved int16 buffer; sample s of element e is e * 1000 + s.
+// Interleaved int16 buffer; sample s of channel e is e * 1000 + s.
 class FakeInputStream : public InputStream
 {
 public:
-	QList<FakeScanElement *> elements() const
-	{
-		QList<FakeScanElement *> out;
-		for(ScanElement *el : findChildren<ScanElement *>()) {
-			out.append(static_cast<FakeScanElement *>(el));
-		}
-		return out;
-	}
-
-	explicit FakeInputStream(int elements)
-	{
-		for(int e = 0; e < elements; ++e) {
-			auto *el = new FakeScanElement(this);
-			el->setIndex(e);
-			el->setId(QStringLiteral("voltage%1").arg(e));
-		}
-	}
+	explicit FakeInputStream(int elements) { addFakeChannels(this, elements, false); }
 	QCoro::Task<CommandResponse<void>> openAsync(const StreamConfig &cfg) override
 	{
 		if(failOpens > 0) {
 			failOpens--;
 			co_return CommandResponse<void>(QUuid(), Unexpected<Error>{Error{-EIO, "buffer open failed"}});
 		}
-		for(auto *el : elements()) {
-			el->m_on = cfg.enabledChannels.contains(int(el->index()));
-		}
-		m_config = cfg;
+		commitConfig(StreamConfig{resolveEnabledChannels(cfg.enabledChannels), cfg.samplesCount});
 		m_open = true;
 		opens++;
 		Q_EMIT openedChanged(true);
@@ -92,12 +72,7 @@ public:
 	}
 	QCoro::Task<CommandResponse<void>> refillAsync() override
 	{
-		QList<FakeScanElement *> on;
-		for(auto *el : elements()) {
-			if(el->m_on) {
-				on.append(el);
-			}
-		}
+		const QList<int> on = enabledChannels();
 		const int n = int(m_config.samplesCount);
 		m_buffer.resize(n * on.size());
 		m_format = StreamFormat{};
@@ -105,11 +80,12 @@ public:
 		m_format.sampleCount = size_t(n);
 		for(int c = 0; c < on.size(); ++c) {
 			ChannelFormat cf;
+			cf.streamIndex = on[c];
 			cf.offset = ptrdiff_t(c * sizeof(int16_t));
 			cf.stride = ptrdiff_t(on.size() * sizeof(int16_t));
 			m_format.channels.append(cf);
 			for(int s = 0; s < n; ++s) {
-				m_buffer[s * on.size() + c] = int16_t(on[c]->index() * 1000 + s);
+				m_buffer[s * on.size() + c] = int16_t(on[c] * 1000 + s);
 			}
 		}
 		refills++;
@@ -166,20 +142,7 @@ public:
 	explicit FakeOutputStream(int elements, bool canCycle = true)
 		: m_canCycle(canCycle)
 	{
-		for(int e = 0; e < elements; ++e) {
-			auto *el = new FakeScanElement(this);
-			el->setIndex(e);
-			el->setId(QStringLiteral("voltage%1").arg(e));
-			el->setIsOutput(true);
-		}
-	}
-	QList<FakeScanElement *> elements() const
-	{
-		QList<FakeScanElement *> out;
-		for(ScanElement *el : findChildren<ScanElement *>()) {
-			out.append(static_cast<FakeScanElement *>(el));
-		}
-		return out;
+		addFakeChannels(this, elements, true);
 	}
 	bool supportsCyclic() const override { return m_canCycle; }
 	bool cyclic() const override { return m_cyclic; }
@@ -193,18 +156,16 @@ public:
 	}
 	QCoro::Task<CommandResponse<void>> openAsync(const StreamConfig &cfg) override
 	{
-		int on = 0;
-		for(auto *el : elements()) {
-			el->m_on = cfg.enabledChannels.contains(int(el->index()));
-			on += el->m_on ? 1 : 0;
-		}
-		m_config = cfg;
+		commitConfig(StreamConfig{resolveEnabledChannels(cfg.enabledChannels), cfg.samplesCount});
+		const QList<int> enabled = enabledChannels();
+		const int on = int(enabled.size());
 		m_buffer.fill(0, int(cfg.samplesCount) * on);
 		m_format = StreamFormat{};
 		m_format.data = m_buffer.data();
 		m_format.sampleCount = cfg.samplesCount;
 		for(int c = 0; c < on; ++c) {
 			ChannelFormat cf;
+			cf.streamIndex = enabled[c];
 			cf.offset = ptrdiff_t(c * sizeof(int16_t));
 			cf.stride = ptrdiff_t(on * sizeof(int16_t));
 			m_format.channels.append(cf);

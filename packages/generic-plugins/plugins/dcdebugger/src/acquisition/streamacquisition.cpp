@@ -27,7 +27,7 @@
 #include <algorithm>
 
 #include <component/inputstream.h>
-#include <component/scanelement.h>
+#include <component/channel.h>
 #include <component/streamview.h>
 #include <qcoro/qcorotask.h>
 
@@ -42,16 +42,14 @@ StreamAcquisition::StreamAcquisition(InputStream *stream, QObject *parent)
 	, m_stream(stream)
 {
 	qRegisterMetaType<AcquiredFrame>();
-	// Default selection: what the stream already has enabled, else every element.
-	const QList<ScanElement *> elems = scanElements();
-	for(ScanElement *el : elems) {
-		if(el->isEnabled()) {
-			m_enabled.append(int(el->index()));
-		}
+	// Default selection: what the stream already has enabled, else every member channel.
+	const QList<Channel *> elems = channels();
+	if(m_stream) {
+		m_enabled = m_stream->enabledChannels();
 	}
 	if(m_enabled.isEmpty()) {
-		for(ScanElement *el : elems) {
-			m_enabled.append(int(el->index()));
+		for(Channel *el : elems) {
+			m_enabled.append(int(el->streamIndex()));
 		}
 	}
 	if(m_stream && m_stream->samplesCount() > 0) {
@@ -63,12 +61,12 @@ StreamAcquisition::~StreamAcquisition() = default;
 
 InputStream *StreamAcquisition::stream() const { return m_stream; }
 
-QList<ScanElement *> StreamAcquisition::scanElements() const
+QList<Channel *> StreamAcquisition::channels() const
 {
 	if(!m_stream) {
 		return {};
 	}
-	return m_stream->findChildren<ScanElement *>(QString(), Qt::FindDirectChildrenOnly);
+	return m_stream->channels();
 }
 
 void StreamAcquisition::setEnabledChannels(const QList<int> &indices)
@@ -248,16 +246,12 @@ AcquiredFrame StreamAcquisition::decode(InputStream *stream)
 		return frame;
 	}
 	const StreamFormat &fmt = stream->readFormat();
-	// StreamFormat::channels lists the enabled scan elements in child order.
-	QStringList ids;
-	for(ScanElement *el : stream->findChildren<ScanElement *>(QString(), Qt::FindDirectChildrenOnly)) {
-		if(el->isEnabled()) {
-			ids.append(el->id());
-		}
-	}
+	// Each StreamFormat entry names the member channel it describes by streamIndex; the
+	// backend may enable more channels than were requested.
 	StreamView view(fmt);
 	for(int c = 0; c < view.channelCount(); ++c) {
-		frame.ids.append(c < ids.size() ? ids[c] : QStringLiteral("channel %1").arg(c));
+		const Channel *ch = stream->channelAt(fmt.channels.at(c).streamIndex);
+		frame.ids.append(ch ? ch->id() : QStringLiteral("channel %1").arg(c));
 		frame.data.append(view.toDoubles(c));
 		frame.raw.append(view.toRawDoubles(c));
 		frame.bits.append(fmt.channels.at(c).validBits);

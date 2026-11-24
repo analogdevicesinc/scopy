@@ -43,7 +43,7 @@
 #include <component/attributereader.h>
 #include <component/device.h>
 #include <component/outputstream.h>
-#include <component/scanelement.h>
+#include <component/channel.h>
 #include <iiowidget.h>
 #include <iiowidgetbuilder.h>
 #include <menucombo.h>
@@ -223,7 +223,7 @@ QWidget *GeneratorView::buildSettings(QWidget *parent)
 
 void GeneratorView::buildChannels()
 {
-	// Left: "Output" (general settings) on top, then one button per scan element. Selecting a
+	// Left: "Output" (general settings) on top, then one button per member channel. Selecting a
 	// button shows its menu on the right; its checkbox enables the channel.
 	auto *vcm = new VerticalChannelManager(this);
 	m_menuGroup = new QButtonGroup(this);
@@ -241,7 +241,7 @@ void GeneratorView::buildChannels()
 	m_menuGroup->addButton(settingsBtn);
 	connect(settingsBtn, &QAbstractButton::clicked, this, [this]() { m_sides->rightStack()->show(SETTINGS_KEY); });
 
-	const QList<ScanElement *> elems = m_gen->scanElements();
+	const QList<Channel *> elems = m_gen->channels();
 	const QHash<QString, ToneSpec> tones = m_gen->tones();
 	for(int i = 0; i < elems.size(); ++i) {
 		const QString id = elems[i]->id();
@@ -249,7 +249,7 @@ void GeneratorView::buildChannels()
 		ChannelControls ctrl;
 		ctrl.id = id;
 		ctrl.button = new MenuControlButton(vcm);
-		ctrl.button->setName(scanElementName(m_stream, id, true));
+		ctrl.button->setName(streamChannelName(m_stream, id, true));
 		ctrl.button->setCheckBoxStyle(MenuControlButton::CS_CIRCLE);
 		ctrl.button->setColor(QColor(StyleHelper::getChannelColor(i)));
 		ctrl.button->setOpenMenuChecksThis(true);
@@ -273,7 +273,7 @@ void GeneratorView::buildChannels()
 
 QWidget *GeneratorView::buildChannelMenu(ChannelControls &ctrl, int index, const ToneSpec &tone)
 {
-	auto *menu = new gui::MenuWidget(scanElementName(m_stream, ctrl.id, true),
+	auto *menu = new gui::MenuWidget(streamChannelName(m_stream, ctrl.id, true),
 					 QPen(QColor(StyleHelper::getChannelColor(index))), this);
 
 	auto *signal = new MenuSectionCollapseWidget("SIGNAL", MenuCollapseSection::MHCW_NONE,
@@ -329,7 +329,7 @@ void GeneratorView::buildPreview()
 	m_plot->setShowXAxisLabels(true);
 	m_plot->setShowYAxisLabels(true);
 	m_plot->navigator()->setBounded(false);
-	const QList<ScanElement *> elems = m_gen->scanElements();
+	const QList<Channel *> elems = m_gen->channels();
 	for(int c = 0; c < elems.size(); ++c) {
 		QPen pen(QColor(StyleHelper::getChannelColor(c)), 1);
 		auto *ch = new PlotChannel(elems[c]->id(), pen, m_plot->xAxis(), m_plot->yAxis(), m_plot);

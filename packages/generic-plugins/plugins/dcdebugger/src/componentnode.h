@@ -44,7 +44,6 @@ enum class NodeKind
 	Attribute,
 	InputStream,
 	OutputStream,
-	ScanElement,
 	Trigger,
 	Triggerable,
 	RegisterReader,

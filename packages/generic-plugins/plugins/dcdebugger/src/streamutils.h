@@ -42,8 +42,8 @@ double sampleRateOf(const component::Attribute *attr);
 
 component::Context *contextOf(QObject *obj);
 
-// "voltage0" or "voltage0 (label)" for a scan element id of `stream`.
-QString scanElementName(QObject *stream, const QString &id, bool output);
+// "voltage0" or "voltage0 (label)" for a member channel id of `stream`.
+QString streamChannelName(QObject *stream, const QString &id, bool output);
 
 } // namespace scopy::dcdebugger
 

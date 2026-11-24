@@ -25,7 +25,7 @@
 #include <QTimer>
 
 #include <component/outputstream.h>
-#include <component/scanelement.h>
+#include <component/channel.h>
 #include <component/streamwriter.h>
 #include <qcoro/qcorotask.h>
 
@@ -43,9 +43,9 @@ StreamGeneration::StreamGeneration(OutputStream *stream, QObject *parent)
 	if(m_stream && m_stream->samplesCount() > 0) {
 		m_samples = m_stream->samplesCount();
 	}
-	// Default: every scan element, 0 / 90 degree sines (an I/Q pair on quadrature DACs).
+	// Default: every member channel, 0 / 90 degree sines (an I/Q pair on quadrature DACs).
 	int i = 0;
-	for(ScanElement *el : scanElements()) {
+	for(Channel *el : channels()) {
 		ToneSpec t;
 		t.phase = (i++ % 2) ? 90 : 0;
 		m_tones.insert(el->id(), t);
@@ -56,18 +56,14 @@ StreamGeneration::~StreamGeneration() = default;
 
 OutputStream *StreamGeneration::stream() const { return m_stream; }
 
-QList<ScanElement *> StreamGeneration::scanElements() const
-{
-	return m_stream ? m_stream->findChildren<ScanElement *>(QString(), Qt::FindDirectChildrenOnly)
-			: QList<ScanElement *>{};
-}
+QList<Channel *> StreamGeneration::channels() const { return m_stream ? m_stream->channels() : QList<Channel *>{}; }
 
 bool StreamGeneration::supportsCyclic() const { return m_stream && m_stream->supportsCyclic(); }
 
 void StreamGeneration::setTones(const QHash<QString, ToneSpec> &tones)
 {
 	const bool channelsChanged = [&]() {
-		for(ScanElement *el : scanElements()) {
+		for(Channel *el : channels()) {
 			if(m_tones.value(el->id()).enabled != tones.value(el->id()).enabled) {
 				return true;
 			}
@@ -119,10 +115,10 @@ QHash<QString, ToneSpec> StreamGeneration::snappedTones() const
 QList<int> StreamGeneration::enabledIndices() const
 {
 	QList<int> out;
-	for(ScanElement *el : scanElements()) {
+	for(Channel *el : channels()) {
 		auto it = m_tones.constFind(el->id());
 		if(it != m_tones.cend() && it->enabled) {
-			out.append(int(el->index()));
+			out.append(int(el->streamIndex()));
 		}
 	}
 	return out;
@@ -221,19 +217,20 @@ void StreamGeneration::fillAndPush()
 	StreamFormat &fmt = m_stream->writeFormat();
 	StreamWriter writer(fmt);
 	const int samples = int(writer.sampleCount());
-	// writeFormat().channels lists the enabled scan elements in child order.
+	// Each writeFormat() entry names the member channel it describes by streamIndex. The
+	// backend may enable more channels than requested: those without an enabled tone get 0.
 	int ch = 0;
-	for(ScanElement *el : scanElements()) {
-		if(!el->isEnabled() || ch >= writer.channelCount()) {
-			continue;
+	for(; ch < writer.channelCount(); ++ch) {
+		const Channel *member = m_stream->channelAt(fmt.channels.at(ch).streamIndex);
+		ToneSpec tone = member ? m_tones.value(member->id()) : ToneSpec{};
+		QVector<double> v(samples, 0.0);
+		if(member && tone.enabled) {
+			tone.frequency = snapFrequency(tone.frequency, m_fs, samples);
+			v = generateTone(tone, samples, m_fs);
 		}
-		ToneSpec tone = m_tones.value(el->id());
-		tone.frequency = snapFrequency(tone.frequency, m_fs, samples);
-		const QVector<double> v = generateTone(tone, samples, m_fs);
 		for(int s = 0; s < v.size(); ++s) {
 			writer.setNormalized(ch, size_t(s), v[s]);
 		}
-		ch++;
 	}
 
 	m_busy = true;

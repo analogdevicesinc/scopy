@@ -83,6 +83,7 @@ QCoro::Task<void> IIOInputStream::applyEnabledChannels(const QList<int> &channel
 		Command *cmd = channels.contains(static_cast<int>(member->streamIndex()))
 			? static_cast<Command *>(new scopy::iio::ChnEnableCommand(m_chOps, ch, m_mask))
 			: static_cast<Command *>(new scopy::iio::ChnDisableCommand(m_chOps, ch, m_mask));
+		CommandMonitor::tag(cmd, member);
 		co_await m_executor->execute(cmd);
 		cmd->deleteLater();
 	}

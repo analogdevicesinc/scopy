@@ -35,13 +35,13 @@
 
 namespace scopy::component {
 class InputStream;
-class ScanElement;
+class Channel;
 } // namespace scopy::component
 
 namespace scopy::dcdebugger {
 
 // One refilled buffer, de-interleaved: data[i] (scaled) and raw[i] (decoded integers) belong
-// to the scan element ids[i]; bits[i] is its valid bit count (full scale = 2^(bits - 1)).
+// to the stream member channel ids[i]; bits[i] is its valid bit count (full scale = 2^(bits - 1)).
 struct AcquiredFrame
 {
 	QStringList ids;
@@ -51,8 +51,8 @@ struct AcquiredFrame
 	quint64 index = 0;
 };
 
-// Drives one InputStream through the component interface: open with the selected scan
-// elements, refill in a loop (or once), decode every buffer, close when stopped. Config
+// Drives one InputStream through the component interface: open with the selected member
+// channels, refill in a loop (or once), decode every buffer, close when stopped. Config
 // changes while running are applied by reopening the stream between two refills.
 class SCOPY_DCDEBUGGER_EXPORT StreamAcquisition : public QObject
 {
@@ -62,7 +62,7 @@ public:
 	~StreamAcquisition() override;
 
 	component::InputStream *stream() const;
-	QList<component::ScanElement *> scanElements() const;
+	QList<component::Channel *> channels() const;
 
 	QList<int> enabledChannels() const { return m_enabled; }
 	void setEnabledChannels(const QList<int> &indices);

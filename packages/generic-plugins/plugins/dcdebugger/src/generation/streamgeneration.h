@@ -34,13 +34,13 @@
 
 namespace scopy::component {
 class OutputStream;
-class ScanElement;
+class Channel;
 } // namespace scopy::component
 
 namespace scopy::dcdebugger {
 
-// Drives one OutputStream through the component interface: open with the enabled tones' scan
-// elements, encode every tone into the write buffer, push. Cyclic streams are pushed once and
+// Drives one OutputStream through the component interface: open with the enabled tones' member
+// channels, encode every tone into the write buffer, push. Cyclic streams are pushed once and
 // replay on the device; others are refilled and pushed in a loop. Changes while running are
 // applied by reopening (cyclic, or new channels / samples) or at the next push (tone values).
 class SCOPY_DCDEBUGGER_EXPORT StreamGeneration : public QObject
@@ -51,9 +51,9 @@ public:
 	~StreamGeneration() override;
 
 	component::OutputStream *stream() const;
-	QList<component::ScanElement *> scanElements() const;
+	QList<component::Channel *> channels() const;
 
-	// Tones by scan element id; elements without a tone, or with enabled = false, stay off.
+	// Tones by member channel id; channels without a tone, or with enabled = false, stay off.
 	QHash<QString, ToneSpec> tones() const { return m_tones; }
 	void setTones(const QHash<QString, ToneSpec> &tones);
 	size_t samples() const { return m_samples; }

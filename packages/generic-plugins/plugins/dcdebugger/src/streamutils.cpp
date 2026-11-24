@@ -78,7 +78,7 @@ Context *scopy::dcdebugger::contextOf(QObject *obj)
 	return nullptr;
 }
 
-QString scopy::dcdebugger::scanElementName(QObject *stream, const QString &id, bool output)
+QString scopy::dcdebugger::streamChannelName(QObject *stream, const QString &id, bool output)
 {
 	Channel *ch = channelById(stream ? stream->parent() : nullptr, id, output);
 	if(!ch) {

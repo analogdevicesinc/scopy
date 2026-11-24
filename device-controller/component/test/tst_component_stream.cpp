@@ -445,12 +445,15 @@ void TstComponentStream::cyclicIsAnOutputStreamProperty()
 	dctest::FakeChannelOps chOps;
 	dctest::FakeBufferOps bufOps;
 	IIOOutputStream stream(&bufOps, &chOps, {reinterpret_cast<void *>(0x1)}, 1, 0, &exec);
+	dctest::FakeChannel c0{0, "voltage0", true, true, s16Format()};
+	addMember(&stream, &c0);
+	bufOps.chOffset.insert(&c0, 0);
 	OutputStream *out = &stream;
 	QVERIFY(out->supportsCyclic());
 	QVERIFY(!out->cyclic());
 	QVERIFY(out->setCyclic(true));
 	QVERIFY(out->property("cyclic").toBool());
-	QVERIFY(QCoro::waitFor(out->openAsync({{}, 4})));
+	QVERIFY(QCoro::waitFor(out->openAsync({{0}, 4})));
 	QVERIFY(!out->setCyclic(false)); // refused while open
 	QVERIFY(out->cyclic());
 }

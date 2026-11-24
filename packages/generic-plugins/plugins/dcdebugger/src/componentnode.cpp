@@ -35,7 +35,6 @@
 #include <component/registerreader.h>
 #include <component/registerwriter.h>
 #include <component/samplecodec.h>
-#include <component/scanelement.h>
 #include <component/tags.h>
 #include <component/trigger.h>
 
@@ -50,7 +49,6 @@ const QString GROUP_DEVICES = QStringLiteral("Devices");
 const QString GROUP_CHANNELS = QStringLiteral("Channels");
 const QString GROUP_STREAMS = QStringLiteral("Streams");
 const QString GROUP_CAPABILITIES = QStringLiteral("Capabilities");
-const QString GROUP_SCAN_ELEMENTS = QStringLiteral("Scan elements");
 
 QString shortName(const char *className)
 {
@@ -85,9 +83,6 @@ NodeKind ComponentNode::kindOf(const QObject *obj)
 	}
 	if(qobject_cast<const OutputStream *>(obj)) {
 		return NodeKind::OutputStream;
-	}
-	if(qobject_cast<const ScanElement *>(obj)) {
-		return NodeKind::ScanElement;
 	}
 	if(qobject_cast<const Trigger *>(obj)) {
 		return NodeKind::Trigger;
@@ -131,8 +126,6 @@ QString ComponentNode::kindName(NodeKind kind)
 		return QStringLiteral("InputStream");
 	case NodeKind::OutputStream:
 		return QStringLiteral("OutputStream");
-	case NodeKind::ScanElement:
-		return QStringLiteral("ScanElement");
 	case NodeKind::Trigger:
 		return QStringLiteral("Trigger");
 	case NodeKind::Triggerable:
@@ -165,8 +158,6 @@ QString ComponentNode::groupOf(const QObject *obj, NodeKind kind)
 	case NodeKind::InputStream:
 	case NodeKind::OutputStream:
 		return GROUP_STREAMS;
-	case NodeKind::ScanElement:
-		return GROUP_SCAN_ELEMENTS;
 	case NodeKind::Trigger:
 	case NodeKind::Triggerable:
 	case NodeKind::RegisterReader:
@@ -184,8 +175,8 @@ QString ComponentNode::groupOf(const QObject *obj, NodeKind kind)
 
 int ComponentNode::groupOrder(const QString &group)
 {
-	static const QStringList order = {GROUP_VIEWS,	 GROUP_ATTRIBUTES,    GROUP_DEVICES,	 GROUP_CHANNELS,
-					  GROUP_STREAMS, GROUP_SCAN_ELEMENTS, GROUP_CAPABILITIES};
+	static const QStringList order = {GROUP_VIEWS,	  GROUP_ATTRIBUTES, GROUP_DEVICES,
+					  GROUP_CHANNELS, GROUP_STREAMS,    GROUP_CAPABILITIES};
 	const int idx = order.indexOf(group);
 	return idx < 0 ? order.size() : idx;
 }
@@ -216,8 +207,6 @@ QString ComponentNode::name(const QObject *obj, NodeKind kind)
 		return QStringLiteral("input buffer %1").arg(static_cast<const Stream *>(obj)->bufferIndex());
 	case NodeKind::OutputStream:
 		return QStringLiteral("output buffer %1").arg(static_cast<const Stream *>(obj)->bufferIndex());
-	case NodeKind::ScanElement:
-		return static_cast<const ScanElement *>(obj)->id();
 	case NodeKind::Trigger:
 		return static_cast<const Trigger *>(obj)->name();
 	default:
@@ -251,16 +240,21 @@ QString ComponentNode::value(const QObject *obj, NodeKind kind)
 		return attr->cachedValue() + " " + attr->unit();
 	}
 	case NodeKind::InputStream:
-	case NodeKind::OutputStream:
-		return static_cast<const Stream *>(obj)->isOpen() ? QStringLiteral("open") : QStringLiteral("closed");
+	case NodeKind::OutputStream: {
+		const auto *stream = static_cast<const Stream *>(obj);
+		QStringList on;
+		for(int idx : stream->enabledChannels()) {
+			const Channel *ch = stream->channelAt(idx);
+			on.append(ch ? ch->id() : QString::number(idx));
+		}
+		const QString state = stream->isOpen() ? QStringLiteral("open") : QStringLiteral("closed");
+		return on.isEmpty() ? state : state + " [" + on.join(", ") + "]";
+	}
 	case NodeKind::RegisterReader:
 	case NodeKind::RegisterWriter:
 		return QStringLiteral("addr %1 bit / value %2 bit")
 			.arg(obj->property("addressBits").toInt())
 			.arg(obj->property("valueBits").toInt());
-	case NodeKind::ScanElement:
-		return static_cast<const ScanElement *>(obj)->isEnabled() ? QStringLiteral("enabled")
-									  : QStringLiteral("disabled");
 	default:
 		break;
 	}

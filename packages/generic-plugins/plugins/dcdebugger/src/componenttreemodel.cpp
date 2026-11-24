@@ -27,7 +27,6 @@
 #include <component/attributereader.h>
 #include <component/commandmonitor.h>
 #include <component/connection.h>
-#include <component/scanelement.h>
 #include <component/stream.h>
 
 using namespace scopy;
@@ -148,9 +147,7 @@ void ComponentTreeModel::watch(QObject *obj, NodeKind kind, QStandardItem *value
 	case NodeKind::InputStream:
 	case NodeKind::OutputStream:
 		connect(static_cast<Stream *>(obj), &Stream::openedChanged, m_watchers, refresh);
-		break;
-	case NodeKind::ScanElement:
-		connect(static_cast<ScanElement *>(obj), &ScanElement::enabledChanged, m_watchers, refresh);
+		connect(static_cast<Stream *>(obj), &Stream::enabledChannelsChanged, m_watchers, refresh);
 		break;
 	default:
 		break;

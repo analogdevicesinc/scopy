@@ -43,7 +43,6 @@
 #include <component/device.h>
 #include <component/inputstream.h>
 #include <component/navigation.h>
-#include <component/scanelement.h>
 #include <component/tags.h>
 #include <component/trigger.h>
 #include <filemanager.h>
@@ -215,10 +214,10 @@ QWidget *AcquisitionView::buildAcquisitionSection(QWidget *parent)
 
 void AcquisitionView::buildChannels()
 {
-	// The channel list on the left, as in the Scopy instruments: one colored checkbox per scan
-	// element (the plot channel shares the color), in a group whose switch toggles them all.
+	// The channel list on the left, as in the Scopy instruments: one colored checkbox per stream
+	// member channel (the plot channel shares the color), in a group whose switch toggles them all.
 	auto *vcm = new VerticalChannelManager(this);
-	const QList<ScanElement *> elems = m_acq->scanElements();
+	const QList<Channel *> elems = m_acq->channels();
 	const QList<int> enabled = m_acq->enabledChannels();
 	QString name = QStringLiteral("Channels");
 	if(auto *dev = qobject_cast<Device *>(m_stream->parent())) {
@@ -232,7 +231,7 @@ void AcquisitionView::buildChannels()
 	group->onOffSwitch()->setChecked(!enabled.isEmpty());
 	vcm->add(group);
 	for(int i = 0; i < elems.size(); ++i) {
-		ScanElement *el = elems[i];
+		Channel *el = elems[i];
 		auto *btn = new MenuControlButton(group);
 		btn->setName(displayName(el->id()));
 		btn->setCheckBoxStyle(MenuControlButton::CS_CIRCLE);
@@ -240,7 +239,7 @@ void AcquisitionView::buildChannels()
 		btn->button()->setVisible(false);
 		btn->setCheckable(false);
 		btn->enableToolTip(true);
-		btn->checkBox()->setChecked(enabled.contains(int(el->index())));
+		btn->checkBox()->setChecked(enabled.contains(int(el->streamIndex())));
 		group->add(btn);
 		QCheckBox *box = btn->checkBox();
 		// No channel menu: a click on the row toggles the channel.
@@ -248,10 +247,10 @@ void AcquisitionView::buildChannels()
 		connect(group->onOffSwitch(), &QAbstractButton::toggled, box, &QCheckBox::setChecked);
 		connect(box, &QCheckBox::toggled, this, &AcquisitionView::applyChannelSelection);
 		m_channelBoxes.insert(el->id(), box);
-		m_channelIndex.insert(el->id(), int(el->index()));
+		m_channelIndex.insert(el->id(), int(el->streamIndex()));
 	}
 	if(elems.isEmpty()) {
-		auto *none = new QLabel("This stream exposes no scan elements.", vcm);
+		auto *none = new QLabel("This stream exposes no streamable channels.", vcm);
 		none->setWordWrap(true);
 		vcm->add(none);
 	}
@@ -304,7 +303,7 @@ QWidget *AcquisitionView::buildSoftwareTriggerSection(QWidget *parent)
 	m_swTrigger->setCollapsed(true);
 
 	m_swSource = new MenuCombo("Source", m_swTrigger);
-	for(ScanElement *el : m_acq->scanElements()) {
+	for(Channel *el : m_acq->channels()) {
 		m_swSource->combo()->addItem(displayName(el->id()), el->id());
 	}
 	m_swMode = new MenuCombo("Mode", m_swTrigger);
@@ -345,7 +344,7 @@ void AcquisitionView::buildPlot()
 	// Wheel zoom-out may go past the data range.
 	m_plot->navigator()->setBounded(false);
 
-	const QList<ScanElement *> elems = m_acq->scanElements();
+	const QList<Channel *> elems = m_acq->channels();
 	for(int c = 0; c < elems.size(); ++c) {
 		QPen pen(QColor(StyleHelper::getChannelColor(c)), 1);
 		auto *ch = new PlotChannel(displayName(elems[c]->id()), pen, m_plot->xAxis(), m_plot->yAxis(), m_plot);
@@ -387,7 +386,7 @@ double AcquisitionView::sampleRate() const
 	return m_manualRate ? m_manualRate->value() : 0;
 }
 
-QString AcquisitionView::displayName(const QString &id) const { return scanElementName(m_stream, id, false); }
+QString AcquisitionView::displayName(const QString &id) const { return streamChannelName(m_stream, id, false); }
 
 void AcquisitionView::onFrame(const AcquiredFrame &frame)
 {
@@ -478,7 +477,7 @@ QWidget *AcquisitionView::buildViewSection(QWidget *parent)
 	m_complexIQ->onOffswitch()->setChecked(false);
 	m_xySource = new MenuCombo("X channel", section);
 	m_xySourceY = new MenuCombo("Y channel", section);
-	for(ScanElement *el : m_acq->scanElements()) {
+	for(Channel *el : m_acq->channels()) {
 		m_xySource->combo()->addItem(displayName(el->id()), el->id());
 		m_xySourceY->combo()->addItem(displayName(el->id()), el->id());
 	}
@@ -636,7 +635,7 @@ void AcquisitionView::render()
 		xhi = m_count > 1 ? m_shownX.last() : 1;
 	}
 
-	const QList<ScanElement *> elems = m_acq->scanElements();
+	const QList<Channel *> elems = m_acq->channels();
 	const bool iq = mode == SpectrumMode && m_complexIQ->onOffswitch()->isChecked();
 	if(iq) {
 		const auto xr = renderIQSpectrum(raw, fs, rows, ylo, yhi);
@@ -733,7 +732,7 @@ QPair<double, double> AcquisitionView::renderIQSpectrum(bool raw, double fs, QLi
 	const AcquiredFrame &f = m_frame;
 	const QVector<QVector<double>> &src = raw ? f.raw : f.data;
 	const WindowType window = WindowType(m_window->combo()->currentIndex());
-	const QList<ScanElement *> elems = m_acq->scanElements();
+	const QList<Channel *> elems = m_acq->channels();
 
 	struct On
 	{

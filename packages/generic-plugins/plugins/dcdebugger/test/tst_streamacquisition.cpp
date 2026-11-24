@@ -47,7 +47,7 @@ void TST_StreamAcquisition::defaultsToEveryElement()
 {
 	FakeInputStream stream(3);
 	StreamAcquisition acq(&stream);
-	QCOMPARE(acq.scanElements().size(), 3);
+	QCOMPARE(acq.channels().size(), 3);
 	QCOMPARE(acq.enabledChannels(), QList<int>({0, 1, 2}));
 }
 

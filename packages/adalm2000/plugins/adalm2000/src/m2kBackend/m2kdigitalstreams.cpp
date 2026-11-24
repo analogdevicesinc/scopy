@@ -283,7 +283,9 @@ QCoro::Task<CommandResponse<void>> M2kDigitalOutputStream::openAsync(const compo
 		// stop driving; their direction is left to the Digital I/O tool.
 		for(int pin : dropped) {
 			if(!pins.contains(pin)) {
-				digital->enableChannel(static_cast<DIO_CHANNEL>(pin), false);
+				const DIO_CHANNEL index = static_cast<DIO_CHANNEL>(pin);
+				M2K_CALL(digital, "M2kDigital::enableChannel", digital->enableChannel(index, false),
+					 M2K_ARG(index), M2K_ARGN("enable", false));
 			}
 		}
 		// Takes over direction for these pins; see the header's caution about the
