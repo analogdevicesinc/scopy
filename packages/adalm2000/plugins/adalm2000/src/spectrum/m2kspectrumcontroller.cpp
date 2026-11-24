@@ -100,6 +100,9 @@ const QString kReferencesGroup = QStringLiteral("References");
 constexpr int kFrameIntervalMs = 16;
 constexpr int kMaxFps = 60;
 constexpr double kDbRange = 200.0;
+// Top/bottom limits around the default dB view, and the input range for linear volts
+constexpr double kDbMargin = 50.0;
+constexpr double kMaxVolts = 25.0;
 
 const QList<QPair<QString, PlotMarkerController::MarkerTypes>> kMarkerTypes = {
 	{QStringLiteral("None"), PlotMarkerController::MC_NONE},
@@ -129,6 +132,8 @@ gui::MenuSpinbox *hzSpin(const QString &name, double v, double min, QWidget *par
 	auto *s =
 		new gui::MenuSpinbox(name, v, QStringLiteral("Hz"), min, spec::MAX_STOP_HZ, true, false, true, parent);
 	s->setIncrementMode(gui::MenuSpinbox::IS_125);
+	s->setCircleEnabled(true);
+	s->setCircleLogFloor(spec::MIN_STOP_HZ);
 	return s;
 }
 } // namespace
@@ -584,6 +589,8 @@ QWidget *M2kSpectrumController::buildGeneralPage()
 	m_bottomSpin = new gui::MenuSpinbox(tr("Bottom"), -kDbRange, QString(), -300, 300, true, false, true, amp);
 	m_topSpin->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
 	m_bottomSpin->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
+	m_topSpin->setCircleEnabled(true);
+	m_bottomSpin->setCircleEnabled(true);
 	amp->contentLayout()->addWidget(m_unitsCombo);
 	amp->contentLayout()->addWidget(m_topSpin);
 	amp->contentLayout()->addWidget(m_bottomSpin);
@@ -904,6 +911,7 @@ void M2kSpectrumController::onUnitsChanged(int idx)
 		s->setUnit(unit);
 	}
 	double top = 0.0, bottom = -kDbRange;
+	double min = bottom - kDbMargin, max = top + kDbMargin;
 	switch(unit) {
 	case SpectrumProcessor::Unit::DBFS:
 		break;
@@ -913,22 +921,33 @@ void M2kSpectrumController::onUnitsChanged(int idx)
 		const double ref = unit == SpectrumProcessor::Unit::DBV ? 1.0 : 0.7745966692;
 		top = std::ceil(20.0 * std::log10(vrms / ref) / 10.0) * 10.0;
 		bottom = top - kDbRange;
+		min = bottom - kDbMargin;
+		max = top + kDbMargin;
 		break;
 	}
 	case SpectrumProcessor::Unit::VPeak:
 	case SpectrumProcessor::Unit::VRms:
 		top = 10.0;
 		bottom = 0.0;
+		min = 0.0;
+		max = kMaxVolts;
 		break;
 	case SpectrumProcessor::Unit::VRmsPerSqrtHz:
 		top = 1.0;
 		bottom = 1e-9;
+		min = bottom;
+		max = 10.0;
 		break;
 	}
 	m_logY = unit == SpectrumProcessor::Unit::VRmsPerSqrtHz;
 	const QString sym = unitSymbol();
-	m_topSpin->setUnit(sym);
-	m_bottomSpin->setUnit(sym);
+	for(gui::MenuSpinbox *s : {m_topSpin, m_bottomSpin}) {
+		s->setUnit(sym);
+		s->setMinValue(min);
+		s->setMaxValue(max);
+		// 1-2-5 steps and a log circle follow the log axis
+		s->setIncrementMode(m_logY ? gui::MenuSpinbox::IS_125 : gui::MenuSpinbox::IS_FIXED);
+	}
 	m_topSpin->setValueSilent(top);
 	m_bottomSpin->setValueSilent(bottom);
 	for(scopy::adc::AcqCurveChannel *c : curves()) {
