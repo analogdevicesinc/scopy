@@ -29,6 +29,7 @@ set(DCDEBUGGER_TESTS
     registers
     attributemonitor
     monitorview
+    channelmonitorview
     commandlog
     pingview
     nodepanel

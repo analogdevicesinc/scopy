@@ -21,6 +21,7 @@
 
 #include "acquisition/acquisitionview.h"
 #include "generation/generatorview.h"
+#include "monitor/channelmonitorview.h"
 #include "monitor/monitorview.h"
 #include "nodepanel.h"
 #include "nodeviewregistry.h"
@@ -89,6 +90,22 @@ public:
 	QWidget *create(QObject *node, NodeKind, NodePanel *panel) override { return new MonitorView(node, panel); }
 };
 
+// Table-only replacement of MonitorViewFactory, side by side until the old view is removed.
+class ChannelMonitorViewFactory : public NodeViewFactory
+{
+public:
+	QString id() const override { return QStringLiteral("channelmonitor"); }
+	QString title() const override { return QStringLiteral("Channel Monitor"); }
+	bool supports(QObject *node, NodeKind kind) const override
+	{
+		return kind == NodeKind::Device && !ChannelMonitorView::inputChannels(node).isEmpty();
+	}
+	QWidget *create(QObject *node, NodeKind, NodePanel *panel) override
+	{
+		return new ChannelMonitorView(node, panel);
+	}
+};
+
 class RegisterViewFactory : public NodeViewFactory
 {
 public:
@@ -110,5 +127,6 @@ void scopy::dcdebugger::registerBuiltinNodeViews(NodeViewRegistry *registry)
 	registry->registerFactory(std::make_unique<GeneratorViewFactory>(), 100);
 	registry->registerFactory(std::make_unique<PingViewFactory>(), 100);
 	registry->registerFactory(std::make_unique<MonitorViewFactory>(), 50);
+	registry->registerFactory(std::make_unique<ChannelMonitorViewFactory>(), 45);
 	registry->registerFactory(std::make_unique<RegisterViewFactory>(), 40);
 }

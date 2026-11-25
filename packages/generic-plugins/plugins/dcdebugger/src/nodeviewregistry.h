@@ -85,7 +85,7 @@ private:
 	std::vector<Entry> m_entries;
 };
 
-// The debugger's own views: Acquisition, Generator, Ping, Monitor, Registers.
+// The debugger's own views: Acquisition, Generator, Ping, Monitor, Channel Monitor, Registers.
 void registerBuiltinNodeViews(NodeViewRegistry *registry);
 
 } // namespace scopy::dcdebugger

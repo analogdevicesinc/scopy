@@ -116,7 +116,8 @@ void TST_NodeViews::cleanup()
 
 void TST_NodeViews::builtinViewsAreRegistered()
 {
-	QCOMPARE(ids(reg()->factories()), QStringList({"acquisition", "generator", "ping", "monitor", "registers"}));
+	QCOMPARE(ids(reg()->factories()),
+		 QStringList({"acquisition", "generator", "ping", "monitor", "channelmonitor", "registers"}));
 	for(NodeViewFactory *f : reg()->factories()) {
 		QVERIFY(NodeViewRegistry::isEnabled(f->id()));
 		QCOMPARE(Preferences::get(NodeViewRegistry::preferenceKey(f->id())).toBool(), true);
