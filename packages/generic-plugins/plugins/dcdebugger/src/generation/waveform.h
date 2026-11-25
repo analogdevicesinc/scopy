@@ -59,6 +59,13 @@ SCOPY_DCDEBUGGER_EXPORT double snapFrequency(double frequency, double fs, int sa
 // given (snap it first for a seamless replay).
 SCOPY_DCDEBUGGER_EXPORT QVector<double> generateTone(const ToneSpec &tone, int samples, double fs);
 
+// Raw-code variant: tone.frequency is the number of periods in the buffer, amplitude and offset
+// are DAC codes. Not clamped (the code range is known once the stream is open).
+SCOPY_DCDEBUGGER_EXPORT QVector<double> generateRawTone(const ToneSpec &tone, int samples);
+
+// Most periods a buffer of `samples` holds below Nyquist (at least 1).
+SCOPY_DCDEBUGGER_EXPORT int maxPeriods(int samples);
+
 } // namespace scopy::dcdebugger
 
 #endif // WAVEFORM_H

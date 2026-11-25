@@ -22,6 +22,7 @@
 #include "acquisition/acquisitionview.h"
 #include "acquisition/rawacquisitionview.h"
 #include "generation/generatorview.h"
+#include "generation/rawgeneratorview.h"
 #include "monitor/channelmonitorview.h"
 #include "monitor/monitorview.h"
 #include "nodepanel.h"
@@ -74,6 +75,19 @@ public:
 	QWidget *create(QObject *node, NodeKind, NodePanel *panel) override
 	{
 		return new GeneratorView(qobject_cast<component::OutputStream *>(node), panel);
+	}
+};
+
+// Simplified replacement of GeneratorViewFactory, side by side until the old view is removed.
+class RawGeneratorViewFactory : public NodeViewFactory
+{
+public:
+	QString id() const override { return QStringLiteral("rawgenerator"); }
+	QString title() const override { return QStringLiteral("Raw Generator"); }
+	bool supports(QObject *node, NodeKind) const override { return qobject_cast<component::OutputStream *>(node); }
+	QWidget *create(QObject *node, NodeKind, NodePanel *panel) override
+	{
+		return new RawGeneratorView(qobject_cast<component::OutputStream *>(node), panel);
 	}
 };
 
@@ -140,6 +154,7 @@ void scopy::dcdebugger::registerBuiltinNodeViews(NodeViewRegistry *registry)
 	registry->registerFactory(std::make_unique<AcquisitionViewFactory>(), 100);
 	registry->registerFactory(std::make_unique<RawAcquisitionViewFactory>(), 95);
 	registry->registerFactory(std::make_unique<GeneratorViewFactory>(), 100);
+	registry->registerFactory(std::make_unique<RawGeneratorViewFactory>(), 95);
 	registry->registerFactory(std::make_unique<PingViewFactory>(), 100);
 	registry->registerFactory(std::make_unique<MonitorViewFactory>(), 50);
 	registry->registerFactory(std::make_unique<ChannelMonitorViewFactory>(), 45);

@@ -38,13 +38,9 @@
 #include <limits>
 
 #include <component/attribute.h>
-#include <component/attributereader.h>
-#include <component/attributewriter.h>
 #include <component/channel.h>
 #include <component/device.h>
 #include <component/inputstream.h>
-#include <component/navigation.h>
-#include <component/tags.h>
 #include <dcdebugger/style_properties.h>
 #include <filemanager.h>
 #include <hoverwidget.h>
@@ -78,34 +74,12 @@ const char *const SETTINGS_KEY = "settings";
 const char *const CHANNELS_KEY = "channels";
 } // namespace
 
-QList<Attribute *> RawAcquisitionView::sampleRateAttributes(InputStream *stream)
-{
-	QList<Attribute *> out;
-	if(!stream) {
-		return out;
-	}
-	for(Channel *ch : stream->channels()) {
-		const QList<Attribute *> tagged = findByTag<Attribute>(ch, tags::SampleRate, false);
-		Attribute *a =
-			tagged.isEmpty() ? attributeByName(ch, QStringLiteral("sampling_frequency")) : tagged.first();
-		if(a && !out.contains(a)) {
-			out.append(a);
-		}
-	}
-	if(out.isEmpty()) {
-		if(Attribute *a = findSampleRate(stream, false)) {
-			out.append(a);
-		}
-	}
-	return out;
-}
-
 RawAcquisitionView::RawAcquisitionView(InputStream *stream, QWidget *parent)
 	: QWidget(parent)
 	, m_stream(stream)
 	, m_acq(new StreamAcquisition(stream, this))
 {
-	m_sampleRateAttrs = sampleRateAttributes(stream);
+	m_sampleRateAttrs = memberSampleRates(stream, false);
 
 	// Every member channel is acquired: there is no channel selection.
 	QList<int> all;
@@ -233,10 +207,7 @@ QWidget *RawAcquisitionView::buildAcquisitionSection(QWidget *parent)
 			lay->addWidget(rate);
 			rate->readAsync();
 		}
-		if(m_sampleRateAttrs.size() > 1 && first->writeCapability()) {
-			connect(first->writeCapability(), &AttributeWriter::writeSucceeded, this,
-				&RawAcquisitionView::propagateSampleRate);
-		}
+		linkSampleRates(this, m_sampleRateAttrs, [this](const QString &msg) { setStatus(msg, true); });
 	}
 	return section;
 }
@@ -267,36 +238,6 @@ QWidget *RawAcquisitionView::buildYAxisSection(QWidget *parent)
 	});
 	connect(m_yRangeCtrl, &gui::MenuPlotAxisRangeControl::intervalChanged, this, [this]() { m_plot->replot(); });
 	return section;
-}
-
-void RawAcquisitionView::propagateSampleRate()
-{
-	Attribute *first = m_sampleRateAttrs.value(0);
-	if(!first || !first->readCapability()) {
-		return;
-	}
-	// The value the device settled on (it may round the request), then the same for the others.
-	QCoro::connect(first->readCapability()->readAsync(), this, [this](const CommandResponse<QByteArray> &r) {
-		if(!r) {
-			setStatus("sample rate: " + r.error().errorString(), true);
-			return;
-		}
-		const QString value = QString::fromUtf8(r.value()).trimmed();
-		for(int i = 1; i < m_sampleRateAttrs.size(); ++i) {
-			Attribute *a = m_sampleRateAttrs[i];
-			if(!a || !a->writeCapability() || a->cachedValue().trimmed() == value) {
-				continue;
-			}
-			QCoro::connect(a->writeCapability()->writeAsync(value), this,
-				       [this, name = a->name()](const CommandResponse<void> &w) {
-					       if(!w) {
-						       setStatus("sample rate (" + name +
-									 "): " + w.error().errorString(),
-								 true);
-					       }
-				       });
-		}
-	});
 }
 
 void RawAcquisitionView::buildChannels()

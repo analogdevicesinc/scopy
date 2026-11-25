@@ -21,11 +21,17 @@
 
 #include "streamutils.h"
 
+#include <QPointer>
+
 #include <component/attribute.h>
+#include <component/attributereader.h>
+#include <component/attributewriter.h>
 #include <component/channel.h>
+#include <component/stream.h>
 #include <component/context.h>
 #include <component/navigation.h>
 #include <component/tags.h>
+#include <qcoro/qcorotask.h>
 
 using namespace scopy;
 using namespace scopy::component;
@@ -56,6 +62,68 @@ Attribute *scopy::dcdebugger::findSampleRate(QObject *stream, bool output)
 		}
 	}
 	return nullptr;
+}
+
+QList<Attribute *> scopy::dcdebugger::memberSampleRates(Stream *stream, bool output)
+{
+	QList<Attribute *> out;
+	if(!stream) {
+		return out;
+	}
+	for(Channel *ch : stream->channels()) {
+		const QList<Attribute *> tagged = findByTag<Attribute>(ch, tags::SampleRate, false);
+		Attribute *a =
+			tagged.isEmpty() ? attributeByName(ch, QStringLiteral("sampling_frequency")) : tagged.first();
+		if(a && !out.contains(a)) {
+			out.append(a);
+		}
+	}
+	if(out.isEmpty()) {
+		if(Attribute *a = findSampleRate(stream, output)) {
+			out.append(a);
+		}
+	}
+	return out;
+}
+
+void scopy::dcdebugger::linkSampleRates(QObject *context, const QList<Attribute *> &attrs,
+					std::function<void(const QString &)> onError)
+{
+	Attribute *first = attrs.value(0);
+	if(!context || attrs.size() < 2 || !first->writeCapability() || !first->readCapability()) {
+		return;
+	}
+	QList<QPointer<Attribute>> others;
+	for(int i = 1; i < attrs.size(); ++i) {
+		others.append(attrs[i]);
+	}
+	QObject::connect(
+		first->writeCapability(), &AttributeWriter::writeSucceeded, context,
+		[context, first, others, onError]() {
+			// The device may round the request: propagate what it settled on.
+			QCoro::connect(
+				first->readCapability()->readAsync(), context,
+				[context, others, onError](const CommandResponse<QByteArray> &r) {
+					if(!r) {
+						onError("sample rate: " + r.error().errorString());
+						return;
+					}
+					const QString value = QString::fromUtf8(r.value()).trimmed();
+					for(const QPointer<Attribute> &a : others) {
+						if(!a || !a->writeCapability() || a->cachedValue().trimmed() == value) {
+							continue;
+						}
+						QCoro::connect(
+							a->writeCapability()->writeAsync(value), context,
+							[onError, name = a->name()](const CommandResponse<void> &w) {
+								if(!w) {
+									onError("sample rate (" + name +
+										"): " + w.error().errorString());
+								}
+							});
+					}
+				});
+		});
 }
 
 double scopy::dcdebugger::sampleRateOf(const Attribute *attr)

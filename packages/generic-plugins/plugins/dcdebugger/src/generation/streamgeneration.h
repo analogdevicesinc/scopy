@@ -26,10 +26,12 @@
 #include "waveform.h"
 
 #include <QHash>
+#include <QPair>
 #include <QObject>
 #include <QPointer>
 
 #include <component/stream.h>
+#include <component/streamformat.h>
 #include <core/result.h>
 
 namespace scopy::component {
@@ -60,6 +62,14 @@ public:
 	void setSamples(size_t samples);
 	double sampleRate() const { return m_fs; }
 	void setSampleRate(double fs);
+	// Raw mode: a tone's frequency is its number of periods in the buffer and amplitude / offset
+	// are codes, written as given (clamped to the channel's code range). Off: Hz and full scale.
+	bool rawMode() const { return m_raw; }
+	void setRawMode(bool raw);
+
+	// [min, max] code of a channel of the stream's write format.
+	static QPair<double, double> codeRange(const component::ChannelFormat &cf);
+
 	bool supportsCyclic() const;
 	bool cyclic() const { return m_cyclic; }
 	void setCyclic(bool cyclic);
@@ -97,6 +107,7 @@ private:
 	size_t m_samples = 8192;
 	double m_fs = 0;
 	bool m_cyclic = true;
+	bool m_raw = false;
 
 	bool m_running = false;
 	bool m_stopRequested = false;

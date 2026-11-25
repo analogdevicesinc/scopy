@@ -27,6 +27,7 @@ set(DCDEBUGGER_TESTS
     rawacquisitionview
     signalmath
     streamgeneration
+    rawgeneratorview
     registers
     attributemonitor
     monitorview

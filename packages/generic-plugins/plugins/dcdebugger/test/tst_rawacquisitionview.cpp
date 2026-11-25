@@ -21,6 +21,7 @@
 
 #include "acquisition/rawacquisitionview.h"
 #include "fakestream.h"
+#include "streamutils.h"
 
 #include <QCheckBox>
 #include <QPushButton>
@@ -184,10 +185,10 @@ void TST_RawAcquisitionView::sampleRateAppliedToEveryChannel()
 		readers.append(r);
 		writers.append(w);
 	}
-	QCOMPARE(RawAcquisitionView::sampleRateAttributes(&stream).size(), 3);
+	QCOMPARE(memberSampleRates(&stream, false).size(), 3);
 
 	RawAcquisitionView view(&stream);
-	Attribute *first = RawAcquisitionView::sampleRateAttributes(&stream).first();
+	Attribute *first = memberSampleRates(&stream, false).first();
 	first->writeCapability()->writeAsync("2000");
 	QTRY_COMPARE(readers[1]->value, QStringLiteral("2000"));
 	QTRY_COMPARE(readers[2]->value, QStringLiteral("2000"));
@@ -196,7 +197,7 @@ void TST_RawAcquisitionView::sampleRateAppliedToEveryChannel()
 
 void TST_RawAcquisitionView::noSampleRateWidgetWithoutAttribute()
 {
-	QVERIFY(RawAcquisitionView::sampleRateAttributes(m_stream).isEmpty());
+	QVERIFY(memberSampleRates(m_stream, false).isEmpty());
 	QVERIFY(!m_view->findChild<QWidget *>("rawAcquisitionSampleRate"));
 }
 

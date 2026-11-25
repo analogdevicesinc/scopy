@@ -118,8 +118,8 @@ void TST_NodeViews::cleanup()
 void TST_NodeViews::builtinViewsAreRegistered()
 {
 	QCOMPARE(ids(reg()->factories()),
-		 QStringList({"acquisition", "rawacquisition", "generator", "ping", "monitor", "channelmonitor",
-			      "registers"}));
+		 QStringList({"acquisition", "rawacquisition", "generator", "rawgenerator", "ping", "monitor",
+			      "channelmonitor", "registers"}));
 	for(NodeViewFactory *f : reg()->factories()) {
 		QVERIFY(NodeViewRegistry::isEnabled(f->id()));
 		QCOMPARE(Preferences::get(NodeViewRegistry::preferenceKey(f->id())).toBool(), true);
@@ -133,7 +133,7 @@ void TST_NodeViews::streamsGetTheirInstrument()
 	FakeInputStream in(1);
 	FakeOutputStream out(1);
 	QCOMPARE(ids(reg()->factoriesFor(&in, NodeKind::InputStream)), QStringList({"acquisition", "rawacquisition"}));
-	QCOMPARE(ids(reg()->factoriesFor(&out, NodeKind::OutputStream)), QStringList({"generator"}));
+	QCOMPARE(ids(reg()->factoriesFor(&out, NodeKind::OutputStream)), QStringList({"generator", "rawgenerator"}));
 	QVERIFY(reg()->factoriesFor(nullptr, NodeKind::Device).isEmpty());
 }
 

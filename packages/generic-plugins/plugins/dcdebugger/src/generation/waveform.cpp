@@ -70,3 +70,19 @@ QVector<double> scopy::dcdebugger::generateTone(const ToneSpec &tone, int sample
 	}
 	return out;
 }
+
+QVector<double> scopy::dcdebugger::generateRawTone(const ToneSpec &tone, int samples)
+{
+	// The unit waveform at periods / samples cycles per sample, then scaled to codes.
+	ToneSpec unit = tone;
+	unit.frequency = std::max(0.0, std::round(tone.frequency));
+	unit.amplitude = 1;
+	unit.offset = 0;
+	QVector<double> out = generateTone(unit, samples, double(std::max(1, samples)));
+	for(double &v : out) {
+		v = tone.offset + tone.amplitude * v;
+	}
+	return out;
+}
+
+int scopy::dcdebugger::maxPeriods(int samples) { return std::max(1, int(std::floor((samples - 1) / 2.0))); }

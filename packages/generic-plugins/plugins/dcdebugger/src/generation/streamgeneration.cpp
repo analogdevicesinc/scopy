@@ -22,6 +22,10 @@
 #include "streamgeneration.h"
 
 #include <QLoggingCategory>
+
+#include <algorithm>
+#include <cmath>
+#include <limits>
 #include <QTimer>
 
 #include <component/outputstream.h>
@@ -91,6 +95,29 @@ void StreamGeneration::setSampleRate(double fs)
 	}
 	m_fs = fs;
 	reconfigure(m_cyclic);
+}
+
+void StreamGeneration::setRawMode(bool raw)
+{
+	if(raw == m_raw) {
+		return;
+	}
+	m_raw = raw;
+	reconfigure(m_cyclic);
+}
+
+QPair<double, double> StreamGeneration::codeRange(const ChannelFormat &cf)
+{
+	if(cf.type == DataType::F32 || cf.type == DataType::F64) {
+		return {std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max()};
+	}
+	const int bits = std::clamp(int(cf.validBits), 1, 63);
+	const bool isSigned = cf.type == DataType::S8 || cf.type == DataType::S16 || cf.type == DataType::S32 ||
+		cf.type == DataType::S64;
+	if(isSigned) {
+		return {-std::ldexp(1.0, bits - 1), std::ldexp(1.0, bits - 1) - 1};
+	}
+	return {0, std::ldexp(1.0, bits) - 1};
 }
 
 void StreamGeneration::setCyclic(bool cyclic)
@@ -224,6 +251,16 @@ void StreamGeneration::fillAndPush()
 		const Channel *member = m_stream->channelAt(fmt.channels.at(ch).streamIndex);
 		ToneSpec tone = member ? m_tones.value(member->id()) : ToneSpec{};
 		QVector<double> v(samples, 0.0);
+		if(m_raw) {
+			if(member && tone.enabled) {
+				v = generateRawTone(tone, samples);
+			}
+			const auto [lo, hi] = codeRange(fmt.channels.at(ch));
+			for(int s = 0; s < v.size(); ++s) {
+				writer.setRaw(ch, size_t(s), int64_t(std::llround(std::clamp(v[s], lo, hi))));
+			}
+			continue;
+		}
 		if(member && tone.enabled) {
 			tone.frequency = snapFrequency(tone.frequency, m_fs, samples);
 			v = generateTone(tone, samples, m_fs);

@@ -70,10 +70,6 @@ public:
 	// The acquired buffer as CSV (sample column, then one per channel); empty before a buffer.
 	QString csvData() const;
 
-	// Sample-rate attributes of the stream's member channels (tagged, else "sampling_frequency");
-	// the stream's or device's own one when no channel has any.
-	static QList<component::Attribute *> sampleRateAttributes(component::InputStream *stream);
-
 private:
 	QWidget *buildSettings(QWidget *parent);
 	QWidget *buildAcquisitionSection(QWidget *parent);
@@ -81,8 +77,6 @@ private:
 	void buildChannels();
 	void buildPlot();
 	void placeLegend();
-	// After the first sample-rate attribute was written: the same value to the others.
-	void propagateSampleRate();
 	void applyXAxis();
 	void onFrame(const AcquiredFrame &frame);
 	void render();
