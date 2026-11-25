@@ -112,12 +112,14 @@ void TST_NodeViews::cleanup()
 		Preferences::set(NodeViewRegistry::preferenceKey(id), true);
 	}
 	Preferences::set(NodeViewRegistry::preferenceKey("acquisition"), true);
+	Preferences::set(NodeViewRegistry::preferenceKey("rawacquisition"), true);
 }
 
 void TST_NodeViews::builtinViewsAreRegistered()
 {
 	QCOMPARE(ids(reg()->factories()),
-		 QStringList({"acquisition", "generator", "ping", "monitor", "channelmonitor", "registers"}));
+		 QStringList({"acquisition", "rawacquisition", "generator", "ping", "monitor", "channelmonitor",
+			      "registers"}));
 	for(NodeViewFactory *f : reg()->factories()) {
 		QVERIFY(NodeViewRegistry::isEnabled(f->id()));
 		QCOMPARE(Preferences::get(NodeViewRegistry::preferenceKey(f->id())).toBool(), true);
@@ -130,7 +132,7 @@ void TST_NodeViews::streamsGetTheirInstrument()
 {
 	FakeInputStream in(1);
 	FakeOutputStream out(1);
-	QCOMPARE(ids(reg()->factoriesFor(&in, NodeKind::InputStream)), QStringList({"acquisition"}));
+	QCOMPARE(ids(reg()->factoriesFor(&in, NodeKind::InputStream)), QStringList({"acquisition", "rawacquisition"}));
 	QCOMPARE(ids(reg()->factoriesFor(&out, NodeKind::OutputStream)), QStringList({"generator"}));
 	QVERIFY(reg()->factoriesFor(nullptr, NodeKind::Device).isEmpty());
 }
@@ -170,6 +172,7 @@ void TST_NodeViews::disabledViewIsNotShown()
 {
 	FakeInputStream in(1);
 	Preferences::set(NodeViewRegistry::preferenceKey("acquisition"), false);
+	Preferences::set(NodeViewRegistry::preferenceKey("rawacquisition"), false);
 	QVERIFY(reg()->factoriesFor(&in, NodeKind::InputStream).isEmpty());
 	std::unique_ptr<NodePanel> panel(createNodePanel(&in, NodeKind::InputStream, "in", {}, {}));
 	QVERIFY(!panel->findChild<QTabWidget *>()); // no view: no tabs, only the sections

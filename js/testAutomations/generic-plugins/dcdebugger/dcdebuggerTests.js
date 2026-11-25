@@ -122,7 +122,7 @@ TestFramework.runTest("TST.DCDBG.TREE", function() {
 TestFramework.runTest("TST.DCDBG.VIEWS", function() {
     var views = dcdebugger.getRegisteredViews();
     printToConsole("  Registered views: " + views);
-    var builtin = ["acquisition", "generator", "ping", "monitor", "registers"];
+    var builtin = ["acquisition", "rawacquisition", "generator", "ping", "monitor", "channelmonitor", "registers"];
     for (var i = 0; i < builtin.length; i++) {
         if (views.indexOf(builtin[i]) === -1 || !dcdebugger.isViewEnabled(builtin[i])) {
             printToConsole("  FAIL: " + builtin[i] + " missing or disabled");

@@ -24,6 +24,7 @@ set(DCDEBUGGER_TESTS
     componenttree
     streamacquisition
     acquisitionui
+    rawacquisitionview
     signalmath
     streamgeneration
     registers

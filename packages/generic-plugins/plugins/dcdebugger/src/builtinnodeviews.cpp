@@ -20,6 +20,7 @@
  */
 
 #include "acquisition/acquisitionview.h"
+#include "acquisition/rawacquisitionview.h"
 #include "generation/generatorview.h"
 #include "monitor/channelmonitorview.h"
 #include "monitor/monitorview.h"
@@ -48,6 +49,19 @@ public:
 	QWidget *create(QObject *node, NodeKind, NodePanel *panel) override
 	{
 		return new AcquisitionView(qobject_cast<component::InputStream *>(node), panel);
+	}
+};
+
+// Simplified replacement of AcquisitionViewFactory, side by side until the old view is removed.
+class RawAcquisitionViewFactory : public NodeViewFactory
+{
+public:
+	QString id() const override { return QStringLiteral("rawacquisition"); }
+	QString title() const override { return QStringLiteral("Raw Acquisition"); }
+	bool supports(QObject *node, NodeKind) const override { return qobject_cast<component::InputStream *>(node); }
+	QWidget *create(QObject *node, NodeKind, NodePanel *panel) override
+	{
+		return new RawAcquisitionView(qobject_cast<component::InputStream *>(node), panel);
 	}
 };
 
@@ -124,6 +138,7 @@ void scopy::dcdebugger::registerBuiltinNodeViews(NodeViewRegistry *registry)
 {
 	// The node's own instrument first, then what its children offer.
 	registry->registerFactory(std::make_unique<AcquisitionViewFactory>(), 100);
+	registry->registerFactory(std::make_unique<RawAcquisitionViewFactory>(), 95);
 	registry->registerFactory(std::make_unique<GeneratorViewFactory>(), 100);
 	registry->registerFactory(std::make_unique<PingViewFactory>(), 100);
 	registry->registerFactory(std::make_unique<MonitorViewFactory>(), 50);
