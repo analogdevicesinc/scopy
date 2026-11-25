@@ -19,7 +19,6 @@
  *
  */
 
-#include "bottompanehost.h"
 #include "dcdebuggertool.h"
 #include "log/codegeneratorpanel.h"
 #include "log/commandlogmodel.h"
@@ -31,6 +30,7 @@
 #include <QClipboard>
 #include <QComboBox>
 #include <QDir>
+#include <QTabWidget>
 #include <QFile>
 #include <QGuiApplication>
 #include <QFrame>
@@ -382,7 +382,7 @@ void TST_CodeGenerator::generateButtonTogglesPanel()
 
 void TST_CodeGenerator::generateButtonInLogTopBar()
 {
-	// In the log's top bar, right of Export; the bottom pane bar only has the pane tabs.
+	// In the log's top bar, right of Export; the log is the tool's Trace tab.
 	DCDebuggerTool tool(nullptr);
 	CommandLogView *view = tool.commandLog();
 	ToolTemplate *logTool = nullptr;
@@ -394,9 +394,7 @@ void TST_CodeGenerator::generateButtonInLogTopBar()
 	QVERIFY(logTool->topContainer()->isAncestorOf(view->pauseButton()));
 	QCOMPARE(view->generateButton()->parentWidget(), view->pauseButton()->parentWidget());
 	QCOMPARE(view->generateButton()->text(), QStringLiteral("Generate code..."));
-	const QList<QAbstractButton *> barButtons = tool.bottomPanes()->bar()->findChildren<QAbstractButton *>();
-	QCOMPARE(barButtons.size(), 1);
-	QCOMPARE(barButtons.first(), tool.bottomPanes()->tabButton(DCDebuggerTool::LOG_PANE));
+	QCOMPARE(tool.tabs()->widget(DCDebuggerTool::TraceTab), static_cast<QWidget *>(view));
 }
 
 void TST_CodeGenerator::docks_data() { dockingModes(); }
@@ -532,7 +530,7 @@ void TST_CodeGenerator::panelBackgrounds()
 	tool.resize(1600, 1000);
 	tool.show();
 	QVERIFY(QTest::qWaitForWindowExposed(&tool));
-	tool.bottomPanes()->showPane(DCDebuggerTool::LOG_PANE);
+	tool.showTab(DCDebuggerTool::TraceTab);
 	CommandLogView *view = tool.commandLog();
 	view->showCodeGenerator(true);
 	QTest::qWait(100);

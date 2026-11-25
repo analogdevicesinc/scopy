@@ -22,6 +22,7 @@
 #include "generatorview.h"
 
 #include "nodepanel.h"
+#include "readpolicy.h"
 #include "sidesplitter.h"
 #include "streamutils.h"
 #include "waveform.h"
@@ -195,7 +196,9 @@ QWidget *GeneratorView::buildSettings(QWidget *parent)
 			IIOWidgetBuilder(section).attribute(m_sampleRateAttr).title("Sample rate").buildSingle();
 		if(rate) {
 			lay->addWidget(rate);
-			rate->readAsync();
+			if(!ReadPolicy::suppressed()) { // e.g. built by a "go to origin" from the log
+				rate->readAsync();
+			}
 		}
 		connect(m_sampleRateAttr, &Attribute::valueChanged, this, &GeneratorView::scheduleApply);
 	} else {

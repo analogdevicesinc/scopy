@@ -146,10 +146,13 @@ CommandLogView::CommandLogView(QWidget *parent)
 	m_generateBtn->setObjectName(QStringLiteral("commandLogGenerate"));
 	m_generateBtn->setCheckable(true);
 	m_generateBtn->setToolTip("Show the script repeating the selected rows (none selected: every visible row)");
-	for(QPushButton *b : {m_pauseBtn, m_clearBtn, m_exportBtn, m_generateBtn}) {
+	for(QPushButton *b : {m_pauseBtn, m_clearBtn, m_exportBtn}) {
 		Style::setStyle(b, style::properties::button::basicButton);
 		b->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	}
+	Style::setStyle(m_generateBtn, style::properties::dcdebugger::toggleButton);
+	m_generateBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
 	m_tool->addWidgetToTopContainerHelper(m_switches, TTA_LEFT);
 	m_tool->addWidgetToTopContainerHelper(m_status, TTA_LEFT);
 	m_tool->addWidgetToTopContainerHelper(m_pauseBtn, TTA_RIGHT);

@@ -69,6 +69,9 @@ public:
 	QStringList viewTitles() const { return m_viewTitles; }
 	// Stops the acquisitions / generations of the panel, docked or floating.
 	void shutdown();
+	// The next time the panel is shown it reads nothing (ReadPolicy suppressed), e.g. after a
+	// "go to origin" from the command log selected it while hidden.
+	void setNextShowPassive(bool passive) { m_nextShowPassive = passive; }
 
 public Q_SLOTS:
 	// The Refresh button: everything re-reads from the device.
@@ -95,6 +98,7 @@ private:
 	QList<DockWrapperInterface *> m_docks; // the attributes first, then the views
 	QStringList m_viewTitles;
 	QVBoxLayout *m_sections;
+	bool m_nextShowPassive = false;
 
 	void addDock(const QString &title, QWidget *widget);
 };

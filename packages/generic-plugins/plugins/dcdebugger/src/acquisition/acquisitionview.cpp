@@ -23,6 +23,7 @@
 
 #include "measurementstable.h"
 #include "nodepanel.h"
+#include "readpolicy.h"
 #include "sidesplitter.h"
 #include "streamutils.h"
 
@@ -197,7 +198,9 @@ QWidget *AcquisitionView::buildAcquisitionSection(QWidget *parent)
 			IIOWidgetBuilder(section).attribute(m_sampleRateAttr).title("Sample rate").buildSingle();
 		if(rate) {
 			lay->addWidget(rate);
-			rate->readAsync();
+			if(!ReadPolicy::suppressed()) { // e.g. built by a "go to origin" from the log
+				rate->readAsync();
+			}
 		}
 	} else {
 		// No sample-rate attribute: the value only scales the time axis.

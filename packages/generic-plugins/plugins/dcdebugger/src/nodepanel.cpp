@@ -21,6 +21,8 @@
 
 #include "nodepanel.h"
 
+#include "readpolicy.h"
+
 #include "acquisition/streamacquisition.h"
 #include "attributessection.h"
 #include "nodeviewregistry.h"
@@ -157,7 +159,7 @@ NodePanel::NodePanel(QObject *node, NodeKind kind, const QString &title, const Q
 	// Header: [path ... refresh] on the first row, the title and info below.
 	auto *header = new QWidget(this);
 	auto *headerLay = new QVBoxLayout(header);
-	headerLay->setContentsMargins(6, 6, 6, 0);
+	headerLay->setContentsMargins(0, 0, 0, 0);
 	headerLay->setSpacing(2);
 	auto *pathRow = new QWidget(header);
 	pathRow->setObjectName("nodePanelPathRow");
@@ -299,6 +301,12 @@ void NodePanel::refresh() { Q_EMIT refreshRequested(); }
 void NodePanel::showEvent(QShowEvent *event)
 {
 	QWidget::showEvent(event);
+	if(m_nextShowPassive) {
+		m_nextShowPassive = false;
+		ReadPolicy::Suppress passive;
+		Q_EMIT selected();
+		return;
+	}
 	Q_EMIT selected();
 }
 

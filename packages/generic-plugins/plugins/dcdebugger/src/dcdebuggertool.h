@@ -32,6 +32,7 @@ class QModelIndex;
 class QSortFilterProxyModel;
 class QSplitter;
 class QStackedWidget;
+class QTabWidget;
 class QTimer;
 class QTreeView;
 
@@ -46,7 +47,6 @@ class Connection;
 
 namespace scopy::dcdebugger {
 class DCDebugger_API;
-class BottomPaneHost;
 class CommandLogView;
 class ComponentTreeModel;
 class NodePanel;
@@ -62,14 +62,22 @@ public:
 	explicit DCDebuggerTool(component::Connection *conn, QWidget *parent = nullptr);
 	~DCDebuggerTool() override;
 
-	static constexpr const char *LOG_PANE = "log";
-	// Throttle of the entry count shown on the "Log" tab.
-	static constexpr int LOG_TAB_UPDATE_MS = 250;
+	// The two pages: Explore (component tree + node panel) and Trace (command log + code generator).
+	// Tabs at the bottom; never docks.
+	enum Tab
+	{
+		ExploreTab = 0,
+		TraceTab
+	};
+	static constexpr const char *EXPLORE_TITLE = "Explore";
+	static constexpr const char *TRACE_TITLE = "Trace";
 
 	CommandLogView *commandLog() const { return m_log; }
-	BottomPaneHost *bottomPanes() const { return m_bottomPanes; }
+	QTabWidget *tabs() const { return m_tabs; }
+	void showTab(Tab tab);
+	Tab currentTab() const;
 
-	// The tree | panel split and the bottom pane (open one, height), to / from layoutstate.
+	// The tree | panel split and the current tab, to / from layoutstate.
 	void storeLayout();
 	void restoreLayout();
 
@@ -101,9 +109,8 @@ private:
 	QSortFilterProxyModel *m_proxy;
 	QStackedWidget *m_panels;
 	CommandLogView *m_log;
-	BottomPaneHost *m_bottomPanes;
+	QTabWidget *m_tabs = nullptr;
 	QSplitter *m_mainSplitter;
-	QTimer *m_logTabTimer;
 	QWidget *m_emptyPanel;
 	QHash<QString, NodePanel *> m_panelCache;
 	bool m_bulkExpand = false;

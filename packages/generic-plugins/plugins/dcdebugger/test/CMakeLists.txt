@@ -36,7 +36,7 @@ set(DCDEBUGGER_TESTS
     pingview
     nodepanel
     nodeviews
-    bottompanes
+    tooltabs
     codegenerator
     logscreenshots
 )

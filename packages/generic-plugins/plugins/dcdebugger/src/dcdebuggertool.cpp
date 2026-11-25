@@ -21,9 +21,7 @@
 
 #include "dcdebuggertool.h"
 
-#include "bottompanehost.h"
 #include "componenttreemodel.h"
-#include "log/commandlogmodel.h"
 #include "log/commandlogview.h"
 #include "nodepanel.h"
 #include "splitterpane.h"
@@ -38,7 +36,8 @@
 #include <QSortFilterProxyModel>
 #include <QSplitter>
 #include <QStackedWidget>
-#include <QTimer>
+#include <QTabBar>
+#include <QTabWidget>
 #include <QTreeView>
 #include <QVBoxLayout>
 
@@ -53,6 +52,11 @@
 
 using namespace scopy;
 using namespace scopy::dcdebugger;
+
+namespace {
+constexpr const char *MAIN_SPLIT_KEY = "tool/mainSplit";
+constexpr const char *TAB_KEY = "tool/tab";
+} // namespace
 
 DCDebuggerTool::DCDebuggerTool(component::Connection *conn, QWidget *parent)
 	: QWidget(parent)
@@ -82,7 +86,7 @@ DCDebuggerTool::DCDebuggerTool(component::Connection *conn, QWidget *parent)
 
 	auto *panelContainer = new QWidget();
 	auto *panelLay = new QVBoxLayout(panelContainer);
-	panelLay->setContentsMargins(6, 6, 6, 6);
+	panelLay->setContentsMargins(0, 0, 0, 0);
 	m_panels = new QStackedWidget(panelContainer);
 	Style::setStyle(m_panels, style::properties::dcdebugger::panelFrame);
 	m_emptyPanel = new QLabel("Select a node in the tree", m_panels);
@@ -104,8 +108,8 @@ DCDebuggerTool::DCDebuggerTool(component::Connection *conn, QWidget *parent)
 	splitter->setStretchFactor(1, 1);
 	splitter->setSizes({INT_MAX / 2, INT_MAX / 2});
 
-	// Bottom: the output panes; for now the command log of this connection.
-	m_bottomPanes = new BottomPaneHost(splitter, this);
+	// Two pages: Explore (tree | node panel) and Trace (the command log of this connection, with
+	// its code generator).
 	m_log = new CommandLogView();
 	if(m_conn) {
 		m_log->setUri(m_conn->uri());
@@ -113,36 +117,26 @@ DCDebuggerTool::DCDebuggerTool(component::Connection *conn, QWidget *parent)
 		m_log->setMonitor(component::CommandMonitor::of(m_conn));
 	}
 	connect(m_log, &CommandLogView::nodeRequested, this, &DCDebuggerTool::selectOrigin);
-	m_bottomPanes->addPane(LOG_PANE, "Log", m_log);
-	m_tool->addWidgetToCentralContainerHelper(m_bottomPanes);
+	m_tabs = new QTabWidget(this);
+	m_tabs->setObjectName("dcdebuggerTabs");
+	m_tabs->setDocumentMode(true);
+	m_tabs->setTabPosition(QTabWidget::South); // page tabs at the bottom, like a workbook
+	m_tabs->addTab(splitter, EXPLORE_TITLE);
+	m_tabs->addTab(m_log, TRACE_TITLE);
+	m_tabs->setTabToolTip(ExploreTab, "Component tree and the selected node's views");
+	m_tool->addWidgetToCentralContainerHelper(m_tabs);
 
-	// The tab shows recording (at once) and the entry count (throttled), also while hidden.
-	m_logTabTimer = new QTimer(this);
-	m_logTabTimer->setSingleShot(true);
-	m_logTabTimer->setInterval(LOG_TAB_UPDATE_MS);
-	connect(m_logTabTimer, &QTimer::timeout, this, &DCDebuggerTool::updateLogTab);
-	connect(m_log->model(), &CommandLogModel::entryCountChanged, this, [this]() {
-		if(!m_logTabTimer->isActive()) {
-			m_logTabTimer->start();
-		}
-	});
+	// The Trace page shows when commands are being recorded.
 	connect(m_log, &CommandLogView::recordingChanged, this, &DCDebuggerTool::updateLogTab);
 	updateLogTab();
 
 	m_model->setConnection(m_conn);
 }
 
-namespace {
-constexpr const char *MAIN_SPLIT_KEY = "tool/mainSplit";
-constexpr const char *PANE_KEY = "tool/pane";
-constexpr const char *PANE_HEIGHT_KEY = "tool/paneHeight";
-} // namespace
-
 void DCDebuggerTool::storeLayout()
 {
 	layoutstate::setValue(MAIN_SPLIT_KEY, m_mainSplitter->saveState());
-	layoutstate::setValue(PANE_KEY, m_bottomPanes->currentPane());
-	layoutstate::setValue(PANE_HEIGHT_KEY, m_bottomPanes->paneHeight());
+	layoutstate::setValue(TAB_KEY, int(currentTab()));
 }
 
 void DCDebuggerTool::restoreLayout()
@@ -151,31 +145,21 @@ void DCDebuggerTool::restoreLayout()
 	if(!split.isEmpty()) {
 		m_mainSplitter->restoreState(split);
 	}
-	const int height = layoutstate::value(PANE_HEIGHT_KEY, 0).toInt();
-	if(height > 0) {
-		m_bottomPanes->setPaneHeight(height);
-	}
-	const QString pane = layoutstate::value(PANE_KEY).toString();
-	if(pane.isEmpty()) {
-		m_bottomPanes->hidePane();
-	} else {
-		m_bottomPanes->showPane(pane);
-	}
+	const int tab = layoutstate::value(TAB_KEY, int(ExploreTab)).toInt();
+	showTab(tab == TraceTab ? TraceTab : ExploreTab);
 }
 
 DCDebuggerTool::~DCDebuggerTool()
 {
 	// The log goes away with the children, after this object's own members.
-	m_logTabTimer->stop();
 	disconnect(m_log, nullptr, this, nullptr);
-	disconnect(m_log->model(), nullptr, this, nullptr);
 	clear();
 }
 
 void DCDebuggerTool::buildTree(QWidget *parent)
 {
 	auto *lay = new QVBoxLayout(parent);
-	lay->setContentsMargins(6, 6, 6, 6);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(6);
 
 	m_search = new SearchBar({}, parent);
@@ -235,11 +219,22 @@ void DCDebuggerTool::clearPanels()
 	m_panelCache.clear();
 }
 
+void DCDebuggerTool::showTab(Tab tab) { m_tabs->setCurrentIndex(int(tab)); }
+
+DCDebuggerTool::Tab DCDebuggerTool::currentTab() const
+{
+	return m_tabs->currentIndex() == TraceTab ? TraceTab : ExploreTab;
+}
+
 void DCDebuggerTool::updateLogTab()
 {
-	const int count = m_log->model()->entryCount();
-	m_bottomPanes->setPaneBadge(LOG_PANE, count > 0 ? QString::number(count) : QString());
-	m_bottomPanes->setPaneIndicator(LOG_PANE, m_log->isRecording(), "Recording commands");
+	// "● Trace" while commands are being recorded; no entry count.
+	const bool recording = m_log->isRecording();
+	const QString text = (recording ? QStringLiteral("● ") : QString()) + QString::fromLatin1(TRACE_TITLE);
+	const QString tip = QStringLiteral("Command log and code generator") +
+		(recording ? QStringLiteral(" · recording commands") : QString());
+	m_tabs->setTabText(TraceTab, text);
+	m_tabs->setTabToolTip(TraceTab, tip);
 }
 
 void DCDebuggerTool::expandDefault()
@@ -344,9 +339,13 @@ void DCDebuggerTool::onFilterChanged(const QString &text)
 
 void DCDebuggerTool::selectOrigin(const QString &origin, const QString &backendId, quintptr object)
 {
-	// Following a log row only navigates: expanding the tree or showing the panel reads nothing.
+	// Following a log row only navigates: expanding the tree, building or later showing the panel
+	// reads nothing, and the Trace tab stays current.
 	ReadPolicy::Suppress passive;
 	selectIndex(m_model->indexOfOrigin(origin, backendId, object));
+	if(auto *panel = qobject_cast<NodePanel *>(m_panels->currentWidget()); panel && !panel->isVisible()) {
+		panel->setNextShowPassive(true);
+	}
 }
 
 void DCDebuggerTool::selectNode(QObject *node) { selectIndex(m_model->indexOf(node)); }

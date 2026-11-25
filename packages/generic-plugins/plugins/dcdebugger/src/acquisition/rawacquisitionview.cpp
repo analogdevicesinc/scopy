@@ -22,6 +22,7 @@
 #include "rawacquisitionview.h"
 
 #include "nodepanel.h"
+#include "readpolicy.h"
 #include "sidesplitter.h"
 #include "streamutils.h"
 
@@ -205,7 +206,9 @@ QWidget *RawAcquisitionView::buildAcquisitionSection(QWidget *parent)
 		if(rate) {
 			rate->setObjectName("rawAcquisitionSampleRate");
 			lay->addWidget(rate);
-			rate->readAsync();
+			if(!ReadPolicy::suppressed()) { // e.g. built by a "go to origin" from the log
+				rate->readAsync();
+			}
 		}
 		linkSampleRates(this, m_sampleRateAttrs, [this](const QString &msg) { setStatus(msg, true); });
 	}

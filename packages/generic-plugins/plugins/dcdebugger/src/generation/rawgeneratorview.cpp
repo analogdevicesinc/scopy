@@ -22,6 +22,7 @@
 #include "rawgeneratorview.h"
 
 #include "nodepanel.h"
+#include "readpolicy.h"
 #include "sidesplitter.h"
 #include "streamutils.h"
 
@@ -230,7 +231,9 @@ QWidget *RawGeneratorView::buildOutputSection(QWidget *parent)
 		if(rate) {
 			rate->setObjectName("rawGeneratorSampleRate");
 			lay->addWidget(rate);
-			rate->readAsync();
+			if(!ReadPolicy::suppressed()) { // e.g. built by a "go to origin" from the log
+				rate->readAsync();
+			}
 		}
 		linkSampleRates(this, m_sampleRateAttrs, [this](const QString &msg) { setStatus(msg, true); });
 		connect(first, &Attribute::valueChanged, this, &RawGeneratorView::updateFrequencies);

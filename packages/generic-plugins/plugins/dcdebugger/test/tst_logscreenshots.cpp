@@ -23,7 +23,6 @@
 // review: in the Scopy and Harmonic dark themes, with and without KDDockWidgets. Skipped unless
 // DC_SCREENSHOT_DIR names the output folder.
 
-#include "bottompanehost.h"
 #include "dcdebuggertool.h"
 #include "log/codegeneratorpanel.h"
 #include "log/commandlogmodel.h"
@@ -161,9 +160,7 @@ void TST_LogScreenshots::render()
 	fill(log->model());
 	tool->show();
 	QVERIFY(QTest::qWaitForWindowExposed(tool));
-	tool->bottomPanes()->showPane(DCDebuggerTool::LOG_PANE);
-	const int total = tool->bottomPanes()->splitter()->height();
-	tool->bottomPanes()->splitter()->setSizes({total - 650, 650});
+	tool->showTab(DCDebuggerTool::TraceTab);
 	log->tree()->expand(log->model()->index(2, 0));
 	log->tree()->selectionModel()->select(log->model()->index(1, 0),
 					      QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
@@ -180,7 +177,7 @@ void TST_LogScreenshots::render()
 	      log->codeGenerator()->copyButton()->height(), log->codeGenerator()->saveButton()->width(),
 	      log->codeGenerator()->saveButton()->height());
 	QVERIFY(tool->grab().save(dir + "/tool-" + tag + ".png"));
-	QVERIFY(tool->bottomPanes()->paneArea()->grab().save(dir + "/log-" + tag + ".png"));
+	QVERIFY(tool->commandLog()->grab().save(dir + "/log-" + tag + ".png"));
 	delete tool;
 }
 
