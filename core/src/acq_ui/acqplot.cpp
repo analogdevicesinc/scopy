@@ -85,20 +85,6 @@ AcqPlot::AcqPlot(const QString &name, AcqPlotKind kind, quint32 uuid, QWidget *p
 	}
 }
 
-AcqPlot::~AcqPlot()
-{
-	// No axis is deleted here, neither the pool's nor m_digitalAxis. PlotWidget has no
-	// removePlotAxis (gui/include/gui/plotwidget.h:73) and PlotAxis's destructor does
-	// not unregister itself from PlotWidget::m_plotAxis, so deleting one would leave a
-	// dangling entry for PlotNavigator to walk. They are parented to this object, so Qt
-	// frees the QObjects — which is exactly as much as is safe.
-
-	// A plot that went first has already deleted every item still attached to it.
-	if(!m_plot.isNull()) {
-		delete m_bufferBand;
-	}
-}
-
 PlotWidget *AcqPlot::plot() const { return m_plot.data(); }
 
 QString AcqPlot::menuId() const { return QStringLiteral("acqplot:%1").arg(m_uuid); }
@@ -358,6 +344,20 @@ public:
 		p->restore();
 	}
 };
+
+AcqPlot::~AcqPlot()
+{
+	// No axis is deleted here, neither the pool's nor m_digitalAxis. PlotWidget has no
+	// removePlotAxis (gui/include/gui/plotwidget.h:73) and PlotAxis's destructor does
+	// not unregister itself from PlotWidget::m_plotAxis, so deleting one would leave a
+	// dangling entry for PlotNavigator to walk. They are parented to this object, so Qt
+	// frees the QObjects — which is exactly as much as is safe.
+
+	// A plot that went first has already deleted every item still attached to it.
+	if(!m_plot.isNull()) {
+		delete m_bufferBand;
+	}
+}
 
 void AcqPlot::setShowBufferStarts(bool on)
 {
