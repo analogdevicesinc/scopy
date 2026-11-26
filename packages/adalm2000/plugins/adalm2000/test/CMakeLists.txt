@@ -134,3 +134,32 @@ target_link_libraries(
 		scopy-pluginbase
 		libm2k::libm2k
 )
+
+# End-to-end Oscilloscope against a board or iio-emu; skipped unless M2K_URI is set.
+file(
+	GLOB
+	OSC_HW_SRC
+	../src/m2kBackend/*.cpp
+	../src/oscilloscope/*.cpp
+	../src/m2kinstrumentcontroller.cpp
+	../src/uihelpers.cpp
+	../src/m2ksource.cpp
+	../src/horizontalsettings.cpp
+)
+file(
+	GLOB
+	OSC_HW_HDR
+	../include/${SCOPY_MODULE}/m2kBackend/*.h
+	../include/${SCOPY_MODULE}/oscilloscope/*.h
+	../include/${SCOPY_MODULE}/horizontalsettings.h
+)
+add_adalm2000_unit_test(oschw ${OSC_HW_SRC} ${OSC_HW_HDR})
+target_compile_definitions(${PROJECT_NAME}_test_oschw PRIVATE SCOPY_ADALM2000_STATIC_DEFINE)
+target_link_libraries(
+	${PROJECT_NAME}_test_oschw
+	PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
+		scopy-core
+		scopy-gui
+		scopy-pluginbase
+		libm2k::libm2k
+)
