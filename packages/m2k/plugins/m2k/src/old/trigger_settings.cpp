@@ -419,7 +419,22 @@ void TriggerSettings::autoTriggerDisable()
 	if(ui->btnTrigger->isChecked()) {
 		writeHwMode(libm2k::ALWAYS);
 		temporarily_disabled = true;
+		m_autoForcedTimer.restart();
 	}
+}
+
+// Called on every new frame. After an Auto timeout, stay in free-run for a while instead of
+// re-arming after each frame: with no edge (DC input), re-arming makes every frame wait for the
+// full timeout and reconfigure the trigger hardware twice.
+void TriggerSettings::autoTriggerRearm()
+{
+	static constexpr qint64 AUTO_REARM_HOLDOFF_MS = 500;
+
+	if(ui->btnTrigger->isChecked() && temporarily_disabled && m_autoForcedTimer.isValid() &&
+	   m_autoForcedTimer.elapsed() < AUTO_REARM_HOLDOFF_MS) {
+		return;
+	}
+	autoTriggerEnable();
 }
 
 void TriggerSettings::autoTriggerEnable()

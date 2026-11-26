@@ -21,6 +21,7 @@
 #ifndef TRIGGER_SETTINGS_HPP
 #define TRIGGER_SETTINGS_HPP
 
+#include <QElapsedTimer>
 #include <QWidget>
 
 #include <libm2k/enums.hpp>
@@ -101,6 +102,7 @@ public Q_SLOTS:
 	void setTriggerHystStep(int chn, double step);
 	void autoTriggerDisable();
 	void autoTriggerEnable();
+	void autoTriggerRearm();
 	void updateHwVoltLevels(int chnIdx);
 	void setAdcRunningState(bool on);
 	void onSpinboxTriggerLevelChanged(double);
@@ -154,6 +156,7 @@ private:
 	PositionSpinButton *trigger_hysteresis;
 	int current_channel;
 	bool temporarily_disabled;
+	QElapsedTimer m_autoForcedTimer;
 	bool trigger_auto_mode;
 	long long trigger_raw_delay;
 	long long daisyChainCompensation;

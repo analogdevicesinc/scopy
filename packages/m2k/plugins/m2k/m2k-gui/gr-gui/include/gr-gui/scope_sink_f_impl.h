@@ -49,6 +49,9 @@
 
 #include <gnuradio/high_res_timer.h>
 
+#include <atomic>
+#include <memory>
+
 namespace scopy {
 
 class scope_sink_f_impl : public scope_sink_f
@@ -70,6 +73,7 @@ private:
 
 	gr::high_res_timer_type d_update_time;
 	gr::high_res_timer_type d_last_time;
+	std::shared_ptr<std::atomic<bool>> d_event_in_flight = std::make_shared<std::atomic<bool>>(false);
 
 	// Members used for triggering scope
 	trigger_mode d_trigger_mode;

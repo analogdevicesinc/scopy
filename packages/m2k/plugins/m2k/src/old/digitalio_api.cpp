@@ -23,6 +23,8 @@
 #include "ui_digitalIoElement.h"
 #include "ui_digitalio.h"
 
+#include <algorithm>
+
 namespace scopy::m2k {
 void DigitalIO_API::show() { Q_EMIT dio->showTool(); }
 
@@ -41,10 +43,13 @@ QList<bool> DigitalIO_API::direction() const
 
 void DigitalIO_API::setDirection(const QList<bool> &list)
 {
-	unsigned int i;
+	const int n = std::min<int>(list.size(), 16);
 
-	for(i = 0; i < 16; i++) {
+	for(int i = 0; i < n; i++) {
 		auto ch = dio->findIndividualUi(i);
+		if(!ch) {
+			continue;
+		}
 		ch->second->inout->setChecked(list.at(i));
 		dio->setDirection(i, list.at(i));
 	}
@@ -80,10 +85,13 @@ void DigitalIO_API::run(bool en) { dio->ui->btnRunStop->setChecked(en); }
 
 void DigitalIO_API::setOutput(const QList<bool> &list)
 {
-	unsigned int i;
+	const int n = std::min<int>(list.size(), 16);
 
-	for(i = 0; i < 16; i++) {
+	for(int i = 0; i < n; i++) {
 		auto ch = dio->findIndividualUi(i);
+		if(!ch) {
+			continue;
+		}
 		ch->second->output->setChecked(list.at(i));
 		dio->setOutput(i, list.at(i));
 	}
@@ -102,7 +110,8 @@ QList<bool> DigitalIO_API::grouped() const
 
 void DigitalIO_API::setGrouped(const QList<bool> &grouped)
 {
-	for(int i = 0; i < grouped.size(); ++i) {
+	const int n = std::min<int>(grouped.size(), dio->groups.size());
+	for(int i = 0; i < n; ++i) {
 		int index = grouped[i] ? 1 : 0;
 		dio->groups[i]->ui->stackedWidget->setCurrentIndex(index);
 		dio->groups[i]->ui->comboBox->setCurrentIndex(index);
