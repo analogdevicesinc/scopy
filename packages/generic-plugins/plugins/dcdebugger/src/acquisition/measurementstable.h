@@ -68,20 +68,16 @@ public:
 
 protected:
 	void showEvent(QShowEvent *event) override;
-	void hideEvent(QHideEvent *event) override;
 
 private:
 	int tableHeight() const;
 	void applyInitialSizes();
-	void storeDocks();
-	void restoreDocks(QWidget *mainWindow);
 
 	QTableWidget *m_table;
 	QString m_stateKey;
 	QSplitter *m_splitter = nullptr;
 	QList<DockWrapperInterface *> m_docks;
 	bool m_sized = false;
-	bool m_shown = false;
 };
 
 // v with an SI prefix and `unit`, e.g. 1.0008 kHz.

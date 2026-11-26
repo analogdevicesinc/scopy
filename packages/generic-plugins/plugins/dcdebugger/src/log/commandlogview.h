@@ -148,7 +148,6 @@ private:
 	// Column widths, the log | generator arrangement and whether the generator is shown, to
 	// layoutstate (read back by the constructor).
 	void storeLayout();
-	void fitCodeGenerator();
 	QWidget *buildFilters(QWidget *parent);
 	void applyFilter();
 	void onRowClicked(const QModelIndex &index);

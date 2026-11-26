@@ -30,7 +30,6 @@
 #include <functional>
 
 namespace scopy {
-class DockWrapperInterface;
 class MapStackedWidget;
 } // namespace scopy
 
@@ -48,17 +47,6 @@ SCOPY_DCDEBUGGER_EXPORT void addCollector(QObject *owner, std::function<void()> 
 SCOPY_DCDEBUGGER_EXPORT QVariantMap values();
 SCOPY_DCDEBUGGER_EXPORT void setValues(const QVariantMap &values);
 
-// Two KDDockWidgets docks of one area: where `second` is relative to `first` (side left / right /
-// top / bottom, or tabbed with it), its size along that side, the current tab and the floating
-// geometries. Empty without KDDockWidgets, before the docks were laid out or with `second` closed.
-SCOPY_DCDEBUGGER_EXPORT QVariantMap dockPairState(DockWrapperInterface *first, DockWrapperInterface *second);
-// Adds `second` to `mainWindow`, where `first` already is, as `state` says (defaultSide /
-// defaultSize without one), then floats what was floating. No-op without KDDockWidgets.
-SCOPY_DCDEBUGGER_EXPORT void placeDockPair(QWidget *mainWindow, DockWrapperInterface *first,
-					   DockWrapperInterface *second, const QVariantMap &state,
-					   const QString &defaultSide, int defaultSize);
-// Resizes the docked `second` within the layout back to its size in `state` (once laid out).
-SCOPY_DCDEBUGGER_EXPORT void fitDockPair(DockWrapperInterface *second, const QVariantMap &state);
 } // namespace layoutstate
 
 // Instrument body as a splitter: [left stack (channels)] [central] [right stack (menus)], like the

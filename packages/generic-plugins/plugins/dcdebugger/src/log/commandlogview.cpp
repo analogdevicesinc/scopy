@@ -60,7 +60,6 @@ namespace {
 // layoutstate keys.
 constexpr const char *COLUMNS_KEY = "log/columns";
 constexpr const char *SPLIT_KEY = "log/split";
-constexpr const char *DOCKS_KEY = "log/docks";
 constexpr const char *CODEGEN_KEY = "log/codeGenerator";
 
 int intPreference(const char *key, int fallback)
@@ -207,8 +206,7 @@ CommandLogView::CommandLogView(QWidget *parent)
 		// The dock title bar names the generator: no second title inside it.
 		m_codegen->setTitleVisible(false);
 		m_area->addDockWrapper(m_logDock, DockableAreaInterface::Direction_LEFT);
-		layoutstate::placeDockPair(area, m_logDock, m_codegenDock, layoutstate::value(DOCKS_KEY).toMap(),
-					   QStringLiteral("right"), 0);
+		m_area->addDockWrapper(m_codegenDock, DockableAreaInterface::Direction_RIGHT);
 #ifdef USE_KDDOCKWIDGETS
 		if(auto *dock = dynamic_cast<KDDockWidgets::QtWidgets::DockWidget *>(m_codegenDock)) {
 			// Closed by the layout (not through the toggle): uncheck it.
@@ -327,11 +325,7 @@ CommandLogView::CommandLogView(QWidget *parent)
 void CommandLogView::showEvent(QShowEvent *event)
 {
 	QWidget::showEvent(event);
-	if(!m_fitted) {
-		m_fitted = true;
-		// Once laid out: the generator dock back at its kept size.
-		QTimer::singleShot(0, this, &CommandLogView::fitCodeGenerator);
-	}
+	m_fitted = true;
 }
 
 void CommandLogView::hideEvent(QHideEvent *event)
@@ -349,19 +343,6 @@ void CommandLogView::storeLayout()
 	layoutstate::setValue(COLUMNS_KEY, m_tree->header()->saveState());
 	if(m_split && m_codegenShown && m_split->sizes().value(1) > 0) {
 		layoutstate::setValue(SPLIT_KEY, m_split->saveState());
-	}
-	if(m_docking) {
-		const QVariantMap docks = layoutstate::dockPairState(m_logDock, m_codegenDock);
-		if(!docks.isEmpty()) {
-			layoutstate::setValue(DOCKS_KEY, docks);
-		}
-	}
-}
-
-void CommandLogView::fitCodeGenerator()
-{
-	if(m_docking && m_codegenShown && isVisible()) {
-		layoutstate::fitDockPair(m_codegenDock, layoutstate::value(DOCKS_KEY).toMap());
 	}
 }
 
@@ -525,8 +506,6 @@ void CommandLogView::showCodeGenerator(bool show)
 	m_codegenDock->setActivated(show);
 	layoutstate::setValue(CODEGEN_KEY, show);
 	if(show) {
-		// Opening lays the docks out equally: back to the kept size.
-		QTimer::singleShot(0, this, &CommandLogView::fitCodeGenerator);
 		// Reopened after being dragged closed: give it its share back.
 		const QList<int> sizes = m_split ? m_split->sizes() : QList<int>();
 		if(sizes.size() == 2 && sizes[1] == 0 && sizes[0] > 0) {

@@ -110,24 +110,18 @@ PlotMeasurementsArea::PlotMeasurementsArea(QWidget *plot, QTableWidget *table, c
 	lay->setContentsMargins(0, 0, 0, 0);
 
 	DockableAreaInterface *area = createDockableArea(this);
-#ifdef USE_KDDOCKWIDGETS
-	if(auto *mw = dynamic_cast<KDDockWidgets::QtWidgets::MainWindow *>(area)) {
-		lay->addWidget(mw);
+	// The docks: KDDockWidgets when available and preferred, else a plain splitter.
+	if(!dynamic_cast<classic::DockableArea *>(area)) {
+		lay->addWidget(area->asWidget());
 		DockWrapperInterface *plotDock = createDockWrapper("Plot");
 		plotDock->setInnerWidget(plot);
 		area->addDockWrapper(plotDock, DockableAreaInterface::Direction_TOP);
 		DockWrapperInterface *tableDock = createDockWrapper("Measurements");
 		tableDock->setInnerWidget(table);
+		area->addDockWrapper(tableDock, DockableAreaInterface::Direction_BOTTOM);
 		m_docks = {plotDock, tableDock};
-		restoreDocks(mw);
-		layoutstate::addCollector(this, [this]() {
-			if(isVisible()) {
-				storeDocks();
-			}
-		});
 		return;
 	}
-#endif
 	delete area->asWidget();
 	m_splitter = new QSplitter(Qt::Vertical, this);
 	m_splitter->setChildrenCollapsible(true);
@@ -155,36 +149,10 @@ PlotMeasurementsArea::~PlotMeasurementsArea()
 void PlotMeasurementsArea::showEvent(QShowEvent *event)
 {
 	QWidget::showEvent(event);
-	m_shown = true;
 	if(m_splitter && !m_sized) {
 		// After the first layout pass, once the splitter has its real height.
 		QTimer::singleShot(0, this, &PlotMeasurementsArea::applyInitialSizes);
 	}
-}
-
-void PlotMeasurementsArea::hideEvent(QHideEvent *event)
-{
-	// Leaving the panel (or the tool): keep how its docks were arranged.
-	storeDocks();
-	QWidget::hideEvent(event);
-}
-
-void PlotMeasurementsArea::storeDocks()
-{
-	if(!m_shown || m_docks.size() != 2) {
-		return;
-	}
-	const QVariantMap state = layoutstate::dockPairState(m_docks[0], m_docks[1]);
-	if(!state.isEmpty()) {
-		layoutstate::setValue(m_stateKey + QStringLiteral("/docks"), state);
-	}
-}
-
-void PlotMeasurementsArea::restoreDocks(QWidget *mainWindow)
-{
-	layoutstate::placeDockPair(mainWindow, m_docks[0], m_docks[1],
-				   layoutstate::value(m_stateKey + QStringLiteral("/docks")).toMap(),
-				   QStringLiteral("bottom"), tableHeight());
 }
 
 int PlotMeasurementsArea::tableHeight() const
