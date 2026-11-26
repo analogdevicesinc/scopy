@@ -94,7 +94,7 @@ public:
 	//                 rather than a shared stream on purpose: all sources share one
 	//                 engine buffer size, so one index ramp is right for everyone, but
 	//                 two channels can legitimately carry different rates.
-	struct Source
+	struct SCOPY_CORE_EXPORT Source
 	{
 		enum class Mode
 		{
