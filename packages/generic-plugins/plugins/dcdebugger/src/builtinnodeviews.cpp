@@ -58,7 +58,7 @@ class RawAcquisitionViewFactory : public NodeViewFactory
 {
 public:
 	QString id() const override { return QStringLiteral("rawacquisition"); }
-	QString title() const override { return QStringLiteral("Raw Acquisition"); }
+	QString title() const override { return QStringLiteral("Acquisition"); }
 	bool supports(QObject *node, NodeKind) const override { return qobject_cast<component::InputStream *>(node); }
 	QWidget *create(QObject *node, NodeKind, NodePanel *panel) override
 	{
@@ -83,7 +83,7 @@ class RawGeneratorViewFactory : public NodeViewFactory
 {
 public:
 	QString id() const override { return QStringLiteral("rawgenerator"); }
-	QString title() const override { return QStringLiteral("Raw Generator"); }
+	QString title() const override { return QStringLiteral("Generator"); }
 	bool supports(QObject *node, NodeKind) const override { return qobject_cast<component::OutputStream *>(node); }
 	QWidget *create(QObject *node, NodeKind, NodePanel *panel) override
 	{
@@ -123,7 +123,7 @@ class ChannelMonitorViewFactory : public NodeViewFactory
 {
 public:
 	QString id() const override { return QStringLiteral("channelmonitor"); }
-	QString title() const override { return QStringLiteral("Channel Monitor"); }
+	QString title() const override { return QStringLiteral("Monitor"); }
 	bool supports(QObject *node, NodeKind kind) const override
 	{
 		return kind == NodeKind::Device && !ChannelMonitorView::inputChannels(node).isEmpty();
@@ -141,7 +141,7 @@ public:
 	QString title() const override { return QStringLiteral("Registers"); }
 	bool supports(QObject *node, NodeKind kind) const override
 	{
-		return isContextOrDevice(kind) && !RegisterView::targetsOf(node).isEmpty();
+		return kind == NodeKind::Device && !RegisterView::targetsOf(node).isEmpty();
 	}
 	QWidget *create(QObject *node, NodeKind, NodePanel *panel) override { return new RegisterView(node, panel); }
 };
@@ -151,12 +151,12 @@ public:
 void scopy::dcdebugger::registerBuiltinNodeViews(NodeViewRegistry *registry)
 {
 	// The node's own instrument first, then what its children offer.
-	registry->registerFactory(std::make_unique<AcquisitionViewFactory>(), 100);
-	registry->registerFactory(std::make_unique<RawAcquisitionViewFactory>(), 95);
-	registry->registerFactory(std::make_unique<GeneratorViewFactory>(), 100);
-	registry->registerFactory(std::make_unique<RawGeneratorViewFactory>(), 95);
+	// registry->registerFactory(std::make_unique<AcquisitionViewFactory>(), 100);
+	registry->registerFactory(std::make_unique<RawAcquisitionViewFactory>(), 100);
+	// registry->registerFactory(std::make_unique<GeneratorViewFactory>(), 100);
+	registry->registerFactory(std::make_unique<RawGeneratorViewFactory>(), 100);
 	registry->registerFactory(std::make_unique<PingViewFactory>(), 100);
-	registry->registerFactory(std::make_unique<MonitorViewFactory>(), 50);
+	// registry->registerFactory(std::make_unique<MonitorViewFactory>(), 50);
 	registry->registerFactory(std::make_unique<ChannelMonitorViewFactory>(), 45);
 	registry->registerFactory(std::make_unique<RegisterViewFactory>(), 40);
 }

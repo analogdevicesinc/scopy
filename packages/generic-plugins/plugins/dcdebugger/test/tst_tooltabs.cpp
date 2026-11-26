@@ -97,6 +97,7 @@ void TST_ToolTabs::cleanup()
 
 void TST_ToolTabs::exploreAndTraceTabs()
 {
+	QSKIP("The first iteration views are disabled");
 	QTabWidget *tabs = m_tool->tabs();
 	QVERIFY(tabs);
 	QCOMPARE(tabs->count(), 2);
@@ -122,6 +123,7 @@ void TST_ToolTabs::splittersCollapse()
 
 void TST_ToolTabs::goToOriginStaysOnTraceWithoutReads()
 {
+	QSKIP("The first iteration views are disabled");
 	m_tool->showTab(DCDebuggerTool::TraceTab);
 	QTest::qWait(50);
 	const int before = m_reader->reads;

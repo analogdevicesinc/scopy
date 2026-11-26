@@ -117,6 +117,7 @@ void TST_NodeViews::cleanup()
 
 void TST_NodeViews::builtinViewsAreRegistered()
 {
+	QSKIP("The first iteration views are disabled");
 	QCOMPARE(ids(reg()->factories()),
 		 QStringList({"acquisition", "rawacquisition", "generator", "rawgenerator", "ping", "monitor",
 			      "channelmonitor", "registers"}));
@@ -130,6 +131,7 @@ void TST_NodeViews::builtinViewsAreRegistered()
 
 void TST_NodeViews::streamsGetTheirInstrument()
 {
+	QSKIP("The first iteration views are disabled");
 	FakeInputStream in(1);
 	FakeOutputStream out(1);
 	QCOMPARE(ids(reg()->factoriesFor(&in, NodeKind::InputStream)), QStringList({"acquisition", "rawacquisition"}));

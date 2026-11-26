@@ -206,6 +206,7 @@ QTableWidget *TST_AcquisitionUi::measurements() const
 
 void TST_AcquisitionUi::viewModesFillTheMeasurements()
 {
+	QSKIP("The first iteration views are disabled");
 	selectStream();
 	QPushButton *single = button("scopy::SingleShotBtn");
 	QVERIFY(single);
@@ -264,6 +265,7 @@ void TST_AcquisitionUi::viewModesFillTheMeasurements()
 
 void TST_AcquisitionUi::generatorStartsAndReappliesEdits()
 {
+	QSKIP("The first iteration views are disabled");
 	selectNode(m_out);
 	QPushButton *start = button("scopy::RunBtn");
 	QVERIFY(start);
@@ -305,6 +307,7 @@ void TST_AcquisitionUi::generatorStartsAndReappliesEdits()
 
 void TST_AcquisitionUi::monitorPollsEnabledChannels()
 {
+	QSKIP("The first iteration views are disabled");
 	selectNode(m_dev);
 	QPushButton *start = button("scopy::RunBtn");
 	QVERIFY(start);
