@@ -39,6 +39,8 @@
 #include <QTableWidget>
 #include <QVBoxLayout>
 
+#include <scopy-core_config.h>
+
 #include <component/attribute.h>
 #include <gui/docking/dockablearea.h>
 #include <gui/docking/dockwrapper.h>
@@ -426,10 +428,13 @@ NodePanel *scopy::dcdebugger::createNodePanel(QObject *node, NodeKind kind, cons
 							  : QStringLiteral("Attributes (%1)").arg(attrs.size()),
 			      attrs);
 	}
+#ifdef SCOPY_DEV_MODE
+	// The node's class and Qt properties: for developers only.
 	auto *props = new PropertiesSection(node, panel);
 	QObject::connect(panel, &NodePanel::refreshRequested, props, &PropertiesSection::refresh);
 	QObject::connect(panel, &NodePanel::selected, props, &PropertiesSection::refresh);
 	panel->addSection(props);
+#endif
 
 	for(NodeViewFactory *factory : NodeViewRegistry::instance()->factoriesFor(node, kind)) {
 		panel->setMainView(factory->title(), factory->create(node, kind, panel));

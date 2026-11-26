@@ -21,6 +21,7 @@
 
 #include "rawacquisitionview.h"
 
+#include "nodeactivity.h"
 #include "nodepanel.h"
 #include "readpolicy.h"
 #include "sidesplitter.h"
@@ -80,6 +81,8 @@ RawAcquisitionView::RawAcquisitionView(InputStream *stream, QWidget *parent)
 	, m_stream(stream)
 	, m_acq(new StreamAcquisition(stream, this))
 {
+	// The tree flags the stream while this runs.
+	NodeActivity::instance()->track(stream, m_acq);
 	m_sampleRateAttrs = memberSampleRates(stream, false);
 
 	// Every member channel is acquired: there is no channel selection.

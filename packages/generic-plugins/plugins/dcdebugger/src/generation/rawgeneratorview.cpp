@@ -21,6 +21,7 @@
 
 #include "rawgeneratorview.h"
 
+#include "nodeactivity.h"
 #include "nodepanel.h"
 #include "readpolicy.h"
 #include "sampletable.h"
@@ -93,6 +94,8 @@ RawGeneratorView::RawGeneratorView(OutputStream *stream, QWidget *parent)
 	, m_gen(new StreamGeneration(stream, this))
 	, m_applyTimer(new QTimer(this))
 {
+	// The tree flags the stream while this runs.
+	NodeActivity::instance()->track(stream, m_gen);
 	m_sampleRateAttrs = memberSampleRates(stream, true);
 	m_gen->setRawMode(true);
 	// Every member is pushed; a channel without table data would send 0 (a silent tone).

@@ -40,6 +40,7 @@
 #include <iiowidget.h>
 #include <menusectionwidget.h>
 #include <pluginbase/preferences.h>
+#include <scopy-core_config.h>
 #include <widgets/animatedrefreshbtn.h>
 
 using namespace scopy;
@@ -163,9 +164,13 @@ void TST_NodePanel::generalInfoStartsExpanded()
 {
 	// A node with attributes used to get its "General info" collapsed.
 	NodePanel *panel = devicePanel();
-	// "Attributes (2)" and "General info".
+	// "Attributes (2)", and "General info" in DEV_MODE builds.
 	const auto sections = panel->findChildren<MenuSectionCollapseWidget *>();
+#ifdef SCOPY_DEV_MODE
 	QCOMPARE(sections.size(), 2);
+#else
+	QCOMPARE(sections.size(), 1);
+#endif
 	for(MenuSectionCollapseWidget *s : sections) {
 		QVERIFY(!s->collapsed());
 	}

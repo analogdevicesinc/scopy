@@ -142,6 +142,8 @@ private Q_SLOTS:
 	void filters();
 	void uriFilter();
 	void pauseKeepsRecording();
+	void excludedCommandsAreNotRecorded();
+	void excludeIsKeptInPreferences();
 	void csvColumns();
 
 	void logSwitchFollowsMonitor();
@@ -346,6 +348,53 @@ void TST_CommandLog::pauseKeepsRecording()
 	QCOMPARE(m.entryCount(), 4);
 	m.setPaused(false);
 	QCOMPARE(m.rowCount(), 4);
+}
+
+void TST_CommandLog::excludedCommandsAreNotRecorded()
+{
+	CommandLogModel m;
+	CommandLogEntry ping = entry(QStringLiteral("ctx"), {call("iio_context_get_version")});
+	ping.commandClass = QStringLiteral("scopy::iio::PingCommand");
+	QCOMPARE(CommandLogModel::commandName(ping), QStringLiteral("PingCommand"));
+
+	m.append(ping);
+	m.append(readRaw());
+	QCOMPARE(m.entryCount(), 2);
+
+	m.setExcludedCommands({QStringLiteral("PingCommand")});
+	QVERIFY(m.isExcluded(QStringLiteral("PingCommand")));
+	m.append(ping);
+	m.append(readRaw());
+	// Dropped on arrival; what was recorded before stays.
+	QCOMPARE(m.entryCount(), 3);
+	QCOMPARE(m.rowCount(), 3);
+	QCOMPARE(m.seenCommands(), QStringList({QStringLiteral("AttrReadCommand"), QStringLiteral("PingCommand")}));
+
+	m.setExcludedCommands({});
+	m.append(ping);
+	QCOMPARE(m.entryCount(), 4);
+}
+
+void TST_CommandLog::excludeIsKeptInPreferences()
+{
+	Preferences::set(CommandLogView::EXCLUDED_PREF, QStringList());
+	{
+		CommandLogView view;
+		view.setCommandExcluded(QStringLiteral("PingCommand"), true);
+		QCOMPARE(view.model()->excludedCommands(), QStringList({QStringLiteral("PingCommand")}));
+		QCOMPARE(view.excludeButton()->text(), QStringLiteral("Excluded (1)"));
+	}
+	QCOMPARE(Preferences::get(CommandLogView::EXCLUDED_PREF).toStringList(),
+		 QStringList({QStringLiteral("PingCommand")}));
+	{
+		// A new log starts with the kept exclusions.
+		CommandLogView view;
+		QVERIFY(view.model()->isExcluded(QStringLiteral("PingCommand")));
+		view.setCommandExcluded(QStringLiteral("PingCommand"), false);
+		QVERIFY(!view.model()->isExcluded(QStringLiteral("PingCommand")));
+		QCOMPARE(view.excludeButton()->text(), QStringLiteral("Exclude..."));
+	}
+	QVERIFY(Preferences::get(CommandLogView::EXCLUDED_PREF).toStringList().isEmpty());
 }
 
 void TST_CommandLog::csvColumns()

@@ -76,6 +76,8 @@ class SCOPY_DCDEBUGGER_EXPORT CommandLogView : public QWidget
 public:
 	static constexpr const char *SIZE_PREF = "dcdebugger_command_log_size";
 	static constexpr const char *COLLAPSE_PREF = "dcdebugger_command_log_collapse_after";
+	// Command names not recorded (CommandLogModel::commandName()), e.g. "PingCommand".
+	static constexpr const char *EXCLUDED_PREF = "dcdebugger_command_log_excluded";
 	static constexpr int DEFAULT_SIZE = 10000;
 	static constexpr int DEFAULT_COLLAPSE_AFTER = 10;
 	// Follow scrolls to the newest row at most this often.
@@ -100,6 +102,10 @@ public:
 	// "Log commands": its onOffswitch() is checked while the monitor records.
 	MenuOnOffSwitch *logSwitch() const { return m_log; }
 	QPushButton *pauseButton() const { return m_pauseBtn; }
+	// "Exclude": a menu of the commands seen (and the excluded ones), checked = not recorded.
+	QPushButton *excludeButton() const { return m_excludeBtn; }
+	// Stops (or resumes) recording a command; kept in EXCLUDED_PREF.
+	void setCommandExcluded(const QString &name, bool excluded);
 	QString statusText() const;
 	QAction *copyAction() const { return m_copyAction; }
 	// The bound monitor records (follows its enabledChanged and destruction).
@@ -150,6 +156,8 @@ private:
 	void storeLayout();
 	QWidget *buildFilters(QWidget *parent);
 	void applyFilter();
+	void showExcludeMenu();
+	void updateExcludeButton();
 	void onRowClicked(const QModelIndex &index);
 	void onEnabledChanged(bool enabled);
 	void onMonitorDestroyed();
@@ -179,6 +187,7 @@ private:
 	QLineEdit *m_library;
 	QLineEdit *m_function;
 	MenuOnOffSwitch *m_errorsOnly;
+	QPushButton *m_excludeBtn;
 	QTreeView *m_tree;
 	QAction *m_copyAction;
 	QAction *m_copyAllAction;

@@ -84,6 +84,7 @@ void CommandLogView::initPreferences()
 {
 	Preferences::init(SIZE_PREF, DEFAULT_SIZE);
 	Preferences::init(COLLAPSE_PREF, DEFAULT_COLLAPSE_AFTER);
+	Preferences::init(EXCLUDED_PREF, QStringList());
 }
 
 CommandLogView::CommandLogView(QWidget *parent)
@@ -92,6 +93,7 @@ CommandLogView::CommandLogView(QWidget *parent)
 {
 	m_model->setCapacity(intPreference(SIZE_PREF, DEFAULT_SIZE));
 	m_model->setCollapseAfter(intPreference(COLLAPSE_PREF, DEFAULT_COLLAPSE_AFTER));
+	m_model->setExcludedCommands(Preferences::get(EXCLUDED_PREF).toStringList());
 	m_model->setErrorColor(QColor(Style::getAttribute(json::theme::content_error)));
 
 	// Two dockable panels side by side, like the Scopy instruments: the log (left) and the code
@@ -326,6 +328,7 @@ void CommandLogView::showEvent(QShowEvent *event)
 {
 	QWidget::showEvent(event);
 	m_fitted = true;
+	updateExcludeButton(); // the theme font may have changed since it was sized
 }
 
 void CommandLogView::hideEvent(QHideEvent *event)
@@ -371,6 +374,15 @@ QWidget *CommandLogView::buildFilters(QWidget *parent)
 	m_errorsOnly->setToolTip("Show only the commands with a failed call");
 	m_errorsOnly->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	lay->addWidget(m_errorsOnly);
+	m_excludeBtn = new QPushButton(w);
+	m_excludeBtn->setObjectName(QStringLiteral("commandLogExclude"));
+	m_excludeBtn->setToolTip("Commands not to record (e.g. PingCommand); they never reach the log, "
+				 "the export or the code generator");
+	Style::setStyle(m_excludeBtn, style::properties::button::basicButton);
+	m_excludeBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	lay->addWidget(m_excludeBtn);
+	connect(m_excludeBtn, &QPushButton::clicked, this, &CommandLogView::showExcludeMenu);
+	updateExcludeButton();
 	for(QLineEdit *e : {m_component, m_library, m_function}) {
 		connect(e, &QLineEdit::textChanged, this, &CommandLogView::applyFilter);
 	}
@@ -415,6 +427,56 @@ void CommandLogView::applyFilter()
 	f.function = m_function->text().trimmed();
 	f.errorsOnly = m_errorsOnly->onOffswitch()->isChecked();
 	m_model->setFilter(f);
+}
+
+void CommandLogView::setCommandExcluded(const QString &name, bool excluded)
+{
+	if(name.isEmpty() || m_model->isExcluded(name) == excluded) {
+		return;
+	}
+	QStringList names = m_model->excludedCommands();
+	if(excluded) {
+		names.append(name);
+	} else {
+		names.removeAll(name);
+	}
+	m_model->setExcludedCommands(names);
+	Preferences::set(EXCLUDED_PREF, m_model->excludedCommands());
+	updateExcludeButton();
+}
+
+void CommandLogView::showExcludeMenu()
+{
+	// The commands seen so far, plus the excluded ones (not seen since they are dropped).
+	QStringList names = m_model->seenCommands();
+	for(const QString &n : m_model->excludedCommands()) {
+		if(!names.contains(n)) {
+			names.append(n);
+		}
+	}
+	names.sort();
+	QMenu menu(this);
+	if(names.isEmpty()) {
+		menu.addAction("No command recorded yet")->setEnabled(false);
+	}
+	for(const QString &n : std::as_const(names)) {
+		QAction *a = menu.addAction(n);
+		a->setCheckable(true);
+		a->setChecked(m_model->isExcluded(n));
+		connect(a, &QAction::toggled, this, [this, n](bool on) { setCommandExcluded(n, on); });
+	}
+	menu.exec(m_excludeBtn->mapToGlobal(QPoint(0, m_excludeBtn->height())));
+}
+
+void CommandLogView::updateExcludeButton()
+{
+	const int n = m_model->excludedCommands().size();
+	m_excludeBtn->setText(n > 0 ? QStringLiteral("Excluded (%1)").arg(n) : QStringLiteral("Exclude..."));
+	// Sized from the styled (bold) font: the cached size hint can predate it and clip the text.
+	m_excludeBtn->ensurePolished();
+	const int text = m_excludeBtn->fontMetrics().horizontalAdvance(m_excludeBtn->text());
+	m_excludeBtn->setMinimumWidth(
+		std::max(m_excludeBtn->sizeHint().width(), text + 2 * Style::getDimension(json::global::unit_1)));
 }
 
 void CommandLogView::onRowClicked(const QModelIndex &index)

@@ -22,6 +22,7 @@
 #include "fakestream.h"
 #include "generation/streamgeneration.h"
 #include "generation/waveform.h"
+#include "nodeactivity.h"
 
 #include <QSignalSpy>
 #include <QtTest>
@@ -44,6 +45,7 @@ private Q_SLOTS:
 	void cyclicChangeReopens();
 	void streamingPushesInALoop();
 	void disabledChannelsAreNotOpened();
+	void activityFollowsTheGeneration();
 };
 
 void TST_StreamGeneration::snapKeepsWholePeriods()
@@ -174,6 +176,25 @@ void TST_StreamGeneration::disabledChannelsAreNotOpened()
 	gen.start();
 	QTRY_COMPARE(errors.size(), 1);
 	QVERIFY(!gen.isRunning());
+}
+
+void TST_StreamGeneration::activityFollowsTheGeneration()
+{
+	// The tree flags the stream while it is generated.
+	FakeOutputStream stream(1);
+	auto *gen = new StreamGeneration(&stream);
+	NodeActivity::instance()->track(&stream, gen);
+	QVERIFY(!NodeActivity::instance()->isActive(&stream));
+	gen->setSamples(16);
+	gen->start();
+	QTRY_VERIFY(NodeActivity::instance()->isActive(&stream));
+	gen->stop();
+	QTRY_VERIFY(!NodeActivity::instance()->isActive(&stream));
+	gen->start();
+	QTRY_VERIFY(NodeActivity::instance()->isActive(&stream));
+	gen->shutdown();
+	delete gen; // destroyed while flagged: the flag goes too
+	QVERIFY(!NodeActivity::instance()->isActive(&stream));
 }
 
 QTEST_GUILESS_MAIN(TST_StreamGeneration)

@@ -21,6 +21,7 @@
 
 #include "fakestream.h"
 #include "monitor/attributemonitor.h"
+#include "nodeactivity.h"
 
 #include <QSignalSpy>
 #include <QtTest>
@@ -40,6 +41,7 @@ private Q_SLOTS:
 	void historyIsTrimmed();
 	void statsOverHistory();
 	void readErrorsAreReported();
+	void activityFollowsRunningMonitors();
 };
 
 void TST_AttributeMonitor::parsesLeadingNumbers()
@@ -136,6 +138,40 @@ void TST_AttributeMonitor::readErrorsAreReported()
 	QVERIFY(mon.lastError("a").startsWith("not a number"));
 	r->fail = true;
 	QTRY_VERIFY(mon.lastError("a") == "read failed");
+}
+
+void TST_AttributeMonitor::activityFollowsRunningMonitors()
+{
+	NodeActivity *activity = NodeActivity::instance();
+	QObject node;
+	QSignalSpy changed(activity, &NodeActivity::activeChanged);
+	auto *a = new AttributeMonitor();
+	auto *b = new AttributeMonitor();
+	activity->track(&node, a);
+	activity->track(&node, b);
+	QVERIFY(!activity->isActive(&node));
+
+	a->start();
+	QVERIFY(activity->isActive(&node));
+	b->start(); // already active: no second signal
+	QCOMPARE(changed.count(), 1);
+	QCOMPARE(changed.at(0).at(1).toBool(), true);
+
+	a->stop();
+	QVERIFY(activity->isActive(&node)); // b still runs
+	delete b;			    // a destroyed running monitor counts as stopped
+	QVERIFY(!activity->isActive(&node));
+	QCOMPARE(changed.count(), 2);
+	QCOMPARE(changed.at(1).at(1).toBool(), false);
+
+	// Tracked while already running.
+	a->start();
+	QObject other;
+	activity->track(&other, a);
+	QVERIFY(activity->isActive(&other));
+	delete a;
+	QVERIFY(!activity->isActive(&node));
+	QVERIFY(!activity->isActive(&other));
 }
 
 QTEST_GUILESS_MAIN(TST_AttributeMonitor)

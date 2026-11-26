@@ -21,13 +21,21 @@
 
 #include "componenttreemodel.h"
 
+#include "nodeactivity.h"
+
+#include <QApplication>
+#include <QIcon>
 #include <QMap>
+#include <QPainter>
+#include <QPixmap>
+#include <QStyle>
 
 #include <component/attribute.h>
 #include <component/attributereader.h>
 #include <component/commandmonitor.h>
 #include <component/connection.h>
 #include <component/stream.h>
+#include <style.h>
 
 using namespace scopy;
 using namespace scopy::dcdebugger;
@@ -62,6 +70,12 @@ void ComponentTreeModel::rebuild()
 	clearTree();
 	if(m_conn) {
 		m_watchers = new QObject(this);
+		connect(NodeActivity::instance(), &NodeActivity::activeChanged, m_watchers,
+			[this](QObject *node, bool active) {
+				if(QStandardItem *item = m_items.value(node)) {
+					setActivityFlag(item, active);
+				}
+			});
 		addNode(invisibleRootItem(), m_conn, NodeKind::Connection);
 	}
 	Q_EMIT rebuilt();
@@ -84,8 +98,38 @@ void ComponentTreeModel::addNode(QStandardItem *parent, QObject *obj, NodeKind k
 	parent->appendRow(row);
 	m_objects.insert(row[NameColumn], obj);
 	m_items.insert(obj, row[NameColumn]);
+	if(NodeActivity::instance()->isActive(obj)) {
+		setActivityFlag(row[NameColumn], true); // e.g. a cached panel still polling across a rebuild
+	}
 	watch(obj, kind, row[ValueColumn]);
 	addChildren(row[NameColumn], obj);
+}
+
+void ComponentTreeModel::setActivityFlag(QStandardItem *item, bool active)
+{
+	if(!active) {
+		item->setData(QVariant(), Qt::DecorationRole);
+		item->setToolTip(QString());
+		return;
+	}
+	// A small dot before the name: light enough for every row, unlike a value or a column. Drawn
+	// centred on a full icon-sized canvas at the screen's pixel ratio, so no scaling or rounding
+	// moves it off the row's middle.
+	const qreal dpr = qApp->devicePixelRatio();
+	const int canvas = qApp->style()->pixelMetric(QStyle::PM_SmallIconSize);
+	const qreal diameter = 8;
+	QPixmap dot(QSize(canvas, canvas) * dpr);
+	dot.setDevicePixelRatio(dpr);
+	dot.fill(Qt::transparent);
+	QPainter p(&dot);
+	p.setRenderHint(QPainter::Antialiasing);
+	p.setPen(Qt::NoPen);
+	p.setBrush(Style::getColor(json::theme::content_success));
+	const qreal offset = (canvas - diameter) / 2;
+	p.drawEllipse(QRectF(offset, offset, diameter, diameter));
+	p.end();
+	item->setData(QIcon(dot), Qt::DecorationRole);
+	item->setToolTip(QStringLiteral("Running"));
 }
 
 void ComponentTreeModel::addChildren(QStandardItem *item, QObject *obj)

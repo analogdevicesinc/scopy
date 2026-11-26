@@ -27,7 +27,9 @@
 #include <QAbstractItemModel>
 #include <QColor>
 #include <QList>
+#include <QSet>
 #include <QString>
+#include <QStringList>
 
 #include <core/callrecord.h>
 
@@ -51,6 +53,8 @@ struct CommandLogFilter
 // into one row "×N" with min / avg / max duration. Children: the calls of a multi-call command, or
 // the commands of a folded run. Folding is display only: the buffer keeps every entry.
 // Pause freezes the rows (entries keep being buffered); resume shows everything buffered.
+// Excluded commands (by commandName(), e.g. "PingCommand") are not recorded at all: they never
+// reach the buffer, the export or the code generator.
 class SCOPY_DCDEBUGGER_EXPORT CommandLogModel : public QAbstractItemModel
 {
 	Q_OBJECT
@@ -90,6 +94,15 @@ public:
 
 	CommandLogFilter filter() const { return m_filter; }
 	void setFilter(const CommandLogFilter &filter);
+
+	// Short class name of an entry's command ("scopy::iio::PingCommand" -> "PingCommand").
+	static QString commandName(const CommandLogEntry &entry);
+	// Commands dropped on arrival from now on; already recorded entries stay.
+	QStringList excludedCommands() const;
+	void setExcludedCommands(const QStringList &names);
+	bool isExcluded(const QString &name) const { return m_excluded.contains(name); }
+	// Every command name that arrived (excluded ones included), sorted.
+	QStringList seenCommands() const;
 
 	bool isPaused() const { return m_paused; }
 	void setPaused(bool paused);
@@ -167,6 +180,8 @@ private:
 	int m_collapseAfter = 10;
 	QString m_uri;
 	CommandLogFilter m_filter;
+	QSet<QString> m_excluded;
+	QSet<QString> m_seen;
 	bool m_paused = false;
 	QColor m_errorColor{Qt::red};
 };

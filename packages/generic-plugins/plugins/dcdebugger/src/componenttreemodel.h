@@ -81,6 +81,8 @@ private:
 	void addChildren(QStandardItem *item, QObject *obj);
 	void watch(QObject *obj, NodeKind kind, QStandardItem *valueItem);
 	QList<QStandardItem *> makeRow(const QString &name, const QString &value) const;
+	// The dot (and tooltip) of a node's name item while something runs on it (see NodeActivity).
+	static void setActivityFlag(QStandardItem *item, bool active);
 
 	QPointer<component::Connection> m_conn;
 	// Context of every live-update connection of the current build; deleted on rebuild.

@@ -22,6 +22,7 @@
 #include "channelmonitorview.h"
 
 #include "acquisition/measurementstable.h"
+#include "nodeactivity.h"
 #include "nodepanel.h"
 #include "sidesplitter.h"
 
@@ -129,6 +130,8 @@ ChannelMonitorView::ChannelMonitorView(QObject *device, QWidget *parent)
 			updateTable();
 		}
 	});
+	// The tree flags the node while this monitor runs.
+	NodeActivity::instance()->track(device, m_monitor);
 	connect(m_monitor, &AttributeMonitor::ticked, this, [this]() { m_dirty = true; });
 	connect(m_monitor, &AttributeMonitor::sampled, this, [this]() { m_dirty = true; });
 

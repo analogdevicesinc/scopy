@@ -135,6 +135,27 @@ void CommandLogModel::setCollapseAfter(int n)
 
 void CommandLogModel::setUri(const QString &uri) { m_uri = uri; }
 
+QString CommandLogModel::commandName(const CommandLogEntry &entry) { return shortClass(entry.commandClass); }
+
+QStringList CommandLogModel::excludedCommands() const
+{
+	QStringList names(m_excluded.cbegin(), m_excluded.cend());
+	names.sort();
+	return names;
+}
+
+void CommandLogModel::setExcludedCommands(const QStringList &names)
+{
+	m_excluded = QSet<QString>(names.cbegin(), names.cend());
+}
+
+QStringList CommandLogModel::seenCommands() const
+{
+	QStringList names(m_seen.cbegin(), m_seen.cend());
+	names.sort();
+	return names;
+}
+
 void CommandLogModel::setFilter(const CommandLogFilter &filter)
 {
 	m_filter = filter;
@@ -363,6 +384,11 @@ bool CommandLogModel::sameCommand(const CommandLogEntry &a, const CommandLogEntr
 void CommandLogModel::append(const CommandLogEntry &entry)
 {
 	if(!m_uri.isEmpty() && entry.uri != m_uri) {
+		return;
+	}
+	const QString name = commandName(entry);
+	m_seen.insert(name);
+	if(m_excluded.contains(name)) {
 		return;
 	}
 	m_entries.append(entry);
