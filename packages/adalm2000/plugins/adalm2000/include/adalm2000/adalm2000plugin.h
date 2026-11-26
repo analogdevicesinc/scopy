@@ -41,6 +41,8 @@ namespace scopy::adalm2000 {
 class Adalm2000Logic_API;
 class Adalm2000Spectrum_API;
 class M2kLogicController;
+class M2kOscController;
+class Adalm2000Osc_API;
 class M2kSpectrumController;
 
 class SCOPY_ADALM2000_EXPORT Adalm2000Plugin : public QObject, public PluginBase
@@ -77,6 +79,8 @@ private:
 	Adalm2000Spectrum_API *m_spectrumApi = nullptr;
 	M2kLogicController *m_logic = nullptr;
 	Adalm2000Logic_API *m_logicApi = nullptr;
+	M2kOscController *m_osc = nullptr;
+	Adalm2000Osc_API *m_oscApi = nullptr;
 	component::ContextHandle m_context;
 };
 

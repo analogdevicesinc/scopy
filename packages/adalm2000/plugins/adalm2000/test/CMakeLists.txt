@@ -41,6 +41,7 @@ macro(add_adalm2000_unit_test name)
 			${CMAKE_CURRENT_SOURCE_DIR}/../include/${SCOPY_MODULE}/digitalio
 			${CMAKE_CURRENT_SOURCE_DIR}/../include/${SCOPY_MODULE}/spectrum
 			${CMAKE_CURRENT_SOURCE_DIR}/../include/${SCOPY_MODULE}/logic
+			${CMAKE_CURRENT_SOURCE_DIR}/../include/${SCOPY_MODULE}/oscilloscope
 	)
 	target_link_libraries(
 		${_t}
@@ -75,6 +76,8 @@ add_adalm2000_unit_test(m2ktriggermath ../include/adalm2000/m2kBackend/m2ktrigge
 add_adalm2000_unit_test(spectrumsweep)
 
 add_adalm2000_unit_test(sweepmath ../include/adalm2000/sweepmath.h)
+
+add_adalm2000_unit_test(oscmath ../include/adalm2000/oscilloscope/oscmath.h)
 
 setup_scopy_tests(pluginloader)
 

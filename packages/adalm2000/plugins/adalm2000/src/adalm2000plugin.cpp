@@ -23,6 +23,8 @@
 #include "digitalio/adalm2000digitaliotool.h"
 #include "logic/adalm2000logic_api.h"
 #include "logic/m2klogiccontroller.h"
+#include "oscilloscope/adalm2000osc_api.h"
+#include "oscilloscope/m2kosccontroller.h"
 #include "powersupply/adalm2000powersupplytool.h"
 #include "spectrum/adalm2000spectrum_api.h"
 #include "spectrum/m2kspectrumcontroller.h"
@@ -51,7 +53,7 @@ Q_LOGGING_CATEGORY(CAT_ADALM2000PLUGIN, "Adalm2000Plugin")
 // The Power Supply is absent on purpose: its rails are enabled individually from its
 // settings menu, so it has no run button for a ToolMenuEntry run state to mirror.
 static const QStringList RUN_CAPABLE_TOOL_IDS = {"adalm2000_dmm", "adalm2000_dio", "adalm2000_spectrum",
-						 "adalm2000_logic"};
+						 "adalm2000_logic", "adalm2000_osc"};
 
 using namespace scopy;
 using namespace scopy::adalm2000;
@@ -107,6 +109,9 @@ void Adalm2000Plugin::loadToolList()
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("adalm2000_logic", "Logic Analyzer",
 						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
 							  "/icons/tool_logic_analyzer.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("adalm2000_osc", "Oscilloscope",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_oscilloscope.svg"));
 #ifdef ADALM2000_DEVTEST
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("adalm2000_devtest", "Dev Test (throwaway)",
 						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
@@ -158,9 +163,16 @@ bool Adalm2000Plugin::onConnect()
 	m_logicApi = new Adalm2000Logic_API(m_logic);
 	m_logicApi->setObjectName("logic");
 	ScopyJS::GetInstance()->registerApi(m_logicApi);
+
+	m_osc = new M2kOscController(m_toolList[5], qobject_cast<M2kContext *>(m_context.get()), m_param, this);
+	m_toolList[5]->setTool(m_osc->ui());
+	m_osc->init(m_context.get());
+	m_oscApi = new Adalm2000Osc_API(m_osc);
+	m_oscApi->setObjectName("osc");
+	ScopyJS::GetInstance()->registerApi(m_oscApi);
 #ifdef ADALM2000_DEVTEST
 	auto *devTestTool = new Adalm2000DevTestTool(m_context.get());
-	m_toolList[5]->setTool(devTestTool);
+	m_toolList[6]->setTool(devTestTool);
 #endif
 
 	for(auto &entry : m_toolList) {
@@ -236,6 +248,16 @@ bool Adalm2000Plugin::onDisconnect()
 		delete m_logic;
 		m_logic = nullptr;
 	}
+	if(m_oscApi) {
+		ScopyJS::GetInstance()->unregisterApi(m_oscApi);
+		delete m_oscApi;
+		m_oscApi = nullptr;
+	}
+	if(m_osc) {
+		m_toolList[5]->setTool(nullptr);
+		delete m_osc;
+		m_osc = nullptr;
+	}
 
 	disconnect(m_calibrateConn);
 	disconnect(m_calibrationStartedConn);
@@ -272,6 +294,9 @@ void Adalm2000Plugin::saveSettings(QSettings &s)
 	if(m_logicApi) {
 		m_logicApi->save(s);
 	}
+	if(m_oscApi) {
+		m_oscApi->save(s);
+	}
 }
 
 void Adalm2000Plugin::loadSettings(QSettings &s)
@@ -281,6 +306,9 @@ void Adalm2000Plugin::loadSettings(QSettings &s)
 	}
 	if(m_logicApi) {
 		m_logicApi->load(s);
+	}
+	if(m_oscApi) {
+		m_oscApi->load(s);
 	}
 }
 

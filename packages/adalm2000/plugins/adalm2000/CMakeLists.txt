@@ -60,6 +60,8 @@ file(
 	src/spectrum/*.cc
 	src/logic/*.cpp
 	src/logic/*.cc
+	src/oscilloscope/*.cpp
+	src/oscilloscope/*.cc
 )
 file(
 	GLOB
@@ -78,6 +80,8 @@ file(
 	include/${SCOPY_MODULE}/spectrum/*.hpp
 	include/${SCOPY_MODULE}/logic/*.h
 	include/${SCOPY_MODULE}/logic/*.hpp
+	include/${SCOPY_MODULE}/oscilloscope/*.h
+	include/${SCOPY_MODULE}/oscilloscope/*.hpp
 )
 
 set(ENABLE_TESTING ON)
@@ -110,6 +114,7 @@ set(INCLUDE_DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/digitalio
     ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/spectrum
     ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/logic
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/oscilloscope
 )
 
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
