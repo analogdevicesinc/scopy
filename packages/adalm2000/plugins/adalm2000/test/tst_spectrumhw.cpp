@@ -26,7 +26,7 @@
 
 #include "adalm2000spectrum_api.h"
 #include "m2kspectrumcontroller.h"
-#include "m2kanaloginsource.h"
+#include "m2ksource.h"
 #include "m2kcomponentbuilder.h"
 #include "m2kcontext.h"
 #include "m2kcontextfactory.h"
@@ -136,8 +136,9 @@ private Q_SLOTS:
 		auto *dev =
 			m_ctx->findChild<component::Device *>(QStringLiteral("analog-in"), Qt::FindDirectChildrenOnly);
 		auto attr = [dev](int ch, const char *name) {
-			QObject *node = ch < 0 ? static_cast<QObject *>(dev)
-					       : component::channelById(dev, M2kAnalogInSource::channelId(ch), false);
+			QObject *node = ch < 0
+				? static_cast<QObject *>(dev)
+				: component::channelById(dev, M2kSource::channelId(M2kSource::Analog, ch), false);
 			return component::attributeByName(node, QString::fromLatin1(name));
 		};
 		auto read = [](component::Attribute *a) {

@@ -58,6 +58,8 @@ file(
 	src/digitalio/*.cc
 	src/spectrum/*.cpp
 	src/spectrum/*.cc
+	src/logic/*.cpp
+	src/logic/*.cc
 )
 file(
 	GLOB
@@ -74,6 +76,8 @@ file(
 	include/${SCOPY_MODULE}/digitalio/*.hpp
 	include/${SCOPY_MODULE}/spectrum/*.h
 	include/${SCOPY_MODULE}/spectrum/*.hpp
+	include/${SCOPY_MODULE}/logic/*.h
+	include/${SCOPY_MODULE}/logic/*.hpp
 )
 
 set(ENABLE_TESTING ON)
@@ -105,6 +109,7 @@ set(INCLUDE_DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/powersupply
     ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/digitalio
     ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/spectrum
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/logic
 )
 
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)

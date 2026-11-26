@@ -23,9 +23,7 @@
 
 #include "spectrumsweep.h"
 
-#include <core/acq_ui/acqinstrumentcontroller.h>
-
-#include <pluginbase/resourcemanager.h>
+#include "m2kinstrumentcontroller.h"
 
 #include <QElapsedTimer>
 #include <QList>
@@ -42,7 +40,6 @@ class QTimer;
 namespace scopy {
 class DockWrapperInterface;
 class MarkerPanel;
-class SemiExclusiveButtonGroup;
 class MenuOnOffSwitch;
 class MenuCombo;
 class MenuControlButton;
@@ -66,10 +63,10 @@ class AcqPlot;
 } // namespace scopy
 
 namespace scopy::adalm2000 {
-class M2kAnalogInSource;
+class M2kSource;
 class M2kContext;
 
-class M2kSpectrumController : public scopy::adc::AcqInstrumentController, public scopy::ResourceUser
+class M2kSpectrumController : public M2kInstrumentController
 {
 	Q_OBJECT
 public:
@@ -77,8 +74,6 @@ public:
 
 	M2kSpectrumController(ToolMenuEntry *tme, M2kContext *ctx, const QString &uri, QObject *parent = nullptr);
 	~M2kSpectrumController() override;
-
-	void stop() override;
 
 	void setChannelEnabled(int ch, bool on);
 	void snapshot(int ch);
@@ -118,6 +113,8 @@ private:
 		QPointer<MenuCombo> range;
 	};
 
+	double sampleRate() const { return spec::MAX_SAMPLE_RATE / m_oversampling; }
+	void setOversampling(int ratio);
 	void setupCenter();
 	void setupChannelRows();
 	void setupTopRail();
@@ -126,8 +123,6 @@ private:
 	QWidget *buildGeneralPage();
 	QWidget *buildMarkersPage();
 	QWidget *buildCursorsPage();
-	void addHoverButton(const QString &label, QWidget *content);
-	void setupCalibrationGate();
 
 	QList<scopy::adc::AcqCurveChannel *> curves() const;
 	QList<scopy::adc::AcqChannel *> allChannels() const;
@@ -152,7 +147,7 @@ private:
 	void refreshSelectedMarker();
 	void updateProgress();
 	void restartIfRunning(const std::function<void()> &change);
-	void updateRunEnabled();
+	void updateRunEnabled() override;
 
 	void addReference(const QString &name, const scopy::acq::DataKey &key, const scopy::acq::DataKey &xKey,
 			  int size, const std::function<void()> &drop);
@@ -161,19 +156,11 @@ private:
 	void exportCsv();
 	void saveCsv(const QList<QPair<QString, scopy::acq::DataKey>> &columns, const scopy::acq::DataKey &xKey);
 
-	bool claim();
-	void release();
-
 	int bins() const { return spec::bins(m_fftSize); }
 	QString unitSymbol() const;
 
-	M2kContext *m_ctx{nullptr};
-	const QString m_resourceKey;
-	bool m_claimed{false};
-	bool m_pingPaused{false};
-	bool m_calibrating{false};
-
-	M2kAnalogInSource *m_source{nullptr};
+	M2kSource *m_source{nullptr};
+	int m_oversampling{0};
 	scopy::acq::GenalyzerFFTProcessor *m_fft[CHANNELS]{};
 	scopy::acq::SpectrumProcessor *m_spectrum[CHANNELS]{};
 
@@ -184,7 +171,6 @@ private:
 	scopy::adc::AcqChannel *m_waterfall{nullptr};
 	scopy::adc::AcqMarkerController *m_markers[CHANNELS]{};
 	QPointer<MarkerPanel> m_markerPanel;
-	SemiExclusiveButtonGroup *m_hoverGroup{nullptr};
 	QList<Reference> m_refs;
 	scopy::acq::SnapshotSource *m_snap{nullptr};
 	scopy::adc::FileSourceBlock *m_file{nullptr};

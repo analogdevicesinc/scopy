@@ -21,9 +21,9 @@
 
 #include "m2kspectrumcontroller.h"
 
-#include "m2kanaloginsource.h"
-#include "m2kcalibration.h"
+#include "m2kcomponentbuilder.h"
 #include "m2kcontext.h"
+#include "m2ksource.h"
 
 #include <core/acq_engine/acquisitionengine.h>
 #include <core/acq_engine/datastore.h>
@@ -38,8 +38,6 @@
 #include <core/acq_ui/acqwaterfallchannel.h>
 #include <core/acq_ui/filesourceblock.h>
 
-#include <component/ping.h>
-
 #include <gui/cursorcontroller.h>
 #include <gui/filemanager.h>
 #include <gui/docking/dockablearea.h>
@@ -51,11 +49,9 @@
 #include <gui/plotnavigator.hpp>
 #include <gui/plotwidget.h>
 #include <gui/printplotmanager.h>
-#include <gui/semiexclusivebuttongroup.h>
 #include <gui/style.h>
 #include <gui/waterfallplotwidget.h>
 #include <gui/widgets/cursorsettings.h>
-#include <gui/widgets/hoverwidget.h>
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menucombo.h>
 #include <gui/widgets/menucontrolbutton.h>
@@ -65,6 +61,9 @@
 #include <gui/widgets/menuspinbox.h>
 #include <gui/widgets/toolbuttons.h>
 #include <pluginbase/statusbarmanager.h>
+
+#include <component/channel.h>
+#include <component/device.h>
 
 #include <QAbstractButton>
 #include <QDesktopServices>
@@ -98,7 +97,7 @@ const QString kChannelsGroup = QStringLiteral("Channels");
 const QString kReferencesGroup = QStringLiteral("References");
 
 constexpr int kFrameIntervalMs = 16;
-constexpr int kMaxFps = 60;
+constexpr unsigned kKernelBuffers = 4;
 constexpr double kDbRange = 200.0;
 // Top/bottom limits around the default dB view, and the input range for linear volts
 constexpr double kDbMargin = 50.0;
@@ -139,21 +138,13 @@ gui::MenuSpinbox *hzSpin(const QString &name, double v, double min, QWidget *par
 } // namespace
 
 M2kSpectrumController::M2kSpectrumController(ToolMenuEntry *tme, M2kContext *ctx, const QString &uri, QObject *parent)
-	: AcqInstrumentController(tme, parent)
-	, m_ctx(ctx)
-	, m_resourceKey(QStringLiteral("adalm2000-adc:") + uri)
+	: M2kInstrumentController(tme, ctx, QStringLiteral("adalm2000-adc:") + uri, tr("Spectrum Analyzer"), parent)
 	, m_fftSize(spec::fftSizes().at(spec::DEFAULT_FFT_INDEX))
-{
-	m_ui->setRunGuard([this]() { return claim(); });
-	m_ui->setBufferControlVisible(false);
-	m_ui->engine()->setMaxFPS(kMaxFps);
-	m_ui->shell()->setTargetFps(kMaxFps);
-}
+{}
 
 M2kSpectrumController::~M2kSpectrumController()
 {
 	AcqInstrumentController::stop();
-	release();
 	for(scopy::adc::AcqCurveChannel *c : m_curve) {
 		delete c;
 	}
@@ -162,12 +153,14 @@ M2kSpectrumController::~M2kSpectrumController()
 
 DataKey M2kSpectrumController::spectrumKey(int ch)
 {
-	return DataKey::withStage(QStringLiteral("spectrum"), M2kAnalogInSource::channelId(ch), QStringLiteral("mag"));
+	return DataKey::withStage(QStringLiteral("spectrum"), M2kSource::channelId(M2kSource::Analog, ch),
+				  QStringLiteral("mag"));
 }
 
 DataKey M2kSpectrumController::freqKey(int ch)
 {
-	return DataKey::withStage(QStringLiteral("fft"), M2kAnalogInSource::channelId(ch), QStringLiteral("freq"));
+	return DataKey::withStage(QStringLiteral("fft"), M2kSource::channelId(M2kSource::Analog, ch),
+				  QStringLiteral("freq"));
 }
 
 void M2kSpectrumController::setupBlocks(scopy::component::Context *ctx)
@@ -179,22 +172,52 @@ void M2kSpectrumController::setupBlocks(scopy::component::Context *ctx)
 	it->addChannelGroup(kGeneralGroup);
 	it->addChannelGroup(kChannelsGroup);
 
-	m_source = new M2kAnalogInSource(m_ctx, engine);
+	m_source = new M2kSource(m_ctx, QStringLiteral("m2k"), engine);
 	engine->addSource(m_source);
 	m_file = new scopy::adc::FileSourceBlock(QStringLiteral("import"), engine);
 	engine->addSource(m_file);
 	m_ui->setBufferSize(m_fftSize);
-	m_source->setOversampling(spec::oversamplingFor(m_span.stop));
+
+	component::Device *dev = m_source->device(M2kSource::Analog);
+	m_source->setAnalogUnit(M2kSource::FullScale);
+	m_source->setKernelBuffers(M2kSource::Analog, kKernelBuffers);
+	m_source->set(dev, "sample_rate", QString::number(spec::MAX_SAMPLE_RATE, 'g', 12), M2kSource::Reopen);
+	setOversampling(spec::oversamplingFor(m_span.stop));
+	// Another tool may have left an external or digital source, which would stall every refill
+	m_source->set(dev, "trigger_source", QStringLiteral("CHANNEL_1"));
+	// The trigger is shared with the other analog-in tools, so it is put back as it was
+	m_source->restoreOnStop(dev, "trigger_source");
+	for(int ch = 0; ch < CHANNELS; ++ch) {
+		component::Channel *chan = m_source->channel(M2kSource::Analog, ch);
+		m_source->enableChannel(M2kSource::channelId(M2kSource::Analog, ch), true);
+		m_source->set(chan, "range", QLatin1String(PLUS_25V), M2kSource::Restart);
+		m_source->set(chan, "vertical_offset", QStringLiteral("0"));
+		m_source->set(chan, "trigger_mode", QStringLiteral("ALWAYS"));
+		m_source->restoreOnStop(chan, "trigger_mode");
+		m_source->watch(chan, "scaling_factor");
+	}
+}
+
+void M2kSpectrumController::setOversampling(int ratio)
+{
+	ratio = std::max(1, ratio);
+	if(ratio == m_oversampling) {
+		return;
+	}
+	m_oversampling = ratio;
+	m_source->set(m_source->device(M2kSource::Analog), "oversampling_ratio", QString::number(ratio),
+		      M2kSource::Reopen);
 }
 
 void M2kSpectrumController::setupProcessors()
 {
 	scopy::acq::AcquisitionEngine *engine = m_ui->engine();
 	for(int ch = 0; ch < CHANNELS; ++ch) {
-		const DataKey dbKey = DataKey::withStage(QStringLiteral("fft"), M2kAnalogInSource::channelId(ch),
-							 QStringLiteral("db"));
-		m_fft[ch] = new scopy::acq::GenalyzerFFTProcessor(m_source->rawKey(ch), dbKey, freqKey(ch), m_fftSize,
-								  m_source->sampleRate(), GnWindowHann, engine);
+		const DataKey dbKey = DataKey::withStage(
+			QStringLiteral("fft"), M2kSource::channelId(M2kSource::Analog, ch), QStringLiteral("db"));
+		m_fft[ch] = new scopy::acq::GenalyzerFFTProcessor(m_source->rawKey(M2kSource::Analog, ch), dbKey,
+								  freqKey(ch), m_fftSize, sampleRate(), GnWindowHann,
+								  engine);
 		m_fft[ch]->setAveragingStore(m_ui->store());
 		engine->addProcessor(m_fft[ch]);
 
@@ -203,10 +226,13 @@ void M2kSpectrumController::setupProcessors()
 		engine->addProcessor(m_spectrum[ch]);
 
 		connect(
-			m_source, &M2kAnalogInSource::fullScaleChanged, m_spectrum[ch],
-			[proc = m_spectrum[ch], ch](int c, double v) {
-				if(c == ch) {
-					proc->setFullScaleVolts(v);
+			m_source, &M2kSource::attributeRead, m_spectrum[ch],
+			[proc = m_spectrum[ch], chan = m_source->channel(M2kSource::Analog, ch)](
+				QObject *node, const QByteArray &attr, const QString &value) {
+				bool ok = false;
+				const double lsb = value.toDouble(&ok);
+				if(node == chan && attr == "scaling_factor" && ok) {
+					proc->setFullScaleVolts(lsb * spec::FULL_SCALE_COUNTS);
 				}
 			},
 			Qt::DirectConnection);
@@ -243,7 +269,7 @@ void M2kSpectrumController::setupPlots()
 	connect(m_ui, &scopy::adc::AcqInstrument::started, this, &M2kSpectrumController::onStarted);
 	connect(m_ui, &scopy::adc::AcqInstrument::cycleComplete, this, &M2kSpectrumController::onCycleComplete);
 	connect(m_ui, &scopy::adc::AcqInstrument::stopped, this, &M2kSpectrumController::onStopped);
-	connect(m_source, &M2kAnalogInSource::sampleRateChanged, this, [this]() {
+	connect(m_source, &M2kSource::sampleRateChanged, this, [this]() {
 		m_xPending = true;
 		refreshSweepReadouts();
 	});
@@ -252,33 +278,6 @@ void M2kSpectrumController::setupPlots()
 	setSpan(m_span);
 	onUnitsChanged(0);
 	general->click();
-}
-
-void M2kSpectrumController::addHoverButton(const QString &label, QWidget *content)
-{
-	InstrumentTemplate *it = m_ui->shell();
-	auto *btn = new QPushButton(label, it);
-	btn->setCheckable(true);
-	Style::setStyle(btn, style::properties::button::blueGrayButton);
-	Style::setStyle(btn, style::properties::label::menuMedium);
-	it->tool()->addWidgetToBottomContainerHelper(btn, TTA_RIGHT);
-	if(!m_hoverGroup) {
-		m_hoverGroup = new SemiExclusiveButtonGroup(this);
-	}
-	m_hoverGroup->addButton(btn);
-
-	content->setMinimumWidth(Style::getDimension(json::global::unit_6) * 2 +
-				 Style::getDimension(json::global::unit_4));
-	Style::setBackgroundColor(content, json::theme::background_primary);
-	auto *hover = new HoverWidget(content, btn, it);
-	hover->setStyleSheet(QStringLiteral("scopy--HoverWidget { background-color: transparent; }"));
-	hover->setAnchorPos(HP_TOPRIGHT);
-	hover->setContentPos(HP_TOPLEFT);
-	hover->setVisible(false);
-	connect(btn, &QAbstractButton::toggled, hover, [hover](bool on) {
-		hover->setVisible(on);
-		hover->raise();
-	});
 }
 
 void M2kSpectrumController::setupCenter()
@@ -537,8 +536,10 @@ QWidget *M2kSpectrumController::buildChannelPage(int ch)
 	connect(windowCombo->combo(), &QComboBox::currentIndexChanged, this, [this, ch, windowCombo](int i) {
 		m_fft[ch]->setWindow(static_cast<GnWindow>(windowCombo->combo()->itemData(i).toInt()));
 	});
-	connect(rangeCombo->combo(), &QComboBox::currentIndexChanged, this,
-		[this, ch](int i) { m_source->setLowRange(ch, i == 1); });
+	connect(rangeCombo->combo(), &QComboBox::currentIndexChanged, this, [this, ch](int i) {
+		m_source->set(m_source->channel(M2kSource::Analog, ch), "range",
+			      QLatin1String(i == 1 ? PLUS_2_5V : PLUS_25V), M2kSource::Restart);
+	});
 	connect(snap, &QPushButton::clicked, this, [this, ch]() { snapshot(ch); });
 	return page(section);
 }
@@ -567,7 +568,7 @@ QWidget *M2kSpectrumController::buildGeneralPage()
 	lay->addWidget(freq);
 	connect(m_logSwitch->onOffswitch(), &QAbstractButton::toggled, this, &M2kSpectrumController::setLogFrequency);
 
-	auto minSpan = [this]() { return spec::minSpan(m_source->sampleRate(), m_fftSize); };
+	auto minSpan = [this]() { return spec::minSpan(sampleRate(), m_fftSize); };
 	connect(m_startSpin, &gui::MenuSpinbox::valueChanged, this,
 		[this, minSpan](double v) { setSpan(spec::withStart(m_span, v, minSpan())); });
 	connect(m_stopSpin, &gui::MenuSpinbox::valueChanged, this,
@@ -710,24 +711,6 @@ QWidget *M2kSpectrumController::buildCursorsPage()
 	return page(section);
 }
 
-void M2kSpectrumController::setupCalibrationGate()
-{
-	auto *calibration = m_ctx ? m_ctx->findChild<M2kCalibration *>() : nullptr;
-	if(!calibration) {
-		return;
-	}
-	auto gate = [this](bool calibrating) {
-		m_calibrating = calibrating;
-		if(calibrating) {
-			AcqInstrumentController::stop();
-		}
-		updateRunEnabled();
-	};
-	connect(calibration, &M2kCalibration::started, this, [gate]() { gate(true); });
-	connect(calibration, &M2kCalibration::finished, this, [gate](bool) { gate(false); });
-	gate(calibration->isRunning());
-}
-
 void M2kSpectrumController::onStarted()
 {
 	for(scopy::adc::AcqChannel *c : allChannels()) {
@@ -742,7 +725,7 @@ void M2kSpectrumController::onStarted()
 
 void M2kSpectrumController::updateProgress()
 {
-	const double period = m_fftSize / m_source->sampleRate();
+	const double period = m_fftSize / sampleRate();
 	m_progressLabel->setVisible(period >= 0.5);
 	const int pct = std::min(99, static_cast<int>(100.0 * m_cycleClock.elapsed() / (period * 1000.0)));
 	m_progressLabel->setText(tr("Acquiring: %1 %").arg(pct));
@@ -780,9 +763,6 @@ void M2kSpectrumController::onStopped()
 	}
 	m_specPlot->replot();
 	m_wfPlot->replot();
-	if(!m_ui->engine()->isRunning()) {
-		release();
-	}
 }
 
 void M2kSpectrumController::restartIfRunning(const std::function<void()> &change)
@@ -802,7 +782,7 @@ void M2kSpectrumController::setChannelEnabled(int ch, bool on) { m_chRow[ch]->ch
 void M2kSpectrumController::applyChannelEnabled(int ch, bool on)
 {
 	m_chEnabled[ch] = on;
-	m_source->enableChannel(M2kAnalogInSource::channelId(ch), on);
+	m_source->enableChannel(M2kSource::channelId(M2kSource::Analog, ch), on);
 	m_fft[ch]->setEnabled(on);
 	m_spectrum[ch]->setEnabled(on);
 	m_curve[ch]->setEnabled(on);
@@ -836,7 +816,7 @@ void M2kSpectrumController::setSpan(const spec::Span &s)
 	m_centerSpin->setValueSilent(s.center());
 	m_spanSpin->setValueSilent(s.width());
 
-	m_source->setOversampling(spec::oversamplingFor(s.stop));
+	setOversampling(spec::oversamplingFor(s.stop));
 	applyXRange();
 	m_xPending = true;
 	refreshSweepReadouts();
@@ -845,7 +825,7 @@ void M2kSpectrumController::setSpan(const spec::Span &s)
 
 void M2kSpectrumController::applyXRange()
 {
-	const double firstBin = spec::rbw(m_source->sampleRate(), m_fftSize);
+	const double firstBin = spec::rbw(sampleRate(), m_fftSize);
 	const double start = m_logX ? std::max(m_span.start, firstBin) : m_span.start;
 	for(scopy::adc::AcqCurveChannel *c : curves()) {
 		c->xAxis()->plotAxis()->setLogScale(m_logX);
@@ -885,7 +865,7 @@ void M2kSpectrumController::refreshSweepReadouts()
 	if(!m_rbwCombo || !m_rateLabel) {
 		return;
 	}
-	const double sr = m_source->sampleRate();
+	const double sr = sampleRate();
 	MetricPrefixFormatter fmt;
 	{
 		QSignalBlocker b(m_rbwCombo->combo());
@@ -1238,45 +1218,6 @@ void M2kSpectrumController::saveCsv(const QList<QPair<QString, DataKey>> &column
 	}
 	out.flush();
 	FileManagerHelper::saveDataToFile(m_ui, csv, tr("Export spectrum"));
-}
-
-bool M2kSpectrumController::claim()
-{
-	if(m_calibrating) {
-		StatusBarManager::pushMessage(tr("Spectrum Analyzer: wait for calibration to finish"));
-		return false;
-	}
-	if(!m_claimed) {
-		ResourceManager::open(m_resourceKey, this, true);
-		m_claimed = true;
-	}
-	if(auto *ping = m_ctx ? m_ctx->findChild<component::Ping *>(QString(), Qt::FindDirectChildrenOnly) : nullptr) {
-		if(ping->isMonitoring()) {
-			ping->stopMonitoring();
-			m_pingPaused = true;
-		}
-	}
-	return true;
-}
-
-void M2kSpectrumController::release()
-{
-	if(m_claimed) {
-		m_claimed = false;
-		ResourceManager::close(m_resourceKey);
-	}
-	if(m_pingPaused && m_ctx) {
-		m_pingPaused = false;
-		if(auto *ping = m_ctx->findChild<component::Ping *>(QString(), Qt::FindDirectChildrenOnly)) {
-			ping->startMonitoring();
-		}
-	}
-}
-
-void M2kSpectrumController::stop()
-{
-	m_claimed = false;
-	AcqInstrumentController::stop();
 }
 
 #include "moc_m2kspectrumcontroller.cpp"

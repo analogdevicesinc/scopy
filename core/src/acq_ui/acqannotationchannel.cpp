@@ -106,6 +106,7 @@ void AcqAnnotationChannel::attachTo(AcqPlot *plot)
 
 	PlotAxis *x = xAxis() ? xAxis()->plotAxis() : m_plot->xAxis();
 	m_item = new AnnotationCurve(name(), x, digAxis, m_handle.data());
+	m_item->setXTransform(m_xOffset, m_xScale);
 	m_item->attach(m_plot->plot());
 
 	// Required for the hover tooltips below: without tracking, Qt delivers MouseMove only
@@ -175,10 +176,13 @@ void AcqAnnotationChannel::readData(scopy::acq::DataStore *store, int plotSize)
 
 	// Before the read, for the same reason as AcqDigitalChannel::readData: the range is
 	// the plot window, so a cycle with no annotations to draw must still rescale. The
-	// source is pinned to the sample index, so there is no scale factor and no X array
-	// to take the range from — plotSize is the whole answer.
+	// source is pinned to the sample index, so there is no X array to take the range
+	// from — plotSize and the x transform are the whole answer.
 	if(xAxis()) {
-		xAxis()->requestInterval(0.0, static_cast<double>(qMax(1, plotSize) - 1));
+		// A transformed axis spans the window's duration, so a time axis divides into round
+		// values; the sample index ends on the last sample.
+		const int span = m_xTransformed ? qMax(1, plotSize) : qMax(1, plotSize) - 1;
+		xAxis()->requestInterval(m_xOffset, m_xOffset + span * m_xScale);
 	}
 
 	// Narrowing to the annotation alternative is the check for "this key is not an annotation
@@ -208,6 +212,20 @@ void AcqAnnotationChannel::readData(scopy::acq::DataStore *store, int plotSize)
 	m_item->setSampleCount(static_cast<quint64>(qMax(1, plotSize)));
 	m_item->setAnnotations(spans);
 }
+
+void AcqAnnotationChannel::setXTransform(double offset, double scale)
+{
+	m_xOffset = offset;
+	m_xScale = scale;
+	m_xTransformed = true;
+	if(m_item && !m_plot.isNull()) {
+		m_item->setXTransform(offset, scale);
+	}
+}
+
+PlotAxisHandle *AcqAnnotationChannel::handle() const { return m_handle.data(); }
+
+int AcqAnnotationChannel::rowCount() const { return m_item && !m_plot.isNull() ? m_item->rowCount() : 0; }
 
 void AcqAnnotationChannel::reset()
 {
