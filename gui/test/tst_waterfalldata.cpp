@@ -55,6 +55,7 @@ private Q_SLOTS:
 	void snapshotDropsRowsBeyondMaxRows();
 	void snapshotAcceptsRaggedRows();
 	void valueRejectsOutOfRange();
+	void rowPeriodScalesTime();
 };
 
 namespace {
@@ -369,6 +370,26 @@ void TST_WaterfallData::valueRejectsOutOfRange()
 	// Plot width or height of zero really does reach here.
 	QCOMPARE(d.value(qQNaN(), 0.0), -DBL_MAX);
 	QCOMPARE(d.value(0.0, qInf()), -DBL_MAX);
+}
+
+void TST_WaterfallData::rowPeriodScalesTime()
+{
+	WaterfallData d;
+	setup(d, 4);
+	append(d, 1);
+	append(d, 2);
+	append(d, 3);
+	d.setRowPeriod(0.5);
+
+	// Y is seconds back from the newest row, so row r of n sits (n - 1 - r) periods down
+	QCOMPARE(d.value(xOfBin(0), 0.0), 300.0);
+	QCOMPARE(d.value(xOfBin(0), 0.5), 200.0);
+	QCOMPARE(d.value(xOfBin(0), 1.0), 100.0);
+	QCOMPARE(d.interval(Qt::YAxis).minValue(), 2.0);
+	QCOMPARE(d.interval(Qt::YAxis).maxValue(), 0.0);
+	// A non-positive period would divide by zero in value(), so it is ignored
+	d.setRowPeriod(0.0);
+	QCOMPARE(d.rowPeriod(), 0.5);
 }
 
 QTEST_GUILESS_MAIN(TST_WaterfallData)

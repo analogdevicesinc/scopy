@@ -26,6 +26,7 @@
 #include <QFileDialog>
 #include <QTextStream>
 #include <pluginbase/preferences.h>
+#include <pluginbase/statusbarmanager.h>
 
 #include <common/common.h>
 #include <common/scopy-common_config.h>
@@ -498,12 +499,17 @@ bool FileManagerHelper::saveDataToFile(QWidget *parent, const QString &data, con
 
 	QFile file(filePath);
 	if(!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-		qWarning() << "FileManagerHelper: Failed to open file for writing:" << filePath;
+		// On the status bar, so a failed export is not mistaken for a saved one
+		StatusBarManager::pushMessage(QObject::tr("Could not write %1: %2").arg(filePath, file.errorString()));
 		return false;
 	}
 
 	QTextStream out(&file);
 	out << data;
 	file.close();
+	if(file.error() != QFileDevice::NoError) {
+		StatusBarManager::pushMessage(QObject::tr("Could not write %1: %2").arg(filePath, file.errorString()));
+		return false;
+	}
 	return true;
 }

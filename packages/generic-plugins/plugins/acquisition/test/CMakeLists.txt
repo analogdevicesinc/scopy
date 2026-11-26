@@ -22,32 +22,3 @@ cmake_minimum_required(VERSION 3.16)
 include(ScopyTest)
 
 setup_scopy_tests(pluginloader)
-
-# Compiled into the test rather than linked: the plugin is built with hidden visibility.
-set(ACQ_TEST_SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/acqannotationchannel.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/acqaxis.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/acqchannel.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/acqchannelregistry.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/acqcurvechannel.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/acqdigitalchannel.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/acqplot.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/acqplotkind.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/acqplotmanager.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/acqplotrail.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/acqtriggermarkerview.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/acqwaterfallchannel.cpp
-)
-add_executable(${PROJECT_NAME}_test_acqchanneldelete tst_acqchanneldelete.cpp ${ACQ_TEST_SRC})
-add_test(NAME ${PROJECT_NAME}_test_acqchanneldelete COMMAND ${PROJECT_NAME}_test_acqchanneldelete)
-target_include_directories(
-	${PROJECT_NAME}_test_acqchanneldelete PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src
-						      ${CMAKE_CURRENT_SOURCE_DIR}/../include/${SCOPY_MODULE}
-)
-target_link_libraries(
-	${PROJECT_NAME}_test_acqchanneldelete
-	Qt${QT_VERSION_MAJOR}::Test
-	scopy-gui
-	scopy-core
-	scopy-pluginbase
-)

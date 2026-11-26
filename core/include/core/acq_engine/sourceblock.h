@@ -41,7 +41,12 @@ namespace acq {
 // acquire(), acquire() per cycle, onStop() once done. A source enabled or added
 // mid-run is started at the next cycle boundary; one disabled or removed is
 // stopped there. Throwing from any of them aborts the run and surfaces as a
-// Critical report.
+// Critical report, prefixed with the phase ("onStart(): ...").
+//
+// Errors must stay explicit down to the backend: when a component call fails, put
+// the step (device/attribute = value) and error().errorString() in the message,
+// never collapse its Result to a bool. Non-fatal problems go through report() or
+// reportOnce(); qWarning() only reaches the console, not the tool's log.
 //
 // The channel map is shared with the GUI thread, so acquire() must go through
 // enabledChannels() rather than touch it directly; the returned list is a
@@ -53,14 +58,6 @@ public:
 	explicit SourceBlock(const QString &id, QObject *parent = nullptr);
 
 	virtual void acquire(DataStore *store) = 0;
-
-	// False when this source's device is not present in the context it was
-	// built against: absent, not failed. A source needing no device never
-	// overrides this. Asked on the GUI thread right after construction, so a
-	// host can build every source it knows of and keep the ones that answer
-	// true — which means an implementation must be safe to call before
-	// onStart() has run.
-	virtual bool isAvailable() const { return true; }
 
 	// Acquire and release device resources. Overrides must call the base.
 	virtual void onStart();

@@ -22,7 +22,14 @@ cmake_minimum_required(VERSION 3.16)
 
 include(ScopyTest)
 
-setup_scopy_tests(pluginmanager pluginrepository)
+setup_scopy_tests(
+	pluginmanager
+	pluginrepository
+	acqchanneldelete
+	spectrumprocessor
+	acqmarkercontroller
+	acquisitionerrors
+)
 
 # test_translationsrepository
 if(ENABLE_TRANSLATION)

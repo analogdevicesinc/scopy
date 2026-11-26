@@ -321,8 +321,12 @@ void PlotWidget::setupAxes()
 	m_plot->setAxisVisible(QwtAxis::YLeft, false);
 	m_plot->setAxisVisible(QwtAxis::XBottom, false);
 
-	m_xPosition = Preferences::get("adc_plot_xaxis_label_position").toInt();
-	m_yPosition = Preferences::get("adc_plot_yaxis_label_position").toInt();
+	// Only the ADC plugin registers these, so without it they are unset, and reading 0
+	// would put the X axis on the left on top of Y
+	const QVariant xPos = Preferences::get("adc_plot_xaxis_label_position");
+	const QVariant yPos = Preferences::get("adc_plot_yaxis_label_position");
+	m_xPosition = xPos.isValid() ? xPos.toInt() : QwtAxis::XBottom;
+	m_yPosition = yPos.isValid() ? yPos.toInt() : QwtAxis::YLeft;
 	QPen pen(QColor(Style::getAttribute(json::theme::content_subtle)));
 	m_xAxis = new PlotAxis(m_xPosition, this, pen, this);
 	m_yAxis = new PlotAxis(m_yPosition, this, pen, this);

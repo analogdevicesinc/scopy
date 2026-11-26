@@ -21,8 +21,8 @@
 
 #include "acquisition.h"
 
-#include "acqinstrument.h"
-#include "acqinstrumentcontroller.h"
+#include <core/acq_ui/acqinstrument.h>
+#include <core/acq_ui/acqinstrumentcontroller.h>
 #include "acquisition_api.h"
 #include "acquisitioninfopage.h"
 #include "scopy-acquisition_config.h"

@@ -22,9 +22,72 @@
 #include "menuspinbox.h"
 #include <style.h>
 #include <stylehelper.h>
+#include <algorithm>
+#include <QPainter>
+#include <QWheelEvent>
+#include <QtMath>
 
 namespace scopy {
 namespace gui {
+
+MenuSpinboxCircle::MenuSpinboxCircle(QWidget *parent)
+	: QAbstractButton(parent)
+{
+	setCheckable(true);
+	setFocusPolicy(Qt::NoFocus);
+	setCursor(Qt::PointingHandCursor);
+	setToolTip(tr("Click to toggle fine adjustment"));
+}
+
+void MenuSpinboxCircle::setRatio(double ratio)
+{
+	m_ratio = ratio;
+	update();
+}
+
+void MenuSpinboxCircle::paintEvent(QPaintEvent *)
+{
+	const double penWidth = 3;
+	const double d = qMin(width(), height()) - penWidth;
+	const QRectF ring((width() - d) / 2, (height() - d) / 2, d, d);
+	const QColor rail = Style::getColor(json::theme::interactive_subtle_idle);
+	const QColor fill = Style::getColor(isEnabled() ? json::theme::interactive_primary_idle
+							: json::theme::interactive_primary_disabled);
+
+	QPainter p(this);
+	p.setRenderHint(QPainter::Antialiasing);
+	p.setPen(QPen(rail, penWidth));
+	p.drawEllipse(ring);
+
+	// clockwise from 12 o'clock
+	p.setPen(QPen(fill, penWidth, Qt::SolidLine, Qt::FlatCap));
+	p.drawArc(ring, 90 * 16, qRound(-m_ratio * 360 * 16));
+
+	// Tick inside the ring at the arc's end
+	const double angle = qDegreesToRadians(90 - m_ratio * 360);
+	const QPointF dir(std::cos(angle), -std::sin(angle));
+	const double r = d / 2;
+	p.setPen(QPen(Style::getColor(isEnabled() ? json::theme::interactive_accent_idle : json::theme::content_silent),
+		      2, Qt::SolidLine, Qt::RoundCap));
+	p.drawLine(ring.center() + dir * r * 0.5, ring.center() + dir * r * 0.75);
+
+	const double dot = d / 8;
+	p.setPen(Qt::NoPen);
+	p.setBrush(isChecked() ? fill : rail);
+	p.drawEllipse(ring.center(), dot, dot);
+}
+
+void MenuSpinboxCircle::wheelEvent(QWheelEvent *e)
+{
+	// Accumulate so a high resolution touchpad steps once per notch, not per event
+	m_wheelDelta += e->angleDelta().y();
+	const int steps = m_wheelDelta / QWheelEvent::DefaultDeltasPerStep;
+	m_wheelDelta -= steps * QWheelEvent::DefaultDeltasPerStep;
+	for(int i = 0; i < qAbs(steps); i++) {
+		Q_EMIT stepped(steps > 0);
+	}
+	e->accept();
+}
 
 MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, double max, bool vertical, bool left,
 			 bool large_widget, QWidget *parent)
@@ -43,6 +106,8 @@ MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, dou
 	m_scaleCb = new QComboBox(parent);
 	m_plus = new QPushButton("", parent);
 	m_minus = new QPushButton("", parent);
+	m_circle = new MenuSpinboxCircle(this);
+	m_circle->setVisible(false);
 	m_mouseWheelGuard = new MouseWheelWidgetGuard(this);
 
 	m_plus->setAutoRepeat(true);
@@ -63,6 +128,8 @@ MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, dou
 
 	connect(m_plus, &QAbstractButton::clicked, this, &MenuSpinbox::incrementValue);
 	connect(m_minus, &QAbstractButton::clicked, this, &MenuSpinbox::decrementValue);
+	connect(m_circle, &MenuSpinboxCircle::stepped, this,
+		[this](bool up) { up ? incrementValue() : decrementValue(); });
 
 	connect(m_edit, &QLineEdit::editingFinished, this, [this]() { userInput(m_edit->text()); });
 
@@ -88,6 +155,7 @@ MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, dou
 	setScaleRange(m_scaleMin, m_scaleMax);
 	setValue(val);
 	m_scalingEnabled = true;
+	m_incrementStrategy->setScale(stepScale());
 	m_mouseWheelGuard->installEventRecursively(this);
 }
 
@@ -127,12 +195,18 @@ void MenuSpinbox::layoutVertically(bool left)
 
 	editLay->addWidget(m_scaleCb);
 
+	auto circleLay = new QVBoxLayout();
+	circleLay->setContentsMargins(left ? 0 : 5, 0, left ? 5 : 0, 0);
+	circleLay->addWidget(m_circle, 0, Qt::AlignVCenter);
+
 	if(left) {
+		lay->addLayout(circleLay);
 		lay->addLayout(btnLay);
 		lay->addLayout(editLay);
 	} else {
 		lay->addLayout(editLay);
 		lay->addLayout(btnLay);
+		lay->addLayout(circleLay);
 	}
 
 	Style::setStyle(m_scaleCb, style::properties::widget::noBorder);
@@ -146,6 +220,10 @@ void MenuSpinbox::layoutVertically(bool left)
 	m_minus->setIcon(Style::getPixmap(":/gui/icons/minus.svg", Style::getColor(json::theme::content_inverse)));
 	Style::setStyle(m_minus, style::properties::button::spinboxButton);
 	m_minus->setFixedSize(size, size);
+
+	int circleSize =
+		m_large_widget ? Style::getDimension(json::global::unit_4) : Style::getDimension(json::global::unit_2);
+	m_circle->setFixedSize(circleSize, circleSize);
 
 	if(!m_large_widget) {
 		int icon_size = Style::getDimension(json::global::unit_0_5);
@@ -178,8 +256,14 @@ void MenuSpinbox::layoutHorizontally(bool left)
 	editLay->setSpacing(8);
 	editLay->setContentsMargins(0, 0, 5, 0);
 
+	if(left) {
+		btnLay->addWidget(m_circle);
+	}
 	btnLay->addWidget(m_minus);
 	btnLay->addWidget(m_plus);
+	if(!left) {
+		btnLay->addWidget(m_circle);
+	}
 
 	editLay->addWidget(m_label);
 	editLay->addWidget(m_infoIcon);
@@ -206,6 +290,7 @@ void MenuSpinbox::layoutHorizontally(bool left)
 	m_minus->setIcon(Style::getPixmap(":/gui/icons/minus.svg", Style::getColor(json::theme::content_inverse)));
 	Style::setStyle(m_minus, style::properties::button::spinboxButton);
 	m_minus->setFixedSize(size, size);
+	m_circle->setFixedSize(size, size);
 }
 
 double MenuSpinbox::value() const { return m_value; }
@@ -216,6 +301,7 @@ void MenuSpinbox::setValueSilent(double newValue)
 {
 	m_value = clamp(newValue, m_min, m_max);
 	populateWidgets();
+	updateCircle();
 }
 
 void MenuSpinbox::setValueForce(double newValue, bool force)
@@ -244,9 +330,17 @@ void MenuSpinbox::setUnit(const QString &newUnit)
 	Q_EMIT unitChanged(newUnit);
 }
 
-void MenuSpinbox::setMinValue(double min) { m_min = min; }
+void MenuSpinbox::setMinValue(double min)
+{
+	m_min = min;
+	updateCircle();
+}
 
-void MenuSpinbox::setMaxValue(double max) { m_max = max; }
+void MenuSpinbox::setMaxValue(double max)
+{
+	m_max = max;
+	updateCircle();
+}
 
 IncrementStrategy *MenuSpinbox::incrementStrategy() const { return m_incrementStrategy; }
 
@@ -270,20 +364,54 @@ void MenuSpinbox::setIncrementMode(IncrementMode im)
 		m_incrementStrategy = new IncrementStrategyFixed();
 		break;
 	}
-	m_incrementStrategy->setScale(m_scaleCb->currentData().toDouble());
+	m_incrementStrategy->setScale(stepScale());
+	updateCircle();
 }
 
 void MenuSpinbox::setScalingEnabled(bool en)
 {
 	m_scalingEnabled = en;
 	m_scaleCb->setVisible(en);
+	m_incrementStrategy->setScale(stepScale());
 }
+
+// Without prefixes the value is shown and stepped in plain units
+double MenuSpinbox::stepScale() const { return m_scalingEnabled ? m_scaleCb->currentData().toDouble() : 1.0; }
 
 void MenuSpinbox::setScaleList(QList<UnitPrefix> scales)
 {
 	m_scales.clear();
 	m_scales = scales;
 	setScaleRange(m_min, m_max);
+}
+
+void MenuSpinbox::setCircleEnabled(bool en)
+{
+	m_circle->setVisible(en);
+	if(!en) {
+		m_circle->setChecked(false);
+	}
+}
+
+void MenuSpinbox::setCircleLogFloor(double floor)
+{
+	m_circleLogFloor = floor;
+	updateCircle();
+}
+
+void MenuSpinbox::updateCircle()
+{
+	double ratio = 0.0;
+	if(m_im == IS_125) {
+		// Log scale spreads the 1-2-5 decades evenly
+		const double lo = m_min > 0 ? m_min : m_circleLogFloor;
+		if(lo > 0 && m_max > lo) {
+			ratio = std::log(std::clamp(m_value, lo, m_max) / lo) / std::log(m_max / lo);
+		}
+	} else if(m_max > m_min) {
+		ratio = std::clamp((m_value - m_min) / (m_max - m_min), 0.0, 1.0);
+	}
+	m_circle->setRatio(ratio);
 }
 
 void MenuSpinbox::userInput(QString s)
@@ -379,7 +507,7 @@ void MenuSpinbox::setScaleRange(double min, double max)
 			m_scaleCb->addItem(m_scales[i].prefix + m_unit, scale);
 		}
 	}
-	m_incrementStrategy->setScale(m_scaleCb->currentData().toDouble());
+	m_incrementStrategy->setScale(stepScale());
 }
 
 void MenuSpinbox::enableRangeLimits(bool en)
@@ -427,14 +555,28 @@ double MenuSpinbox::clamp(double val, double min, double max)
 	return val;
 }
 
+double MenuSpinbox::nextValue(bool up) const
+{
+	if(!m_circle->isChecked()) {
+		return up ? m_incrementStrategy->increment(m_value) : m_incrementStrategy->decrement(m_value);
+	}
+	// Fine mode steps by one unit of the shown prefix, or a tenth of a fixed step
+	double step = stepScale();
+	if(m_im == IS_FIXED) {
+		step *= static_cast<IncrementStrategyFixed *>(m_incrementStrategy)->k() / 10;
+	}
+	const double val = m_value + (up ? step : -step);
+	// Drop the residue of repeated decimal steps so zero lands on zero
+	return std::abs(val) < step * 1e-9 ? 0.0 : val;
+}
+
 void MenuSpinbox::incrementValue()
 {
-	if(qFuzzyCompare(m_value, 0.0)) {
+	if(!m_circle->isChecked() && qFuzzyCompare(m_value, 0.0)) {
 		// On increment from zero, set to 1 * current scale
-		double scale = m_scaleCb->itemData(m_scaleCb->currentIndex()).toDouble();
-		setValue(1 * scale);
+		setValue(stepScale());
 	} else {
-		setValue(m_incrementStrategy->increment(m_value));
+		setValue(nextValue(true));
 	}
 }
 
@@ -464,12 +606,12 @@ void MenuSpinbox::decrementValue()
 	double rolled = 0.0;
 
 	if(qFuzzyCompare(m_value, 0.0)) {
-		setValue(prefixRollDown(&rolled) ? rolled : m_incrementStrategy->decrement(m_value));
+		setValue(prefixRollDown(&rolled) ? rolled : nextValue(false));
 		return;
 	}
 
 	// If decrement would result in 0 and there is a lower scale, scale down instead
-	const double newValue = m_incrementStrategy->decrement(m_value);
+	const double newValue = nextValue(false);
 	if(qFuzzyCompare(newValue, 0.0) && prefixRollDown(&rolled)) {
 		setValue(rolled);
 		return;
