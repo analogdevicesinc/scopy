@@ -1,0 +1,8 @@
+/* A scroll bar that stays grabbable on very long lists: the theme's bar (width included), with a
+   minimum handle length (without it the handle shrinks to a pixel on a million rows). */
+QScrollBar[&&property&&=true]::handle:vertical {
+	min-height: &unit_3&;
+}
+QScrollBar[&&property&&=true]::handle:horizontal {
+	min-width: &unit_3&;
+}

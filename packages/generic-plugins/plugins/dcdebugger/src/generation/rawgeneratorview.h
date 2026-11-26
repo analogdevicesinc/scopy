@@ -32,10 +32,11 @@
 
 class QLabel;
 class QPushButton;
+class QTableView;
 class QTimer;
 
 namespace scopy {
-class MenuCombo;
+class MenuLineEdit;
 class MenuOnOffSwitch;
 class PlotChannel;
 class PlotWidget;
@@ -51,68 +52,71 @@ class OutputStream;
 } // namespace scopy::component
 
 namespace scopy::dcdebugger {
+class SampleTableModel;
 class SideSplitter;
 
-// Simplified Generator tab of an OutputStream, in raw codes: every member channel gets its own
-// tone (waveform, periods per buffer, amplitude / offset in codes, phase), and every setting is in
-// the right menu (Output, then one section per channel). The preview plots one buffer against the
-// sample index, with a legend. One sample-rate control is applied to every member channel; it only
-// sets the playback speed (the tone frequency shown is periods * rate / samples).
+// Simplified Generator tab of an OutputStream: the buffer is a table of raw codes (one column per
+// member channel, one row per sample), edited in place, copied / pasted as spreadsheet cells or
+// loaded from a CSV / text file; it is pushed as it is (clamped to each channel's code range).
+// Preview of the buffer against the sample index above the table, with a legend. Run and the
+// settings gear in the top bar; the settings menu: Samples (load a file, its path, the row count),
+// then Output (sample rate for every member, cyclic).
 class SCOPY_DCDEBUGGER_EXPORT RawGeneratorView : public QWidget
 {
 	Q_OBJECT
 public:
-	static constexpr int DefaultPeriods = 8;
-	static constexpr double DefaultAmplitude = 1024;
+	static constexpr int DefaultRows = 1024;
 
 	explicit RawGeneratorView(component::OutputStream *stream, QWidget *parent = nullptr);
 	~RawGeneratorView() override;
 
 	StreamGeneration *generation() const { return m_gen; }
 	PlotWidget *plot() const { return m_plot; }
+	SampleTableModel *samples() const { return m_model; }
+	QTableView *table() const { return m_table; }
 
 public Q_SLOTS:
-	// Applies the menu values to the generation now (they are otherwise applied shortly after a
-	// change).
+	// Applies the table to the generation now (it is otherwise applied shortly after a change).
 	void apply();
+	// Column k of the file feeds channel k; false (status set) when it cannot be read.
+	bool loadFile(const QString &path);
+	// The clipboard (spreadsheet cells: tab separated) written from the current cell on.
+	void pasteClipboard();
+	// The selected cells (a range, whole rows or whole columns) to the clipboard, tab separated.
+	void copySelection();
 
 private:
-	struct ChannelControls
-	{
-		QString id;
-		MenuCombo *waveform = nullptr;
-		gui::MenuSpinbox *periods = nullptr;
-		gui::MenuSpinbox *amplitude = nullptr;
-		gui::MenuSpinbox *offset = nullptr;
-		gui::MenuSpinbox *phase = nullptr;
-		QLabel *frequency = nullptr;
-	};
-
-	QWidget *buildSettings(QWidget *parent);
-	QWidget *buildOutputSection(QWidget *parent);
-	QWidget *buildChannelSection(ChannelControls &ctrl, int index, const ToneSpec &tone, QWidget *parent);
+	QWidget *buildMenu(QWidget *parent);
+	QWidget *buildSettingsSection(QWidget *parent);
+	QWidget *buildSamplesSection(QWidget *parent);
 	void buildPreview();
+	void buildTable();
 	void placeLegend();
+	// The row numbers' header as wide as the largest one.
+	void fitRowHeader();
 	void scheduleApply();
 	void updatePreview();
-	void updateFrequencies();
+	void loadFromDialog();
 	void onRunningChanged(bool running);
 	void setStatus(const QString &text, bool error = false);
-	double sampleRate() const;
 
 	QPointer<component::OutputStream> m_stream;
 	StreamGeneration *m_gen;
 	QList<component::Attribute *> m_sampleRateAttrs;
+	QStringList m_ids; // member channel ids, in table column order
 
 	ToolTemplate *m_tool;
 	SideSplitter *m_sides;
 	QPushButton *m_runBtn;
+	QPushButton *m_loadBtn;
+	MenuLineEdit *m_path = nullptr;
 	QLabel *m_status;
-	gui::MenuSpinbox *m_samples = nullptr;
+	gui::MenuSpinbox *m_rows = nullptr;
 	MenuOnOffSwitch *m_cyclic = nullptr;
-	QList<ChannelControls> m_channels;
 	PlotWidget *m_plot = nullptr;
 	QMap<QString, PlotChannel *> m_plotChannels;
+	SampleTableModel *m_model = nullptr;
+	QTableView *m_table = nullptr;
 	QTimer *m_applyTimer;
 };
 

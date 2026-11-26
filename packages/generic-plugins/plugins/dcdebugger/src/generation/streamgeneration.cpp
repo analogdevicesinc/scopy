@@ -97,6 +97,13 @@ void StreamGeneration::setSampleRate(double fs)
 	reconfigure(m_cyclic);
 }
 
+void StreamGeneration::setRawSamples(const QHash<QString, QVector<double>> &samples)
+{
+	m_rawSamples = samples;
+	// A cyclic buffer replays what was pushed: new values need a new buffer.
+	reconfigure(m_cyclic);
+}
+
 void StreamGeneration::setRawMode(bool raw)
 {
 	if(raw == m_raw) {
@@ -247,16 +254,23 @@ void StreamGeneration::fillAndPush()
 	// Each writeFormat() entry names the member channel it describes by streamIndex. The
 	// backend may enable more channels than requested: those without an enabled tone get 0.
 	int ch = 0;
+	m_clipped = 0;
 	for(; ch < writer.channelCount(); ++ch) {
 		const Channel *member = m_stream->channelAt(fmt.channels.at(ch).streamIndex);
 		ToneSpec tone = member ? m_tones.value(member->id()) : ToneSpec{};
 		QVector<double> v(samples, 0.0);
 		if(m_raw) {
-			if(member && tone.enabled) {
+			if(member && m_rawSamples.contains(member->id())) {
+				const QVector<double> &given = m_rawSamples[member->id()];
+				std::copy_n(given.cbegin(), std::min(int(given.size()), samples), v.begin());
+			} else if(member && tone.enabled) {
 				v = generateRawTone(tone, samples);
 			}
 			const auto [lo, hi] = codeRange(fmt.channels.at(ch));
 			for(int s = 0; s < v.size(); ++s) {
+				if(v[s] < lo || v[s] > hi) {
+					m_clipped++;
+				}
 				writer.setRaw(ch, size_t(s), int64_t(std::llround(std::clamp(v[s], lo, hi))));
 			}
 			continue;

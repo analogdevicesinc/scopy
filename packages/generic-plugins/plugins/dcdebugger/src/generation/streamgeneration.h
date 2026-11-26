@@ -67,6 +67,13 @@ public:
 	bool rawMode() const { return m_raw; }
 	void setRawMode(bool raw);
 
+	// Raw mode: the samples of each channel (by member id), pushed as they are instead of its tone
+	// (cut or 0-padded to samples()). Channels without samples keep their tone.
+	QHash<QString, QVector<double>> rawSamples() const { return m_rawSamples; }
+	void setRawSamples(const QHash<QString, QVector<double>> &samples);
+	// Samples clamped to their channel's code range in the last push.
+	quint64 clippedSamples() const { return m_clipped; }
+
 	// [min, max] code of a channel of the stream's write format.
 	static QPair<double, double> codeRange(const component::ChannelFormat &cf);
 
@@ -108,6 +115,8 @@ private:
 	double m_fs = 0;
 	bool m_cyclic = true;
 	bool m_raw = false;
+	QHash<QString, QVector<double>> m_rawSamples;
+	quint64 m_clipped = 0;
 
 	bool m_running = false;
 	bool m_stopRequested = false;

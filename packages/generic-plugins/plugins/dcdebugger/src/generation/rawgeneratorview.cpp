@@ -23,15 +23,29 @@
 
 #include "nodepanel.h"
 #include "readpolicy.h"
+#include "sampletable.h"
 #include "sidesplitter.h"
 #include "streamutils.h"
 
-#include <QComboBox>
+#include <QApplication>
+#include <QClipboard>
+#include <QFile>
+#include <QFileDialog>
+#include <QFileInfo>
+#include <QFontMetrics>
 #include <QGraphicsOpacityEffect>
+#include <QHBoxLayout>
+#include <QHeaderView>
+#include <QItemSelectionModel>
 #include <QLabel>
+#include <QLineEdit>
 #include <QPushButton>
 #include <QScrollArea>
+#include <QScrollBar>
+#include <QShortcut>
 #include <QSignalBlocker>
+#include <QSplitter>
+#include <QTableView>
 #include <QTimer>
 #include <QVBoxLayout>
 
@@ -47,7 +61,7 @@
 #include <hoverwidget.h>
 #include <iiowidget.h>
 #include <iiowidgetbuilder.h>
-#include <menucombo.h>
+#include <menulineedit.h>
 #include <menuonoffswitch.h>
 #include <menusectionwidget.h>
 #include <menuspinbox.h>
@@ -57,6 +71,7 @@
 #include <plotlegend.h>
 #include <plotnavigator.hpp>
 #include <plotwidget.h>
+#include <pluginbase/preferences.h>
 #include <pluginbase/statusbarmanager.h>
 #include <style.h>
 #include <stylehelper.h>
@@ -69,23 +84,7 @@ using namespace scopy::component;
 
 namespace {
 const char *const SETTINGS_KEY = "settings";
-// Codes reach 2^31 on 32-bit DACs; the code range is clamped when the buffer is written.
-constexpr double MaxCode = 2147483647.0;
-
-gui::MenuSpinbox *makeSpin(const QString &name, double value, const QString &unit, double min, double max, double step,
-			   QWidget *parent)
-{
-	auto *sb = new gui::MenuSpinbox(name, value, unit, min, max, true, false, false, parent);
-	sb->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
-	if(auto *fixed = dynamic_cast<gui::IncrementStrategyFixed *>(sb->incrementStrategy())) {
-		fixed->setK(step);
-	}
-	sb->setScalingEnabled(false);
-	// Hidden, the unit prefix still scales the step: unit only.
-	sb->setScaleList(QList<gui::UnitPrefix>{{QString(), 1.0}});
-	sb->setScaleRange(1, 1); // setScaleList keeps the scales inside [min, max]
-	return sb;
-}
+constexpr int MaxRows = 4 * 1024 * 1024;
 } // namespace
 
 RawGeneratorView::RawGeneratorView(OutputStream *stream, QWidget *parent)
@@ -96,16 +95,18 @@ RawGeneratorView::RawGeneratorView(OutputStream *stream, QWidget *parent)
 {
 	m_sampleRateAttrs = memberSampleRates(stream, true);
 	m_gen->setRawMode(true);
-	// Raw defaults: DefaultPeriods periods of DefaultAmplitude codes; the engine's 0 / 90 degree
-	// phases (an I/Q pair on quadrature DACs) are kept.
+	// Every member is pushed; a channel without table data would send 0 (a silent tone).
 	QHash<QString, ToneSpec> tones = m_gen->tones();
 	for(ToneSpec &t : tones) {
 		t.enabled = true;
-		t.frequency = DefaultPeriods;
-		t.amplitude = DefaultAmplitude;
+		t.waveform = Waveform::Constant;
+		t.amplitude = 0;
 		t.offset = 0;
 	}
 	m_gen->setTones(tones);
+	for(Channel *ch : m_gen->channels()) {
+		m_ids.append(ch->id());
+	}
 
 	m_applyTimer->setSingleShot(true);
 	m_applyTimer->setInterval(150);
@@ -120,13 +121,14 @@ RawGeneratorView::RawGeneratorView(OutputStream *stream, QWidget *parent)
 	m_tool->centralContainer()->setVisible(true);
 	m_tool->topContainerMenuControl()->setVisible(false);
 	lay->addWidget(m_tool);
-	// Preview | Settings menu (everything is in the menu: no channel list).
-	m_sides = new SideSplitter(0, 320, QStringLiteral("rawgenerator/sides"), this);
+	// Preview over table | Output menu.
+	m_sides = new SideSplitter(0, 300, QStringLiteral("rawgenerator/sides"), this);
 	m_tool->addWidgetToCentralContainerHelper(m_sides);
 
 	m_status = new QLabel("Stopped", this);
 	Style::setStyle(m_status, style::properties::label::subtle);
 	m_runBtn = new RunBtn(this);
+	m_runBtn->setObjectName("rawGeneratorRun");
 	m_runBtn->setText("Start");
 	disconnect(m_runBtn, &QPushButton::toggled, m_runBtn, nullptr); // RunBtn's own Run / Stop text
 	connect(m_runBtn, &QPushButton::toggled, m_runBtn,
@@ -139,8 +141,20 @@ RawGeneratorView::RawGeneratorView(OutputStream *stream, QWidget *parent)
 	connect(gearBtn, &QPushButton::toggled, m_sides, &SideSplitter::setRightOpen);
 	connect(m_sides, &SideSplitter::rightOpenChanged, gearBtn, &QAbstractButton::setChecked);
 
+	m_model = new SampleTableModel(m_ids, DefaultRows, this);
+	connect(m_model, &SampleTableModel::samplesChanged, this, &RawGeneratorView::scheduleApply);
+
+	auto *central = new QSplitter(Qt::Vertical, this);
+	central->setObjectName("rawGeneratorSplitter");
+	central->setChildrenCollapsible(true);
 	buildPreview();
-	m_sides->rightStack()->add(SETTINGS_KEY, buildSettings(this));
+	buildTable();
+	central->addWidget(m_plot);
+	central->addWidget(m_table);
+	central->setStretchFactor(0, 1);
+	central->setStretchFactor(1, 1);
+	m_sides->setCentralWidget(central);
+	m_sides->rightStack()->add(SETTINGS_KEY, buildMenu(this));
 	m_sides->rightStack()->show(SETTINGS_KEY);
 
 	connect(m_runBtn, &QPushButton::toggled, this, [this](bool on) {
@@ -153,19 +167,25 @@ RawGeneratorView::RawGeneratorView(OutputStream *stream, QWidget *parent)
 	});
 	connect(m_gen, &StreamGeneration::runningChanged, this, &RawGeneratorView::onRunningChanged);
 	connect(m_gen, &StreamGeneration::pushed, this, [this](int channels, quint64 samples, bool cyclic) {
-		setStatus(QStringLiteral("Running: %1 channel(s), %2 samples, %3")
-				  .arg(channels)
-				  .arg(samples)
-				  .arg(cyclic ? QStringLiteral("cyclic")
-					      : QStringLiteral("streaming (push %1)").arg(m_gen->pushes())));
+		const quint64 clipped = m_gen->clippedSamples();
+		setStatus(
+			QStringLiteral("Running: %1 channel(s), %2 samples, %3%4")
+				.arg(channels)
+				.arg(samples)
+				.arg(cyclic ? QStringLiteral("cyclic")
+					    : QStringLiteral("streaming (push %1)").arg(m_gen->pushes()))
+				.arg(clipped ? QStringLiteral(" · %1 sample(s) clipped to the code range").arg(clipped)
+					     : QString()),
+			clipped > 0);
 	});
 	connect(m_gen, &StreamGeneration::errorOccurred, this, [this](const QString &msg) {
 		setStatus(msg, true);
 		StatusBarManager::pushMessage("DC Debugger: " + msg, 5000);
 	});
-	if(m_gen->channels().isEmpty()) {
+	if(m_ids.isEmpty()) {
 		setStatus("This stream exposes no streamable channels.", true);
 		m_runBtn->setEnabled(false);
+		m_loadBtn->setEnabled(false);
 	}
 
 	apply();
@@ -173,7 +193,7 @@ RawGeneratorView::RawGeneratorView(OutputStream *stream, QWidget *parent)
 
 RawGeneratorView::~RawGeneratorView() = default;
 
-QWidget *RawGeneratorView::buildSettings(QWidget *parent)
+QWidget *RawGeneratorView::buildMenu(QWidget *parent)
 {
 	auto *scroll = new QScrollArea(parent);
 	scroll->setWidgetResizable(true);
@@ -184,28 +204,19 @@ QWidget *RawGeneratorView::buildSettings(QWidget *parent)
 	auto *outer = new QVBoxLayout(content);
 	outer->setContentsMargins(0, 0, 0, 0);
 	outer->setSpacing(10);
-	outer->addWidget(buildOutputSection(content));
-
-	const QList<Channel *> elems = m_gen->channels();
-	const QHash<QString, ToneSpec> tones = m_gen->tones();
-	for(int i = 0; i < elems.size(); ++i) {
-		ChannelControls ctrl;
-		ctrl.id = elems[i]->id();
-		outer->addWidget(buildChannelSection(ctrl, i, tones.value(ctrl.id), content));
-		m_channels.append(ctrl);
-	}
+	outer->addWidget(buildSamplesSection(content));
+	outer->addWidget(buildSettingsSection(content));
 	outer->addStretch();
-
-	// Scrolling the menu must not change the values under the cursor.
 	auto *guard = new MouseWheelWidgetGuard(content);
 	guard->installEventRecursively(content);
 	scroll->setWidget(content);
 	return scroll;
 }
 
-QWidget *RawGeneratorView::buildOutputSection(QWidget *parent)
+QWidget *RawGeneratorView::buildSettingsSection(QWidget *parent)
 {
 	MenuSectionCollapseWidget *section = makeSection("Output", parent);
+	section->setObjectName("rawGeneratorOutputSection");
 	QVBoxLayout *lay = section->contentLayout();
 	lay->setSpacing(8);
 	if(auto *dev = qobject_cast<Device *>(m_stream->parent())) {
@@ -216,14 +227,6 @@ QWidget *RawGeneratorView::buildOutputSection(QWidget *parent)
 		Style::setStyle(devLabel, style::properties::label::subtle);
 		lay->addWidget(devLabel);
 	}
-
-	m_samples = new gui::MenuSpinbox("Buffer samples", double(m_gen->samples()), "", 2, 4 * 1024 * 1024, true,
-					 false, false, section);
-	m_samples->setObjectName("rawGeneratorSamples");
-	m_samples->setIncrementMode(gui::MenuSpinbox::IS_POW2);
-	m_samples->setScalingEnabled(false);
-	connect(m_samples, &gui::MenuSpinbox::valueChanged, this, &RawGeneratorView::scheduleApply);
-	lay->addWidget(m_samples);
 
 	// One control for the stream: shows the first member's rate, a write is applied to every member.
 	if(Attribute *first = m_sampleRateAttrs.value(0)) {
@@ -236,7 +239,6 @@ QWidget *RawGeneratorView::buildOutputSection(QWidget *parent)
 			}
 		}
 		linkSampleRates(this, m_sampleRateAttrs, [this](const QString &msg) { setStatus(msg, true); });
-		connect(first, &Attribute::valueChanged, this, &RawGeneratorView::updateFrequencies);
 	}
 
 	m_cyclic = new MenuOnOffSwitch("Cyclic", section);
@@ -252,50 +254,80 @@ QWidget *RawGeneratorView::buildOutputSection(QWidget *parent)
 	return section;
 }
 
-QWidget *RawGeneratorView::buildChannelSection(ChannelControls &ctrl, int index, const ToneSpec &tone, QWidget *parent)
+QWidget *RawGeneratorView::buildSamplesSection(QWidget *parent)
 {
-	MenuSectionCollapseWidget *section = makeSection(streamChannelName(m_stream, ctrl.id, true), parent);
-	section->setObjectName("rawGeneratorChannel:" + ctrl.id);
+	MenuSectionCollapseWidget *section = makeSection("Samples", parent);
+	section->setObjectName("rawGeneratorSamplesSection");
 	QVBoxLayout *lay = section->contentLayout();
 	lay->setSpacing(8);
 
-	// The channel's curve color, so a section matches its curve in the preview and the legend.
-	auto *swatch = new QWidget(section);
-	swatch->setFixedHeight(3);
-	swatch->setStyleSheet(QStringLiteral("background-color: %1;").arg(StyleHelper::getChannelColor(index)));
-	lay->addWidget(swatch);
+	// A path typed (Enter) or picked with Load: CSV / text, one column per channel.
+	m_path = new MenuLineEdit(section);
+	m_path->setObjectName("rawGeneratorPath");
+	m_path->edit()->setPlaceholderText("Path to a CSV / text file");
+	m_path->setToolTip("One column per channel (raw codes); an optional header row and a leading "
+			   "\"sample\" column are skipped. Enter loads it.");
+	connect(m_path->edit(), &QLineEdit::returnPressed, this, [this]() {
+		const QString path = m_path->edit()->text().trimmed();
+		if(!path.isEmpty()) {
+			loadFile(path);
+		}
+	});
+	m_loadBtn = new QPushButton("Load", section);
+	m_loadBtn->setObjectName("rawGeneratorLoad");
+	m_loadBtn->setToolTip("Pick a file and load it");
+	Style::setStyle(m_loadBtn, style::properties::button::basicButton);
+	connect(m_loadBtn, &QPushButton::clicked, this, &RawGeneratorView::loadFromDialog);
+	auto *fileRow = new QHBoxLayout();
+	fileRow->setSpacing(6);
+	fileRow->addWidget(m_path, 1);
+	fileRow->addWidget(m_loadBtn);
+	lay->addLayout(fileRow);
 
-	ctrl.waveform = new MenuCombo("Waveform", section);
-	ctrl.waveform->combo()->setObjectName("rawGeneratorWaveform:" + ctrl.id);
-	ctrl.waveform->combo()->addItems(waveformNames());
-	ctrl.waveform->combo()->setCurrentIndex(int(tone.waveform));
-	const int maxP = maxPeriods(int(m_gen->samples()));
-	ctrl.periods = makeSpin("Periods", std::min<double>(tone.frequency, maxP), "", 0, maxP, 1, section);
-	ctrl.periods->setObjectName("rawGeneratorPeriods:" + ctrl.id);
-	ctrl.periods->setToolTip("Whole periods in one buffer (0: a constant level)");
-	ctrl.amplitude = makeSpin("Amplitude", tone.amplitude, "codes", 0, MaxCode, 64, section);
-	ctrl.amplitude->setObjectName("rawGeneratorAmplitude:" + ctrl.id);
-	ctrl.offset = makeSpin("Offset", tone.offset, "codes", -MaxCode, MaxCode, 64, section);
-	ctrl.offset->setObjectName("rawGeneratorOffset:" + ctrl.id);
-	ctrl.phase = makeSpin("Phase", tone.phase, "°", -360, 360, 15, section);
-	ctrl.phase->setObjectName("rawGeneratorPhase:" + ctrl.id);
-	ctrl.frequency = new QLabel(section);
-	ctrl.frequency->setObjectName("rawGeneratorFrequency:" + ctrl.id);
-	Style::setStyle(ctrl.frequency, style::properties::label::subtle);
-
-	lay->addWidget(ctrl.waveform);
-	lay->addWidget(ctrl.periods);
-	lay->addWidget(ctrl.amplitude);
-	lay->addWidget(ctrl.offset);
-	lay->addWidget(ctrl.phase);
-	lay->addWidget(ctrl.frequency);
-
-	connect(ctrl.waveform->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this,
-		&RawGeneratorView::scheduleApply);
-	for(gui::MenuSpinbox *sb : {ctrl.periods, ctrl.amplitude, ctrl.offset, ctrl.phase}) {
-		connect(sb, &gui::MenuSpinbox::valueChanged, this, &RawGeneratorView::scheduleApply);
-	}
+	// The buffer length is the number of rows: new rows are 0, dropped rows are lost.
+	m_rows = new gui::MenuSpinbox("Samples", m_model->rowCount(), "", 1, MaxRows, true, false, false, section);
+	m_rows->setObjectName("rawGeneratorRows");
+	m_rows->setIncrementMode(gui::MenuSpinbox::IS_POW2);
+	m_rows->setScalingEnabled(false);
+	m_rows->setToolTip("Rows of the table: the buffer length");
+	connect(m_rows, &gui::MenuSpinbox::valueChanged, this,
+		[this](double v) { m_model->setRows(int(std::clamp(v, 1.0, double(MaxRows)))); });
+	connect(m_model, &SampleTableModel::samplesChanged, this, [this]() {
+		if(int(m_rows->value()) != m_model->rowCount()) {
+			m_rows->setValueSilent(m_model->rowCount());
+		}
+	});
+	lay->addWidget(m_rows);
 	return section;
+}
+
+void RawGeneratorView::buildTable()
+{
+	m_table = new QTableView(this);
+	m_table->setObjectName("rawGeneratorTable");
+	m_table->setModel(m_model);
+	m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	m_table->verticalHeader()->setDefaultSectionSize(22);
+	m_table->setSelectionMode(QAbstractItemView::ContiguousSelection);
+	// A header click selects the whole row / column (for Ctrl+C).
+	m_table->horizontalHeader()->setSectionsClickable(true);
+	m_table->verticalHeader()->setSectionsClickable(true);
+	m_table->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::EditKeyPressed |
+				 QAbstractItemView::AnyKeyPressed);
+	m_table->setToolTip("Raw codes; double click to edit, Ctrl+C copies the selection, Ctrl+V pastes "
+			    "spreadsheet cells from the current one");
+	Style::setStyle(m_table, style::properties::widget::tableViewWidget);
+	// Scroll bars that stay grabbable on long tables.
+	Style::setStyle(m_table->verticalScrollBar(), style::properties::dcdebugger::grabScrollBar);
+	Style::setStyle(m_table->horizontalScrollBar(), style::properties::dcdebugger::grabScrollBar);
+	fitRowHeader();
+	connect(m_model, &SampleTableModel::modelReset, this, &RawGeneratorView::fitRowHeader);
+	auto *paste = new QShortcut(QKeySequence::Paste, m_table);
+	paste->setContext(Qt::WidgetWithChildrenShortcut);
+	connect(paste, &QShortcut::activated, this, &RawGeneratorView::pasteClipboard);
+	auto *copy = new QShortcut(QKeySequence::Copy, m_table);
+	copy->setContext(Qt::WidgetWithChildrenShortcut);
+	connect(copy, &QShortcut::activated, this, &RawGeneratorView::copySelection);
 }
 
 void RawGeneratorView::buildPreview()
@@ -308,20 +340,30 @@ void RawGeneratorView::buildPreview()
 	m_plot->setShowYAxisLabels(true);
 	m_plot->showAxisLabels();
 	m_plot->navigator()->setBounded(false);
-
-	const QList<Channel *> elems = m_gen->channels();
-	for(int c = 0; c < elems.size(); ++c) {
+	for(int c = 0; c < m_ids.size(); ++c) {
 		QPen pen(QColor(StyleHelper::getChannelColor(c)), 1);
-		auto *ch = new PlotChannel(streamChannelName(m_stream, elems[c]->id(), true), pen, m_plot->xAxis(),
+		auto *ch = new PlotChannel(streamChannelName(m_stream, m_ids[c], true), pen, m_plot->xAxis(),
 					   m_plot->yAxis(), m_plot);
 		m_plot->addPlotChannel(ch);
 		ch->enable();
-		m_plotChannels.insert(elems[c]->id(), ch);
+		m_plotChannels.insert(m_ids[c], ch);
 	}
 	auto *legend = new PlotLegend(m_plot, m_plot);
 	placeLegend();
-	legend->setVisible(!elems.isEmpty());
-	m_sides->setCentralWidget(m_plot);
+	legend->setVisible(!m_ids.isEmpty());
+}
+
+void RawGeneratorView::fitRowHeader()
+{
+	QHeaderView *header = m_table->verticalHeader();
+	const int last = std::max(0, m_model->rowCount() - 1);
+	const int digits = int(QString::number(last).size());
+	// The widest digit string of that length (bold, as a style may draw the sections), plus the
+	// section padding.
+	QFont font = header->font();
+	font.setBold(true);
+	const int text = QFontMetrics(font).horizontalAdvance(QString(digits, '0'));
+	header->setFixedWidth(text + 2 * 8 + 4);
 }
 
 void RawGeneratorView::placeLegend()
@@ -341,79 +383,119 @@ void RawGeneratorView::placeLegend()
 	}
 }
 
-double RawGeneratorView::sampleRate() const { return sampleRateOf(m_sampleRateAttrs.value(0)); }
-
 void RawGeneratorView::scheduleApply() { m_applyTimer->start(); }
 
 void RawGeneratorView::apply()
 {
 	m_applyTimer->stop();
-	const int samples = int(std::max(2.0, m_samples->value()));
-	const int maxP = maxPeriods(samples);
-	QHash<QString, ToneSpec> tones;
-	for(const ChannelControls &ctrl : std::as_const(m_channels)) {
-		ctrl.periods->setMaxValue(maxP);
-		ToneSpec t;
-		t.enabled = true;
-		t.waveform = Waveform(ctrl.waveform->combo()->currentIndex());
-		t.frequency = std::clamp(std::round(ctrl.periods->value()), 0.0, double(maxP));
-		if(t.frequency != ctrl.periods->value()) {
-			ctrl.periods->setValueSilent(t.frequency);
-		}
-		t.amplitude = ctrl.amplitude->value();
-		t.offset = ctrl.offset->value();
-		t.phase = ctrl.phase->value();
-		tones.insert(ctrl.id, t);
+	QHash<QString, QVector<double>> samples;
+	for(int c = 0; c < m_ids.size(); ++c) {
+		samples.insert(m_ids[c], m_model->column(c));
 	}
-	m_gen->setSamples(size_t(samples));
+	m_gen->setSamples(size_t(std::max(1, m_model->rowCount())));
 	m_gen->setCyclic(m_cyclic->onOffswitch()->isChecked());
-	m_gen->setTones(tones);
-	updateFrequencies();
+	m_gen->setRawSamples(samples);
 	updatePreview();
-}
-
-void RawGeneratorView::updateFrequencies()
-{
-	const double fs = sampleRate();
-	const double samples = double(m_gen->samples());
-	const QHash<QString, ToneSpec> tones = m_gen->tones();
-	for(const ChannelControls &ctrl : std::as_const(m_channels)) {
-		const double periods = tones.value(ctrl.id).frequency;
-		ctrl.frequency->setText(fs > 0 ? QStringLiteral("Tone: %1 Hz at %2 Hz sample rate")
-							 .arg(periods * fs / samples, 0, 'g', 6)
-							 .arg(fs, 0, 'g', 6)
-					       : QStringLiteral("Tone: %1 period(s) per buffer").arg(periods));
-	}
 }
 
 void RawGeneratorView::updatePreview()
 {
-	const int samples = int(m_gen->samples());
-	const QHash<QString, ToneSpec> tones = m_gen->tones();
-	QVector<float> x(samples);
-	for(int i = 0; i < samples; ++i) {
+	const int rows = m_model->rowCount();
+	QVector<float> x(rows);
+	for(int i = 0; i < rows; ++i) {
 		x[i] = float(i);
 	}
 	double ylo = std::numeric_limits<double>::max();
 	double yhi = std::numeric_limits<double>::lowest();
-	for(auto it = m_plotChannels.cbegin(); it != m_plotChannels.cend(); ++it) {
-		const QVector<double> v = generateRawTone(tones.value(it.key()), samples);
+	for(int c = 0; c < m_ids.size(); ++c) {
+		const QVector<double> &v = m_model->column(c);
 		QVector<float> y(v.size());
 		for(int i = 0; i < v.size(); ++i) {
 			y[i] = float(v[i]);
 			ylo = std::min(ylo, v[i]);
 			yhi = std::max(yhi, v[i]);
 		}
-		it.value()->setSamples(x.data(), y.data(), size_t(y.size()), true);
+		m_plotChannels.value(m_ids[c])->setSamples(x.data(), y.data(), size_t(y.size()), true);
 	}
 	if(!m_plot->navigator()->isZoomed()) {
-		m_plot->xAxis()->setInterval(0, samples);
+		m_plot->xAxis()->setInterval(0, std::max(1, rows));
 		if(ylo <= yhi) {
 			const double span = yhi > ylo ? yhi - ylo : std::max(1.0, std::abs(yhi));
 			m_plot->yAxis()->setInterval(ylo - span * 0.1, yhi + span * 0.1);
 		}
 	}
 	m_plot->replot();
+}
+
+bool RawGeneratorView::loadFile(const QString &path)
+{
+	QFile file(path);
+	if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		setStatus("Cannot open " + path + ": " + file.errorString(), true);
+		return false;
+	}
+	ParsedSamples parsed;
+	QString error;
+	if(!parseSamples(QString::fromUtf8(file.readAll()), parsed, &error)) {
+		setStatus(QFileInfo(path).fileName() + ": " + error, true);
+		return false;
+	}
+	if(parsed.rows() > MaxRows) {
+		setStatus(QStringLiteral("%1: %2 rows, at most %3")
+				  .arg(QFileInfo(path).fileName())
+				  .arg(parsed.rows())
+				  .arg(MaxRows),
+			  true);
+		return false;
+	}
+	m_model->setColumns(parsed.columns);
+	apply();
+	QString text = QStringLiteral("Loaded %1 sample(s) from %2").arg(parsed.rows()).arg(QFileInfo(path).fileName());
+	const int columns = int(parsed.columns.size());
+	if(columns > m_ids.size()) {
+		text += QStringLiteral(" · %1 extra column(s) ignored").arg(columns - m_ids.size());
+	} else if(columns < m_ids.size()) {
+		text += QStringLiteral(" · %1 set to 0").arg(QStringList(m_ids.mid(columns)).join(", "));
+	}
+	setStatus(text);
+	return true;
+}
+
+void RawGeneratorView::loadFromDialog()
+{
+	const bool native = Preferences::get("general_use_native_dialogs").toBool();
+	const QString path = QFileDialog::getOpenFileName(
+		this, "Load samples", QString(), "CSV / text (*.csv *.txt);;All files (*)", nullptr,
+		native ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog);
+	if(!path.isEmpty()) {
+		m_path->edit()->setText(path);
+		loadFile(path);
+	}
+}
+
+void RawGeneratorView::pasteClipboard()
+{
+	ParsedSamples parsed;
+	QString error;
+	if(!parseSamples(QApplication::clipboard()->text(), parsed, &error)) {
+		setStatus("Paste: " + error, true);
+		return;
+	}
+	const QModelIndex at = m_table->currentIndex();
+	m_model->paste(at.isValid() ? at.row() : 0, at.isValid() ? at.column() : 0, parsed.columns);
+	setStatus(QStringLiteral("Pasted %1 row(s) × %2 column(s)").arg(parsed.rows()).arg(parsed.columns.size()));
+}
+
+void RawGeneratorView::copySelection()
+{
+	// Contiguous selection: one range (cells, whole rows or whole columns).
+	const QItemSelection sel = m_table->selectionModel()->selection();
+	if(sel.isEmpty()) {
+		return;
+	}
+	const QItemSelectionRange &r = sel.first();
+	QApplication::clipboard()->setText(m_model->toTsv(r.top(), r.bottom(), r.left(), r.right()));
+	setStatus(QStringLiteral("Copied %1 row(s) × %2 column(s)").arg(r.height()).arg(r.width()));
 }
 
 void RawGeneratorView::onRunningChanged(bool running)
