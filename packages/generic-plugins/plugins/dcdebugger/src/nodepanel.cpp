@@ -166,13 +166,9 @@ NodePanel::NodePanel(QObject *node, NodeKind kind, const QString &title, const Q
 	auto *pathLay = new QHBoxLayout(pathRow);
 	pathLay->setContentsMargins(0, 0, 0, 0);
 	pathLay->setSpacing(6);
-	auto *titleLabel = new QLabel(title, header);
+	QString titleName = ComponentNode::kindName(kind) + ": " + title;
+	auto *titleLabel = new QLabel(titleName, header);
 	Style::setStyle(titleLabel, style::properties::label::menuBig);
-	auto *infoLabel = new QLabel(
-		ComponentNode::kindName(kind) +
-			(node && kind == NodeKind::Other ? " — " + ComponentNode::className(node) : QString()),
-		header);
-	Style::setStyle(infoLabel, style::properties::label::subtle);
 	auto *pathTitle = new PathTitle(path, pathRow);
 	connect(pathTitle, &PathTitle::pathSelected, this, &NodePanel::pathSelected);
 	pathLay->addWidget(pathTitle, 1, Qt::AlignVCenter);
@@ -188,7 +184,7 @@ NodePanel::NodePanel(QObject *node, NodeKind kind, const QString &title, const Q
 
 	headerLay->addWidget(pathRow);
 	headerLay->addWidget(titleLabel);
-	headerLay->addWidget(infoLabel);
+	// headerLay->addWidget(infoLabel);
 	lay->addWidget(header);
 
 	auto *scroll = new QScrollArea(this);

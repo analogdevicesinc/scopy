@@ -66,6 +66,7 @@ DCDebuggerTool::DCDebuggerTool(component::Connection *conn, QWidget *parent)
 	lay->setContentsMargins(0, 0, 0, 0);
 
 	m_tool = new ToolTemplate(this);
+	m_tool->layout()->setContentsMargins(0, 0, 0, 0);
 	m_tool->topContainer()->setVisible(false);
 	m_tool->topContainerMenuControl()->setVisible(false);
 	m_tool->bottomContainer()->setVisible(false);
@@ -77,6 +78,7 @@ DCDebuggerTool::DCDebuggerTool(component::Connection *conn, QWidget *parent)
 
 	// Both sides are SplitterPanes: the handle moves smoothly over the whole width.
 	auto *splitter = new QSplitter(Qt::Horizontal, this);
+	splitter->setContentsMargins(8, 8, 8, 8);
 	splitter->setChildrenCollapsible(true);
 	m_mainSplitter = splitter;
 
@@ -88,7 +90,6 @@ DCDebuggerTool::DCDebuggerTool(component::Connection *conn, QWidget *parent)
 	auto *panelLay = new QVBoxLayout(panelContainer);
 	panelLay->setContentsMargins(0, 0, 0, 0);
 	m_panels = new QStackedWidget(panelContainer);
-	Style::setStyle(m_panels, style::properties::dcdebugger::panelFrame);
 	m_emptyPanel = new QLabel("Select a node in the tree", m_panels);
 	static_cast<QLabel *>(m_emptyPanel)->setAlignment(Qt::AlignCenter);
 	Style::setStyle(m_emptyPanel, style::properties::label::subtle);
@@ -111,6 +112,7 @@ DCDebuggerTool::DCDebuggerTool(component::Connection *conn, QWidget *parent)
 	// Two pages: Explore (tree | node panel) and Trace (the command log of this connection, with
 	// its code generator).
 	m_log = new CommandLogView();
+	m_log->setContentsMargins(8, 8, 8, 8);
 	if(m_conn) {
 		m_log->setUri(m_conn->uri());
 		// Every view (context) of the connection shares this one monitor.

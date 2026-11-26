@@ -93,6 +93,7 @@ RawAcquisitionView::RawAcquisitionView(InputStream *stream, QWidget *parent)
 	lay->setContentsMargins(0, 0, 0, 0);
 	// ToolTemplate starts with every container hidden.
 	m_tool = new ToolTemplate(this);
+	m_tool->layout()->setContentsMargins(0, 0, 0, 0);
 	m_tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_tool->topContainer()->setVisible(true);
 	m_tool->centralContainer()->setVisible(true);

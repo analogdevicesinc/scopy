@@ -135,6 +135,7 @@ ChannelMonitorView::ChannelMonitorView(QObject *device, QWidget *parent)
 	auto *lay = new QVBoxLayout(this);
 	lay->setContentsMargins(0, 0, 0, 0);
 	m_tool = new ToolTemplate(this);
+	m_tool->layout()->setContentsMargins(0, 0, 0, 0);
 	m_tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_tool->topContainer()->setVisible(true);
 	m_tool->centralContainer()->setVisible(true);
