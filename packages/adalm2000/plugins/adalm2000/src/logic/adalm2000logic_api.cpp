@@ -70,19 +70,31 @@ void Adalm2000Logic_API::setRunning(bool on)
 	}
 }
 
-double Adalm2000Logic_API::sampleRate() const { return m_tool->m_sampleRate; }
+double Adalm2000Logic_API::sampleRate() const { return m_tool->m_sweep.sampleRate; }
 
-void Adalm2000Logic_API::setSampleRate(double hz) { m_tool->m_rateSpin->setValue(hz); }
+void Adalm2000Logic_API::setSampleRate(double hz)
+{
+	sweep::Sweep s = m_tool->m_sweep;
+	s.sampleRate = hz;
+	m_tool->setSweep(s);
+}
 
-int Adalm2000Logic_API::bufferSize() const { return m_tool->m_bufferSize; }
+int Adalm2000Logic_API::bufferSize() const { return m_tool->m_sweep.bufferSize; }
 
-void Adalm2000Logic_API::setBufferSize(int n) { m_tool->m_bufferSpin->setValue(n); }
+void Adalm2000Logic_API::setBufferSize(int n)
+{
+	m_tool->setSweep(sweep::withBuffer(m_tool->m_sweep, n, m_tool->m_limits));
+}
 
-int Adalm2000Logic_API::plotWindow() const { return m_tool->m_plotWindow; }
+int Adalm2000Logic_API::plotWindow() const { return m_tool->m_sweep.plotWindow; }
 
-void Adalm2000Logic_API::setPlotWindow(int n) { m_tool->m_windowSpin->setValue(n); }
+void Adalm2000Logic_API::setPlotWindow(int n)
+{
+	const sweep::Sweep &s = m_tool->m_sweep;
+	m_tool->setSweep(sweep::withWindow(s, s.bufferSize, n, m_tool->m_limits));
+}
 
-int Adalm2000Logic_API::delay() const { return m_tool->m_delay; }
+int Adalm2000Logic_API::delay() const { return m_tool->m_sweep.delay; }
 
 void Adalm2000Logic_API::setDelay(int samples) { m_tool->setDelay(samples); }
 
@@ -224,7 +236,7 @@ QList<int> Adalm2000Logic_API::samples(int pin) const
 		return out;
 	}
 	const QVector<quint8> bits = m_tool->ui()->store()->windowAs<QVector<quint8>>(
-		m_tool->m_source->rawKey(M2kSource::Digital, pin), m_tool->m_plotWindow);
+		m_tool->m_source->rawKey(M2kSource::Digital, pin), m_tool->m_sweep.plotWindow);
 	for(quint8 b : bits) {
 		out.append(b);
 	}

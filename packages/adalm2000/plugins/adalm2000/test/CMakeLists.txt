@@ -74,6 +74,8 @@ add_adalm2000_unit_test(m2ktriggermath ../include/adalm2000/m2kBackend/m2ktrigge
 
 add_adalm2000_unit_test(spectrumsweep)
 
+add_adalm2000_unit_test(sweepmath ../include/adalm2000/sweepmath.h)
+
 setup_scopy_tests(pluginloader)
 
 # End-to-end Spectrum Analyzer pipeline against a board or iio-emu; skipped unless M2K_URI is set. The backend and
@@ -109,8 +111,15 @@ file(
 	../src/m2kinstrumentcontroller.cpp
 	../src/uihelpers.cpp
 	../src/m2ksource.cpp
+	../src/horizontalsettings.cpp
 )
-file(GLOB LOGIC_HW_HDR ../include/${SCOPY_MODULE}/m2kBackend/*.h ../include/${SCOPY_MODULE}/logic/*.h)
+file(
+	GLOB
+	LOGIC_HW_HDR
+	../include/${SCOPY_MODULE}/m2kBackend/*.h
+	../include/${SCOPY_MODULE}/logic/*.h
+	../include/${SCOPY_MODULE}/horizontalsettings.h
+)
 add_adalm2000_unit_test(logichw ${LOGIC_HW_SRC} ${LOGIC_HW_HDR})
 # The plugin sources live inside this executable, so their export macro must not expand to dllimport on Windows.
 target_compile_definitions(${PROJECT_NAME}_test_logichw PRIVATE SCOPY_ADALM2000_STATIC_DEFINE)

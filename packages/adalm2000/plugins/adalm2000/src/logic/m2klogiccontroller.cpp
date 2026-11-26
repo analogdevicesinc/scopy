@@ -21,6 +21,7 @@
 
 #include "m2klogiccontroller.h"
 
+#include "horizontalsettings.h"
 #include "m2kattributeio.h"
 #include "m2kcontext.h"
 #include "m2ksource.h"
@@ -100,6 +101,7 @@ constexpr int kMaxBuffer = 1 << 20;
 constexpr int kMaxWindow = 1 << 22;
 constexpr int kDelayMin = trigger::DELAY_MIN;
 constexpr int kDelayMax = -trigger::DELAY_MIN - 1;
+constexpr int kTimeBaseSamples = 1 << 16;
 constexpr int kTrigDebounceMs = 300;
 constexpr int kTrigWaitMs = 250;
 constexpr double kMaxContinuousRate = 5e6;
@@ -138,20 +140,20 @@ MenuCombo *conditionCombo(const QString &label, QWidget *parent)
 	return combo;
 }
 
-gui::MenuSpinbox *samplesSpin(const QString &name, int value, int max, QWidget *parent)
-{
-	auto *s = new gui::MenuSpinbox(name, value, QStringLiteral("samples"), kMinSamples, max, true, false, true,
-				       parent);
-	s->setIncrementMode(gui::MenuSpinbox::IS_125);
-	s->setCircleEnabled(true);
-	return s;
-}
-
 } // namespace
 
 M2kLogicController::M2kLogicController(ToolMenuEntry *tme, M2kContext *ctx, const QString &uri, QObject *parent)
 	: M2kInstrumentController(tme, ctx, QStringLiteral("adalm2000-digital-in:") + uri, tr("Logic Analyzer"), parent)
-{}
+{
+	m_limits.rates = sweep::series125(1.0, kMaxSampleRate);
+	m_limits.minSamples = kMinSamples;
+	m_limits.maxBuffer = kMaxBuffer;
+	m_limits.maxWindow = kMaxWindow;
+	m_limits.timeBaseSamples = kTimeBaseSamples;
+	m_limits.delayMin = kDelayMin;
+	m_limits.delayMax = kDelayMax;
+	m_limits.triggerInBuffer = true;
+}
 
 M2kLogicController::~M2kLogicController()
 {
@@ -172,10 +174,10 @@ void M2kLogicController::setupBlocks(scopy::component::Context *ctx)
 
 	m_source = new M2kSource(m_ctx, QStringLiteral("logic"), m_ui->engine());
 	m_ui->engine()->addSource(m_source);
-	m_ui->setBufferSize(m_bufferSize);
+	m_ui->setBufferSize(m_sweep.bufferSize);
 
 	component::Device *dev = digital();
-	m_source->set(dev, "sample_rate_in", rateValue(m_sampleRate), M2kSource::Reopen);
+	m_source->set(dev, "sample_rate_in", rateValue(m_sweep.sampleRate), M2kSource::Reopen);
 	m_source->set(dev, "trigger_streaming_flag", QStringLiteral("0"), M2kSource::Reopen);
 	m_source->set(dev, "trigger_delay", QStringLiteral("0"));
 	m_source->set(dev, "trigger_mode", trigger::toName(trigger::DIGITAL_MODE_OPTIONS, 0));
@@ -225,8 +227,8 @@ void M2kLogicController::setupPlots()
 		if(input != M2kSource::Digital) {
 			return;
 		}
-		m_sampleRate = hz;
-		m_rateSpin->setValueSilent(hz);
+		m_sweep.sampleRate = hz;
+		m_horizontal->setSweep(m_sweep);
 		applyXTransform();
 		syncDecoderRates();
 	});
@@ -249,7 +251,7 @@ void M2kLogicController::setupDecoders()
 	it->addMenuPage(QStringLiteral("decoders"), withStretch({section}));
 
 	scopy::decoder::DecoderManager *mgr = decoders()->manager();
-	mgr->setDecoderWindowSize(m_plotWindow);
+	mgr->setDecoderWindowSize(m_sweep.plotWindow);
 	connect(mgr, &scopy::decoder::DecoderManager::outKeyAdded, this, &M2kLogicController::addDecode);
 	connect(mgr, &scopy::decoder::DecoderManager::stagesRemoved, this,
 		[this](const QString &, const QList<DataKey> &keys) { removeDecodes(keys); });
@@ -334,7 +336,8 @@ void M2kLogicController::setupCenter()
 	connect(m_trigHandle, &PlotAxisHandle::scalePosChanged, this, [this, x](double pos) {
 		const QwtScaleMap map = m_plot->plot()->plot()->canvasMap(x->axisId());
 		const double width = map.s2() - map.s1();
-		const double maxFrac = std::min(1.0, -static_cast<double>(delayMin()) / m_plotWindow);
+		const double maxFrac =
+			std::min(1.0, -static_cast<double>(sweep::delayMin(m_sweep, m_limits)) / m_sweep.plotWindow);
 		m_trigFrac = std::clamp((pos - map.s1()) / width, 0.0, maxFrac);
 		x->setInterval(-m_trigFrac * width, (1.0 - m_trigFrac) * width);
 		m_trigHandle->setPositionSilent(0.0);
@@ -343,7 +346,7 @@ void M2kLogicController::setupCenter()
 		m_plot->replot();
 		m_delayTimer->start();
 	});
-	connect(m_delayTimer, &QTimer::timeout, this, [this]() { setDelay(qRound(-m_trigFrac * m_plotWindow)); });
+	connect(m_delayTimer, &QTimer::timeout, this, [this]() { setDelay(qRound(-m_trigFrac * m_sweep.plotWindow)); });
 
 	m_frameTimer = new QTimer(this);
 	m_frameTimer->setInterval(kFrameIntervalMs);
@@ -411,16 +414,9 @@ void M2kLogicController::setupTopRail()
 QWidget *M2kLogicController::buildGeneralPage()
 {
 	MenuSectionCollapseWidget *section = m_ui->shell()->createMenuSection(tr("SWEEP"), SO_DEV);
-	m_rateSpin = new gui::MenuSpinbox(tr("Sample Rate"), m_sampleRate, QStringLiteral("Hz"), 1, kMaxSampleRate,
-					  true, false, true, section);
-	m_rateSpin->setIncrementMode(gui::MenuSpinbox::IS_125);
-	m_rateSpin->setCircleEnabled(true);
-	m_bufferSpin = samplesSpin(tr("Buffer Size"), m_bufferSize, kMaxBuffer, section);
-	m_windowSpin = samplesSpin(tr("Plot Window"), m_plotWindow, kMaxWindow, section);
-	m_delaySpin = new gui::MenuSpinbox(tr("Delay"), m_delay, QStringLiteral("samples"), delayMin(), kDelayMax, true,
-					   false, true, section);
-	m_delaySpin->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
-	m_delaySpin->setCircleEnabled(true);
+	const int divs = qRound(m_dio[0]->xAxis()->plotAxis()->divs());
+	m_horizontal = new HorizontalSettings(m_limits, divs, HorizontalSettings::Samples, section);
+	m_horizontal->setSweep(m_sweep);
 	m_buffersSwitch = new MenuOnOffSwitch(tr("Show buffers"), section, false);
 	auto *hint = new QLabel(tr("A plot window wider than the buffer streams: it triggers once, then joins "
 				   "consecutive buffers. The delay applies to triggered buffers only."),
@@ -428,19 +424,13 @@ QWidget *M2kLogicController::buildGeneralPage()
 	hint->setWordWrap(true);
 	Style::setStyle(hint, style::properties::label::subtle);
 
-	section->add(m_rateSpin);
-	section->add(m_bufferSpin);
-	section->add(m_windowSpin);
-	section->add(m_delaySpin);
+	section->add(m_horizontal);
 	section->add(m_buffersSwitch);
 	section->add(hint);
 
-	connect(m_rateSpin, &gui::MenuSpinbox::valueChanged, this, &M2kLogicController::setSampleRate);
-	connect(m_bufferSpin, &gui::MenuSpinbox::valueChanged, this,
-		[this](double v) { setBufferSize(static_cast<int>(v)); });
-	connect(m_windowSpin, &gui::MenuSpinbox::valueChanged, this,
-		[this](double v) { setPlotWindow(static_cast<int>(v)); });
-	connect(m_delaySpin, &gui::MenuSpinbox::valueChanged, this, [this](double v) { setDelay(qRound(v)); });
+	connect(m_horizontal, &HorizontalSettings::sweepRequested, this, &M2kLogicController::setSweep);
+	connect(m_horizontal, &HorizontalSettings::timeBaseSamplesChanged, this,
+		[this](int n) { m_limits.timeBaseSamples = n; });
 	connect(m_buffersSwitch->onOffswitch(), &QAbstractButton::toggled, m_plot,
 		&scopy::adc::AcqPlot::setShowBufferStarts);
 	return withStretch({section});
@@ -553,7 +543,7 @@ void M2kLogicController::onCycleComplete()
 {
 	if(m_ui->engine()->isRunning()) {
 		setTriggerStatus(tr("Triggered"));
-		const double bufferMs = 1000.0 * m_bufferSize / m_sampleRate;
+		const double bufferMs = 1000.0 * m_sweep.bufferSize / m_sweep.sampleRate;
 		m_trigWaitTimer->start(kTrigWaitMs + static_cast<int>(bufferMs));
 		if(m_source->bufferDelay(M2kSource::Digital) != m_shownDelay) {
 			m_shownDelay = m_source->bufferDelay(M2kSource::Digital);
@@ -561,11 +551,11 @@ void M2kLogicController::onCycleComplete()
 		}
 	}
 	for(scopy::adc::AcqDigitalChannel *c : m_dio) {
-		c->pull(m_plotWindow);
+		c->pull(m_sweep.plotWindow);
 	}
 	QList<int> rows;
 	for(scopy::adc::AcqAnnotationChannel *d : std::as_const(m_decodes)) {
-		d->pull(m_plotWindow);
+		d->pull(m_sweep.plotWindow);
 		rows.append(d->rowCount());
 	}
 	if(rows != m_decodeRowCounts) {
@@ -593,77 +583,57 @@ void M2kLogicController::single()
 	if(m_ui->engine()->isRunning()) {
 		return;
 	}
-	m_ui->single(static_cast<unsigned int>((m_plotWindow + m_bufferSize - 1) / m_bufferSize));
+	m_ui->single(static_cast<unsigned int>((m_sweep.plotWindow + m_sweep.bufferSize - 1) / m_sweep.bufferSize));
 }
 
-void M2kLogicController::setSampleRate(double hz)
+void M2kLogicController::setSweep(sweep::Sweep s)
 {
-	hz = std::clamp(hz, 1.0, kMaxSampleRate);
-	restartIfRunning([this, hz]() {
-		m_sampleRate = hz;
-		m_source->set(digital(), "sample_rate_in", rateValue(hz), M2kSource::Reopen);
-		applyXTransform();
+	s = sweep::normalized(s, m_limits);
+	if(s.sampleRate == m_sweep.sampleRate && s.bufferSize == m_sweep.bufferSize &&
+	   s.plotWindow == m_sweep.plotWindow) {
+		setDelay(s.delay);
+		return;
+	}
+	restartIfRunning([this, s]() {
+		m_sweep = s;
+		m_source->set(digital(), "sample_rate_in", rateValue(s.sampleRate), M2kSource::Reopen);
+		m_ui->setBufferSize(s.bufferSize);
+		applySweep();
 		syncDecoderRates();
-	});
-}
-
-void M2kLogicController::setBufferSize(int n)
-{
-	n = std::clamp(n, kMinSamples, kMaxBuffer);
-	restartIfRunning([this, n]() {
-		const bool streaming = isStreaming();
-		m_bufferSize = n;
-		m_ui->setBufferSize(n);
-		m_plotWindow = streaming ? std::max(m_plotWindow, n) : n;
-		applySweep();
-	});
-}
-
-void M2kLogicController::setPlotWindow(int n)
-{
-	n = std::clamp(n, m_bufferSize, kMaxWindow);
-	restartIfRunning([this, n]() {
-		m_plotWindow = n;
-		applySweep();
 	});
 }
 
 void M2kLogicController::setDelay(int samples)
 {
-	m_delay = std::clamp(samples, delayMin(), kDelayMax);
-	m_delaySpin->setValueSilent(m_delay);
-	m_source->set(digital(), "trigger_delay", QString::number(isStreaming() ? 0 : m_delay), M2kSource::Restart);
+	m_sweep.delay = sweep::align4(samples, sweep::delayMin(m_sweep, m_limits), kDelayMax);
+	m_horizontal->setSweep(m_sweep);
+	m_source->set(digital(), "trigger_delay", QString::number(isStreaming() ? 0 : m_sweep.delay),
+		      M2kSource::Restart);
 }
 
-int M2kLogicController::delayMin() const { return std::max(kDelayMin, -m_bufferSize); }
-
-double M2kLogicController::timeOffset() const { return isStreaming() ? 0.0 : m_shownDelay / m_sampleRate; }
+double M2kLogicController::timeOffset() const { return isStreaming() ? 0.0 : m_shownDelay / m_sweep.sampleRate; }
 
 void M2kLogicController::applySweep()
 {
-	m_delaySpin->setMinValue(delayMin());
-	// A new window size starts the trigger at its left edge, so the handle never falls off it.
-	setDelay(0);
-	m_shownDelay = 0;
+	setDelay(m_sweep.delay);
+	m_shownDelay = m_sweep.delay;
 	const bool streaming = isStreaming();
 	m_source->set(digital(), "trigger_streaming_flag", streaming ? QStringLiteral("1") : QStringLiteral("0"),
 		      M2kSource::Reopen);
 	m_source->setKernelBuffers(M2kSource::Digital, streaming ? kStreamingKernelBuffers : 1);
-	m_bufferSpin->setValueSilent(m_bufferSize);
-	m_windowSpin->setValueSilent(m_plotWindow);
-	m_delaySpin->setEnabled(!streaming);
+	m_horizontal->setDelayEnabled(!streaming);
 	for(scopy::adc::AcqDigitalChannel *c : m_dio) {
-		c->reclaimDepth(m_plotWindow);
+		c->reclaimDepth(m_sweep.plotWindow);
 	}
 	if(decoders()) {
-		decoders()->manager()->setDecoderWindowSize(m_plotWindow);
+		decoders()->manager()->setDecoderWindowSize(m_sweep.plotWindow);
 	}
 	applyXTransform();
 }
 
 void M2kLogicController::applyXTransform()
 {
-	const double sr = m_sampleRate;
+	const double sr = m_sweep.sampleRate;
 	const bool streaming = isStreaming();
 	const double offset = timeOffset();
 	for(scopy::adc::AcqDigitalChannel *c : m_dio) {
@@ -673,7 +643,7 @@ void M2kLogicController::applyXTransform()
 		d->setXTransform(offset, 1.0 / sr);
 	}
 	m_trigHandle->handle()->setVisible(!streaming && m_trigEnable->isChecked());
-	m_trigHandle->setPositionSilent(std::clamp(0.0, offset, offset + m_plotWindow / sr));
+	m_trigHandle->setPositionSilent(std::clamp(0.0, offset, offset + m_sweep.plotWindow / sr));
 	m_continuityWarning->setVisible(streaming && sr > kMaxContinuousRate);
 	updateSweepInfo();
 	if(!m_ui->engine()->isRunning()) {
@@ -695,8 +665,8 @@ void M2kLogicController::updateSweepInfo()
 	PlotAxis *x = m_dio[0]->xAxis()->plotAxis();
 	const double perDiv = std::abs(x->visibleMax() - x->visibleMin()) / x->divs();
 	m_sweepInfo->setText(tr("%1 samples at %2, %3/div")
-				     .arg(m_plotWindow)
-				     .arg(fmt.format(m_sampleRate, QStringLiteral("sps"), 2))
+				     .arg(m_sweep.plotWindow)
+				     .arg(fmt.format(m_sweep.sampleRate, QStringLiteral("sps"), 2))
 				     .arg(fmt.format(perDiv, QStringLiteral("s"), 2)));
 }
 
@@ -716,7 +686,7 @@ void M2kLogicController::addDecode(const DataKey &key)
 	ch->setName(args.info.label.isEmpty() ? key.channelId() : args.info.label);
 	m_plot->addChannelRef(ch);
 	ch->attach(m_plot);
-	ch->reclaimDepth(m_plotWindow);
+	ch->reclaimDepth(m_sweep.plotWindow);
 	ch->setKeyPresent(true);
 	ch->xAxis()->setUnit(QStringLiteral("s"));
 	ch->handle()->setPositionSilent(-top);
@@ -760,7 +730,7 @@ void M2kLogicController::addDecoderRow(const QString &uid)
 		m_plot->replot();
 	});
 	m_decoderRows.insert(uid, row);
-	editor->setSampleRate(m_sampleRate);
+	editor->setSampleRate(m_sweep.sampleRate);
 	row->click();
 }
 
@@ -790,7 +760,7 @@ void M2kLogicController::syncDecoderRates()
 	}
 	for(const scopy::decoder::DecoderInstance &d : decoders()->manager()->decoders()) {
 		if(scopy::decoder::DecoderEditor *editor = decoders()->editor(d.uid)) {
-			editor->setSampleRate(m_sampleRate);
+			editor->setSampleRate(m_sweep.sampleRate);
 		}
 	}
 }
@@ -891,7 +861,7 @@ bool M2kLogicController::exportData(const QString &path) const
 			continue;
 		}
 		QVector<quint8> b = m_ui->store()->windowAs<QVector<quint8>>(m_source->rawKey(M2kSource::Digital, pin),
-									     m_plotWindow);
+									     m_sweep.plotWindow);
 		if(!b.isEmpty()) {
 			pins.append(pin);
 			bits.append(std::move(b));
@@ -910,7 +880,7 @@ bool M2kLogicController::exportData(const QString &path) const
 		return false;
 	}
 	QTextStream out(&file);
-	const double sr = m_sampleRate;
+	const double sr = m_sweep.sampleRate;
 
 	if(!path.endsWith(QStringLiteral(".vcd"), Qt::CaseInsensitive)) {
 		const double offset = timeOffset();

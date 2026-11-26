@@ -22,6 +22,7 @@
 #pragma once
 
 #include "m2kinstrumentcontroller.h"
+#include "sweepmath.h"
 
 #include <QList>
 #include <QMap>
@@ -52,6 +53,7 @@ class AcqPlot;
 } // namespace scopy
 
 namespace scopy::adalm2000 {
+class HorizontalSettings;
 class M2kSource;
 
 // The ADALM2000 Logic Analyzer: 16 logic tracks and their decodes on one time axis. A plot
@@ -100,9 +102,7 @@ private:
 	void onCycleComplete();
 	void onStopped();
 
-	void setSampleRate(double hz);
-	void setBufferSize(int n);
-	void setPlotWindow(int n);
+	void setSweep(sweep::Sweep s);
 	void setDelay(int samples);
 	void applySweep();
 	void applyXTransform();
@@ -116,8 +116,7 @@ private:
 	int contentBottomPx() const;
 	void applyTrackScroll();
 
-	bool isStreaming() const { return m_plotWindow > m_bufferSize; }
-	int delayMin() const;
+	bool isStreaming() const { return m_sweep.plotWindow > m_sweep.bufferSize; }
 	double timeOffset() const;
 	scopy::component::Device *digital() const;
 	bool hasExternalTrigger() const;
@@ -138,20 +137,15 @@ private:
 	bool m_dirty{false};
 	int m_uid{0};
 
-	double m_sampleRate{1e6};
-	int m_bufferSize{1000};
-	int m_plotWindow{1000};
-	int m_delay{0};
+	sweep::Limits m_limits;
+	sweep::Sweep m_sweep;
 	// The delay of the data on screen, which is what places t = 0.
 	int m_shownDelay{0};
 	double m_trigFrac{0.0};
 
 	MenuControlButton *m_chRow[CHANNELS]{};
 	QPointer<MenuCombo> m_trigger[CHANNELS];
-	QPointer<gui::MenuSpinbox> m_rateSpin;
-	QPointer<gui::MenuSpinbox> m_bufferSpin;
-	QPointer<gui::MenuSpinbox> m_windowSpin;
-	QPointer<gui::MenuSpinbox> m_delaySpin;
+	QPointer<HorizontalSettings> m_horizontal;
 	QPointer<MenuOnOffSwitch> m_buffersSwitch;
 	QPointer<QAbstractButton> m_trigEnable;
 	QPointer<MenuCombo> m_modeCombo;
