@@ -4115,6 +4115,269 @@
         }
       ]
     },
+    "dio": {
+      "methods": [
+        {
+          "name": "directionWord",
+          "args": [],
+          "returns": "int"
+        },
+        {
+          "name": "groupInput",
+          "args": [
+            {
+              "name": "group",
+              "type": "int"
+            }
+          ],
+          "returns": "int"
+        },
+        {
+          "name": "groupOutput",
+          "args": [
+            {
+              "name": "group",
+              "type": "int"
+            }
+          ],
+          "returns": "int"
+        },
+        {
+          "name": "inputWord",
+          "args": [],
+          "returns": "int"
+        },
+        {
+          "name": "isGroupMode",
+          "args": [
+            {
+              "name": "group",
+              "type": "int"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "isGroupOutput",
+          "args": [
+            {
+              "name": "group",
+              "type": "int"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "isUsable",
+          "args": [],
+          "returns": "bool"
+        },
+        {
+          "name": "outputWord",
+          "args": [],
+          "returns": "int"
+        },
+        {
+          "name": "pinInput",
+          "args": [
+            {
+              "name": "pin",
+              "type": "int"
+            }
+          ],
+          "returns": "int"
+        },
+        {
+          "name": "pinOutput",
+          "args": [
+            {
+              "name": "pin",
+              "type": "int"
+            }
+          ],
+          "returns": "int"
+        },
+        {
+          "name": "readInputWord",
+          "args": [],
+          "returns": "int"
+        },
+        {
+          "name": "setDirectionWord",
+          "args": [
+            {
+              "name": "word",
+              "type": "int"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setGroupDirection",
+          "args": [
+            {
+              "name": "group",
+              "type": "int"
+            },
+            {
+              "name": "output",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setGroupMode",
+          "args": [
+            {
+              "name": "group",
+              "type": "int"
+            },
+            {
+              "name": "grouped",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setGroupValue",
+          "args": [
+            {
+              "name": "group",
+              "type": "int"
+            },
+            {
+              "name": "value",
+              "type": "int"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setOutputWord",
+          "args": [
+            {
+              "name": "word",
+              "type": "int"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setPinDirection",
+          "args": [
+            {
+              "name": "pin",
+              "type": "int"
+            },
+            {
+              "name": "output",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setPinOutput",
+          "args": [
+            {
+              "name": "pin",
+              "type": "int"
+            },
+            {
+              "name": "high",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setPolling",
+          "args": [
+            {
+              "name": "on",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setRunning",
+          "args": [
+            {
+              "name": "on",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "shortedWord",
+          "args": [],
+          "returns": "int"
+        },
+        {
+          "name": "show",
+          "args": [],
+          "returns": "void"
+        }
+      ],
+      "properties": [
+        {
+          "name": "dir",
+          "type": "QList<bool>",
+          "read": "direction",
+          "is_list": true,
+          "write": "setDirection",
+          "element_type": "bool"
+        },
+        {
+          "name": "gpi",
+          "type": "QList<bool>",
+          "read": "gpi",
+          "is_list": true,
+          "element_type": "bool"
+        },
+        {
+          "name": "group",
+          "type": "QList<bool>",
+          "read": "grouped",
+          "is_list": true,
+          "write": "setGrouped",
+          "element_type": "bool"
+        },
+        {
+          "name": "locked",
+          "type": "QList<bool>",
+          "read": "locked",
+          "is_list": true,
+          "element_type": "bool"
+        },
+        {
+          "name": "notes",
+          "type": "QString",
+          "read": "getNotes",
+          "is_list": false,
+          "write": "setNotes"
+        },
+        {
+          "name": "out",
+          "type": "QList<bool>",
+          "read": "output",
+          "is_list": true,
+          "write": "setOutput",
+          "element_type": "bool"
+        },
+        {
+          "name": "running",
+          "type": "bool",
+          "read": "running",
+          "is_list": false,
+          "write": "run"
+        }
+      ]
+    },
     "adrv9002": {
       "methods": [
         {
@@ -6769,6 +7032,21 @@
           "doc": "Engine mode: \"continuous\" or \"triggered\". Triggered waits for a fire only with the trigger block enabled; without it, single() is one plain cycle. Refused while running."
         },
         {
+          "name": "setPlotBufferStarts",
+          "args": [
+            {
+              "name": "uuid",
+              "type": "int"
+            },
+            {
+              "name": "on",
+              "type": "bool"
+            }
+          ],
+          "returns": "void",
+          "doc": "Show/hide a strip of labelled blocks along the bottom of a plot, one per acquired buffer, and a dashed vertical line at each boundary between buffers."
+        },
+        {
           "name": "setPlotChannelColor",
           "args": [
             {
@@ -7710,69 +7988,6 @@
           "name": "resetCalibration",
           "args": [],
           "returns": "bool"
-        }
-      ]
-    },
-    "dio": {
-      "methods": [
-        {
-          "name": "show",
-          "args": [],
-          "returns": "void"
-        }
-      ],
-      "properties": [
-        {
-          "name": "dir",
-          "type": "QList<bool>",
-          "read": "direction",
-          "is_list": true,
-          "write": "setDirection",
-          "element_type": "bool"
-        },
-        {
-          "name": "gpi",
-          "type": "QList<bool>",
-          "read": "gpi",
-          "is_list": true,
-          "element_type": "bool"
-        },
-        {
-          "name": "group",
-          "type": "QList<bool>",
-          "read": "grouped",
-          "is_list": true,
-          "write": "setGrouped",
-          "element_type": "bool"
-        },
-        {
-          "name": "locked",
-          "type": "QList<bool>",
-          "read": "locked",
-          "is_list": true,
-          "element_type": "bool"
-        },
-        {
-          "name": "notes",
-          "type": "QString",
-          "read": "getNotes",
-          "is_list": false,
-          "write": "setNotes"
-        },
-        {
-          "name": "out",
-          "type": "QList<bool>",
-          "read": "output",
-          "is_list": true,
-          "write": "setOutput",
-          "element_type": "bool"
-        },
-        {
-          "name": "running",
-          "type": "bool",
-          "read": "running",
-          "is_list": false,
-          "write": "run"
         }
       ]
     },
