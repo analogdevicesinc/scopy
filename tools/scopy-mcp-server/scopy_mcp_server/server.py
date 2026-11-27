@@ -53,10 +53,15 @@ bridge = ScopyBridge()
 
 _API = json.loads((pathlib.Path(__file__).parent / "scopy_api.json").read_text())
 
+_ENABLE_MCP_HINT = (
+    "Scopy 2.2.1 or newer is required. In Scopy, open Preferences > "
+    "General and turn on 'Enable the MCP server' (it is off by default)."
+)
+
 _NO_SCOPY_MSG = (
-    "No running Scopy instance found. "
-    "Please start Scopy manually (it must be built with MCP support), "
-    "or call start_scopy() to launch it."
+    "No running Scopy instance with the MCP server enabled was found. "
+    f"{_ENABLE_MCP_HINT} "
+    "Then start Scopy manually, or call start_scopy() to launch it."
 )
 
 
@@ -85,8 +90,7 @@ def _run_tool(js_code: str) -> str:
     except TimeoutError:
         return (
             "Scopy did not respond within the timeout. "
-            "Check that Scopy is running and the MCP server is active "
-            "(look for 'MCP server listening' in Scopy's log)."
+            f"Check that Scopy is running. {_ENABLE_MCP_HINT}"
         )
 
 
@@ -159,6 +163,16 @@ def start_scopy() -> str:
     try:
         bridge.launch(scopy_path)
         return "Scopy launched successfully and ready to use."
+    except RuntimeError as e:
+        # Raised by bridge._wait_for_server when the MCP socket never appears,
+        # most often because the MCP server preference is off.
+        logger.error(f"Failed to launch Scopy: {e}")
+        return (
+            "Scopy started but its MCP server did not appear within 30s. "
+            f"{_ENABLE_MCP_HINT} It takes effect immediately in the Scopy "
+            "window that just opened; then retry the request (no restart and "
+            "no second start_scopy() call needed)."
+        )
     except Exception as e:
         logger.error(f"Failed to launch Scopy: {e}")
         return f"Failed to launch Scopy: {e}"
