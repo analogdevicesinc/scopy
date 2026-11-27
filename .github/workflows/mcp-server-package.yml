@@ -28,6 +28,7 @@ jobs:
         cp tools/scopy-mcp-server/scopy_mcp_server/scopy_api.json "$PKG/scopy_mcp_server/"
 
         cp tools/scopy-mcp-server/pyproject.toml "$PKG/"
+        cp tools/scopy-mcp-server/uv.lock        "$PKG/"
         cp tools/scopy-mcp-server/setup.py       "$PKG/"
         cp tools/scopy-mcp-server/README.md      "$PKG/"
 
@@ -37,3 +38,33 @@ jobs:
       with:
         name: scopy-mcp-server
         path: scopy-mcp-server.zip
+
+  build-pypi:
+    name: Build Python package (sdist + wheel)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: tools/scopy-mcp-server
+    steps:
+    - uses: actions/checkout@v6
+
+    - uses: astral-sh/setup-uv@v10.4.0
+
+    - name: Build sdist and wheel
+      run: uv build --out-dir dist
+
+    - name: Check metadata
+      run: uvx twine check --strict dist/*
+
+    - name: Smoke test the wheel
+      run: |
+        uv venv /tmp/smoke
+        uv pip install --python /tmp/smoke/bin/python dist/*.whl
+        /tmp/smoke/bin/python -c "import scopy_mcp_server"
+
+    - uses: actions/upload-artifact@v7
+      with:
+        name: scopy-mcp-server-dist
+        path: tools/scopy-mcp-server/dist/
+        if-no-files-found: error

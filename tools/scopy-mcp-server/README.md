@@ -12,12 +12,30 @@ Claude Code ──(MCP stdio)──> scopy-mcp-server ──(Unix socket / named
 ## Prerequisites
 
 - **Python 3.10+**
-- **Scopy** installed — [download here](https://github.com/analogdevicesinc/scopy/releases)
+- **Scopy 2.2.1 or newer** — [download here](https://github.com/analogdevicesinc/scopy/releases)
+- **The MCP server enabled in Scopy** — open *Preferences > General* and turn on *Enable the MCP server*. It is off by default and takes effect immediately, no restart needed.
 - **Claude Code** (CLI, desktop, or IDE extension)
 
 ## Install
 
-### Option A: Download the standalone package (Scopy app users)
+### Option A: From PyPI (recommended)
+
+With [uv](https://docs.astral.sh/uv/) installed, no separate install step is needed. Add this to your `.mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "scopy": {
+      "command": "uvx",
+      "args": ["scopy-mcp-server==2.3.0"]
+    }
+  }
+}
+```
+
+`uvx` downloads the pinned version on first use. On Windows the `pywin32` dependency is installed automatically.
+
+### Option B: Download the standalone package (Scopy app users)
 
 Download `scopy-mcp-server.zip` from the latest [CI build artifacts](https://github.com/analogdevicesinc/scopy/actions/workflows/mcp-server-package.yml), then:
 
@@ -37,7 +55,7 @@ python setup.py
 
 The script installs dependencies (tries [uv](https://docs.astral.sh/uv/), falls back to pip), including the Windows-only `pywin32` package on Windows, and prints the `.mcp.json` snippet to paste into Claude Code.
 
-### Option B: From source (developers)
+### Option C: From source (developers)
 
 **Linux / macOS:**
 ```bash
@@ -104,7 +122,7 @@ Restart Claude Code after changing `.mcp.json`.
 
 The server communicates with Scopy in two modes:
 
-- **Attach mode** — connects to an already-running Scopy via its `QLocalServer` socket (`/tmp/scopy_mcp` on Linux/macOS, `\\.\pipe\scopy_mcp` on Windows). Scopy creates this automatically on startup when built with MCP support.
+- **Attach mode** — connects to an already-running Scopy via its `QLocalServer` socket (`/tmp/scopy_mcp` on Linux/macOS, `\\.\pipe\scopy_mcp` on Windows). Scopy creates it when the *Enable the MCP server* preference is on (Scopy 2.2.1+).
 - **Launch mode** — spawns a new Scopy process and waits for its MCP server socket to appear. Use the `start_scopy()` tool.
 
 Each JS command is a fresh connection: connect → send one line → read `OK:<result>` or `ERROR:<msg>` → close.
@@ -160,7 +178,8 @@ For each Scopy API object (`ad936x`, `adrv9002`, `regmap`, `datalogger`, etc.), 
 
 | Problem | Fix |
 |---------|-----|
-| `No running Scopy instance found` | Start Scopy first (must be built with MCP support), or call `start_scopy()` |
+| `No running Scopy instance ... found` | Use Scopy 2.2.1+ and turn on *Preferences > General > Enable the MCP server*, then start Scopy or call `start_scopy()` |
+| `Scopy started but its MCP server did not appear within 30s` | Turn on *Enable the MCP server* in the Scopy window that opened, then retry the request (no restart needed) |
 | `Scopy binary not found` | Set `SCOPY_PATH` in `.mcp.json` env, or add `scopy` to your PATH |
 | `Scopy did not respond within 10s` | Check Scopy is responsive, try a simpler command |
 | MCP server not showing in Claude Code | Check `.mcp.json` syntax, restart Claude Code |
