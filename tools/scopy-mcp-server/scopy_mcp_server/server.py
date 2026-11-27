@@ -23,15 +23,23 @@ import pathlib
 import shutil
 import sys
 
-from mcp.server.fastmcp import FastMCP
+from importlib.metadata import PackageNotFoundError, version
+
+from mcp.server.mcpserver import MCPServer
 
 from scopy_mcp_server.bridge import ScopyBridge
 
 logging.basicConfig(level=logging.INFO, stream=sys.stderr)
 logger = logging.getLogger("scopy-mcp")
 
-mcp = FastMCP(
+try:
+    __version__ = version("scopy-mcp-server")
+except PackageNotFoundError:
+    __version__ = ""
+
+mcp = MCPServer(
     "Scopy MCP Server",
+    version=__version__,
     instructions=(
         "You are controlling Scopy, a multi-domain instrument application. "
         "Use ONLY the provided MCP tools to interact with Scopy and its instruments. "
